@@ -20,10 +20,10 @@
 
 ## Typography
 
-### Display / Headings: Cormorant Garamond
-- **Weights used:** Light 300 (display), Regular 400 (section headings)
-- **Rationale:** High-contrast transitional serif with dramatic thin strokes. At large sizes, the delicate hairlines create a "whisper, don't shout" effect. Reads as established, European, timeless. Not commonly seen in tech or SaaS -- places the brand firmly in the editorial/luxury space.
-- **Loading:** Google Fonts -- `family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400`
+### Display / Headings: Playfair Display
+- **Weights used:** Regular 400 (display, section headings), Bold 700 (wordmark)
+- **Rationale:** Didone-influenced transitional serif designed by Claus Eggers Sørensen (2011). Strong vertical stress and dramatic thick/thin contrast give it conviction at display sizes. Pairs naturally with the wordmark, which is already set in Playfair Bold. Reads as confident magazine-editorial luxury rather than understated whisper.
+- **Loading:** Google Fonts -- `family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700`
 
 ### Body / UI: Libre Franklin
 - **Weights used:** Light 300 (body text), Regular 400 (UI labels, prices), Medium 500 (overlines, navigation labels)
@@ -34,10 +34,10 @@
 
 | Level | Font | Weight | Size | Line Height | Tracking | Usage |
 |-------|------|--------|------|-------------|----------|-------|
-| Display | Cormorant Garamond | Light 300 | 4rem (64px) | 1.05 | -0.02em | Hero headlines, page titles |
-| H2 | Cormorant Garamond | Regular 400 | 2.5rem (40px) | 1.1 | normal | Section headings |
-| H3 | Cormorant Garamond | Regular 400 | 1.75rem (28px) | 1.2 | normal | Card titles, sub-sections |
-| H4 | Cormorant Garamond | Regular 400 | 1.5rem (24px) | 1.2 | normal | Property names |
+| Display | Playfair Display | Regular 400 | 4rem (64px) | 1.05 | -0.02em | Hero headlines, page titles |
+| H2 | Playfair Display | Regular 400 | 2.5rem (40px) | 1.1 | normal | Section headings |
+| H3 | Playfair Display | Regular 400 | 1.75rem (28px) | 1.2 | normal | Card titles, sub-sections |
+| H4 | Playfair Display | Regular 400 | 1.5rem (24px) | 1.2 | normal | Property names |
 | Body | Libre Franklin | Light 300 | 1rem (16px) | 1.7 | normal | Long-form copy, descriptions |
 | UI | Libre Franklin | Regular 400 | 0.95rem (15.2px) | 1.6 | normal | Input text, prices, labels |
 | Small | Libre Franklin | Regular 400 | 0.9rem (14.4px) | 1.6 | normal | Nav links, card metadata |
@@ -162,7 +162,7 @@ Underline on hover (not at rest). Arrow (`→`) slides right 3px on hover. Color
 - Image: 3:2 aspect ratio, `object-fit: cover`, scales to 1.03 on hover
 - Location badge: white chip overlaid on bottom-left of image
 - Metadata: dot-separated (using pseudo-element `::after` with 3px gold dot)
-- Title: Cormorant Garamond, Regular 400, 1.5rem
+- Title: Playfair Display, Regular 400, 1.5rem
 - Price: Libre Franklin, Regular 400, tabular numerals
 - Footer: separated by 1px border-top, contains text link
 
@@ -191,7 +191,7 @@ Underline on hover (not at rest). Arrow (`→`) slides right 3px on hover. Color
     --border: #E2DED5;
     --muted: #7A7A7A;
 
-    --serif: 'Cormorant Garamond', 'Georgia', serif;
+    --serif: 'Playfair Display', 'Georgia', serif;
     --sans: 'Libre Franklin', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -203,7 +203,7 @@ Underline on hover (not at rest). Arrow (`→`) slides right 3px on hover. Color
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Libre+Franklin:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Libre+Franklin:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 ```
 
 ## Decisions Log
@@ -211,13 +211,14 @@ Underline on hover (not at rest). Arrow (`→`) slides right 3px on hover. Color
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-05-07 | Green + linen + gold palette selected | Derived from the landscape: fairway greens, coastal sand, Mediterranean light. Restrained to 4 core colors. |
-| 2026-05-07 | Cormorant Garamond for display | High-contrast transitional serif. Delicate hairlines create understated luxury at large sizes. Distinctly European. |
+| 2026-05-07 | Cormorant Garamond for display (later reversed -- see 2026-05-12) | High-contrast transitional serif. Delicate hairlines create understated luxury at large sizes. Distinctly European. |
 | 2026-05-07 | Libre Franklin for body/UI | 1912 Franklin Gothic revival. Warm without being quirky. Not on any AI default list. Defers to the serif. |
 | 2026-05-07 | Zero border-radius everywhere | Deliberate departure from convention. Square corners signal precision and editorial authority. |
 | 2026-05-07 | Bottom-border-only form inputs | Another deliberate departure. Forms feel like a considered questionnaire, not a web form. |
 | 2026-05-07 | Asymmetric hero layouts | Editorial composition over centered templates. Text offset, image bleeding to edge. Feels curated. |
-| 2026-05-07 | Rejected Inter, Montserrat, Playfair Display | Inter and Montserrat are overused. Playfair Display is common in luxury templates and reads as "vibe-coded." |
+| 2026-05-07 | Rejected Inter and Montserrat | Inter and Montserrat are overused. (Playfair Display was also rejected here for being common in luxury templates -- this was reversed on 2026-05-12.) |
 | 2026-05-09 | Page background switched from Soft Linen to White | Cleaner, more modern canvas. Linen retained in the palette as a warm surface for feature sections and on-dark contrast; cards now rely on the 1px Stone Border for definition. |
+| 2026-05-12 | Display serif swapped from Cormorant Garamond to Playfair Display | Owner preference. Playfair already used in the wordmark, so unifying the system serif removes the Cormorant/Playfair split. Earlier "vibe-coded" objection acknowledged and overridden -- the higher contrast and stronger conviction were judged more on-brand than Cormorant's whisper. Display weight steps up from Light 300 to Regular 400 (Playfair Display has no Light weight on Google Fonts). Type sizes left unchanged for now -- Playfair sits visually heavier than Cormorant at the same size, so the scale may want a small downward re-tune as it's used in real layouts. |
 
 ## Preview
 See `design-system/index.html` for a live rendering of all tokens and components.
