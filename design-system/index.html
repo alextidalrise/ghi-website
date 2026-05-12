@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golf Homes International — Design System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Libre+Franklin:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #1F3D34;
+            --linen: #F5F1E8;
+            --gold: #D6C3A3;
+            --charcoal: #2B2B2B;
+            --white: #FFFFFF;
+            --border: #E2DED5;
+            --muted: #7A7A7A;
+
+            --serif: 'Cormorant Garamond', 'Georgia', serif;
+            --serif-alt: 'Playfair Display', 'Georgia', serif;
+            --sans: 'Libre Franklin', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--sans);
+            font-weight: 300;
+            color: var(--charcoal);
+            background: var(--white);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.6;
+        }
+
+        img { display: block; max-width: 100%; }
+
+        /* ---- NAV ---- */
+        .ds-nav {
+            position: fixed;
+            top: 0; left: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+        .ds-nav-logo { width: 160px; margin-bottom: 3rem; }
+        .ds-nav-group { margin-bottom: 2rem; }
+        .ds-nav-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 1rem;
+        }
+        .ds-nav-list { list-style: none; }
+        .ds-nav-list li { margin-bottom: 0.75rem; }
+        .ds-nav-list a {
+            font-size: 0.9rem;
+            color: var(--charcoal);
+            text-decoration: none;
+            transition: color 0.3s var(--ease);
+        }
+        .ds-nav-list a:hover { color: var(--gold); }
+        .ds-nav-foot {
+            margin-top: auto;
+            font-size: 0.75rem;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        /* ---- MAIN ---- */
+        .ds-main {
+            margin-left: 260px;
+        }
+        .ds-wrap {
+            max-width: 1060px;
+            margin: 0 auto;
+            padding: 5rem 3rem;
+        }
+
+        /* ---- HEADER ---- */
+        .ds-hero {
+            padding-bottom: 5rem;
+            margin-bottom: 5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .ds-hero-overline {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+        .ds-hero h1 {
+            font-family: var(--serif);
+            font-weight: 300;
+            font-size: 4.5rem;
+            color: var(--green);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+        }
+        .ds-hero-lead {
+            font-family: var(--serif);
+            font-size: 1.35rem;
+            font-weight: 400;
+            color: var(--muted);
+            max-width: 700px;
+            line-height: 1.5;
+        }
+
+        /* ---- SECTIONS ---- */
+        .ds-section {
+            margin-bottom: 7rem;
+        }
+        .ds-section-head {
+            display: flex;
+            align-items: baseline;
+            gap: 1.25rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2.5rem;
+        }
+        .ds-section-num {
+            font-family: var(--serif);
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: var(--gold);
+        }
+        .ds-section-head h2 {
+            font-family: var(--serif);
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--green);
+            line-height: 1.1;
+        }
+        .ds-section-desc {
+            font-size: 0.95rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+        }
+
+        /* ---- GRID HELPERS ---- */
+        .ds-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+        .ds-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+
+        /* ---- BRAND ETHOS ---- */
+        .ds-ethos-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+        }
+        .ds-ethos-card h3 {
+            font-family: var(--serif);
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: var(--green);
+            margin-bottom: 1rem;
+        }
+        .ds-ethos-card p {
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* ---- COLORS ---- */
+        .ds-color-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+        }
+        .ds-swatch { height: 140px; }
+        .ds-color-meta {
+            padding: 1.25rem;
+        }
+        .ds-color-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.25rem;
+        }
+        .ds-color-name {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--charcoal);
+        }
+        .ds-color-hex {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-family: var(--sans);
+        }
+        .ds-color-use {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* ---- TYPOGRAPHY ---- */
+        .ds-type-specimen {
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+        }
+        .ds-type-overline {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+        .ds-type-name-serif {
+            font-family: var(--serif);
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: var(--green);
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+        .ds-type-name-sans {
+            font-family: var(--sans);
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--green);
+            margin-bottom: 0.5rem;
+        }
+        .ds-type-chars {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--charcoal);
+            margin-bottom: 1.5rem;
+            word-break: break-all;
+        }
+        .ds-type-rationale {
+            font-size: 0.9rem;
+            color: var(--muted);
+            line-height: 1.7;
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+        }
+
+        /* Type Scale */
+        .ds-scale-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 2rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border);
+            align-items: baseline;
+        }
+        .ds-scale-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .ds-scale-spec {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 0.25rem;
+            line-height: 1.5;
+        }
+        .ds-scale-display {
+            font-family: var(--serif);
+            font-weight: 300;
+            font-size: 4rem;
+            color: var(--green);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+        }
+        .ds-scale-h2 {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 2.5rem;
+            color: var(--green);
+            line-height: 1.1;
+        }
+        .ds-scale-h3 {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 1.75rem;
+            color: var(--green);
+            line-height: 1.2;
+        }
+        .ds-scale-body {
+            font-family: var(--sans);
+            font-weight: 300;
+            font-size: 1rem;
+            color: var(--charcoal);
+            line-height: 1.7;
+            max-width: 520px;
+        }
+        .ds-scale-overline-demo {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+
+        /* ---- TYPE COMPARISON ---- */
+        .ds-compare {
+            margin-top: 5rem;
+            padding-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+        .ds-compare-head {
+            margin-bottom: 3rem;
+            max-width: 640px;
+        }
+        .ds-compare-overline {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+        .ds-compare-title {
+            font-family: var(--serif);
+            font-weight: 300;
+            font-size: 2.5rem;
+            color: var(--green);
+            line-height: 1.1;
+            margin-bottom: 1.25rem;
+        }
+        .ds-compare-lead {
+            font-family: var(--sans);
+            font-weight: 300;
+            font-size: 1rem;
+            color: var(--charcoal);
+            line-height: 1.7;
+        }
+
+        .ds-compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .ds-compare-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+        }
+        .ds-compare-tag {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.75rem;
+        }
+        .ds-compare-meta {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--charcoal);
+            margin-bottom: 2.25rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            line-height: 1.6;
+        }
+        .ds-compare-meta span {
+            color: var(--muted);
+        }
+        .ds-compare-row-label {
+            font-family: var(--sans);
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.6rem;
+        }
+        .ds-compare-wordmark {
+            font-size: 3.4rem;
+            color: var(--green);
+            line-height: 1;
+            letter-spacing: -0.005em;
+            margin-bottom: 2rem;
+        }
+        .ds-compare-wordmark.pf {
+            font-family: var(--serif-alt);
+            font-weight: 700;
+        }
+        .ds-compare-wordmark.cm {
+            font-family: var(--serif);
+            font-weight: 600;
+        }
+        .ds-compare-display {
+            font-size: 4rem;
+            color: var(--green);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+        }
+        .ds-compare-display.pf {
+            font-family: var(--serif-alt);
+            font-weight: 400;
+        }
+        .ds-compare-display.cm {
+            font-family: var(--serif);
+            font-weight: 300;
+        }
+        .ds-compare-pangram {
+            font-size: 1.4rem;
+            color: var(--charcoal);
+            line-height: 1.4;
+        }
+        .ds-compare-pangram.pf {
+            font-family: var(--serif-alt);
+            font-weight: 400;
+        }
+        .ds-compare-pangram.cm {
+            font-family: var(--serif);
+            font-weight: 400;
+        }
+        .ds-compare-pangram em {
+            font-style: italic;
+            color: var(--green);
+        }
+
+        /* Letter-by-letter atomic grid */
+        .ds-letter-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            background: var(--border);
+            border: 1px solid var(--border);
+            gap: 1px;
+            margin-top: 2rem;
+        }
+        .ds-letter-cell {
+            background: var(--white);
+            padding: 2rem 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .ds-letter-glyph {
+            font-size: 5.5rem;
+            color: var(--green);
+            line-height: 0.95;
+            margin-bottom: 0.5rem;
+        }
+        .ds-letter-glyph.pf {
+            font-family: var(--serif-alt);
+            font-weight: 400;
+        }
+        .ds-letter-glyph.cm {
+            font-family: var(--serif);
+            font-weight: 400;
+            border-top: 1px dashed var(--border);
+            padding-top: 1.25rem;
+            margin-top: 0.25rem;
+            width: 100%;
+            text-align: center;
+        }
+        .ds-letter-foot {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--sans);
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .ds-letter-foot .pf-tag { color: var(--green); }
+        .ds-letter-foot .cm-tag { color: var(--muted); }
+
+        /* Verdict notes */
+        .ds-compare-notes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+        .ds-compare-note h4 {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 1.4rem;
+            color: var(--green);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        .ds-compare-note p {
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--charcoal);
+            line-height: 1.7;
+            margin-bottom: 0.75rem;
+        }
+        .ds-compare-note p:last-child {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        /* Compact card variant for the additional comparison rows */
+        .ds-compare-card-tight {
+            padding: 2rem 2.25rem 2.25rem;
+        }
+
+        /* Headlines list */
+        .ds-compare-headline {
+            font-size: 2.4rem;
+            color: var(--green);
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .ds-compare-headline:first-of-type { padding-top: 0.5rem; }
+        .ds-compare-headline:last-child { border-bottom: 0; padding-bottom: 0.25rem; }
+        .ds-compare-headline.pf { font-family: var(--serif-alt); font-weight: 400; }
+        .ds-compare-headline.cm { font-family: var(--serif); font-weight: 400; }
+
+        /* Weight ladder */
+        .ds-weight-row {
+            display: grid;
+            grid-template-columns: 110px 1fr;
+            align-items: baseline;
+            padding: 0.9rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .ds-weight-row:first-of-type { padding-top: 0.5rem; }
+        .ds-weight-row:last-child { border-bottom: 0; padding-bottom: 0.25rem; }
+        .ds-weight-label {
+            font-family: var(--sans);
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .ds-weight-glyph {
+            font-size: 2.4rem;
+            color: var(--green);
+            line-height: 1;
+        }
+        .ds-weight-glyph.pf { font-family: var(--serif-alt); }
+        .ds-weight-glyph.cm { font-family: var(--serif); }
+
+        /* In-context mock card */
+        .ds-mockcard {
+            padding-top: 0.25rem;
+        }
+        .ds-mockcard-overline {
+            font-family: var(--sans);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.25rem;
+        }
+        .ds-mockcard-title {
+            font-size: 2.2rem;
+            color: var(--green);
+            font-weight: 400;
+            line-height: 1.15;
+            margin-bottom: 1rem;
+        }
+        .ds-mockcard-title.pf { font-family: var(--serif-alt); }
+        .ds-mockcard-title.cm { font-family: var(--serif); }
+        .ds-mockcard-meta {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .ds-mockcard-price {
+            font-family: var(--sans);
+            font-size: 1.05rem;
+            font-weight: 400;
+            font-feature-settings: 'tnum';
+            color: var(--green);
+            padding-top: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Numerals */
+        .ds-numerals {
+            font-size: 3.2rem;
+            color: var(--green);
+            line-height: 1.1;
+            font-feature-settings: 'tnum';
+            margin: 0.5rem 0 1.25rem;
+        }
+        .ds-numerals.pf { font-family: var(--serif-alt); font-weight: 400; }
+        .ds-numerals.cm { font-family: var(--serif); font-weight: 400; }
+        .ds-numerals-line {
+            font-size: 1.5rem;
+            color: var(--charcoal);
+            line-height: 1.4;
+            font-feature-settings: 'tnum';
+            padding: 0.7rem 0;
+            border-top: 1px solid var(--border);
+        }
+        .ds-numerals-line.pf { font-family: var(--serif-alt); font-weight: 400; }
+        .ds-numerals-line.cm { font-family: var(--serif); font-weight: 400; }
+
+        /* Sub-divider for "More comparisons" */
+        .ds-compare-divider {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+        .ds-compare-divider-title {
+            font-family: var(--serif);
+            font-weight: 300;
+            font-size: 1.6rem;
+            color: var(--green);
+            margin-bottom: 0.5rem;
+        }
+        .ds-compare-divider-lead {
+            font-family: var(--sans);
+            font-size: 0.9rem;
+            color: var(--muted);
+            line-height: 1.6;
+            max-width: 580px;
+        }
+
+        @media (max-width: 900px) {
+            .ds-compare-grid { grid-template-columns: 1fr; }
+            .ds-letter-grid { grid-template-columns: repeat(2, 1fr); }
+            .ds-compare-notes { grid-template-columns: 1fr; gap: 2rem; }
+            .ds-compare-wordmark, .ds-compare-display { font-size: 2.6rem; }
+            .ds-letter-glyph { font-size: 4rem; }
+            .ds-compare-headline, .ds-weight-glyph, .ds-mockcard-title { font-size: 2rem; }
+            .ds-numerals { font-size: 2.6rem; }
+        }
+
+        /* ---- SPACING ---- */
+        .ds-spacing-row {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .ds-spacing-box {
+            background: var(--gold);
+            opacity: 0.35;
+            flex-shrink: 0;
+        }
+        .ds-spacing-label {
+            font-size: 0.85rem;
+            color: var(--charcoal);
+        }
+        .ds-spacing-value {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-family: var(--sans);
+        }
+
+        /* ---- BUTTONS ---- */
+        .ds-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.875rem 2rem;
+            font-family: var(--sans);
+            font-weight: 400;
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s var(--ease);
+            border: none;
+        }
+        .ds-btn-primary {
+            background: var(--green);
+            color: var(--white);
+            border: 1px solid var(--green);
+        }
+        .ds-btn-primary:hover {
+            background: var(--charcoal);
+            border-color: var(--charcoal);
+        }
+        .ds-btn-outline {
+            background: transparent;
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
+        .ds-btn-outline:hover {
+            background: var(--green);
+            color: var(--white);
+        }
+        .ds-btn-gold {
+            background: var(--gold);
+            color: var(--green);
+            border: 1px solid var(--gold);
+        }
+        .ds-btn-gold:hover {
+            background: var(--green);
+            color: var(--white);
+            border-color: var(--green);
+        }
+
+        .ds-link {
+            font-size: 0.9rem;
+            color: var(--green);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 2px;
+            transition: all 0.3s var(--ease);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .ds-link:hover {
+            border-bottom-color: var(--gold);
+            color: var(--gold);
+        }
+        .ds-link .arrow {
+            transition: transform 0.3s var(--ease);
+            font-size: 1.1em;
+        }
+        .ds-link:hover .arrow { transform: translateX(3px); }
+
+        /* ---- COMPONENT BLOCK ---- */
+        .ds-comp-block {
+            margin-bottom: 3rem;
+        }
+        .ds-comp-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 1.25rem;
+        }
+        .ds-comp-row {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .ds-comp-surface {
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 2rem;
+        }
+
+        /* ---- PROPERTY CARD ---- */
+        .ds-property-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+        }
+        .ds-property-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(31,61,52,0.06);
+        }
+        .ds-property-img {
+            position: relative;
+            aspect-ratio: 3/2;
+            overflow: hidden;
+        }
+        .ds-property-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s var(--ease);
+        }
+        .ds-property-card:hover .ds-property-img img {
+            transform: scale(1.03);
+        }
+        .ds-property-location {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background: var(--white);
+            padding: 0.4rem 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--charcoal);
+        }
+        .ds-property-body {
+            padding: 2rem;
+        }
+        .ds-property-meta {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+            align-items: center;
+        }
+        .ds-property-meta span:not(:last-child)::after {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 50%;
+            margin-left: 0.75rem;
+            vertical-align: middle;
+        }
+        .ds-property-title {
+            font-family: var(--serif);
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--green);
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
+        }
+        .ds-property-price {
+            font-family: var(--sans);
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--charcoal);
+            margin-bottom: 1.5rem;
+            font-feature-settings: 'tnum';
+        }
+        .ds-property-foot {
+            border-top: 1px solid var(--border);
+            padding-top: 1.25rem;
+        }
+
+        /* ---- HERO MOCKUP ---- */
+        .ds-mockup {
+            background: var(--green);
+            margin-bottom: 3rem;
+            overflow: hidden;
+        }
+        .ds-mockup-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 480px;
+        }
+        .ds-mockup-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem;
+        }
+        .ds-mockup-overline {
+            font-family: var(--sans);
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+        .ds-mockup-h1 {
+            font-family: var(--serif);
+            font-size: 3.2rem;
+            font-weight: 300;
+            color: var(--linen);
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            margin-bottom: 1.5rem;
+        }
+        .ds-mockup-body {
+            font-family: var(--sans);
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: rgba(245,241,232,0.7);
+            line-height: 1.7;
+            max-width: 380px;
+            margin-bottom: 2.5rem;
+        }
+        .ds-mockup-img {
+            position: relative;
+        }
+        .ds-mockup-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .ds-btn-on-dark {
+            background: transparent;
+            color: var(--linen);
+            border: 1px solid rgba(245,241,232,0.4);
+            font-family: var(--sans);
+            font-weight: 400;
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
+            padding: 0.875rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s var(--ease);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .ds-btn-on-dark:hover {
+            background: var(--linen);
+            color: var(--green);
+            border-color: var(--linen);
+        }
+
+        /* ---- FORM ---- */
+        .ds-form {
+            max-width: 440px;
+        }
+        .ds-form-group {
+            margin-bottom: 1.75rem;
+        }
+        .ds-form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--charcoal);
+            margin-bottom: 0.5rem;
+        }
+        .ds-input {
+            width: 100%;
+            padding: 0.875rem 0;
+            font-family: var(--sans);
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: var(--charcoal);
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            transition: border-color 0.3s var(--ease);
+            border-radius: 0;
+            outline: none;
+        }
+        .ds-input::placeholder { color: #b5b5b5; }
+        .ds-input:focus { border-bottom-color: var(--green); }
+        .ds-select-wrap { position: relative; }
+        .ds-select-wrap::after {
+            content: '\2193';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--green);
+        }
+        .ds-select {
+            width: 100%;
+            padding: 0.875rem 2rem 0.875rem 0;
+            font-family: var(--sans);
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: var(--charcoal);
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+            border-radius: 0;
+            transition: border-color 0.3s var(--ease);
+        }
+        .ds-select:focus { border-bottom-color: var(--green); }
+
+        /* ---- DARK MODE ---- */
+        .ds-dark-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 48px;
+            height: 48px;
+            background: var(--green);
+            color: var(--linen);
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s var(--ease);
+            z-index: 200;
+        }
+        .ds-dark-toggle:hover {
+            background: var(--charcoal);
+        }
+
+        body.dark {
+            --green: #C5D6C0;
+            --linen: #151B17;
+            --charcoal: #E8E5DF;
+            --white: #1C231E;
+            --border: #2A332C;
+            --muted: #8A8A8A;
+            --gold: #D6C3A3;
+            background: var(--linen);
+            color: var(--charcoal);
+        }
+        body.dark .ds-nav {
+            background: #1C231E;
+            border-right-color: var(--border);
+        }
+        body.dark .ds-nav-logo {
+            filter: brightness(0) invert(0.85);
+        }
+        body.dark .ds-mockup {
+            background: #0E1410;
+        }
+        body.dark .ds-mockup-h1 { color: #C5D6C0; }
+        body.dark .ds-mockup-body { color: rgba(197,214,192,0.6); }
+        body.dark .ds-mockup-overline { color: var(--gold); }
+        body.dark .ds-btn-on-dark {
+            color: #C5D6C0;
+            border-color: rgba(197,214,192,0.3);
+        }
+        body.dark .ds-btn-on-dark:hover {
+            background: #C5D6C0;
+            color: #0E1410;
+        }
+        body.dark .ds-btn-primary {
+            background: #C5D6C0;
+            color: #151B17;
+            border-color: #C5D6C0;
+        }
+        body.dark .ds-btn-outline {
+            color: #C5D6C0;
+            border-color: #C5D6C0;
+        }
+        body.dark .ds-btn-outline:hover {
+            background: #C5D6C0;
+            color: #151B17;
+        }
+
+        /* ---- MOBILE HEADER & NAV DRAWER (off by default on large screens) ---- */
+        .ds-mobile-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 250;
+            height: 3.25rem;
+            padding: 0 1rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+        .ds-mobile-logo {
+            width: 120px;
+            height: auto;
+            flex-shrink: 0;
+        }
+        .ds-nav-toggle {
+            flex-shrink: 0;
+            font-family: var(--sans);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--green);
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.85rem;
+            cursor: pointer;
+            transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+        }
+        .ds-nav-toggle:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .ds-nav-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 230;
+            background: rgba(43, 43, 43, 0.35);
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body.ds-nav-open .ds-nav-backdrop {
+            display: block;
+        }
+
+        @media (max-width: 960px) {
+            .ds-mobile-bar {
+                display: flex;
+            }
+            .ds-nav-backdrop {
+                top: 3.25rem;
+                height: calc(100dvh - 3.25rem);
+            }
+            .ds-nav {
+                top: 3.25rem;
+                left: 0;
+                width: min(280px, 88vw);
+                height: calc(100dvh - 3.25rem);
+                padding: 2rem 1.5rem 2rem;
+                transform: translateX(-100%);
+                transition: transform 0.35s var(--ease);
+                box-shadow: none;
+                border-right: 1px solid var(--border);
+                z-index: 240;
+            }
+            body.ds-nav-open .ds-nav {
+                transform: translateX(0);
+                box-shadow: 8px 0 32px rgba(31, 61, 52, 0.12);
+            }
+            .ds-nav-logo {
+                width: 140px;
+                margin-bottom: 2rem;
+            }
+            .ds-main {
+                margin-left: 0;
+                padding-top: 3.25rem;
+            }
+            .ds-wrap {
+                padding: 2.5rem 1.25rem 4rem;
+            }
+            .ds-hero {
+                padding-bottom: 3rem;
+                margin-bottom: 3rem;
+            }
+            .ds-hero h1 {
+                font-size: clamp(2.5rem, 10vw, 3.5rem);
+            }
+            .ds-hero-lead {
+                font-size: 1.1rem;
+            }
+            .ds-section {
+                margin-bottom: 4.5rem;
+            }
+            .ds-section-head {
+                flex-wrap: wrap;
+                gap: 0.75rem 1rem;
+            }
+            .ds-section-head h2 {
+                font-size: clamp(1.75rem, 6vw, 2.5rem);
+            }
+            .ds-grid-2 {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .ds-grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            .ds-ethos-card,
+            .ds-type-specimen {
+                padding: 1.75rem;
+            }
+            .ds-type-name-serif {
+                font-size: 2rem;
+            }
+            .ds-type-name-sans {
+                font-size: 1.5rem;
+            }
+            .ds-scale-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 1.5rem 0;
+            }
+            .ds-scale-display {
+                font-size: clamp(2.25rem, 8vw, 3.25rem);
+            }
+            .ds-scale-h2 {
+                font-size: clamp(1.65rem, 5vw, 2.5rem);
+            }
+            .ds-scale-h3 {
+                font-size: 1.35rem;
+            }
+            .ds-spacing-row {
+                flex-wrap: wrap;
+                gap: 0.75rem 1rem;
+            }
+            .ds-mockup-inner {
+                grid-template-columns: 1fr;
+                min-height: 0;
+            }
+            .ds-mockup-text {
+                padding: 2.25rem 1.5rem;
+                order: 1;
+            }
+            .ds-mockup-img {
+                order: 2;
+                min-height: 220px;
+            }
+            .ds-mockup-img img {
+                min-height: 220px;
+                object-fit: cover;
+            }
+            .ds-mockup-h1 {
+                font-size: clamp(2rem, 7vw, 3.2rem);
+            }
+            .ds-dark-toggle {
+                bottom: 1rem;
+                right: 1rem;
+                width: 44px;
+                height: 44px;
+            }
+            body.dark .ds-mobile-bar {
+                background: #1C231E;
+                border-bottom-color: var(--border);
+            }
+            body.dark .ds-nav-toggle {
+                color: #C5D6C0;
+                border-color: var(--border);
+            }
+            body.dark .ds-mobile-logo {
+                filter: brightness(0) invert(0.85);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .ds-grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .ds-swatch {
+                height: 100px;
+            }
+            .ds-color-meta-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+            .ds-weight-row {
+                grid-template-columns: 1fr;
+                gap: 0.35rem;
+            }
+            .ds-compare-pangram {
+                font-size: 1.15rem;
+            }
+            .ds-property-body {
+                padding: 1.5rem;
+            }
+            .ds-comp-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .ds-comp-row .ds-btn {
+                justify-content: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ds-nav {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="ds-mobile-bar">
+        <img src="assets/logo.png" alt="Golf Homes International" class="ds-mobile-logo">
+        <button type="button" class="ds-nav-toggle" id="navToggle" aria-expanded="false" aria-controls="siteNav">Menu</button>
+    </header>
+    <button type="button" class="ds-nav-backdrop" id="navBackdrop" aria-hidden="true" tabindex="-1"></button>
+
+    <!-- Nav -->
+    <nav class="ds-nav" id="siteNav">
+        <img src="assets/logo.png" alt="Golf Homes International" class="ds-nav-logo">
+        <div class="ds-nav-group">
+            <p class="ds-nav-label">Foundation</p>
+            <ul class="ds-nav-list">
+                <li><a href="#brand">Brand Ethos</a></li>
+                <li><a href="#colors">Color Palette</a></li>
+                <li><a href="#typography">Typography</a></li>
+                <li><a href="#type-compare" style="padding-left: 1rem; color: var(--muted); font-size: 0.85rem;">— Cormorant vs Playfair</a></li>
+                <li><a href="#spacing">Grid & Spacing</a></li>
+            </ul>
+        </div>
+        <div class="ds-nav-group">
+            <p class="ds-nav-label">Components</p>
+            <ul class="ds-nav-list">
+                <li><a href="#buttons">Buttons & Links</a></li>
+                <li><a href="#cards">Property Cards</a></li>
+                <li><a href="#hero">Hero Layout</a></li>
+                <li><a href="#forms">Form Elements</a></li>
+            </ul>
+        </div>
+        <div class="ds-nav-foot">
+            <p>Golf Homes International<br>Design System v1.0<br>May 2026</p>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="ds-main">
+        <div class="ds-wrap">
+
+            <!-- Hero -->
+            <header class="ds-hero" id="top">
+                <p class="ds-hero-overline">Visual Identity</p>
+                <h1>Design<br>System</h1>
+                <p class="ds-hero-lead">The digital foundation for Golf Homes International. A framework built around calm exclusivity, reflecting the prestige and serenity of southern Europe's premier golf estates.</p>
+            </header>
+
+            <!-- 01 Brand Ethos -->
+            <section class="ds-section" id="brand">
+                <div class="ds-section-head">
+                    <span class="ds-section-num">01</span>
+                    <h2>Brand Ethos</h2>
+                </div>
+                <div class="ds-grid-2">
+                    <div class="ds-ethos-card">
+                        <h3>A Private Club,<br>Not a Portal.</h3>
+                        <p>The site should feel like being handed a leather-bound portfolio in a quiet room. Photography speaks first. Typography frames it. Nothing is loud. The brand earns attention through restraint, not through competing for it.</p>
+                    </div>
+                    <div class="ds-ethos-card">
+                        <h3>Rooted in<br>the Landscape.</h3>
+                        <p>Every color traces back to the terrain: the deep green of manicured fairways, the warm sand of coastal dunes, the bleached linen of Mediterranean light. The palette is the place.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 02 Colors -->
+            <section class="ds-section" id="colors">
+                <div class="ds-section-head">
+                    <span class="ds-section-num">02</span>
+                    <h2>Color Palette</h2>
+                </div>
+                <p class="ds-section-desc">A restrained palette. White is the primary canvas; linen warms feature sections and pairs with photography. Deep Golf Green handles typography and structural weight. Sand Gold is used sparingly for accents and interactive states only.</p>
+
+                <div class="ds-grid-4">
+                    <div class="ds-color-card">
+                        <div class="ds-swatch" style="background: #1F3D34;"></div>
+                        <div class="ds-color-meta">
+                            <div class="ds-color-meta-row">
+                                <span class="ds-color-name">Deep Golf Green</span>
+                                <span class="ds-color-hex">#1F3D34</span>
+                            </div>
+                            <span class="ds-color-use">Primary. Typography, structural borders, dark backgrounds.</span>
+                        </div>
+                    </div>
+                    <div class="ds-color-card">
+                        <div class="ds-swatch" style="background: #F5F1E8;"></div>
+                        <div class="ds-color-meta">
+                            <div class="ds-color-meta-row">
+                                <span class="ds-color-name">Soft Linen</span>
+                                <span class="ds-color-hex">#F5F1E8</span>
+                            </div>
+                            <span class="ds-color-use">Surface. Warm tone for feature sections, alternating panels, and photography mounts.</span>
+                        </div>
+                    </div>
+                    <div class="ds-color-card">
+                        <div class="ds-swatch" style="background: #D6C3A3;"></div>
+                        <div class="ds-color-meta">
+                            <div class="ds-color-meta-row">
+                                <span class="ds-color-name">Sand Gold</span>
+                                <span class="ds-color-hex">#D6C3A3</span>
+                            </div>
+                            <span class="ds-color-use">Accent. Interactive states, overlines, and highlights.</span>
+                        </div>
+                    </div>
+                    <div class="ds-color-card">
+                        <div class="ds-swatch" style="background: #FFFFFF; border-bottom: 1px solid #E2DED5;"></div>
+                        <div class="ds-color-meta">
+                            <div class="ds-color-meta-row">
+                                <span class="ds-color-name">White</span>
+                                <span class="ds-color-hex">#FFFFFF</span>
+                            </div>
+                            <span class="ds-color-use">Background. Primary canvas across all surfaces; cards are defined by 1px borders.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 03 Typography -->
+            <section class="ds-section" id="typography">
+                <div class="ds-section-head">
+                    <span class="ds-section-num">03</span>
+                    <h2>Typography</h2>
+                </div>
+
+                <div class="ds-grid-2" style="margin-bottom: 4rem;">
+                    <div class="ds-type-specimen">
+                        <p class="ds-type-overline">Display Serif / Headings</p>
+                        <h3 class="ds-type-name-serif">Cormorant Garamond</h3>
+                        <p class="ds-type-chars" style="font-family: var(--serif);">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm<br>Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz<br>0 1 2 3 4 5 6 7 8 9</p>
+                        <p class="ds-type-rationale">High-contrast transitional serif with dramatic thin strokes. At large sizes, the delicate hairlines create a "whisper, don't shout" effect. Reads as established, European, timeless.</p>
+                    </div>
+                    <div class="ds-type-specimen">
+                        <p class="ds-type-overline">Body Sans / UI</p>
+                        <h3 class="ds-type-name-sans">Libre Franklin</h3>
+                        <p class="ds-type-chars" style="font-family: var(--sans);">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm<br>Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz<br>0 1 2 3 4 5 6 7 8 9</p>
+                        <p class="ds-type-rationale">A revival of Morris Fuller Benton's 1912 Franklin Gothic. Genuine warmth in the letterforms without being quirky. Not on any AI's default list. It looks like good taste, quietly.</p>
+                    </div>
+                </div>
+
+                <div class="ds-scale-row">
+                    <div>
+                        <p class="ds-scale-label">Display</p>
+                        <p class="ds-scale-spec">Cormorant Garamond<br>Light 300 / 4rem / -0.02em</p>
+                    </div>
+                    <div class="ds-scale-display">Sanctuary.</div>
+                </div>
+                <div class="ds-scale-row">
+                    <div>
+                        <p class="ds-scale-label">Heading 2</p>
+                        <p class="ds-scale-spec">Cormorant Garamond<br>Regular 400 / 2.5rem</p>
+                    </div>
+                    <div class="ds-scale-h2">The Algarve Collection</div>
+                </div>
+                <div class="ds-scale-row">
+                    <div>
+                        <p class="ds-scale-label">Heading 3</p>
+                        <p class="ds-scale-spec">Cormorant Garamond<br>Regular 400 / 1.75rem</p>
+                    </div>
+                    <div class="ds-scale-h3">Villa Los Flamingos, Marbella</div>
+                </div>
+                <div class="ds-scale-row">
+                    <div>
+                        <p class="ds-scale-label">Body</p>
+                        <p class="ds-scale-spec">Libre Franklin<br>Light 300 / 1rem / 170%</p>
+                    </div>
+                    <div class="ds-scale-body">Wake up to panoramic views of rolling fairways. Our properties offer unparalleled access to world-class golfing, a lifestyle rooted in tranquility, and communities built around shared passion.</div>
+                </div>
+                <div class="ds-scale-row">
+                    <div>
+                        <p class="ds-scale-label">Overline</p>
+                        <p class="ds-scale-spec">Libre Franklin<br>Medium 500 / 0.7rem / 0.15em</p>
+                    </div>
+                    <div class="ds-scale-overline-demo">Featured Property</div>
+                </div>
+
+                <!-- Comparison study: Cormorant vs Playfair -->
+                <div class="ds-compare" id="type-compare">
+                    <div class="ds-compare-head">
+                        <p class="ds-compare-overline">Comparison Study</p>
+                        <h3 class="ds-compare-title">Cormorant Garamond <span style="color: var(--muted);">vs</span> Playfair Display</h3>
+                        <p class="ds-compare-lead">The logo is set in Playfair Display Bold. The system is set in Cormorant Garamond. They are both transitional serifs, but they hold different convictions. Worth seeing them next to each other before deciding whether to unify, separate by role, or replace.</p>
+                    </div>
+
+                    <!-- Wordmark row -->
+                    <div class="ds-compare-grid">
+                        <div class="ds-compare-card">
+                            <p class="ds-compare-tag">As the Logo</p>
+                            <p class="ds-compare-meta">Playfair Display <span>/ Bold 700 / Didone-influenced transitional, 2011</span></p>
+                            <p class="ds-compare-row-label">Wordmark — 3.4rem</p>
+                            <div class="ds-compare-wordmark pf">Golf Homes</div>
+                            <p class="ds-compare-row-label">Display — 4rem / Regular 400</p>
+                            <div class="ds-compare-display pf">Sanctuary.</div>
+                            <p class="ds-compare-row-label">Pangram — 1.4rem / Regular &amp; Italic</p>
+                            <p class="ds-compare-pangram pf">A quiet villa above the <em>Algarve</em> coastline, framed by old olive trees &amp; the eighteenth fairway.</p>
+                        </div>
+                        <div class="ds-compare-card">
+                            <p class="ds-compare-tag">As the System</p>
+                            <p class="ds-compare-meta">Cormorant Garamond <span>/ SemiBold 600 + Light 300 / Garamond reinterpretation, 2014</span></p>
+                            <p class="ds-compare-row-label">Wordmark — 3.4rem / SemiBold 600</p>
+                            <div class="ds-compare-wordmark cm">Golf Homes</div>
+                            <p class="ds-compare-row-label">Display — 4rem / Light 300</p>
+                            <div class="ds-compare-display cm">Sanctuary.</div>
+                            <p class="ds-compare-row-label">Pangram — 1.4rem / Regular &amp; Italic</p>
+                            <p class="ds-compare-pangram cm">A quiet villa above the <em>Algarve</em> coastline, framed by old olive trees &amp; the eighteenth fairway.</p>
+                        </div>
+                    </div>
+
+                    <!-- Atomic letterform comparison -->
+                    <p class="ds-compare-row-label" style="margin-top: 3rem; margin-bottom: 1rem;">Letter-by-letter — top: Playfair Regular &nbsp;·&nbsp; bottom: Cormorant Regular</p>
+                    <div class="ds-letter-grid">
+                        <div class="ds-letter-cell">
+                            <div class="ds-letter-glyph pf">G</div>
+                            <div class="ds-letter-glyph cm">G</div>
+                            <div class="ds-letter-foot"><span class="pf-tag">PF</span><span class="cm-tag">CM</span></div>
+                        </div>
+                        <div class="ds-letter-cell">
+                            <div class="ds-letter-glyph pf">Q</div>
+                            <div class="ds-letter-glyph cm">Q</div>
+                            <div class="ds-letter-foot"><span class="pf-tag">PF</span><span class="cm-tag">CM</span></div>
+                        </div>
+                        <div class="ds-letter-cell">
+                            <div class="ds-letter-glyph pf">g</div>
+                            <div class="ds-letter-glyph cm">g</div>
+                            <div class="ds-letter-foot"><span class="pf-tag">PF</span><span class="cm-tag">CM</span></div>
+                        </div>
+                        <div class="ds-letter-cell">
+                            <div class="ds-letter-glyph pf">a</div>
+                            <div class="ds-letter-glyph cm">a</div>
+                            <div class="ds-letter-foot"><span class="pf-tag">PF</span><span class="cm-tag">CM</span></div>
+                        </div>
+                        <div class="ds-letter-cell">
+                            <div class="ds-letter-glyph pf">&amp;</div>
+                            <div class="ds-letter-glyph cm">&amp;</div>
+                            <div class="ds-letter-foot"><span class="pf-tag">PF</span><span class="cm-tag">CM</span></div>
+                        </div>
+                    </div>
+
+                    <!-- More comparisons -->
+                    <div class="ds-compare-divider">
+                        <h4 class="ds-compare-divider-title">More comparisons</h4>
+                        <p class="ds-compare-divider-lead">Same content set in both faces — alternate headlines, the full weight range, a property card in context, and numerals.</p>
+                    </div>
+
+                    <!-- 1. Alternate headlines -->
+                    <p class="ds-compare-row-label" style="margin-top: 2.5rem; margin-bottom: 1.25rem;">Alternate headlines — Regular 400 / 2.4rem</p>
+                    <div class="ds-compare-grid">
+                        <div class="ds-compare-card ds-compare-card-tight">
+                            <p class="ds-compare-tag">Playfair Display</p>
+                            <div class="ds-compare-headline pf">The Algarve Collection</div>
+                            <div class="ds-compare-headline pf">An Editor&rsquo;s Selection</div>
+                            <div class="ds-compare-headline pf">A House on the Eighteenth</div>
+                            <div class="ds-compare-headline pf">Members Only.</div>
+                        </div>
+                        <div class="ds-compare-card ds-compare-card-tight">
+                            <p class="ds-compare-tag">Cormorant Garamond</p>
+                            <div class="ds-compare-headline cm">The Algarve Collection</div>
+                            <div class="ds-compare-headline cm">An Editor&rsquo;s Selection</div>
+                            <div class="ds-compare-headline cm">A House on the Eighteenth</div>
+                            <div class="ds-compare-headline cm">Members Only.</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Weight ladder -->
+                    <p class="ds-compare-row-label" style="margin-top: 2.5rem; margin-bottom: 1.25rem;">The weight ladder &mdash; Algarve at 2.4rem</p>
+                    <div class="ds-compare-grid">
+                        <div class="ds-compare-card ds-compare-card-tight">
+                            <p class="ds-compare-tag">Playfair Display</p>
+                            <div class="ds-weight-row"><span class="ds-weight-label">Regular 400</span><span class="ds-weight-glyph pf" style="font-weight:400;">Algarve</span></div>
+                            <div class="ds-weight-row"><span class="ds-weight-label">Medium 500</span><span class="ds-weight-glyph pf" style="font-weight:500;">Algarve</span></div>
+                            <div class="ds-weight-row"><span class="ds-weight-label">SemiBold 600</span><span class="ds-weight-glyph pf" style="font-weight:600;">Algarve</span></div>
+                            <div class="ds-weight-row"><span class="ds-weight-label">Bold 700</span><span class="ds-weight-glyph pf" style="font-weight:700;">Algarve</span></div>
+                        </div>
+                        <div class="ds-compare-card ds-compare-card-tight">
+                            <p class="ds-compare-tag">Cormorant Garamond</p>
+                            <div class="ds-weight-row"><span class="ds-weight-label">Light 300</span><span class="ds-weight-glyph cm" style="font-weight:300;">Algarve</span></div>
+                            <div class="ds-weight-row"><span class="ds-weight-label">Regular 400</span><span class="ds-weight-glyph cm" style="font-weight:400;">Algarve</span></div>
+                            <div class="ds-weight-row"><span class="ds-weight-label">Medium 500</span><span class="ds-weight-glyph cm" style="font-weight:500;">Algarve</span></div>
+                            <div class="ds-weight-row"><span class="ds-weight-label">SemiBold 600</span><span class="ds-weight-glyph cm" style="font-weight:600;">Algarve</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. In context: property card -->
+                    <p class="ds-compare-row-label" style="margin-top: 2.5rem; margin-bottom: 1.25rem;">In context — only the title font changes</p>
+                    <div class="ds-compare-grid">
+                        <div class="ds-compare-card ds-compare-card-tight">
+                            <p class="ds-compare-tag">Playfair Display</p>
+                            <div class="ds-mockcard">
+                                <div class="ds-mockcard-overline">Featured Property &middot; Andalucía</div>
+                                <h4 class="ds-mockcard-title pf">Villa Los Flamingos</h4>
+                                <p class="ds-mockcard-meta">Marbella &middot; 6 Bedrooms &middot; 1.4 Hectares</p>
+                                <p class="ds-mockcard-price">&euro;4,250,000</p>
+                            </div>
+                        </div>
+                        <div class="ds-compare-card ds-compare-card-tight">
+                            <p class="ds-compare-tag">Cormorant Garamond</p>
+                            <div class="ds-mockcard">
+                                <div class="ds-mockcard-overline">Featured Property &middot; Andalucía</div>
+                                <h4 class="ds-mockcard-title cm">Villa Los Flamingos</h4>
+                                <p class="ds-mockcard-meta">Marbella &middot; 6 Bedrooms &middot; 1.4 Hectares</p>
+                                <p class="ds-mockcard-price">&euro;4,250,000</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Numerals -->
+                    <p class="ds-compare-row-label" style="margin-top: 2.5rem; margin-bottom: 1.25rem;">Numerals &mdash; tabular figures</p>
+                    <div class="ds-compare-grid">
+                        <div class="ds-compare-card ds-compare-card-tight">
+                            <p class="ds-compare-tag">Playfair Display</p>
+                            <div class="ds-numerals pf">0123456789</div>
+                            <div class="ds-numerals-line pf">&euro;4,250,000</div>
+                            <div class="ds-numerals-line pf">Built 1862 &middot; 18 Holes</div>
+                        </div>
+                        <div class="ds-compare-card ds-compare-card-tight">
+                            <p class="ds-compare-tag">Cormorant Garamond</p>
+                            <div class="ds-numerals cm">0123456789</div>
+                            <div class="ds-numerals-line cm">&euro;4,250,000</div>
+                            <div class="ds-numerals-line cm">Built 1862 &middot; 18 Holes</div>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="ds-compare-notes">
+                        <div class="ds-compare-note">
+                            <h4>What Playfair brings</h4>
+                            <p>Vertical stress, larger x-height, ball terminals on the f and r. The Bold weight has a confident, "established 1962" stamp — anchoring, present, suited to a wordmark.</p>
+                            <p>Trade-off: It is the most-used display serif on the luxury web. Squarespace, Etsy, and most AI-generated sites reach for it. Familiarity is its strength and its weakness.</p>
+                        </div>
+                        <div class="ds-compare-note">
+                            <h4>What Cormorant brings</h4>
+                            <p>Slightly oblique stress, smaller x-height, taller ascenders, more extreme stroke contrast. The Light weight whispers — feels like a private hotel, not a marketplace listing.</p>
+                            <p>Trade-off: Hairlines suffer below 16px on lower-DPI screens. Less recognisable at logo weight. The Bold can read closer to Playfair than you'd expect — see the wordmark above.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 04 Spacing -->
+            <section class="ds-section" id="spacing">
+                <div class="ds-section-head">
+                    <span class="ds-section-num">04</span>
+                    <h2>Grid & Spacing</h2>
+                </div>
+                <p class="ds-section-desc">8px base unit. Comfortable density. The private club feeling comes from everything having room to breathe without looking empty.</p>
+
+                <div class="ds-spacing-row">
+                    <div class="ds-spacing-box" style="width:8px; height:8px;"></div>
+                    <span class="ds-spacing-label">xs</span>
+                    <span class="ds-spacing-value">8px</span>
+                </div>
+                <div class="ds-spacing-row">
+                    <div class="ds-spacing-box" style="width:16px; height:16px;"></div>
+                    <span class="ds-spacing-label">sm</span>
+                    <span class="ds-spacing-value">16px</span>
+                </div>
+                <div class="ds-spacing-row">
+                    <div class="ds-spacing-box" style="width:24px; height:24px;"></div>
+                    <span class="ds-spacing-label">md</span>
+                    <span class="ds-spacing-value">24px</span>
+                </div>
+                <div class="ds-spacing-row">
+                    <div class="ds-spacing-box" style="width:32px; height:32px;"></div>
+                    <span class="ds-spacing-label">lg</span>
+                    <span class="ds-spacing-value">32px</span>
+                </div>
+                <div class="ds-spacing-row">
+                    <div class="ds-spacing-box" style="width:48px; height:48px;"></div>
+                    <span class="ds-spacing-label">xl</span>
+                    <span class="ds-spacing-value">48px</span>
+                </div>
+                <div class="ds-spacing-row">
+                    <div class="ds-spacing-box" style="width:80px; height:80px;"></div>
+                    <span class="ds-spacing-label">2xl</span>
+                    <span class="ds-spacing-value">80px</span>
+                </div>
+            </section>
+
+            <!-- 05 Buttons -->
+            <section class="ds-section" id="buttons">
+                <div class="ds-section-head">
+                    <span class="ds-section-num">05</span>
+                    <h2>Buttons & Links</h2>
+                </div>
+
+                <div class="ds-comp-block">
+                    <p class="ds-comp-label">Primary Actions</p>
+                    <div class="ds-comp-row">
+                        <a href="#" class="ds-btn ds-btn-primary">View Portfolio</a>
+                        <a href="#" class="ds-btn ds-btn-primary">Enquire Now</a>
+                    </div>
+                </div>
+
+                <div class="ds-comp-block">
+                    <p class="ds-comp-label">Secondary Actions</p>
+                    <div class="ds-comp-row ds-comp-surface">
+                        <a href="#" class="ds-btn ds-btn-outline">Discover Marbella</a>
+                        <a href="#" class="ds-btn ds-btn-gold">Read the Journal</a>
+                    </div>
+                </div>
+
+                <div class="ds-comp-block">
+                    <p class="ds-comp-label">Text Links</p>
+                    <div class="ds-comp-row">
+                        <a href="#" class="ds-link">Explore the property <span class="arrow">&rarr;</span></a>
+                        <a href="#" class="ds-link">View floorplans <span class="arrow">&rarr;</span></a>
+                        <a href="#" class="ds-link">Back to listings <span class="arrow">&rarr;</span></a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 06 Property Cards -->
+            <section class="ds-section" id="cards">
+                <div class="ds-section-head">
+                    <span class="ds-section-num">06</span>
+                    <h2>Property Cards</h2>
+                </div>
+                <p class="ds-section-desc">No drop shadows. Crisp 1px borders. Generous internal padding. Photography given maximum visual weight. Square corners throughout.</p>
+
+                <div class="ds-grid-2" style="margin-top: 2.5rem;">
+                    <div class="ds-property-card">
+                        <div class="ds-property-img">
+                            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80" alt="Villa Exterior">
+                            <div class="ds-property-location">Marbella, Spain</div>
+                        </div>
+                        <div class="ds-property-body">
+                            <div class="ds-property-meta">
+                                <span>Villa</span>
+                                <span>4 Beds</span>
+                                <span>5 Baths</span>
+                            </div>
+                            <h4 class="ds-property-title">Villa Los Flamingos</h4>
+                            <p class="ds-property-price">&euro;2,450,000</p>
+                            <div class="ds-property-foot">
+                                <a href="#" class="ds-link">View Details <span class="arrow">&rarr;</span></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ds-property-card">
+                        <div class="ds-property-img">
+                            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80" alt="Modern Villa">
+                            <div class="ds-property-location">Algarve, Portugal</div>
+                        </div>
+                        <div class="ds-property-body">
+                            <div class="ds-property-meta">
+                                <span>Estate</span>
+                                <span>6 Beds</span>
+                                <span>7 Baths</span>
+                            </div>
+                            <h4 class="ds-property-title">Quinta do Lago Estate</h4>
+                            <p class="ds-property-price">&euro;4,800,000</p>
+                            <div class="ds-property-foot">
+                                <a href="#" class="ds-link">View Details <span class="arrow">&rarr;</span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 07 Hero Layout -->
+            <section class="ds-section" id="hero">
+                <div class="ds-section-head">
+                    <span class="ds-section-num">07</span>
+                    <h2>Hero Layout</h2>
+                </div>
+                <p class="ds-section-desc">Asymmetric composition. Text offset to one side, image bleeds to the opposite edge. This editorial approach feels curated rather than templated.</p>
+            </section>
+        </div>
+
+        <!-- Hero Mockup (full-width) -->
+        <div class="ds-mockup">
+            <div class="ds-mockup-inner">
+                <div class="ds-mockup-text">
+                    <p class="ds-mockup-overline">Southern Europe</p>
+                    <h2 class="ds-mockup-h1">Your life on<br>the fairway.</h2>
+                    <p class="ds-mockup-body">Discover an exclusive portfolio of homes on the finest golf courses across Spain and Portugal. Curated for those who understand that home is where the course is.</p>
+                    <div>
+                        <a href="#" class="ds-btn-on-dark">Explore Properties</a>
+                    </div>
+                </div>
+                <div class="ds-mockup-img">
+                    <img src="https://images.unsplash.com/photo-1646204221936-35451c74e3de?auto=format&fit=crop&w=800&q=80" alt="Golf course with ocean view, Marbella">
+                </div>
+            </div>
+        </div>
+
+        <div class="ds-wrap">
+            <!-- 08 Forms -->
+            <section class="ds-section" id="forms" style="margin-bottom: 8rem;">
+                <div class="ds-section-head">
+                    <span class="ds-section-num">08</span>
+                    <h2>Form Elements</h2>
+                </div>
+                <p class="ds-section-desc">Bottom-border inputs only. No boxes. The form should feel like filling in a considered questionnaire, not a web form.</p>
+
+                <div class="ds-comp-surface" style="max-width: 440px; margin-top: 2rem;">
+                    <form class="ds-form">
+                        <div class="ds-form-group">
+                            <label class="ds-form-label">Full Name</label>
+                            <input class="ds-input" type="text" placeholder="Jane Doe">
+                        </div>
+                        <div class="ds-form-group">
+                            <label class="ds-form-label">Email Address</label>
+                            <input class="ds-input" type="email" placeholder="jane@example.com">
+                        </div>
+                        <div class="ds-form-group">
+                            <label class="ds-form-label">Region of Interest</label>
+                            <div class="ds-select-wrap">
+                                <select class="ds-select">
+                                    <option>Costa del Sol, Spain</option>
+                                    <option>Algarve, Portugal</option>
+                                    <option>Sotogrande, Spain</option>
+                                    <option>Vilamoura, Portugal</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="button" class="ds-btn ds-btn-primary" style="width: 100%; justify-content: center; margin-top: 0.5rem;">Submit Enquiry</button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Dark Mode Toggle -->
+    <button class="ds-dark-toggle" id="darkToggle" title="Toggle dark mode">&#9789;</button>
+
+    <script>
+        const setNavOpen = (open) => {
+            document.body.classList.toggle('ds-nav-open', open);
+            const btn = document.getElementById('navToggle');
+            const backdrop = document.getElementById('navBackdrop');
+            if (btn) {
+                btn.setAttribute('aria-expanded', open);
+                btn.textContent = open ? 'Close' : 'Menu';
+            }
+            if (backdrop) backdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
+            document.body.style.overflow = open ? 'hidden' : '';
+        };
+
+        document.getElementById('navToggle')?.addEventListener('click', () => {
+            setNavOpen(!document.body.classList.contains('ds-nav-open'));
+        });
+        document.getElementById('navBackdrop')?.addEventListener('click', () => setNavOpen(false));
+        document.getElementById('siteNav')?.querySelectorAll('a').forEach((a) => {
+            a.addEventListener('click', () => setNavOpen(false));
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') setNavOpen(false);
+        });
+        window.addEventListener('resize', () => {
+            if (window.matchMedia('(min-width: 961px)').matches) setNavOpen(false);
+        });
+
+        const toggle = document.getElementById('darkToggle');
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            toggle.textContent = document.body.classList.contains('dark') ? '\u2600' : '\u263D';
+        });
+    </script>
+
+</body>
+</html>

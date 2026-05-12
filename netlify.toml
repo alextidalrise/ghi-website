@@ -1,0 +1,7 @@
+# Static design system preview — publish folder is the site root on Netlify
+[build]
+  publish = "design-system"
+
+# Optional: keep preview deploys predictable
+[build.environment]
+  NODE_VERSION = "20"
