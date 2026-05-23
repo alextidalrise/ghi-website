@@ -18,6 +18,7 @@ sanity/dist
 sanity/.sanity
 sanity/.env
 sanity/.env.*
+sanity/.env.local
 !sanity/.env.example
 
 # OS
