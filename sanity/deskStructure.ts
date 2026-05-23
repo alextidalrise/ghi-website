@@ -1,9 +1,24 @@
 import type { StructureResolver } from 'sanity/structure';
 
-const APPROVED_FOR_PUBLISH = 'approved_for_publish';
+/**
+ * Individual review-blocker GROQ predicates. A propertyListing appears in the
+ * "Needs review" view when ANY of these evaluate to true. Once every blocker is
+ * resolved and the document is saved, the listing drops out automatically.
+ */
+const REVIEW_BLOCKERS = [
+	'workflow.humanReviewed != true',
+	'workflow.publishReadiness == "governance_hold"',
+	'sensitiveGovernance.sensitiveReviewStatus in ["pending", "in_review", "blocked"]',
+	'sensitiveGovernance.requiresHumanApproval == true',
+	'media.heroImage.publicUseApproved != true',
+	'count(media.gallery[publicUseApproved != true]) > 0',
+	'count(media.gallery[imageRightsStatus == "needs_review"]) > 0',
+	'count(sourceProvenance[publicSafeStatus == "needs_review"]) > 0',
+	'count(workflow.factsNeedingConfirmation) > 0',
+	'count(workflow.missingSourceFields) > 0',
+];
 
-/** Documents with workflow whose publish readiness is not approved. */
-const NEEDS_REVIEW_FILTER = `_type in ["propertyListing", "development", "unit", "unitType"] && coalesce(workflow.publishReadiness, "") != "${APPROVED_FOR_PUBLISH}"`;
+const NEEDS_REVIEW_FILTER = `_type == "propertyListing" && (${REVIEW_BLOCKERS.join(' || ')})`;
 
 export const deskStructure: StructureResolver = (S) =>
 	S.list()
@@ -47,6 +62,7 @@ export const deskStructure: StructureResolver = (S) =>
 				.child(
 					S.documentList()
 						.title('Needs review')
+						.schemaType('propertyListing')
 						.filter(NEEDS_REVIEW_FILTER)
 						.defaultOrdering([{ field: '_updatedAt', direction: 'desc' }])
 				)
