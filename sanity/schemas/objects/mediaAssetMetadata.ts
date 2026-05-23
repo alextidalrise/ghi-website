@@ -110,6 +110,12 @@ export const mediaAssetMetadata = defineType({
 			description: 'Private/internal — never expose publicly.'
 		}),
 		defineField({
+			name: 'sourceFileName',
+			title: 'Source file name',
+			type: 'string',
+			description: 'Original filename from Drive/Dropbox/source media folder. Internal provenance only.'
+		}),
+		defineField({
 			name: 'approvedBy',
 			title: 'Approved by',
 			type: 'string'

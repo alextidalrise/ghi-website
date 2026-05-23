@@ -579,6 +579,7 @@ export type MediaAssetMetadata = {
   imageUsageNotes?: string;
   sourceDriveFileId?: string;
   sourceMediaFolderUrl?: string;
+  sourceFileName?: string;
   approvedBy?: string;
   approvedAt?: string;
 };
@@ -782,6 +783,7 @@ export type SourceProvenance = {
     | "price_list_extraction"
     | "agent_supplied"
     | "drive_sync"
+    | "drive_folder_inventory"
     | "unknown";
   sourceConfidence?: "high" | "medium" | "low" | "unknown";
   publicSafeStatus?:

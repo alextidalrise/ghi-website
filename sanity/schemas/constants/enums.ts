@@ -244,6 +244,7 @@ export const SOURCE_EXTRACTION_METHODS = [
 	{ title: 'Price list extraction', value: 'price_list_extraction' },
 	{ title: 'Agent supplied', value: 'agent_supplied' },
 	{ title: 'Drive sync', value: 'drive_sync' },
+	{ title: 'Drive folder inventory', value: 'drive_folder_inventory' },
 	{ title: 'Unknown', value: 'unknown' }
 ] as const;
 

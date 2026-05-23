@@ -13,6 +13,7 @@ import {
 	schemaViolationExamples
 } from './fixture-payloads';
 import { toPublicDevelopment, toPublicPropertyListing } from '../transforms';
+import { MEDIA_ASSET_PUBLIC } from '../allowlists';
 
 describe('privacy layer 1 — schema validation', () => {
 	it('rejects public price when priceSourceStatus is folder_hint_only', () => {
@@ -116,5 +117,19 @@ describe('privacy layer 3 — server transforms', () => {
 		expect(pub!.media?.heroImage).toBeNull();
 		expect(pub!.media?.gallery).toHaveLength(1);
 		expect(pub!.media?.gallery[0]?.altText).toContain('Approved');
+	});
+
+	it('MEDIA_ASSET_PUBLIC allowlist excludes private media provenance fields', () => {
+		expect(MEDIA_ASSET_PUBLIC).not.toContain('sourceFileName');
+		expect(MEDIA_ASSET_PUBLIC).not.toContain('sourceDriveFileId');
+		expect(MEDIA_ASSET_PUBLIC).not.toContain('sourceMediaFolderUrl');
+	});
+
+	it('fixture 1: public payload excludes private media provenance fields', () => {
+		const pub = toPublicPropertyListing(goldenPropertyRaw);
+		const serialized = JSON.stringify(pub);
+		expect(serialized).not.toContain('sourceFileName');
+		expect(serialized).not.toContain('sourceDriveFileId');
+		expect(serialized).not.toContain('sourceMediaFolderUrl');
 	});
 });
