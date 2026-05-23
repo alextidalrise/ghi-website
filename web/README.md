@@ -1,32 +1,41 @@
-# sv
+# Golf Homes International Web
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-pnpm dlx sv@0.15.3 create --template minimal --types ts --add sveltekit-adapter="adapter:netlify" --no-download-check --install pnpm web
-```
+SvelteKit site for Golf Homes International.
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Install dependencies from the workspace root, then start the web app:
 
 ```sh
-npm run dev
+pnpm install
+pnpm dev
+```
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+For local development, copy `.env.example` to `.env.local`. Local and preview builds should use the Sanity `development` dataset:
+
+```dotenv
+PUBLIC_SANITY_PROJECT_ID=s88o8sjb
+PUBLIC_SANITY_DATASET=development
+```
+
+## Vercel Environments
+
+The Vercel project should keep production and preview pointed at different Sanity datasets:
+
+- Production:
+  - `PUBLIC_SANITY_PROJECT_ID=s88o8sjb`
+  - `PUBLIC_SANITY_DATASET=production`
+- Preview:
+  - `PUBLIC_SANITY_PROJECT_ID=s88o8sjb`
+  - `PUBLIC_SANITY_DATASET=development`
+
+With the Vercel CLI, after logging in and linking the project, add or update them with:
+
+```sh
+printf 'production\n' | vercel env add PUBLIC_SANITY_DATASET production
+printf 'development\n' | vercel env add PUBLIC_SANITY_DATASET preview
+printf 's88o8sjb\n' | vercel env add PUBLIC_SANITY_PROJECT_ID production
+printf 's88o8sjb\n' | vercel env add PUBLIC_SANITY_PROJECT_ID preview
 ```
 
 ## Building
@@ -34,9 +43,9 @@ npm run dev -- --open
 To create a production version of your app:
 
 ```sh
-npm run build
+pnpm build
 ```
 
-You can preview the production build with `npm run preview`.
+You can preview the production build with `pnpm preview`.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+The root `vercel.json` contains the Vercel build command for the workspace.
