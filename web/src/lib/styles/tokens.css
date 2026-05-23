@@ -1,0 +1,57 @@
+/**
+ * Design tokens extracted from design-system/index.html and DESIGN.md.
+ * Source of truth for colour, type, spacing, layout, and motion.
+ */
+
+:root {
+	/* Colour */
+	--green: #1f3d34;
+	--green-deep: #1f3d34;
+	--linen: #f5f1e8;
+	--gold: #d6c3a3;
+	--charcoal: #2b2b2b;
+	--white: #ffffff;
+	--border: #e2ded5;
+	--muted: #7a7a7a;
+	--hero-dark: #0e1410;
+
+	/* Typography families */
+	--serif: 'Playfair Display', 'Georgia', serif;
+	--sans: 'Libre Franklin', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+	/* Type scale */
+	--text-display: clamp(2.25rem, 5vw + 0.5rem, 4rem);
+	--text-h2: clamp(1.5rem, 3vw + 0.75rem, 2.5rem);
+	--text-h3: clamp(1.25rem, 1.5vw + 0.75rem, 1.75rem);
+	--text-h4: 1.375rem;
+	--text-body: 1rem;
+	--text-ui: 0.875rem;
+	--text-small: 0.75rem;
+	--text-overline: 0.6875rem;
+
+	/* Tracking */
+	--tracking-tight: -0.015em;
+	--tracking-wide: 0.04em;
+	--tracking-overline: 0.12em;
+
+	/* Spacing (8px base) */
+	--space-xs: 0.5rem;
+	--space-sm: 1rem;
+	--space-md: 1.5rem;
+	--space-lg: 2rem;
+	--space-xl: 3rem;
+	--space-2xl: 5rem;
+
+	/* Layout */
+	--content-max: 1060px;
+	--content-padding: 3rem;
+	--nav-height: 3.75rem;
+	--section-gap: 7rem;
+	--hero-padding-y: 5rem;
+
+	/* Motion */
+	--ease: cubic-bezier(0.16, 1, 0.3, 1);
+	--duration-hover: 0.3s;
+	--duration-lift: 0.4s;
+	--duration-image: 0.6s;
+}

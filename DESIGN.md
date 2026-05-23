@@ -21,9 +21,10 @@
 ## Typography
 
 ### Display / Headings: Playfair Display
-- **Weights used:** Regular 400 (display, section headings), Bold 700 (wordmark)
+- **Weights used:** SemiBold 600 (display headlines), Regular 400 (section headings), Bold 700 (wordmark)
+- **Italic:** Used for select display moments — hero taglines, pull quotes. The italic cut has a calligraphic quality that adds editorial character at large sizes.
 - **Rationale:** Didone-influenced transitional serif designed by Claus Eggers Sørensen (2011). Strong vertical stress and dramatic thick/thin contrast give it conviction at display sizes. Pairs naturally with the wordmark, which is already set in Playfair Bold. Reads as confident magazine-editorial luxury rather than understated whisper.
-- **Loading:** Google Fonts -- `family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700`
+- **Loading:** Google Fonts -- `family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700`
 
 ### Body / UI: Libre Franklin
 - **Weights used:** Light 300 (body text), Regular 400 (UI labels, prices), Medium 500 (overlines, navigation labels)
@@ -32,17 +33,38 @@
 
 ### Type Scale
 
-| Level | Font | Weight | Size | Line Height | Tracking | Usage |
+All sizes are exposed as CSS custom properties (`--text-*`) on `:root`. Headings use fluid `clamp()` for smooth scaling between mobile and desktop. Body and UI sizes are fixed rem values.
+
+| Token | Font | Weight | Size | Line Height | Tracking | Usage |
 |-------|------|--------|------|-------------|----------|-------|
-| Display | Playfair Display | Regular 400 | 4rem (64px) | 1.05 | -0.02em | Hero headlines, page titles |
-| H2 | Playfair Display | Regular 400 | 2.5rem (40px) | 1.1 | normal | Section headings |
-| H3 | Playfair Display | Regular 400 | 1.75rem (28px) | 1.2 | normal | Card titles, sub-sections |
-| H4 | Playfair Display | Regular 400 | 1.5rem (24px) | 1.2 | normal | Property names |
-| Body | Libre Franklin | Light 300 | 1rem (16px) | 1.7 | normal | Long-form copy, descriptions |
-| UI | Libre Franklin | Regular 400 | 0.95rem (15.2px) | 1.6 | normal | Input text, prices, labels |
-| Small | Libre Franklin | Regular 400 | 0.9rem (14.4px) | 1.6 | normal | Nav links, card metadata |
-| Overline | Libre Franklin | Medium 500 | 0.7rem (11.2px) | normal | 0.15em | Category labels, section markers |
-| Caption | Libre Franklin | Regular 400 | 0.75rem (12px) | 1.5 | normal | Metadata, hex values, fine print |
+| `--text-display` | Playfair Display | SemiBold 600 | clamp(2.25rem, 5vw + 0.5rem, 4rem) | 1.05 | `--tracking-tight` (-0.015em) | Hero headlines, page titles |
+| `--text-h2` | Playfair Display | Regular 400 | clamp(1.5rem, 3vw + 0.75rem, 2.5rem) | 1.1 | normal | Section headings |
+| `--text-h3` | Playfair Display | Regular 400 | clamp(1.25rem, 1.5vw + 0.75rem, 1.75rem) | 1.2 | normal | Card titles, sub-sections |
+| `--text-h4` | Playfair Display | Regular 400 | 1.375rem (22px) | 1.25 | normal | Property names, lead text, small headings |
+| `--text-body` | Libre Franklin | Light 300 | 1rem (16px) | 1.7 | normal | Long-form copy, descriptions, inputs |
+| `--text-ui` | Libre Franklin | Regular 400 | 0.875rem (14px) | 1.5 | normal | Buttons, nav links, form labels, prices |
+| `--text-small` | Libre Franklin | Regular 400 | 0.75rem (12px) | 1.5 | normal | Metadata, captions, hex values, fine print |
+| `--text-overline` | Libre Franklin | Medium 500 | 0.6875rem (11px) | 1 | `--tracking-overline` (0.12em) | Uppercase labels, section markers |
+
+### Tracking Tokens
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--tracking-tight` | -0.015em | Display headings |
+| `--tracking-wide` | 0.04em | Buttons, dimension labels |
+| `--tracking-overline` | 0.12em | All uppercase overlines and labels |
+
+### Modern Typography Features
+- `font-kerning: normal` and `font-optical-sizing: auto` on body
+- `text-wrap: balance` on all headings (h1–h4)
+- `text-wrap: pretty` on body paragraphs and descriptions
+- `font-feature-settings: 'tnum'` for tabular numerals on prices
+
+### Light-on-Dark Compensation
+Body text on dark surfaces (green backgrounds, dark mode panels) gets adjusted for legibility:
+- Weight bumped from 300 to 350
+- Line-height increased to 1.8
+- Letter-spacing added at 0.01em
 
 ### Data / Tables
 - **Font:** Libre Franklin with `font-feature-settings: 'tnum'` for tabular numerals
@@ -162,7 +184,7 @@ Underline on hover (not at rest). Arrow (`→`) slides right 3px on hover. Color
 - Image: 3:2 aspect ratio, `object-fit: cover`, scales to 1.03 on hover
 - Location badge: white chip overlaid on bottom-left of image
 - Metadata: dot-separated (using pseudo-element `::after` with 3px gold dot)
-- Title: Playfair Display, Regular 400, 1.5rem
+- Title: Playfair Display, Regular 400, `--text-h3`
 - Price: Libre Franklin, Regular 400, tabular numerals
 - Footer: separated by 1px border-top, contains text link
 
@@ -218,7 +240,9 @@ Underline on hover (not at rest). Arrow (`→`) slides right 3px on hover. Color
 | 2026-05-07 | Asymmetric hero layouts | Editorial composition over centered templates. Text offset, image bleeding to edge. Feels curated. |
 | 2026-05-07 | Rejected Inter and Montserrat | Inter and Montserrat are overused. (Playfair Display was also rejected here for being common in luxury templates -- this was reversed on 2026-05-12.) |
 | 2026-05-09 | Page background switched from Soft Linen to White | Cleaner, more modern canvas. Linen retained in the palette as a warm surface for feature sections and on-dark contrast; cards now rely on the 1px Stone Border for definition. |
-| 2026-05-12 | Display serif swapped from Cormorant Garamond to Playfair Display | Owner preference. Playfair already used in the wordmark, so unifying the system serif removes the Cormorant/Playfair split. Earlier "vibe-coded" objection acknowledged and overridden -- the higher contrast and stronger conviction were judged more on-brand than Cormorant's whisper. Display weight steps up from Light 300 to Regular 400 (Playfair Display has no Light weight on Google Fonts). Type sizes left unchanged for now -- Playfair sits visually heavier than Cormorant at the same size, so the scale may want a small downward re-tune as it's used in real layouts. |
+| 2026-05-12 | Display serif swapped from Cormorant Garamond to Playfair Display | Owner preference. Playfair already used in the wordmark, so unifying the system serif removes the Cormorant/Playfair split. Earlier "vibe-coded" objection acknowledged and overridden -- the higher contrast and stronger conviction were judged more on-brand than Cormorant's whisper. Display weight steps up from Light 300 to Regular 400 (Playfair Display has no Light weight on Google Fonts). |
+| 2026-05-12 | Typography system consolidated to 8 semantic tokens | 23 arbitrary font sizes consolidated to 8 `--text-*` tokens and 3 `--tracking-*` tokens. Headings (Display, H2, H3) use fluid `clamp()` for responsive sizing, eliminating breakpoint overrides. Modern rendering added: `text-wrap: balance` on headings, `text-wrap: pretty` on paragraphs, `font-kerning: normal`, `font-optical-sizing: auto`. Light-on-dark body text gets weight/spacing/leading compensation. |
+| 2026-05-12 | Display weight bumped to 600, italic introduced for select display moments | Display headings now SemiBold 600 (was Regular 400) to widen the stroke contrast against Light 300 body text -- the weight cascade is now 600 → 400 → 300. Playfair italic activated for hero taglines (e.g. "the fairway") to leverage the calligraphic quality at large sizes. Italic 600 weight added to the Google Fonts request. |
 
 ## Preview
 See `design-system/index.html` for a live rendering of all tokens and components.

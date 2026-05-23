@@ -1,0 +1,21 @@
+{
+	"name": "ghi-website",
+	"private": true,
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "pnpm --filter web dev",
+		"dev:studio": "pnpm --filter sanity dev",
+		"build": "pnpm --filter web build",
+		"build:studio": "pnpm --filter sanity build",
+		"check": "pnpm --filter web check",
+		"test:verification": "pnpm --filter web test:verification",
+		"typegen": "pnpm --filter sanity typegen"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"packageManager": "pnpm@10.12.1",
+	"pnpm": {
+		"onlyBuiltDependencies": ["esbuild"]
+	}
+}

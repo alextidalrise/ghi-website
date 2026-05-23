@@ -1,3 +1,25 @@
 .netlify/
+.vercel/
 .gstack/browse-audit.jsonl
 .gstack/
+
+node_modules
+.pnpm-store
+
+# SvelteKit
+web/.svelte-kit
+web/build
+web/.env
+web/.env.*
+!web/.env.example
+
+# Sanity Studio
+sanity/dist
+sanity/.sanity
+sanity/.env
+sanity/.env.*
+!sanity/.env.example
+
+# OS
+.DS_Store
+Thumbs.db

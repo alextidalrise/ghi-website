@@ -1,0 +1,34 @@
+{
+	"name": "web",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"typegen": "pnpm --dir .. typegen",
+		"dev": "pnpm typegen && vite dev",
+		"build": "pnpm typegen && vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "pnpm typegen && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test": "vitest run",
+		"test:verification": "vitest run src/lib/sanity/verification"
+	},
+	"dependencies": {
+		"@portabletext/svelte": "^3.0.1",
+		"@sanity/client": "^7.14.0",
+		"@sanity/image-url": "^1.2.0",
+		"groq": "^3.88.2"
+	},
+	"devDependencies": {
+		"@portabletext/types": "^4.0.2",
+		"@sveltejs/adapter-vercel": "^6.3.3",
+		"@sveltejs/kit": "^2.57.0",
+		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"svelte": "^5.55.2",
+		"svelte-check": "^4.4.6",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.7",
+		"vitest": "^4.1.7"
+	}
+}

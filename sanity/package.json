@@ -1,0 +1,31 @@
+{
+	"name": "sanity",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "sanity dev",
+		"build": "sanity build",
+		"deploy": "sanity deploy",
+		"start": "sanity start",
+		"datasets:list": "sanity dataset list",
+		"datasets:ensure": "sanity dataset list | grep -q '^development$' || sanity dataset create development --visibility public",
+		"fixtures:seed": "tsx fixtures/verification/seed.ts",
+		"fixtures:seed:dry-run": "tsx fixtures/verification/seed.ts --dry-run",
+		"schema:extract": "sanity schema extract --workspace production --enforce-required-fields --path schema.json",
+		"typegen": "pnpm schema:extract && sanity typegen generate"
+	},
+	"dependencies": {
+		"@sanity/client": "^7.14.0",
+		"@sanity/vision": "^5.20.0",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"sanity": "^5.20.0",
+		"styled-components": "^6.3.12"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.0",
+		"tsx": "^4.20.3",
+		"typescript": "^5.9.3"
+	}
+}
