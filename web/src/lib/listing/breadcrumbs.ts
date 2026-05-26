@@ -13,9 +13,19 @@ export type BreadcrumbItem = {
 	href: string | null;
 };
 
+type BreadcrumbLocation = {
+	country?: LocationTaxonomyRef | null;
+	location?: LocationTaxonomyRef | null;
+	community?: LocationTaxonomyRef | null;
+};
+
 function labelFor(ref: LocationTaxonomyRef | null | undefined): string | null {
 	if (!ref) return null;
 	return ref.breadcrumbLabel ?? ref.name ?? null;
+}
+
+function locationRefs(source: { location?: unknown }): BreadcrumbLocation | null {
+	return (source.location as BreadcrumbLocation | null | undefined) ?? null;
 }
 
 /** Build breadcrumb trail from resolved location taxonomy refs (not URL parsing). */
@@ -23,18 +33,26 @@ export function buildPropertyBreadcrumbs(
 	listing: PublicPropertyListing,
 	canonicalPath: string
 ): BreadcrumbItem[] {
-	const location = listing.location;
+	const location = locationRefs(listing);
 	const items: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
 
 	const country = location?.country;
-	const area = location?.area;
+	const loc = location?.location;
+	const community = location?.community;
 
 	if (country?.slug && labelFor(country)) {
 		items.push({ label: labelFor(country)!, href: `/${country.slug}` });
 	}
 
-	if (area?.slug && country?.slug && labelFor(area)) {
-		items.push({ label: labelFor(area)!, href: `/${country.slug}/${area.slug}` });
+	if (loc?.slug && country?.slug && labelFor(loc)) {
+		items.push({ label: labelFor(loc)!, href: `/${country.slug}/${loc.slug}` });
+	}
+
+	if (community?.slug && loc?.slug && country?.slug && labelFor(community)) {
+		items.push({
+			label: labelFor(community)!,
+			href: `/${country.slug}/${loc.slug}/${community.slug}`
+		});
 	}
 
 	items.push({
@@ -57,10 +75,10 @@ export function buildCountryBreadcrumbs(
 	return items;
 }
 
-/** Build breadcrumb trail for an area stub page. */
-export function buildAreaBreadcrumbs(
+/** Build breadcrumb trail for a location stub page. */
+export function buildLocationBreadcrumbs(
 	country: LocationTaxonomyRef,
-	area: LocationTaxonomyRef,
+	location: LocationTaxonomyRef,
 	canonicalPath: string
 ): BreadcrumbItem[] {
 	const items: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
@@ -69,9 +87,34 @@ export function buildAreaBreadcrumbs(
 		items.push({ label: labelFor(country)!, href: `/${country.slug}` });
 	}
 
-	const areaLabel = labelFor(area);
-	if (areaLabel) {
-		items.push({ label: areaLabel, href: canonicalPath });
+	const locationLabel = labelFor(location);
+	if (locationLabel) {
+		items.push({ label: locationLabel, href: canonicalPath });
+	}
+
+	return items;
+}
+
+/** Build breadcrumb trail for a community stub page. */
+export function buildCommunityBreadcrumbs(
+	country: LocationTaxonomyRef,
+	location: LocationTaxonomyRef,
+	community: LocationTaxonomyRef,
+	canonicalPath: string
+): BreadcrumbItem[] {
+	const items: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
+
+	if (country?.slug && labelFor(country)) {
+		items.push({ label: labelFor(country)!, href: `/${country.slug}` });
+	}
+
+	if (location?.slug && country?.slug && labelFor(location)) {
+		items.push({ label: labelFor(location)!, href: `/${country.slug}/${location.slug}` });
+	}
+
+	const communityLabel = labelFor(community);
+	if (communityLabel) {
+		items.push({ label: communityLabel, href: canonicalPath });
 	}
 
 	return items;
@@ -82,18 +125,26 @@ export function buildDevelopmentBreadcrumbs(
 	development: PublicDevelopment,
 	canonicalPath: string
 ): BreadcrumbItem[] {
-	const location = development.location;
+	const location = locationRefs(development);
 	const items: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
 
 	const country = location?.country;
-	const area = location?.area;
+	const loc = location?.location;
+	const community = location?.community;
 
 	if (country?.slug && labelFor(country)) {
 		items.push({ label: labelFor(country)!, href: `/${country.slug}` });
 	}
 
-	if (area?.slug && country?.slug && labelFor(area)) {
-		items.push({ label: labelFor(area)!, href: `/${country.slug}/${area.slug}` });
+	if (loc?.slug && country?.slug && labelFor(loc)) {
+		items.push({ label: labelFor(loc)!, href: `/${country.slug}/${loc.slug}` });
+	}
+
+	if (community?.slug && loc?.slug && country?.slug && labelFor(community)) {
+		items.push({
+			label: labelFor(community)!,
+			href: `/${country.slug}/${loc.slug}/${community.slug}`
+		});
 	}
 
 	items.push({

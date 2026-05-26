@@ -7,7 +7,8 @@ export const developmentByPathQuery = defineQuery(`
   *[
     _type == "development"
     && location.country->slug.current == $countrySlug
-    && location.area->slug.current == $areaSlug
+    && location.location->slug.current == $locationSlug
+    && location.community->slug.current == $communitySlug
     && slug.current == $slug
     && ${PUBLIC_LISTING_FILTER}
   ][0]${DEVELOPMENT_PUBLIC}
@@ -18,7 +19,8 @@ export const developmentCanonicalPathQuery = defineQuery(`
   *[
     _type == "development"
     && location.country->slug.current == $countrySlug
-    && location.area->slug.current == $areaSlug
+    && location.location->slug.current == $locationSlug
+    && location.community->slug.current == $communitySlug
     && slug.current == $slug
     && ${PUBLIC_LISTING_FILTER}
   ][0]${CANONICAL_PATH}
@@ -34,7 +36,7 @@ export const developmentByGhiIdQuery = defineQuery(`
 `);
 
 /**
- * Find publishable developments by country + slug when the area segment may be stale.
+ * Find publishable developments by country + slug when location/community segments may be stale.
  * Returns canonical path fields for 301 redirect when exactly one match exists.
  */
 export const developmentStalePathQuery = defineQuery(`

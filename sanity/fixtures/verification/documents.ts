@@ -25,11 +25,12 @@ function approvedWorkflow() {
 	};
 }
 
-function verificationLocation(countryId: string, areaId: string) {
+function verificationLocation(countryId: string, locationId: string, communityId: string) {
 	return {
 		_type: 'locationFields' as const,
 		country: { _type: 'reference' as const, _ref: countryId },
-		area: { _type: 'reference' as const, _ref: areaId },
+		location: { _type: 'reference' as const, _ref: locationId },
+		community: { _type: 'reference' as const, _ref: communityId },
 		addressDisplay: 'Costa del Sol, Spain (verification fixture)',
 		mapPrivacyLevel: 'area_only',
 		mapDisplayApproved: false
@@ -87,14 +88,24 @@ export function buildLocationDocuments() {
 			publicDescription: 'Verification fixture country stub.'
 		},
 		{
-			_id: FIXTURE_IDS.area,
+			_id: FIXTURE_IDS.location,
 			_type: 'locationTaxonomy',
 			name: 'Costa del Sol (verification)',
-			slug: { _type: 'slug', current: FIXTURE_SLUGS.area },
-			type: 'area',
+			slug: { _type: 'slug', current: FIXTURE_SLUGS.location },
+			type: 'location',
 			parent: { _type: 'reference', _ref: FIXTURE_IDS.country },
 			breadcrumbLabel: 'Costa del Sol',
-			publicDescription: 'Verification fixture area stub.'
+			publicDescription: 'Verification fixture location stub.'
+		},
+		{
+			_id: FIXTURE_IDS.community,
+			_type: 'locationTaxonomy',
+			name: 'Verification Community',
+			slug: { _type: 'slug', current: FIXTURE_SLUGS.community },
+			type: 'community',
+			parent: { _type: 'reference', _ref: FIXTURE_IDS.location },
+			breadcrumbLabel: 'Verification Community',
+			publicDescription: 'Verification fixture community stub.'
 		}
 	];
 }
@@ -111,7 +122,7 @@ export function buildGoldenProperty(assets: UploadedAssets) {
 		listingKind: 'property',
 		propertyType: 'villa',
 		transactionType: 'sale',
-		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.area),
+		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.location, FIXTURE_IDS.community),
 		pricing: {
 			_type: 'pricingFields',
 			price: 895_000,
@@ -161,7 +172,7 @@ export function buildPrivacyDevelopmentStub(assets: UploadedAssets) {
 		slug: { _type: 'slug', current: FIXTURE_SLUGS.privacyDevelopment },
 		listingKind: 'development',
 		developmentDisplayMode: 'units',
-		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.area),
+		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.location, FIXTURE_IDS.community),
 		pricing: {
 			_type: 'pricingFields',
 			priceDisplay: 'POA',
@@ -268,7 +279,7 @@ export function buildMediaPrivacyProperty(assets: UploadedAssets) {
 		listingKind: 'property',
 		propertyType: 'villa',
 		transactionType: 'sale',
-		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.area),
+		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.location, FIXTURE_IDS.community),
 		pricing: {
 			_type: 'pricingFields',
 			price: 750_000,

@@ -31,7 +31,16 @@ export const locationTaxonomy = defineType({
 			title: 'Parent location',
 			type: 'reference',
 			to: [{ type: 'locationTaxonomy' }],
-			description: 'Parent in the hierarchy (e.g. area → municipality → region → country).'
+			description: 'Parent in the hierarchy (community → location → country).'
+		}),
+		defineField({
+			name: 'associatedLocations',
+			title: 'Associated locations',
+			type: 'array',
+			of: [{ type: 'reference', to: [{ type: 'locationTaxonomy' }] }],
+			description:
+				'Additional locations this community should appear under (beyond its canonical parent).',
+			hidden: ({ document }) => document?.type !== 'community'
 		}),
 		defineField({
 			name: 'breadcrumbLabel',
@@ -72,9 +81,8 @@ export const locationTaxonomy = defineType({
 			parentName: 'parent.name'
 		},
 		prepare({ title, type, parentName }) {
-			const subtitle = [type?.replace(/_/g, ' '), parentName ? `in ${parentName}` : null]
-				.filter(Boolean)
-				.join(' · ');
+			const typeLabel = LOCATION_TAXONOMY_TYPES.find((t) => t.value === type)?.title ?? type;
+			const subtitle = [typeLabel, parentName ? `in ${parentName}` : null].filter(Boolean).join(' · ');
 			return { title: title || 'Location', subtitle: subtitle || undefined };
 		}
 	}

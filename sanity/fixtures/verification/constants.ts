@@ -1,7 +1,8 @@
 /** Stable IDs for idempotent upserts in the development dataset. No dots — Sanity hides dotted IDs from anonymous API clients. */
 export const FIXTURE_IDS = {
 	country: 'verificationFixture-country-spain',
-	area: 'verificationFixture-area-costa-del-sol',
+	location: 'verificationFixture-location-costa-del-sol',
+	community: 'verificationFixture-community-costa-del-sol',
 	goldenProperty: 'verificationFixture-property-golden',
 	privacyDevelopment: 'verificationFixture-development-privacy-units',
 	unitAvailable: 'verificationFixture-unit-available-a',
@@ -17,7 +18,8 @@ export const FIXTURE_GHI_IDS = {
 
 export const FIXTURE_SLUGS = {
 	country: 'spain',
-	area: 'costa-del-sol-verification',
+	location: 'costa-del-sol-verification',
+	community: 'verification-community',
 	goldenProperty: 'verification-golden-villa',
 	privacyDevelopment: 'verification-privacy-units',
 	mediaPrivacyProperty: 'verification-media-privacy'

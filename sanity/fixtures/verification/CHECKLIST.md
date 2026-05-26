@@ -26,9 +26,9 @@ pnpm --filter web test:verification
 
 | # | Type | GHI ID | Canonical URL |
 |---|------|--------|---------------|
-| 1 | Property (golden) | `GHI99001` | `/spain/costa-del-sol-verification/verification-golden-villa` |
-| 2 | Development (privacy) | `GHI99002` | `/spain/costa-del-sol-verification/verification-privacy-units` |
-| 3 | Property (media) | `GHI99003` | `/spain/costa-del-sol-verification/verification-media-privacy` |
+| 1 | Property (golden) | `GHI99001` | `/spain/costa-del-sol-verification/verification-community/verification-golden-villa` |
+| 2 | Development (privacy) | `GHI99002` | `/spain/costa-del-sol-verification/verification-community/verification-privacy-units` |
+| 3 | Property (media) | `GHI99003` | `/spain/costa-del-sol-verification/verification-community/verification-media-privacy` |
 
 Permalinks: `/p/GHI99001`, `/d/GHI99002`, `/p/GHI99003` (301 → canonical).
 
@@ -130,7 +130,7 @@ Start web dev server with `PUBLIC_SANITY_DATASET=development`, then verify each 
 
 ### Fixture 1 — Golden property
 
-URL: `/spain/costa-del-sol-verification/verification-golden-villa`
+URL: `/spain/costa-del-sol-verification/verification-community/verification-golden-villa`
 
 - [ ] Page returns **200** (not 404)
 - [ ] Title shows **Verification Golden Villa**
@@ -141,7 +141,7 @@ URL: `/spain/costa-del-sol-verification/verification-golden-villa`
 
 ### Fixture 2 — Privacy development
 
-URL: `/spain/costa-del-sol-verification/verification-privacy-units`
+URL: `/spain/costa-del-sol-verification/verification-community/verification-privacy-units`
 
 - [ ] Page returns **200**
 - [ ] Development headline renders
@@ -152,7 +152,7 @@ URL: `/spain/costa-del-sol-verification/verification-privacy-units`
 
 ### Fixture 3 — Media privacy property
 
-URL: `/spain/costa-del-sol-verification/verification-media-privacy`
+URL: `/spain/costa-del-sol-verification/verification-community/verification-media-privacy`
 
 - [ ] Page returns **200**
 - [ ] No hero image rendered (fallback layout / no `<img>` for do-not-use asset)

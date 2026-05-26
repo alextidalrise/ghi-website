@@ -13,7 +13,9 @@
 		"fixtures:seed": "tsx fixtures/verification/seed.ts",
 		"fixtures:seed:dry-run": "tsx fixtures/verification/seed.ts --dry-run",
 		"schema:extract": "sanity schema extract --workspace production --enforce-required-fields --path schema.json",
-		"typegen": "pnpm schema:extract && sanity typegen generate"
+		"typegen": "pnpm schema:extract && sanity typegen generate",
+		"migrate:location-hierarchy": "tsx migrations/location-hierarchy-migrate.ts",
+		"migrate:location-hierarchy:dry-run": "tsx migrations/location-hierarchy-migrate.ts --dry-run"
 	},
 	"dependencies": {
 		"@sanity/client": "^7.14.0",

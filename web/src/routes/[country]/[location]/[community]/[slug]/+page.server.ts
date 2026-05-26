@@ -20,21 +20,30 @@ import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/trans
 
 type StalePathRow = {
 	countrySlug?: string | null;
-	areaSlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
 	slug?: string | null;
 };
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const countrySlug = params.country;
-	const areaSlug = params.area;
+	const locationSlug = params.location;
+	const communitySlug = params.community;
 	const slug = params.slug;
 
 	const property = await fetchPublicProperty(propertyByPathQuery, {
-		params: { countrySlug, areaSlug, slug }
+		params: { countrySlug, locationSlug, communitySlug, slug }
 	});
 
 	if (property) {
-		return buildPropertyPagePayload(property, url.origin, countrySlug, areaSlug, slug);
+		return buildPropertyPagePayload(
+			property,
+			url.origin,
+			countrySlug,
+			locationSlug,
+			communitySlug,
+			slug
+		);
 	}
 
 	const stalePropertyMatches = await fetchPublic<StalePathRow[]>(propertyStalePathQuery, {
@@ -44,7 +53,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	if (stalePropertyMatches?.length === 1) {
 		const canonical = stalePropertyMatches[0];
 		if (
-			!pathsMatch({ countrySlug, areaSlug, slug }, canonical) &&
+			!pathsMatch({ countrySlug, locationSlug, communitySlug, slug }, canonical) &&
 			buildCanonicalPath(canonical)
 		) {
 			redirect(301, buildCanonicalPath(canonical)!);
@@ -52,11 +61,18 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	const development = await fetchPublicDevelopment(developmentByPathQuery, {
-		params: { countrySlug, areaSlug, slug }
+		params: { countrySlug, locationSlug, communitySlug, slug }
 	});
 
 	if (development) {
-		return buildDevelopmentPagePayload(development, url.origin, countrySlug, areaSlug, slug);
+		return buildDevelopmentPagePayload(
+			development,
+			url.origin,
+			countrySlug,
+			locationSlug,
+			communitySlug,
+			slug
+		);
 	}
 
 	const staleDevelopmentMatches = await fetchPublic<StalePathRow[]>(developmentStalePathQuery, {
@@ -66,7 +82,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	if (staleDevelopmentMatches?.length === 1) {
 		const canonical = staleDevelopmentMatches[0];
 		if (
-			!pathsMatch({ countrySlug, areaSlug, slug }, canonical) &&
+			!pathsMatch({ countrySlug, locationSlug, communitySlug, slug }, canonical) &&
 			buildCanonicalPath(canonical)
 		) {
 			redirect(301, buildCanonicalPath(canonical)!);
@@ -80,12 +96,14 @@ function buildPropertyPagePayload(
 	property: PublicPropertyListing,
 	siteOrigin: string,
 	countrySlug: string,
-	areaSlug: string,
+	locationSlug: string,
+	communitySlug: string,
 	slug: string
 ) {
 	const canonicalPath = buildCanonicalPath({
 		countrySlug: property.location?.country?.slug ?? countrySlug,
-		areaSlug: property.location?.area?.slug ?? areaSlug,
+		locationSlug: property.location?.location?.slug ?? locationSlug,
+		communitySlug: property.location?.community?.slug ?? communitySlug,
 		slug: property.slug ?? slug
 	});
 
@@ -94,9 +112,10 @@ function buildPropertyPagePayload(
 	}
 
 	if (
-		!pathsMatch({ countrySlug, areaSlug, slug }, {
+		!pathsMatch({ countrySlug, locationSlug, communitySlug, slug }, {
 			countrySlug: property.location?.country?.slug,
-			areaSlug: property.location?.area?.slug,
+			locationSlug: property.location?.location?.slug,
+			communitySlug: property.location?.community?.slug,
 			slug: property.slug
 		})
 	) {
@@ -122,12 +141,14 @@ function buildDevelopmentPagePayload(
 	development: PublicDevelopment,
 	siteOrigin: string,
 	countrySlug: string,
-	areaSlug: string,
+	locationSlug: string,
+	communitySlug: string,
 	slug: string
 ) {
 	const canonicalPath = buildCanonicalPath({
 		countrySlug: development.location?.country?.slug ?? countrySlug,
-		areaSlug: development.location?.area?.slug ?? areaSlug,
+		locationSlug: development.location?.location?.slug ?? locationSlug,
+		communitySlug: development.location?.community?.slug ?? communitySlug,
 		slug: development.slug ?? slug
 	});
 
@@ -136,9 +157,10 @@ function buildDevelopmentPagePayload(
 	}
 
 	if (
-		!pathsMatch({ countrySlug, areaSlug, slug }, {
+		!pathsMatch({ countrySlug, locationSlug, communitySlug, slug }, {
 			countrySlug: development.location?.country?.slug,
-			areaSlug: development.location?.area?.slug,
+			locationSlug: development.location?.location?.slug,
+			communitySlug: development.location?.community?.slug,
 			slug: development.slug
 		})
 	) {

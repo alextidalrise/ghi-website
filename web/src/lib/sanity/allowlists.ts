@@ -25,10 +25,8 @@ export const LOCATION_MAP_INTERNAL = /* groq */ `{
 /** Public location projection — includes internal map fields for server-side transform only. */
 export const LOCATION_PUBLIC = /* groq */ `{
   country->${LOCATION_TAXONOMY_PUBLIC},
-  region->${LOCATION_TAXONOMY_PUBLIC},
-  municipality->${LOCATION_TAXONOMY_PUBLIC},
-  area->${LOCATION_TAXONOMY_PUBLIC},
-  subArea->${LOCATION_TAXONOMY_PUBLIC},
+  location->${LOCATION_TAXONOMY_PUBLIC},
+  community->${LOCATION_TAXONOMY_PUBLIC},
   microLocation,
   addressDisplay,
   mapPrivacyLevel,
@@ -163,7 +161,8 @@ export const PROPERTY_CARD_PUBLIC = /* groq */ `{
   transactionType,
   location{
     country->{ name, "slug": slug.current },
-    area->{ name, "slug": slug.current },
+    location->{ name, "slug": slug.current },
+    community->{ name, "slug": slug.current },
     addressDisplay
   },
   pricing${PRICING_PUBLIC},
@@ -263,7 +262,8 @@ export const DEVELOPMENT_PUBLIC = /* groq */ `{
 /** Canonical path fields for slug resolution and 301 redirects. */
 export const CANONICAL_PATH_FIELDS = /* groq */ `
   "countrySlug": location.country->slug.current,
-  "areaSlug": location.area->slug.current,
+  "locationSlug": location.location->slug.current,
+  "communitySlug": location.community->slug.current,
   "slug": slug.current,
   listingKind
 `;

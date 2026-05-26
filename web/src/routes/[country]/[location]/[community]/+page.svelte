@@ -5,7 +5,7 @@
 	let { data } = $props();
 
 	const placeholderBody = $derived(
-		`Property listings and editorial content for ${data.location.name} coming soon.`
+		`Property listings and editorial content for ${data.community.name} coming soon.`
 	);
 </script>
 
@@ -30,10 +30,16 @@
 	<Breadcrumbs items={data.breadcrumbs} />
 
 	<div class="location-stub__body content-wrap">
-		<h1>{data.location.name}</h1>
+		<h1>{data.community.name}</h1>
 		<p class="location-stub__intro">
-			{data.location.publicDescription ?? placeholderBody}
+			{data.community.publicDescription ?? placeholderBody}
 		</p>
+
+		{#if data.listings.length > 0}
+			<p class="location-stub__count">
+				{data.listings.length} listing{data.listings.length === 1 ? '' : 's'} in this community.
+			</p>
+		{/if}
 	</div>
 </article>
 
@@ -45,5 +51,10 @@
 	.location-stub__intro {
 		margin-top: var(--space-md);
 		max-width: 42rem;
+	}
+
+	.location-stub__count {
+		margin-top: var(--space-lg);
+		color: var(--green);
 	}
 </style>

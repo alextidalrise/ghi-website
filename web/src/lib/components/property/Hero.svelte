@@ -15,7 +15,7 @@
 	);
 	const headline = $derived(listing.content?.heroHeadline ?? listing.publicTitle);
 	const overline = $derived(
-		[listing.location?.area?.name, listing.location?.country?.name].filter(Boolean).join(', ')
+		[listing.location?.community?.name, listing.location?.country?.name].filter(Boolean).join(', ')
 	);
 	const priceLabel = $derived(formatListingPrice(listing.pricing));
 	const propertyLabel = $derived(formatPropertyType(listing.propertyType));

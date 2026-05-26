@@ -13,7 +13,8 @@ export const propertyByPathQuery = defineQuery(`
     _type == "propertyListing"
     && listingKind in ["property", "unit"]
     && location.country->slug.current == $countrySlug
-    && location.area->slug.current == $areaSlug
+    && location.location->slug.current == $locationSlug
+    && location.community->slug.current == $communitySlug
     && slug.current == $slug
     && ${PUBLIC_LISTING_FILTER}
   ][0]${PROPERTY_LISTING_PUBLIC}
@@ -25,7 +26,8 @@ export const propertyCanonicalPathQuery = defineQuery(`
     _type == "propertyListing"
     && listingKind in ["property", "unit"]
     && location.country->slug.current == $countrySlug
-    && location.area->slug.current == $areaSlug
+    && location.location->slug.current == $locationSlug
+    && location.community->slug.current == $communitySlug
     && slug.current == $slug
     && ${PUBLIC_LISTING_FILTER}
   ][0]${CANONICAL_PATH}
@@ -42,7 +44,7 @@ export const propertyByGhiIdQuery = defineQuery(`
 `);
 
 /**
- * Find publishable properties by country + slug when the area segment may be stale.
+ * Find publishable properties by country + slug when location/community segments may be stale.
  * Returns canonical path fields for 301 redirect when exactly one match exists.
  */
 export const propertyStalePathQuery = defineQuery(`
@@ -55,13 +57,25 @@ export const propertyStalePathQuery = defineQuery(`
   ]${CANONICAL_PATH}
 `);
 
-/** Minimal card projection for listings grids (future browse pages). */
-export const propertyCardsByAreaQuery = defineQuery(`
+/** Minimal card projection for listings grids within a community. */
+export const propertyCardsByCommunityQuery = defineQuery(`
   *[
     _type == "propertyListing"
     && listingKind in ["property", "unit"]
     && location.country->slug.current == $countrySlug
-    && location.area->slug.current == $areaSlug
+    && location.location->slug.current == $locationSlug
+    && location.community->slug.current == $communitySlug
+    && ${PUBLIC_LISTING_FILTER}
+  ] | order(publicTitle asc)[$start...$end]${PROPERTY_CARD_PUBLIC}
+`);
+
+/** Minimal card projection for listings grids within a location (all communities). */
+export const propertyCardsByLocationQuery = defineQuery(`
+  *[
+    _type == "propertyListing"
+    && listingKind in ["property", "unit"]
+    && location.country->slug.current == $countrySlug
+    && location.location->slug.current == $locationSlug
     && ${PUBLIC_LISTING_FILTER}
   ] | order(publicTitle asc)[$start...$end]${PROPERTY_CARD_PUBLIC}
 `);

@@ -9,7 +9,8 @@
 		"build:studio": "pnpm --filter sanity build",
 		"check": "pnpm --filter web check",
 		"test:verification": "pnpm --filter web test:verification",
-		"typegen": "pnpm --filter sanity typegen"
+		"typegen": "pnpm --filter sanity typegen",
+		"migrate:location-hierarchy": "pnpm --filter sanity migrate:location-hierarchy"
 	},
 	"engines": {
 		"node": ">=20"

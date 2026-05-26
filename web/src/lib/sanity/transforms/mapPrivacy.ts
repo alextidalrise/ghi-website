@@ -15,10 +15,8 @@ export type LocationTaxonomyRef = {
 
 export type LocationMapInput = {
 	country?: LocationTaxonomyRef | null;
-	region?: LocationTaxonomyRef | null;
-	municipality?: LocationTaxonomyRef | null;
-	area?: LocationTaxonomyRef | null;
-	subArea?: LocationTaxonomyRef | null;
+	location?: LocationTaxonomyRef | null;
+	community?: LocationTaxonomyRef | null;
 	microLocation?: string | null;
 	mapPrivacyLevel?: MapPrivacyLevel | string | null;
 	mapDisplayApproved?: boolean | null;
@@ -73,7 +71,7 @@ export function transformMapPrivacy(location: LocationMapInput | null | undefine
 	}
 
 	const level = (location.mapPrivacyLevel ?? 'hidden') as MapPrivacyLevel;
-	const label = location.addressDisplay ?? location.area?.name ?? null;
+	const label = location.addressDisplay ?? location.location?.name ?? null;
 	const raw = location.coordinates;
 
 	if (level === 'hidden' || !raw?.lat || !raw?.lng) {
@@ -102,8 +100,8 @@ export function transformMapPrivacy(location: LocationMapInput | null | undefine
 	if (level === 'area_only') {
 		return {
 			level: 'area_only',
-			coordinates: jitterCoordinates(raw, AREA_ONLY_JITTER_METRES, `area:${location.area?.slug ?? 'x'}`),
-			label: location.area?.name ?? label
+			coordinates: jitterCoordinates(raw, AREA_ONLY_JITTER_METRES, `area:${location.location?.slug ?? 'x'}`),
+			label: location.location?.name ?? label
 		};
 	}
 

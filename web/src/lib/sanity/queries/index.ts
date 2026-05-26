@@ -11,7 +11,8 @@ export {
 	propertyByGhiIdQuery,
 	propertyCanonicalPathQuery,
 	propertyStalePathQuery,
-	propertyCardsByAreaQuery
+	propertyCardsByCommunityQuery,
+	propertyCardsByLocationQuery
 } from './propertyListing';
 
 export {
@@ -21,9 +22,16 @@ export {
 	developmentStalePathQuery
 } from './development';
 
-export { countryBySlugQuery, areaBySlugQuery, locationBreadcrumbQuery } from './location';
+export {
+	countryBySlugQuery,
+	locationBySlugQuery,
+	communityBySlugQuery,
+	locationsByCountryQuery,
+	communitiesByLocationQuery,
+	locationBreadcrumbQuery
+} from './location';
 
-export { listingByPathQuery } from './listingResolver';
+export { listingByPathQuery, listingLegacyThreeSegmentPathQuery } from './listingResolver';
 
 export {
 	fetchPublic,

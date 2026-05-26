@@ -16,7 +16,9 @@
 	);
 	const headline = $derived(development.content?.heroHeadline ?? development.publicTitle);
 	const overline = $derived(
-		[development.location?.area?.name, development.location?.country?.name].filter(Boolean).join(', ')
+		[development.location?.community?.name, development.location?.country?.name]
+			.filter(Boolean)
+			.join(', ')
 	);
 	const showPricing = $derived(shouldShowDevelopmentPricing(development.developmentDisplayMode));
 	const priceLabel = $derived(showPricing ? formatListingPrice(development.pricing) : null);

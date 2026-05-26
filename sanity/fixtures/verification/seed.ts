@@ -32,7 +32,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ID = process.env.SANITY_STUDIO_PROJECT_ID ?? 's88o8sjb';
-const TOKEN = process.env.SANITY_API_TOKEN ?? readSanityCliAuthToken();
+const TOKEN = process.env.SANITY_API_TOKEN ?? process.env.SANITY_AUTH_TOKEN ?? readSanityCliAuthToken();
 const dryRun = process.argv.includes('--dry-run');
 
 function readSanityCliAuthToken(): string | undefined {
@@ -103,7 +103,9 @@ async function main() {
 		process.exit(1);
 	}
 
-	ensureDevelopmentDataset();
+	if (!process.env.SANITY_API_TOKEN) {
+		ensureDevelopmentDataset();
+	}
 
 	const client = createClient({
 		projectId: PROJECT_ID,
@@ -136,15 +138,10 @@ async function main() {
 	}
 
 	console.log('\nFixture URLs (development dataset, after web dev server is running):');
-	console.log(
-		`  1. Golden property:  /${FIXTURE_SLUGS.country}/${FIXTURE_SLUGS.area}/${FIXTURE_SLUGS.goldenProperty}`
-	);
-	console.log(
-		`  2. Privacy units:    /${FIXTURE_SLUGS.country}/${FIXTURE_SLUGS.area}/${FIXTURE_SLUGS.privacyDevelopment}`
-	);
-	console.log(
-		`  3. Media privacy:    /${FIXTURE_SLUGS.country}/${FIXTURE_SLUGS.area}/${FIXTURE_SLUGS.mediaPrivacyProperty}`
-	);
+	const base = `/${FIXTURE_SLUGS.country}/${FIXTURE_SLUGS.location}/${FIXTURE_SLUGS.community}`;
+	console.log(`  1. Golden property:  ${base}/${FIXTURE_SLUGS.goldenProperty}`);
+	console.log(`  2. Privacy units:    ${base}/${FIXTURE_SLUGS.privacyDevelopment}`);
+	console.log(`  3. Media privacy:    ${base}/${FIXTURE_SLUGS.mediaPrivacyProperty}`);
 	console.log('\nGHI permalinks:');
 	console.log(`  /p/${FIXTURE_GHI_IDS.goldenProperty}`);
 	console.log(`  /d/${FIXTURE_GHI_IDS.privacyDevelopment}`);

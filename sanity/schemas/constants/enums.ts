@@ -305,11 +305,8 @@ export const TRANSACTION_TYPES = [
 
 export const LOCATION_TAXONOMY_TYPES = [
 	{ title: 'Country', value: 'country' },
-	{ title: 'Region', value: 'region' },
-	{ title: 'Municipality', value: 'municipality' },
-	{ title: 'Area', value: 'area' },
-	{ title: 'Sub-area', value: 'sub_area' },
-	{ title: 'Micro-location', value: 'micro_location' }
+	{ title: 'Location', value: 'location' },
+	{ title: 'Community', value: 'community' }
 ] as const;
 
 export const DEVELOPMENT_DISPLAY_MODES = [

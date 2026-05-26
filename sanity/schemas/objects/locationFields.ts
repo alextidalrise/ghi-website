@@ -15,27 +15,15 @@ export const locationFields = defineType({
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
-			name: 'region',
-			title: 'Region',
-			type: 'reference',
-			to: [{ type: 'locationTaxonomy' }]
-		}),
-		defineField({
-			name: 'municipality',
-			title: 'Municipality',
-			type: 'reference',
-			to: [{ type: 'locationTaxonomy' }]
-		}),
-		defineField({
-			name: 'area',
-			title: 'Area',
+			name: 'location',
+			title: 'Location',
 			type: 'reference',
 			to: [{ type: 'locationTaxonomy' }],
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
-			name: 'subArea',
-			title: 'Sub-area',
+			name: 'community',
+			title: 'Community',
 			type: 'reference',
 			to: [{ type: 'locationTaxonomy' }]
 		}),

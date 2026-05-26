@@ -259,11 +259,11 @@ export const development = defineType({
 			title: 'developmentName',
 			publicTitle: 'publicTitle',
 			ghiId: 'ghiListingId',
-			area: 'location.area.name',
+			location: 'location.location.name',
 			displayMode: 'developmentDisplayMode'
 		},
-		prepare({ title, publicTitle, ghiId, area, displayMode }) {
-			const subtitle = [ghiId, area, displayMode?.replace(/_/g, ' ')].filter(Boolean).join(' · ');
+		prepare({ title, publicTitle, ghiId, location: locationName, displayMode }) {
+			const subtitle = [ghiId, locationName, displayMode?.replace(/_/g, ' ')].filter(Boolean).join(' · ');
 			return {
 				title: title || publicTitle || 'Development',
 				subtitle: subtitle || undefined

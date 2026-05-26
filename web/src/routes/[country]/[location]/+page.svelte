@@ -7,6 +7,16 @@
 	const placeholderBody = $derived(
 		`Property listings and editorial content for ${data.location.name} coming soon.`
 	);
+
+	function communityHref(community: {
+		slug?: string | null;
+		canonicalLocationSlug?: string | null;
+	}) {
+		if (!community.slug || !community.canonicalLocationSlug || !data.country.slug) {
+			return null;
+		}
+		return `/${data.country.slug}/${community.canonicalLocationSlug}/${community.slug}`;
+	}
 </script>
 
 <svelte:head>
@@ -35,16 +45,35 @@
 			{data.location.publicDescription ?? placeholderBody}
 		</p>
 
-		{#if data.locations.length > 0}
-			<section class="location-stub__list" aria-labelledby="locations-heading">
-				<h2 id="locations-heading">Locations</h2>
+		{#if data.directCommunities.length > 0}
+			<section class="location-stub__list" aria-labelledby="communities-heading">
+				<h2 id="communities-heading">Communities</h2>
 				<ul>
-					{#each data.locations as location (location._id)}
+					{#each data.directCommunities as community (community._id)}
+						{@const href = communityHref(community)}
 						<li>
-							{#if location.slug}
-								<a href="/{data.location.slug}/{location.slug}">{location.name}</a>
+							{#if href}
+								<a {href}>{community.name}</a>
 							{:else}
-								{location.name}
+								{community.name}
+							{/if}
+						</li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
+
+		{#if data.associatedCommunities.length > 0}
+			<section class="location-stub__list" aria-labelledby="associated-communities-heading">
+				<h2 id="associated-communities-heading">Also in this area</h2>
+				<ul>
+					{#each data.associatedCommunities as community (community._id)}
+						{@const href = communityHref(community)}
+						<li>
+							{#if href}
+								<a {href}>{community.name}</a>
+							{:else}
+								{community.name}
 							{/if}
 						</li>
 					{/each}

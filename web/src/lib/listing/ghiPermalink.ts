@@ -6,7 +6,8 @@ const GHI_ID_PATTERN = /^GHI[0-9]{5}$/;
 
 type CanonicalPathRow = {
 	countrySlug?: string | null;
-	areaSlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
 	slug?: string | null;
 };
 

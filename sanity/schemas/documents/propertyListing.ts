@@ -196,11 +196,11 @@ export const propertyListing = defineType({
 			ghiId: 'ghiListingId',
 			propertyType: 'propertyType',
 			listingKind: 'listingKind',
-			area: 'location.area.name',
+			location: 'location.location.name',
 			priceDisplay: 'pricing.priceDisplay'
 		},
-		prepare({ title, internalTitle, ghiId, propertyType, listingKind, area, priceDisplay }) {
-			const subtitle = [ghiId, propertyType, listingKind, area, priceDisplay]
+		prepare({ title, internalTitle, ghiId, propertyType, listingKind, location: locationName, priceDisplay }) {
+			const subtitle = [ghiId, propertyType, listingKind, locationName, priceDisplay]
 				.filter(Boolean)
 				.join(' · ');
 			return {

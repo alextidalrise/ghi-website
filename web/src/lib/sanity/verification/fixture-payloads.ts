@@ -30,7 +30,13 @@ function blockedAsset(ref: string, alt: string, rights: 'do_not_use' | 'restrict
 
 const sharedLocation = {
 	country: { _id: 'c1', name: 'Spain', slug: 'spain', type: 'country' },
-	area: { _id: 'a1', name: 'Costa del Sol', slug: 'costa-del-sol-verification', type: 'area' },
+	location: { _id: 'a1', name: 'Costa del Sol', slug: 'costa-del-sol-verification', type: 'location' },
+	community: {
+		_id: 'cm1',
+		name: 'Verification Community',
+		slug: 'verification-community',
+		type: 'community'
+	},
 	addressDisplay: 'Costa del Sol, Spain',
 	mapPrivacyLevel: 'area_only' as const,
 	mapDisplayApproved: false
