@@ -13,17 +13,17 @@ function approvedAsset(ref: string, alt: string): MediaAssetInput {
 		asset: imageRef(ref),
 		altText: alt,
 		assetBrandingType: 'ghi_branded',
-		imageRightsStatus: 'assumed_approved',
+		imageRightsStatus: 'approved',
 		publicUseApproved: true
 	};
 }
 
-function blockedAsset(ref: string, alt: string, rights: 'do_not_use' | 'restricted'): MediaAssetInput {
+function blockedAsset(ref: string, alt: string, rights: 'rejected' | 'do_not_use' | 'restricted' = 'rejected'): MediaAssetInput {
 	return {
 		asset: imageRef(ref),
 		altText: alt,
 		assetBrandingType: 'third_party_branded',
-		imageRightsStatus: rights,
+		imageRightsStatus: rights === 'rejected' ? 'rejected' : rights,
 		publicUseApproved: false
 	};
 }
@@ -178,7 +178,7 @@ export const schemaViolationExamples = {
 	},
 	restrictedApproved: {
 		assetBrandingType: 'third_party_branded',
-		imageRightsStatus: 'restricted',
+		imageRightsStatus: 'rejected',
 		publicUseApproved: true
 	}
 } as const;

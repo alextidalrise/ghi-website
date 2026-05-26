@@ -40,14 +40,14 @@ function verificationLocation(countryId: string, locationId: string, communityId
 function approvedMediaAsset(
 	assetId: string,
 	altText: string,
-	rights: 'assumed_approved' | 'ghi_branded' = 'assumed_approved'
+	rights: 'approved' | 'ghi_branded' = 'approved'
 ) {
 	return {
 		_type: 'mediaAssetMetadata' as const,
 		asset: imageRef(assetId),
 		altText,
 		assetBrandingType: rights === 'ghi_branded' ? 'ghi_branded' : 'unbranded',
-		imageRightsStatus: 'assumed_approved',
+		imageRightsStatus: 'approved',
 		publicUseApproved: true
 	};
 }
@@ -55,14 +55,14 @@ function approvedMediaAsset(
 function blockedMediaAsset(
 	assetId: string,
 	altText: string,
-	rights: 'do_not_use' | 'restricted'
+	rights: 'rejected' | 'do_not_use' | 'restricted' = 'rejected'
 ) {
 	return {
 		_type: 'mediaAssetMetadata' as const,
 		asset: imageRef(assetId),
 		altText,
 		assetBrandingType: 'third_party_branded',
-		imageRightsStatus: rights,
+		imageRightsStatus: rights === 'rejected' ? 'rejected' : rights,
 		publicUseApproved: false
 	};
 }

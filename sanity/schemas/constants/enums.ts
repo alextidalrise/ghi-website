@@ -159,11 +159,36 @@ export const ASSET_BRANDING_TYPES = [
 ] as const;
 
 export const IMAGE_RIGHTS_STATUSES = [
-	{ title: 'Assumed approved', value: 'assumed_approved' },
-	{ title: 'Confirmed approved', value: 'confirmed_approved' },
-	{ title: 'Needs review', value: 'needs_review' },
-	{ title: 'Restricted', value: 'restricted' },
-	{ title: 'Do not use', value: 'do_not_use' }
+	{ title: 'Source pack provided', value: 'source_pack_provided' },
+	{ title: 'Specific concern', value: 'specific_concern' },
+	{ title: 'Needs rights review', value: 'needs_rights_review' },
+	{ title: 'Approved', value: 'approved' },
+	{ title: 'Rejected', value: 'rejected' }
+] as const;
+
+export const REVIEW_SEVERITIES = [
+	{ title: 'Must check', value: 'must_check' },
+	{ title: 'Nice to check', value: 'nice_to_check' },
+	{ title: 'Internal note', value: 'internal_note' }
+] as const;
+
+export const REVIEW_SOURCE_LEVELS = [
+	{ title: 'Window card', value: 'window_card' },
+	{ title: 'Brochure', value: 'brochure' },
+	{ title: 'Source folder', value: 'source_folder' },
+	{ title: 'Deep audit', value: 'deep_audit' },
+	{ title: 'Derived', value: 'derived' }
+] as const;
+
+export const REVIEW_CATEGORIES = [
+	{ title: 'Price', value: 'price' },
+	{ title: 'Facts', value: 'facts' },
+	{ title: 'Media', value: 'media' },
+	{ title: 'Location', value: 'location' },
+	{ title: 'Copy', value: 'copy' },
+	{ title: 'SEO', value: 'seo' },
+	{ title: 'Legal', value: 'legal' },
+	{ title: 'Internal', value: 'internal' }
 ] as const;
 
 export const BROCHURE_VISIBILITY = [

@@ -115,6 +115,11 @@ export type WorkflowFields = {
       _key: string;
     } & ChannelReadinessItem
   >;
+  reviewItems?: Array<
+    {
+      _key: string;
+    } & ReviewItem
+  >;
   factsNeedingConfirmation?: Array<string>;
   missingSourceFields?: Array<string>;
   approvalNotes?: string;
@@ -566,11 +571,11 @@ export type MediaAssetMetadata = {
     | "unbranded"
     | "unknown";
   imageRightsStatus:
-    | "assumed_approved"
-    | "confirmed_approved"
-    | "needs_review"
-    | "restricted"
-    | "do_not_use";
+    | "source_pack_provided"
+    | "specific_concern"
+    | "needs_rights_review"
+    | "approved"
+    | "rejected";
   publicUseApproved?: boolean;
   requiresRebrandOrCrop?: boolean;
   brandingNotes?: string;
@@ -791,6 +796,30 @@ export type SourceProvenance = {
   notes?: string;
 };
 
+export type ReviewItem = {
+  _type: "reviewItem";
+  label: string;
+  detail?: string;
+  severity: "must_check" | "nice_to_check" | "internal_note";
+  sourceLevel:
+    | "window_card"
+    | "brochure"
+    | "source_folder"
+    | "deep_audit"
+    | "derived";
+  visibleToReviewer?: boolean;
+  blocksPublish?: boolean;
+  category:
+    | "price"
+    | "facts"
+    | "media"
+    | "location"
+    | "copy"
+    | "seo"
+    | "legal"
+    | "internal";
+};
+
 export type ChannelReadinessItem = {
   _type: "channelReadinessItem";
   channel: "website" | "email" | "social" | "crm" | "paid_ads";
@@ -963,6 +992,7 @@ export type AllSanitySchemaTypes =
   | Geopoint
   | LocationTaxonomy
   | SourceProvenance
+  | ReviewItem
   | ChannelReadinessItem
   | GalleryGroup
   | SanityImageCrop
@@ -1147,11 +1177,11 @@ export type DevelopmentByPathQueryResult = {
       | "unknown"
       | null;
     imageRightsStatus:
-      | "assumed_approved"
-      | "confirmed_approved"
-      | "do_not_use"
-      | "needs_review"
-      | "restricted";
+      | "approved"
+      | "needs_rights_review"
+      | "rejected"
+      | "source_pack_provided"
+      | "specific_concern";
     publicUseApproved: boolean | null;
   }> | null;
   media: {
@@ -1192,11 +1222,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     gallery: Array<{
@@ -1236,11 +1266,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
@@ -1282,11 +1312,11 @@ export type DevelopmentByPathQueryResult = {
           | "unknown"
           | null;
         imageRightsStatus:
-          | "assumed_approved"
-          | "confirmed_approved"
-          | "do_not_use"
-          | "needs_review"
-          | "restricted";
+          | "approved"
+          | "needs_rights_review"
+          | "rejected"
+          | "source_pack_provided"
+          | "specific_concern";
         publicUseApproved: boolean | null;
       }> | null;
     }> | null;
@@ -1327,11 +1357,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
@@ -1371,11 +1401,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
@@ -1417,11 +1447,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
@@ -1645,11 +1675,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
@@ -1754,11 +1784,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     gallery: Array<{
@@ -1798,11 +1828,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
   }> | null;
@@ -1894,11 +1924,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     unitGallery: Array<{
@@ -1938,11 +1968,11 @@ export type DevelopmentByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
   }> | null;
@@ -2130,11 +2160,11 @@ export type DevelopmentByGhiIdQueryResult = {
       | "unknown"
       | null;
     imageRightsStatus:
-      | "assumed_approved"
-      | "confirmed_approved"
-      | "do_not_use"
-      | "needs_review"
-      | "restricted";
+      | "approved"
+      | "needs_rights_review"
+      | "rejected"
+      | "source_pack_provided"
+      | "specific_concern";
     publicUseApproved: boolean | null;
   }> | null;
   media: {
@@ -2175,11 +2205,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     gallery: Array<{
@@ -2219,11 +2249,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
@@ -2265,11 +2295,11 @@ export type DevelopmentByGhiIdQueryResult = {
           | "unknown"
           | null;
         imageRightsStatus:
-          | "assumed_approved"
-          | "confirmed_approved"
-          | "do_not_use"
-          | "needs_review"
-          | "restricted";
+          | "approved"
+          | "needs_rights_review"
+          | "rejected"
+          | "source_pack_provided"
+          | "specific_concern";
         publicUseApproved: boolean | null;
       }> | null;
     }> | null;
@@ -2310,11 +2340,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
@@ -2354,11 +2384,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
@@ -2400,11 +2430,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
@@ -2628,11 +2658,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
@@ -2737,11 +2767,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     gallery: Array<{
@@ -2781,11 +2811,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
   }> | null;
@@ -2877,11 +2907,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     unitGallery: Array<{
@@ -2921,11 +2951,11 @@ export type DevelopmentByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
   }> | null;
@@ -3384,11 +3414,11 @@ export type PropertyByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     gallery: Array<{
@@ -3428,11 +3458,11 @@ export type PropertyByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
@@ -3474,11 +3504,11 @@ export type PropertyByPathQueryResult = {
           | "unknown"
           | null;
         imageRightsStatus:
-          | "assumed_approved"
-          | "confirmed_approved"
-          | "do_not_use"
-          | "needs_review"
-          | "restricted";
+          | "approved"
+          | "needs_rights_review"
+          | "rejected"
+          | "source_pack_provided"
+          | "specific_concern";
         publicUseApproved: boolean | null;
       }> | null;
     }> | null;
@@ -3519,11 +3549,11 @@ export type PropertyByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
@@ -3563,11 +3593,11 @@ export type PropertyByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
@@ -3609,11 +3639,11 @@ export type PropertyByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
@@ -3674,11 +3704,11 @@ export type PropertyByPathQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
@@ -4001,11 +4031,11 @@ export type PropertyByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     gallery: Array<{
@@ -4045,11 +4075,11 @@ export type PropertyByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
@@ -4091,11 +4121,11 @@ export type PropertyByGhiIdQueryResult = {
           | "unknown"
           | null;
         imageRightsStatus:
-          | "assumed_approved"
-          | "confirmed_approved"
-          | "do_not_use"
-          | "needs_review"
-          | "restricted";
+          | "approved"
+          | "needs_rights_review"
+          | "rejected"
+          | "source_pack_provided"
+          | "specific_concern";
         publicUseApproved: boolean | null;
       }> | null;
     }> | null;
@@ -4136,11 +4166,11 @@ export type PropertyByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
@@ -4180,11 +4210,11 @@ export type PropertyByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
@@ -4226,11 +4256,11 @@ export type PropertyByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
@@ -4291,11 +4321,11 @@ export type PropertyByGhiIdQueryResult = {
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
@@ -4446,11 +4476,11 @@ export type PropertyCardsByCommunityQueryResult = Array<{
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     thumbnailOverride: {
@@ -4490,11 +4520,11 @@ export type PropertyCardsByCommunityQueryResult = Array<{
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
   } | null;
@@ -4617,11 +4647,11 @@ export type PropertyCardsByLocationQueryResult = Array<{
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
     thumbnailOverride: {
@@ -4661,11 +4691,11 @@ export type PropertyCardsByLocationQueryResult = Array<{
         | "unknown"
         | null;
       imageRightsStatus:
-        | "assumed_approved"
-        | "confirmed_approved"
-        | "do_not_use"
-        | "needs_review"
-        | "restricted";
+        | "approved"
+        | "needs_rights_review"
+        | "rejected"
+        | "source_pack_provided"
+        | "specific_concern";
       publicUseApproved: boolean | null;
     } | null;
   } | null;

@@ -45,11 +45,10 @@ export function validatePricingFields(value: PricingValue | undefined) {
 export function validateMediaAssetMetadata(value: MediaAssetValue | undefined) {
 	if (!value) return true;
 
-	const blockedRights =
-		value.imageRightsStatus === 'restricted' || value.imageRightsStatus === 'do_not_use';
+	const blockedRights = new Set(['restricted', 'do_not_use', 'rejected']);
 
-	if (blockedRights && value.publicUseApproved) {
-		return 'Assets marked restricted or do-not-use cannot be approved for public use.';
+	if (blockedRights.has(value.imageRightsStatus ?? '') && value.publicUseApproved) {
+		return 'Assets marked rejected (or legacy restricted/do-not-use) cannot be approved for public use.';
 	}
 
 	return true;

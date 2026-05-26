@@ -26,9 +26,9 @@ describe('privacy layer 1 — schema validation', () => {
 		expect(validatePricingFields(schemaViolationExamples.reservedVisible)).toMatch(/Reserved items/);
 	});
 
-	it('rejects publicUseApproved on restricted assets', () => {
+	it('rejects publicUseApproved on rejected assets', () => {
 		expect(validateMediaAssetMetadata(schemaViolationExamples.restrictedApproved)).toMatch(
-			/restricted or do-not-use/
+			/rejected/
 		);
 	});
 

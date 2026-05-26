@@ -12,6 +12,7 @@ import { sensitiveGovernanceFields } from './sensitiveGovernanceFields';
 import { seoFields } from './seoFields';
 import { sourceProvenance } from './sourceProvenance';
 import { specsFields } from './specsFields';
+import { reviewItem } from './reviewItem';
 import { channelReadinessItem, workflowFields } from './workflowFields';
 
 /** Shared object schemas referenced by document types. */
@@ -21,6 +22,7 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	galleryGroup,
 	enquiryRouting,
 	channelReadinessItem,
+	reviewItem,
 	mediaAssetMetadata,
 	sourceProvenance,
 	// Primary field groups
@@ -39,6 +41,7 @@ export const objectTypes: SchemaTypeDefinition[] = [
 
 export {
 	channelReadinessItem,
+	reviewItem,
 	contentFields,
 	ctaFields,
 	enquiryRouting,

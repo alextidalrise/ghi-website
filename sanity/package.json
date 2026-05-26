@@ -15,10 +15,16 @@
 		"schema:extract": "sanity schema extract --workspace production --enforce-required-fields --path schema.json",
 		"typegen": "pnpm schema:extract && sanity typegen generate",
 		"migrate:location-hierarchy": "tsx migrations/location-hierarchy-migrate.ts",
-		"migrate:location-hierarchy:dry-run": "tsx migrations/location-hierarchy-migrate.ts --dry-run"
+		"migrate:location-hierarchy:dry-run": "tsx migrations/location-hierarchy-migrate.ts --dry-run",
+		"migrate:review-items": "tsx migrations/review-items-migrate.ts",
+		"migrate:review-items:dry-run": "tsx migrations/review-items-migrate.ts --dry-run",
+		"migrate:image-rights": "tsx migrations/image-rights-migrate.ts",
+		"migrate:image-rights:dry-run": "tsx migrations/image-rights-migrate.ts --dry-run"
 	},
 	"dependencies": {
 		"@sanity/client": "^7.14.0",
+		"@sanity/icons": "^3.7.4",
+		"@sanity/ui": "^3.2.0",
 		"@sanity/vision": "^5.20.0",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0",

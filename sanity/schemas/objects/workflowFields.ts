@@ -5,6 +5,11 @@ import {
 	CONTENT_STATUSES,
 	PUBLISH_READINESS
 } from '../constants/enums';
+import { ReviewItemsInput } from '../../components/ReviewItemsInput';
+
+type ReviewItemEntry = {
+	blocksPublish?: boolean;
+};
 
 export const channelReadinessItem = defineType({
 	name: 'channelReadinessItem',
@@ -66,17 +71,30 @@ export const workflowFields = defineType({
 			of: [defineArrayMember({ type: 'channelReadinessItem' })]
 		}),
 		defineField({
+			name: 'reviewItems',
+			title: 'Review items',
+			type: 'array',
+			of: [defineArrayMember({ type: 'reviewItem' })],
+			description: 'Structured review queue — use instead of legacy string arrays.',
+			components: {
+				input: ReviewItemsInput
+			}
+		}),
+		defineField({
 			name: 'factsNeedingConfirmation',
-			title: 'Facts needing confirmation',
+			title: 'Facts needing confirmation (legacy)',
 			type: 'array',
 			of: [{ type: 'string' }],
-			description: 'Publish-blocking facts that must be resolved before approval.'
+			description: 'Deprecated — use review items instead.',
+			hidden: true
 		}),
 		defineField({
 			name: 'missingSourceFields',
-			title: 'Missing source fields',
+			title: 'Missing source fields (legacy)',
 			type: 'array',
-			of: [{ type: 'string' }]
+			of: [{ type: 'string' }],
+			description: 'Deprecated — use review items instead.',
+			hidden: true
 		}),
 		defineField({
 			name: 'approvalNotes',
@@ -119,15 +137,22 @@ export const workflowFields = defineType({
 			if (!value) return true;
 
 			const readiness = value.publishReadiness as string | undefined;
-			const blockers = value.factsNeedingConfirmation as string[] | undefined;
+			const reviewItems = (value.reviewItems ?? []) as ReviewItemEntry[];
+			const legacyFacts = value.factsNeedingConfirmation as string[] | undefined;
 			const doNotPublish = value.doNotPublishReason as string | undefined;
+
+			const blockers = reviewItems.filter((item) => item.blocksPublish);
+
+			if (readiness === 'approved_for_publish' && blockers.length > 0) {
+				return `Cannot approve for publish: ${blockers.length} publish-blocking review item(s) remain.`;
+			}
 
 			if (
 				readiness === 'approved_for_publish' &&
-				Array.isArray(blockers) &&
-				blockers.length > 0
+				Array.isArray(legacyFacts) &&
+				legacyFacts.length > 0
 			) {
-				return 'Cannot set publish readiness to approved for publish while facts still need confirmation.';
+				return 'Cannot approve for publish while legacy facts still need confirmation.';
 			}
 
 			if (readiness === 'approved_for_publish' && doNotPublish) {

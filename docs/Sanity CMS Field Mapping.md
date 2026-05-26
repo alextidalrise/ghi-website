@@ -38,7 +38,7 @@ This is still an implementation-planning document, not a live Sanity migration. 
 - **Development modelling:** support `development`, `unit`, and `unitType`; development display can be flat, unit-type led, unit-led, price-from summary, or enquiry-led.
 - **Payment schedules:** deferred for v1.
 - **Branded asset model:** approved with explicit branding classes: `ghi_branded`, `developer_branded`, `agency_branded`, `third_party_branded`, `unbranded`, `unknown`.
-- **Image rights:** default may be `assumed_approved`, with override statuses for restricted, uncertain, or do-not-use assets.
+- **Image rights:** default `source_pack_provided` for pack images; explicit statuses for concern, rights review, approved, or rejected.
 - **Reserved units/items:** hidden from public output entirely.
 - **Brochures:** request-only or disabled by default until explicitly approved.
 - **Golf:** manual enrichment, supported by lightweight `golfCourse` references.
@@ -350,8 +350,9 @@ Initial controlled feature vocabulary may include: frontline golf, golf views, p
 
 - `imageRightsStatus`
   - Classification: **private/internal governance** controlling public media use.
-  - Values: `assumed_approved`, `confirmed_approved`, `needs_review`, `restricted`, `do_not_use`.
-  - Default: `assumed_approved` unless evidence says otherwise.
+  - Values: `source_pack_provided`, `specific_concern`, `needs_rights_review`, `approved`, `rejected`.
+  - Default: `source_pack_provided` for property-pack sourced images unless evidence says otherwise.
+  - Desk alarm: only `needs_rights_review` and `specific_concern` (not `source_pack_provided`).
 
 - `publicMediaApproved`, `publicUseApproved`, `approvalStatus`, `approvedBy`, `approvedAt`
   - Classification: **private/internal**.
@@ -456,8 +457,18 @@ Initial controlled feature vocabulary may include: frontline golf, golf views, p
   - Classification: **private/internal**.
   - Type: object or array keyed by `website`, `email`, `social`, `crm`, `paid_ads`.
 
-- `factsNeedingConfirmation[]`, `missingSourceFields[]`, `approvalNotes`, `approvedBy`, `approvedAt`, `lastSourceReviewAt`, `doNotPublishReason`
+- `reviewItems[]`
   - Classification: **private/internal**.
+  - Structured review queue replacing legacy flat string arrays.
+  - Each item: `label`, optional `detail`, `severity` (`must_check` | `nice_to_check` | `internal_note`), `sourceLevel`, `visibleToReviewer`, `blocksPublish`, `category`.
+  - Reviewer checklist shows only `visibleToReviewer == true && severity == must_check`.
+  - Publish gate: any item with `blocksPublish == true` blocks `approved_for_publish`.
+
+- `factsNeedingConfirmation[]`, `missingSourceFields[]` (deprecated — migrate to `reviewItems`)
+  - Classification: **private/internal**.
+  - Legacy flat string arrays; hidden in Studio after migration.
+
+- `approvalNotes`, `approvedBy`, `approvedAt`, `lastSourceReviewAt`, `doNotPublishReason`
 
 - Team approval ownership
   - Rule: any approved team member can approve; capture approver identity and timestamp rather than hard-coding a single owner.
@@ -499,11 +510,11 @@ Required before public publish:
 - Confirmed `availabilityStatus` that is not hidden/reserved.
 - Core specs appropriate to the property type.
 - Approved `heroImage`; approved gallery if page UX includes gallery.
-- Public-safe media governance: no `do_not_use`/restricted hero; branding/use rules satisfied.
+- Public-safe media governance: no `rejected` hero; branding/use rules satisfied.
 - `shortDescription` and `aboutDescription` reviewed.
 - `featureHighlights` reviewed if displayed.
 - Golf enrichment reviewed: `golfRelevance`, plus `linkedGolfCourses` only when named course claims/cards are shown.
-- No publish-blocking `factsNeedingConfirmation` or `doNotPublishReason`.
+- No publish-blocking `reviewItems` (`blocksPublish == true`) or `doNotPublishReason`.
 - Sensitive/internal review complete.
 - `publishReadiness = approved_for_publish`.
 - Human approval metadata recorded.
@@ -748,7 +759,7 @@ object mediaAssetMetadata {
   altText: string
   caption: string
   assetBrandingType: 'ghi_branded' | 'developer_branded' | 'agency_branded' | 'third_party_branded' | 'unbranded' | 'unknown'
-  imageRightsStatus: 'assumed_approved' | 'confirmed_approved' | 'needs_review' | 'restricted' | 'do_not_use'
+  imageRightsStatus: 'source_pack_provided' | 'specific_concern' | 'needs_rights_review' | 'approved' | 'rejected'
   publicUseApproved: boolean
   requiresRebrandOrCrop: boolean
   brandingNotes: text // private_internal
@@ -759,12 +770,23 @@ object mediaAssetMetadata {
   approvedAt: datetime
 }
 
+object reviewItem {
+  label: string
+  detail: text
+  severity: 'must_check' | 'nice_to_check' | 'internal_note'
+  sourceLevel: 'window_card' | 'brochure' | 'source_folder' | 'deep_audit' | 'derived'
+  visibleToReviewer: boolean
+  blocksPublish: boolean
+  category: 'price' | 'facts' | 'media' | 'location' | 'copy' | 'seo' | 'legal' | 'internal'
+}
+
 object workflowFields {
   contentStatus: 'draft' | 'needs_facts' | 'ready_for_editorial' | 'ready_for_ghi_review' | 'approved' | 'published' | 'archived'
   publishReadiness: 'metadata_only' | 'structured_extracted_needs_review' | 'governance_hold' | 'ready_for_editorial' | 'ready_for_ghi_review' | 'approved_for_publish' | 'published' | 'archived'
   channelReadiness: object
-  factsNeedingConfirmation: array
-  missingSourceFields: array
+  reviewItems: array // reviewItem[]
+  factsNeedingConfirmation: array // deprecated
+  missingSourceFields: array // deprecated
   approvalNotes: text
   approvedBy: string
   approvedAt: datetime
@@ -802,7 +824,7 @@ object sensitiveGovernanceFields {
 - `commissionVisibility` must be `private_internal` for v1.
 - `feesTaxVisibility` must be `private_internal` for v1.
 - Brochure downloads must be disabled or request-only unless `brochureVisibility = public_approved`.
-- Any asset with `imageRightsStatus = restricted` or `do_not_use` must be excluded from public output.
+- Any asset with `imageRightsStatus = rejected` (or legacy `restricted` / `do_not_use`) must be excluded from public output.
 - Non-GHI branded assets must not be public unless `publicUseApproved = true`.
 - `legalPublicUseAllowed` defaults to false.
 - Public SEO fields must be generated only from public-safe fields.

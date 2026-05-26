@@ -10,7 +10,7 @@ export type MediaAssetInput = {
 	publicUseApproved?: boolean | null;
 };
 
-const BLOCKED_RIGHTS = new Set(['restricted', 'do_not_use']);
+const BLOCKED_RIGHTS = new Set(['restricted', 'do_not_use', 'rejected']);
 
 const GHI_BRANDED = new Set(['ghi_branded', 'unbranded']);
 
@@ -20,7 +20,7 @@ export function isPublicMediaAsset(asset: MediaAssetInput | null | undefined): b
 		return false;
 	}
 
-	const rights = asset.imageRightsStatus ?? 'assumed_approved';
+	const rights = asset.imageRightsStatus ?? 'source_pack_provided';
 	if (BLOCKED_RIGHTS.has(rights)) {
 		return false;
 	}

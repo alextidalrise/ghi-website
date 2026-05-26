@@ -41,7 +41,7 @@ Open Studio at `/development` and confirm invalid states are **blocked on save**
 ### Golden property (`GHI99001`)
 
 - [ ] Document saves successfully with `publishReadiness = approved_for_publish`
-- [ ] Approved hero has `imageRightsStatus ≠ do_not_use/restricted` and GHI branding or `publicUseApproved = true`
+- [ ] Approved hero has `imageRightsStatus = approved` (or legacy non-rejected) and GHI branding or `publicUseApproved = true`
 - [ ] Pricing uses `priceSourceStatus = source_confirmed` with a numeric price
 
 ### Privacy development (`GHI99002`)
@@ -54,8 +54,8 @@ Open Studio at `/development` and confirm invalid states are **blocked on save**
 ### Media privacy property (`GHI99003`)
 
 - [ ] Document saves (CMS stores blocked assets for editorial review)
-- [ ] Hero with `imageRightsStatus = do_not_use` cannot have `publicUseApproved = true` → **validation error if toggled**
-- [ ] Gallery item with `restricted` + `publicUseApproved = true` → **validation error**
+- [ ] Hero with `imageRightsStatus = rejected` cannot have `publicUseApproved = true` → **validation error if toggled**
+- [ ] Gallery item with `rejected` + `publicUseApproved = true` → **validation error**
 
 ---
 
@@ -155,9 +155,9 @@ URL: `/spain/costa-del-sol-verification/verification-community/verification-priv
 URL: `/spain/costa-del-sol-verification/verification-community/verification-media-privacy`
 
 - [ ] Page returns **200**
-- [ ] No hero image rendered (fallback layout / no `<img>` for do-not-use asset)
+- [ ] No hero image rendered (fallback layout / no `<img>` for rejected asset)
 - [ ] Gallery shows **1** image (approved item only)
-- [ ] Restricted gallery item absent from HTML and JSON-LD
+- [ ] Restricted/rejected gallery item absent from HTML and JSON-LD
 - [ ] Inspect Sanity CDN URLs in page source — none tagged `verification-do-not-use-hero` or `verification-restricted-gallery`
 
 ---
@@ -174,6 +174,31 @@ Dry run (no writes):
 
 ```bash
 pnpm --filter sanity fixtures:seed -- --dry-run
+```
+
+---
+
+## Review items workflow
+
+Open any property listing in **Governance & workflow → Review items**:
+
+- [ ] **Review checklist** shows only `must_check` items with `visibleToReviewer = true`
+- [ ] **Internal audit notes** section is collapsed by default and includes `internal_note` / `nice_to_check` items
+- [ ] Resolving a checklist item removes it from the array
+- [ ] `blocksPublish = true` items prevent `publishReadiness = approved_for_publish`
+
+Migrate legacy string arrays (if any documents pre-date this schema):
+
+```bash
+pnpm --filter sanity migrate:review-items:dry-run -- --dataset development
+SANITY_API_TOKEN=… pnpm --filter sanity migrate:review-items -- --dataset development
+```
+
+Migrate legacy image rights values:
+
+```bash
+pnpm --filter sanity migrate:image-rights:dry-run -- --dataset development
+SANITY_API_TOKEN=… pnpm --filter sanity migrate:image-rights -- --dataset development
 ```
 
 ---

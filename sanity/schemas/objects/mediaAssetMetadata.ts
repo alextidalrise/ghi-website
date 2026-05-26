@@ -66,7 +66,7 @@ export const mediaAssetMetadata = defineType({
 			title: 'Image rights status',
 			type: 'string',
 			options: { list: [...IMAGE_RIGHTS_STATUSES], layout: 'dropdown' },
-			initialValue: 'assumed_approved',
+			initialValue: 'source_pack_provided',
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
@@ -75,7 +75,7 @@ export const mediaAssetMetadata = defineType({
 			type: 'boolean',
 			initialValue: false,
 			description:
-				'Required for non-GHI branded assets before public output. Blocked when rights status is restricted or do-not-use.'
+				'Required for non-GHI branded assets before public output. Blocked when rights status is rejected.'
 		}),
 		defineField({
 			name: 'requiresRebrandOrCrop',
