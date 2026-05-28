@@ -3,14 +3,15 @@ import type { PageServerLoad } from './$types';
 import { buildCommunityBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
 import { buildCanonicalPath } from '$lib/listing/canonicalPath';
+import { parseListingSearchParams } from '$lib/listing/searchParams';
 import { buildLocationSeo } from '$lib/listing/seo';
 import {
 	communityBySlugQuery,
 	countryBySlugQuery,
+	fetchListingCards,
 	fetchPublic,
 	listingLegacyThreeSegmentPathQuery,
-	locationBySlugQuery,
-	propertyCardsByCommunityQuery
+	locationBySlugQuery
 } from '$lib/sanity/queries';
 import type { CountryBySlugQueryResult } from '$lib/sanity/types';
 
@@ -26,8 +27,6 @@ type LegacyPathRow = {
 	communitySlug?: string | null;
 	slug?: string | null;
 };
-
-const COMMUNITY_LISTINGS_PAGE_SIZE = 24;
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const [country, location, community] = await Promise.all([
@@ -51,7 +50,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	if (community?.slug && community.name) {
-		return loadCommunityPage(country, location, community, params, url.origin);
+		return loadCommunityPage(country, location, community, params, url);
 	}
 
 	const legacyMatches = await fetchPublic<LegacyPathRow[]>(listingLegacyThreeSegmentPathQuery, {
@@ -77,20 +76,21 @@ async function loadCommunityPage(
 	location: LocationTaxonomyPage,
 	community: LocationTaxonomyPage,
 	params: { country: string; location: string; community: string },
-	siteOrigin: string
+	url: URL
 ) {
-	const listings = await fetchPublic<unknown[]>(propertyCardsByCommunityQuery, {
-		params: {
+	const searchParams = parseListingSearchParams(url);
+	const canonicalPath = `/${country.slug}/${location.slug}/${community.slug}`;
+	const listingResults = await fetchListingCards({
+		scope: {
+			type: 'community',
 			countrySlug: params.country,
 			locationSlug: params.location,
-			communitySlug: params.community,
-			start: 0,
-			end: COMMUNITY_LISTINGS_PAGE_SIZE
-		}
+			communitySlug: params.community
+		},
+		params: searchParams
 	});
 
-	const canonicalPath = `/${country.slug}/${location.slug}/${community.slug}`;
-	const canonicalUrl = `${siteOrigin}${canonicalPath}`;
+	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const breadcrumbs = buildCommunityBreadcrumbs(country, location, community, canonicalPath);
 	const seo = buildLocationSeo(
 		{
@@ -101,14 +101,16 @@ async function loadCommunityPage(
 		},
 		canonicalUrl
 	);
-	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, siteOrigin);
+	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, url.origin);
 
 	return {
 		pageType: 'community' as const,
 		country,
 		location,
 		community,
-		listings: listings ?? [],
+		canonicalPath,
+		searchParams,
+		listingResults,
 		canonicalUrl,
 		breadcrumbs,
 		seo,

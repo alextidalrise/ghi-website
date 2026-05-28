@@ -1,4 +1,8 @@
 <script lang="ts">
+	import ListingGrid from '$lib/components/listing/ListingGrid.svelte';
+
+	let { data } = $props();
+
 	const colors = [
 		{
 			name: 'Deep Golf Green',
@@ -251,6 +255,15 @@
 				</div>
 			</article>
 		</div>
+
+		<div class="ds-subsection">
+			<h3 class="ds-subsection__title">Live component</h3>
+			<p class="ds-subsection__copy">
+				Wired <code>ListingGrid</code> and <code>PropertyCard</code> using verification fixtures and
+				public transforms.
+			</p>
+			<ListingGrid cards={data.demoCards} />
+		</div>
 	</section>
 
 	<section class="ds-section" id="forms">
@@ -402,6 +415,31 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
 		gap: var(--space-md);
+	}
+
+	.ds-subsection {
+		margin-top: var(--space-2xl);
+		padding-top: var(--space-xl);
+		border-top: 1px solid var(--border);
+	}
+
+	.ds-subsection__title {
+		margin: 0 0 var(--space-sm);
+		font-family: var(--serif);
+		font-size: var(--text-h3);
+		color: var(--green);
+	}
+
+	.ds-subsection__copy {
+		max-width: 42rem;
+		margin-bottom: var(--space-lg);
+		color: var(--muted);
+	}
+
+	.ds-subsection__copy code {
+		font-family: var(--sans);
+		font-size: var(--text-small);
+		color: var(--green);
 	}
 
 	.color-card {

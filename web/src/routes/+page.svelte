@@ -1,3 +1,9 @@
+<script lang="ts">
+	import DiscoveryBar from '$lib/components/listing/DiscoveryBar.svelte';
+
+	let { data } = $props();
+</script>
+
 <section class="home-hero on-dark">
 	<div class="home-hero__bg" aria-hidden="true">
 		<img
@@ -20,6 +26,8 @@
 			A curated portfolio of residential properties on and near premier golf courses — starting
 			in southern Europe, with room to grow.
 		</p>
+
+		<DiscoveryBar countries={data.countries} locations={data.locations} />
 	</div>
 </section>
 
@@ -97,6 +105,7 @@
 		max-width: 36rem;
 		line-height: 1.55;
 		letter-spacing: 0.005em;
+		margin-bottom: var(--space-xl);
 	}
 
 	.home-intro {

@@ -17,6 +17,24 @@ export function buildCanonicalPath({
 	return `/${countrySlug}/${locationSlug}/${communitySlug}/${slug}`;
 }
 
+export type ListingHrefInput = {
+	slug?: string | null;
+	location?: {
+		country?: { slug?: string | null } | null;
+		location?: { slug?: string | null } | null;
+		community?: { slug?: string | null } | null;
+	} | null;
+};
+
+export function buildListingHref({ slug, location }: ListingHrefInput): string | null {
+	return buildCanonicalPath({
+		countrySlug: location?.country?.slug,
+		locationSlug: location?.location?.slug,
+		communitySlug: location?.community?.slug,
+		slug
+	});
+}
+
 export function pathsMatch(
 	request: { countrySlug: string; locationSlug: string; communitySlug: string; slug: string },
 	canonical: CanonicalSegments

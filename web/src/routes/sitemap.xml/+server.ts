@@ -1,0 +1,20 @@
+import type { RequestHandler } from './$types';
+import { collectSitemapEntries, renderSitemapXml } from '$lib/listing/sitemap';
+import { fetchPublic, sitemapListingsQuery, sitemapTaxonomyQuery } from '$lib/sanity/queries';
+
+export const GET: RequestHandler = async ({ url }) => {
+	const [taxonomyRows, listingRows] = await Promise.all([
+		fetchPublic<Parameters<typeof collectSitemapEntries>[0]>(sitemapTaxonomyQuery),
+		fetchPublic<Parameters<typeof collectSitemapEntries>[1]>(sitemapListingsQuery)
+	]);
+
+	const entries = collectSitemapEntries(taxonomyRows ?? [], listingRows ?? []);
+	const body = renderSitemapXml(url.origin, entries);
+
+	return new Response(body, {
+		headers: {
+			'Content-Type': 'application/xml; charset=utf-8',
+			'Cache-Control': 'public, max-age=3600'
+		}
+	});
+};

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Guidelines — Golf Homes International</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Libre+Franklin:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+--green:#1F3D34;
+--linen:#F5F1E8;
+--gold:#D6C3A3;
+--charcoal:#2B2B2B;
+--white:#FFFFFF;
+--border:#E2DED5;
+--muted:#7A7A7A;
+--serif:'Playfair Display','Georgia',serif;
+--sans:'Libre Franklin','Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+
+html{font-size:16px}
+body{
+font-family:var(--sans);
+font-weight:300;
+line-height:1.7;
+color:var(--charcoal);
+background:var(--white);
+}
+
+h1,h2,h3,h4{font-family:var(--serif);font-weight:400;text-wrap:balance}
+h1{font-weight:600;font-size:clamp(2.25rem,5vw+0.5rem,3.5rem);letter-spacing:-0.015em;line-height:1.05}
+h2{font-size:clamp(1.5rem,3vw+0.75rem,2.25rem);line-height:1.1;margin-bottom:1rem}
+h3{font-size:1.375rem;line-height:1.25;margin-bottom:0.75rem}
+p{text-wrap:pretty;max-width:52rem}
+
+.page{max-width:900px;margin:0 auto;padding:3rem 2rem}
+
+/* Cover */
+.cover{
+min-height:100vh;display:grid;align-content:end;
+padding:5rem 3rem;
+background:var(--green);color:var(--linen);
+page-break-after:always;
+}
+.cover h1{color:var(--linen);margin-bottom:1.5rem}
+.cover h1 em{font-style:italic}
+.cover p{color:rgba(245,241,232,0.8);font-size:1.125rem;max-width:36rem}
+.cover__meta{margin-top:3rem;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);font-weight:500}
+
+/* Sections */
+section{padding:4rem 0;border-bottom:1px solid var(--border);page-break-inside:avoid}
+section:last-child{border-bottom:0}
+.overline{
+font-family:var(--sans);font-size:0.6875rem;font-weight:500;
+letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);
+margin-bottom:1.5rem;display:block;
+}
+
+/* Logo */
+.logo-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:2rem}
+.logo-box{padding:2.5rem;display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}
+.logo-box--dark{background:var(--green);border-color:var(--green)}
+.logo-box img{max-width:100%;height:auto;max-height:80px}
+.logo-note{margin-top:1.5rem;font-size:0.875rem;color:var(--muted)}
+
+/* Clearspace */
+.clearspace{
+margin-top:2rem;padding:2.5rem;
+border:1px dashed var(--border);
+position:relative;text-align:center;
+}
+.clearspace img{max-height:60px}
+.clearspace__label{
+position:absolute;top:0.5rem;left:0.5rem;
+font-size:0.6875rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-weight:500
+}
+
+/* Colour */
+.colour-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;margin-top:2rem}
+.colour-card{border:1px solid var(--border)}
+.colour-card__swatch{height:100px}
+.colour-card__body{padding:1rem}
+.colour-card__name{font-weight:400;font-size:0.875rem;margin-bottom:0.25rem}
+.colour-card__hex{font-size:0.75rem;color:var(--muted);margin-bottom:0.5rem;font-feature-settings:'tnum'}
+.colour-card__usage{font-size:0.75rem;color:var(--muted);line-height:1.5}
+
+/* Typography */
+.type-specimen{margin-top:2rem;border-top:1px solid var(--border)}
+.type-row{display:grid;grid-template-columns:10rem 1fr;gap:2rem;align-items:baseline;padding:1.5rem 0;border-bottom:1px solid var(--border)}
+.type-row__meta{font-size:0.75rem;color:var(--muted);line-height:1.6}
+.type-row__meta strong{display:block;color:var(--charcoal);font-weight:400;font-size:0.875rem}
+.type-sample-display{font-family:var(--serif);font-weight:600;font-size:2.5rem;letter-spacing:-0.015em;line-height:1.05}
+.type-sample-h2{font-family:var(--serif);font-weight:400;font-size:1.75rem;line-height:1.1}
+.type-sample-h3{font-family:var(--serif);font-weight:400;font-size:1.375rem;line-height:1.2}
+.type-sample-body{font-family:var(--sans);font-weight:300;font-size:1rem;line-height:1.7}
+.type-sample-ui{font-family:var(--sans);font-weight:400;font-size:0.875rem;line-height:1.5}
+.type-sample-overline{font-family:var(--sans);font-weight:500;font-size:0.6875rem;letter-spacing:0.12em;text-transform:uppercase}
+
+/* Spacing */
+.spacing-table{width:100%;border-collapse:collapse;margin-top:2rem;font-size:0.875rem}
+.spacing-table th,.spacing-table td{padding:0.875rem 1rem;border-bottom:1px solid var(--border);text-align:left}
+.spacing-table th{font-weight:500;font-size:0.6875rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+
+/* Buttons */
+.button-demo{display:flex;flex-wrap:wrap;gap:1rem;margin-top:2rem;padding:2rem;background:var(--linen);border:1px solid var(--border)}
+.btn{
+display:inline-flex;align-items:center;justify-content:center;
+min-height:3rem;padding:0.875rem 2rem;
+font-family:var(--sans);font-size:0.85rem;font-weight:400;
+letter-spacing:0.04em;text-transform:uppercase;text-decoration:none;
+border:1px solid var(--green);
+}
+.btn--primary{background:var(--green);color:var(--white)}
+.btn--outline{background:transparent;color:var(--green)}
+.btn--gold{background:var(--gold);border-color:var(--gold);color:var(--green)}
+
+/* Do/Don't */
+.dos-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:2rem}
+.dos-card{padding:1.5rem;border:1px solid var(--border)}
+.dos-card h4{font-family:var(--sans);font-size:0.75rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem}
+.dos-card--do h4{color:#2a6e4a}
+.dos-card--dont h4{color:#8b3a3a}
+.dos-card ul{list-style:none;font-size:0.875rem;color:var(--muted)}
+.dos-card li{padding:0.4rem 0;padding-left:1.25rem;position:relative}
+.dos-card--do li::before{content:"✓";position:absolute;left:0;color:#2a6e4a}
+.dos-card--dont li::before{content:"✗";position:absolute;left:0;color:#8b3a3a}
+
+/* Files */
+.files-table{width:100%;border-collapse:collapse;margin-top:2rem;font-size:0.875rem}
+.files-table th,.files-table td{padding:0.75rem 1rem;border-bottom:1px solid var(--border);text-align:left}
+.files-table th{font-weight:500;font-size:0.6875rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.files-table code{font-size:0.8125rem;background:var(--linen);padding:0.15rem 0.4rem}
+
+@media print{
+.cover{min-height:auto;padding:3rem}
+section{page-break-inside:avoid}
+.page{padding:2rem 1.5rem}
+}
+
+@media(max-width:600px){
+.logo-grid,.dos-grid{grid-template-columns:1fr}
+.type-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="cover">
+<h1>Golf Homes<br>International<br><em>Brand Guidelines</em></h1>
+<p>A reference for anyone producing content, design, or marketing materials for GHI. Covers logo usage, colour palette, typography, spacing, and tone.</p>
+<p class="cover__meta">Version 1.0 — May 2026</p>
+</div>
+
+<div class="page">
+
+<!-- LOGO -->
+<section>
+<span class="overline">01 — Logo</span>
+<h2>Logo Versions</h2>
+<p>The wordmark reads "Golf Homes" in Playfair Display Bold, with "INTERNATIONAL" letterspaced beneath. Two horizontal rules frame the subtitle. Use the version appropriate to the surface.</p>
+
+<div class="logo-grid">
+<div class="logo-box">
+<img src="logo-green.png" alt="GHI logo — green on white">
+</div>
+<div class="logo-box logo-box--dark">
+<img src="logo-white-on-transparent.png" alt="GHI logo — white on green">
+</div>
+</div>
+
+<p class="logo-note"><strong>Primary:</strong> Green on white/light backgrounds. <strong>Reversed:</strong> White on green/dark backgrounds. Never place the green logo on a dark surface or the white logo on a light surface.</p>
+
+<div class="clearspace">
+<span class="clearspace__label">Minimum clear space = height of the "G" on all sides</span>
+<img src="logo-green.png" alt="Clear space example">
+</div>
+
+<h3 style="margin-top:2rem">Minimum Size</h3>
+<p>Do not reproduce the logo smaller than <strong>120px wide</strong> on screen or <strong>30mm wide</strong> in print. At small sizes the subtitle becomes illegible.</p>
+</section>
+
+<!-- COLOUR -->
+<section>
+<span class="overline">02 — Colour Palette</span>
+<h2>Colour</h2>
+<p>The palette is restrained. Green carries authority, linen softens the page, and gold appears only when attention has been earned. Colour is derived from the landscape: fairway greens, coastal sand, and Mediterranean light.</p>
+
+<div class="colour-grid">
+<div class="colour-card">
+<div class="colour-card__swatch" style="background:#1F3D34"></div>
+<div class="colour-card__body">
+<p class="colour-card__name">Deep Golf Green</p>
+<p class="colour-card__hex">#1F3D34</p>
+<p class="colour-card__usage">Primary. Headlines, structural borders, dark surfaces, buttons.</p>
+</div>
+</div>
+<div class="colour-card">
+<div class="colour-card__swatch" style="background:#F5F1E8"></div>
+<div class="colour-card__body">
+<p class="colour-card__name">Soft Linen</p>
+<p class="colour-card__hex">#F5F1E8</p>
+<p class="colour-card__usage">Feature panels, warm backgrounds, light-on-dark body text.</p>
+</div>
+</div>
+<div class="colour-card">
+<div class="colour-card__swatch" style="background:#D6C3A3"></div>
+<div class="colour-card__body">
+<p class="colour-card__name">Sand Gold</p>
+<p class="colour-card__hex">#D6C3A3</p>
+<p class="colour-card__usage">Accent only. Overlines, hover states, moments that earn emphasis.</p>
+</div>
+</div>
+<div class="colour-card">
+<div class="colour-card__swatch" style="background:#2B2B2B"></div>
+<div class="colour-card__body">
+<p class="colour-card__name">Charcoal</p>
+<p class="colour-card__hex">#2B2B2B</p>
+<p class="colour-card__usage">Body copy and secondary headings on light surfaces.</p>
+</div>
+</div>
+<div class="colour-card">
+<div class="colour-card__swatch" style="background:#FFFFFF;border-bottom:1px solid #E2DED5"></div>
+<div class="colour-card__body">
+<p class="colour-card__name">White</p>
+<p class="colour-card__hex">#FFFFFF</p>
+<p class="colour-card__usage">Primary canvas. Cards defined by 1px borders, not fill.</p>
+</div>
+</div>
+<div class="colour-card">
+<div class="colour-card__swatch" style="background:#E2DED5"></div>
+<div class="colour-card__body">
+<p class="colour-card__name">Stone Border</p>
+<p class="colour-card__hex">#E2DED5</p>
+<p class="colour-card__usage">One-pixel dividers, input underlines, quiet card definition.</p>
+</div>
+</div>
+<div class="colour-card">
+<div class="colour-card__swatch" style="background:#7A7A7A"></div>
+<div class="colour-card__body">
+<p class="colour-card__name">Muted</p>
+<p class="colour-card__hex">#7A7A7A</p>
+<p class="colour-card__usage">Supporting copy, metadata, captions.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- TYPOGRAPHY -->
+<section>
+<span class="overline">03 — Typography</span>
+<h2>Type System</h2>
+<p>Playfair Display sets the editorial tone — confident, magazine-quality serif. Libre Franklin keeps UI, navigation, and body copy legible and warm without competing.</p>
+
+<div class="type-specimen">
+<div class="type-row">
+<div class="type-row__meta"><strong>Display</strong>Playfair Display · SemiBold 600<br>Fluid: 36–64px · Tracking: -0.015em</div>
+<p class="type-sample-display">Homes beside the fairway</p>
+</div>
+<div class="type-row">
+<div class="type-row__meta"><strong>Heading 2</strong>Playfair Display · Regular 400<br>Fluid: 24–40px</div>
+<p class="type-sample-h2">Curated homes on premier golf courses</p>
+</div>
+<div class="type-row">
+<div class="type-row__meta"><strong>Heading 3</strong>Playfair Display · Regular 400<br>Fluid: 20–28px</div>
+<p class="type-sample-h3">Sotogrande, Quinta do Lago, Marbella</p>
+</div>
+<div class="type-row">
+<div class="type-row__meta"><strong>Body</strong>Libre Franklin · Light 300<br>16px · Line-height: 1.7</div>
+<p class="type-sample-body">The system favours calm authority, generous spacing, and restrained detail. Photography carries the lifestyle promise; UI stays invisible.</p>
+</div>
+<div class="type-row">
+<div class="type-row__meta"><strong>UI / Labels</strong>Libre Franklin · Regular 400<br>14px · Line-height: 1.5</div>
+<p class="type-sample-ui">Navigation · Buttons · Prices · Form labels</p>
+</div>
+<div class="type-row">
+<div class="type-row__meta"><strong>Overline</strong>Libre Franklin · Medium 500<br>11px · Tracking: 0.12em · Uppercase</div>
+<p class="type-sample-overline">Section marker · Category label</p>
+</div>
+</div>
+
+<h3 style="margin-top:2rem">Font Loading</h3>
+<p style="font-size:0.875rem;color:var(--muted)">Both typefaces are loaded from Google Fonts. Playfair Display: Regular 400, Medium 500, SemiBold 600, Bold 700, plus Italic 400 and 600. Libre Franklin: Light 300, Regular 400, Medium 500, plus Italic 300 and 400.</p>
+
+<h3 style="margin-top:2rem">Italic Usage</h3>
+<p>Playfair Display italic is reserved for select display moments — hero taglines and pull quotes. It has a calligraphic quality that adds editorial character at large sizes. Never use italic for body text.</p>
+</section>
+
+<!-- SPACING -->
+<section>
+<span class="overline">04 — Spacing &amp; Layout</span>
+<h2>Spacing Scale</h2>
+<p>Based on an 8px unit. Generous whitespace is a deliberate design feature — it signals exclusivity. Keep local groups tight; section changes generous.</p>
+
+<table class="spacing-table">
+<thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+<tbody>
+<tr><td>XS</td><td>8px (0.5rem)</td><td>Tight gaps: icon padding, metadata pairs</td></tr>
+<tr><td>SM</td><td>16px (1rem)</td><td>Label-to-field, list items</td></tr>
+<tr><td>MD</td><td>24px (1.5rem)</td><td>Component internal padding</td></tr>
+<tr><td>LG</td><td>32px (2rem)</td><td>Between components in a section</td></tr>
+<tr><td>XL</td><td>48px (3rem)</td><td>Between sections, card groups</td></tr>
+<tr><td>2XL</td><td>80px (5rem)</td><td>Major section separation, hero padding</td></tr>
+</tbody>
+</table>
+
+<h3 style="margin-top:2rem">Key Layout Rules</h3>
+<table class="spacing-table">
+<thead><tr><th>Property</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Content max-width</td><td>1060px</td></tr>
+<tr><td>Content padding</td><td>48px (3rem) horizontal</td></tr>
+<tr><td>Section gap</td><td>112px (7rem)</td></tr>
+<tr><td>Hero vertical padding</td><td>80px (5rem)</td></tr>
+<tr><td>Nav height</td><td>60px (3.75rem)</td></tr>
+<tr><td>Border radius</td><td>0 — everywhere, no exceptions</td></tr>
+<tr><td>Borders</td><td>1px only — never thicker</td></tr>
+<tr><td>Shadows</td><td>None at rest; subtle on hover only</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- BUTTONS -->
+<section>
+<span class="overline">05 — Buttons</span>
+<h2>Button System</h2>
+<p>Square corners, 1px borders, uppercase letterspacing. Choose by surface and hierarchy, not decoration.</p>
+
+<div class="button-demo">
+<a class="btn btn--primary" href="#">Primary Action</a>
+<a class="btn btn--outline" href="#">Outline Action</a>
+<a class="btn btn--gold" href="#">Gold Action</a>
+</div>
+
+<table class="spacing-table" style="margin-top:1.5rem">
+<thead><tr><th>Type</th><th>Background</th><th>Text</th><th>Hover</th></tr></thead>
+<tbody>
+<tr><td>Primary</td><td>Deep Golf Green</td><td>White</td><td>Background → Charcoal</td></tr>
+<tr><td>Outline</td><td>Transparent</td><td>Green</td><td>Fill green, text white</td></tr>
+<tr><td>Gold</td><td>Sand Gold</td><td>Green</td><td>Fill green, text white</td></tr>
+<tr><td>On Dark</td><td>Transparent</td><td>Linen</td><td>Fill linen, text green</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- DO / DON'T -->
+<section>
+<span class="overline">06 — Usage Guidelines</span>
+<h2>Do &amp; Don't</h2>
+
+<div class="dos-grid">
+<div class="dos-card dos-card--do">
+<h4>Do</h4>
+<ul>
+<li>Use generous negative space — it signals exclusivity</li>
+<li>Let photography carry emotional weight</li>
+<li>Use gold sparingly — only for earned emphasis</li>
+<li>Keep all corners square (0 border-radius)</li>
+<li>Use 1px borders to define cards — never shadows</li>
+<li>Set prices in tabular numerals</li>
+<li>Use italic only for display taglines and pull quotes</li>
+</ul>
+</div>
+<div class="dos-card dos-card--dont">
+<h4>Don't</h4>
+<ul>
+<li>Add rounded corners to any element</li>
+<li>Use drop shadows at rest</li>
+<li>Use borders thicker than 1px</li>
+<li>Use gold as a background for large surfaces</li>
+<li>Crowd elements — nothing should look packed</li>
+<li>Use decorative elements, gradients, or ornaments</li>
+<li>Set body text in the serif or in italic</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- TONE -->
+<section>
+<span class="overline">07 — Brand Tone</span>
+<h2>Voice &amp; Mood</h2>
+<p><strong>Mood:</strong> Walking into a quiet room in a private club. A leather portfolio is placed in front of you. Everything has been considered. Nothing competes for attention. You feel welcomed, not sold to.</p>
+<p style="margin-top:1rem"><strong>Direction:</strong> Luxury / Refined with Editorial influence. Minimal decoration — typography, negative space, and photography do all the work.</p>
+<p style="margin-top:1rem"><strong>Audience:</strong> Affluent buyers and lifestyle investors seeking property tied to world-class golf. Aspirational, not exclusively ultra-high-net-worth.</p>
+<p style="margin-top:1rem"><strong>Tone:</strong> Calm exclusivity — like a private members' club, not a property search engine.</p>
+</section>
+
+<!-- FILES -->
+<section>
+<span class="overline">08 — Asset Files</span>
+<h2>Included Files</h2>
+
+<table class="files-table">
+<thead><tr><th>File</th><th>Format</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>logo-green.svg</code></td><td>SVG</td><td>Master logo — green on transparent (web/design)</td></tr>
+<tr><td><code>logo-white.svg</code></td><td>SVG</td><td>Master logo — white on transparent (dark surfaces)</td></tr>
+<tr><td><code>logo-green.png</code></td><td>PNG 1200w</td><td>Quick-use export for presentations/docs</td></tr>
+<tr><td><code>logo-green-2x.png</code></td><td>PNG 2400w</td><td>High-resolution export (retina/print)</td></tr>
+<tr><td><code>logo-white-on-transparent.png</code></td><td>PNG 1200w</td><td>White logo for overlaying on images/green</td></tr>
+<tr><td><code>logo-white-on-green.png</code></td><td>PNG 1200w</td><td>White logo on solid green background</td></tr>
+<tr><td><code>favicon.svg</code></td><td>SVG</td><td>Favicon — standalone "G" letterform</td></tr>
+<tr><td><code>favicon-512.png</code></td><td>PNG 512×512</td><td>Favicon for platforms requiring raster</td></tr>
+<tr><td><code>index.html</code></td><td>HTML</td><td>This document (print to PDF via browser)</td></tr>
+</tbody>
+</table>
+
+<p style="margin-top:1.5rem;font-size:0.875rem;color:var(--muted)"><strong>To create a PDF:</strong> Open this file in Chrome/Edge → Print (Ctrl+P) → Destination: Save as PDF → Print. All styles are print-optimised.</p>
+</section>
+
+</div>
+</body>
+</html>

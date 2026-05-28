@@ -1,6 +1,4 @@
-import type { PublicPropertyListing } from '$lib/sanity/transforms';
-
-type Pricing = NonNullable<PublicPropertyListing['pricing']>;
+import type { PublicPricing } from '$lib/sanity/transforms/pricingFilter';
 
 const currencyFormatters = new Map<string, Intl.NumberFormat>();
 
@@ -23,7 +21,7 @@ function formatAmount(amount: number, currency: string): string {
 }
 
 /** Format public-safe pricing for display. Returns null when no price may be shown. */
-export function formatListingPrice(pricing: Pricing | null | undefined): string | null {
+export function formatListingPrice(pricing: PublicPricing | null | undefined): string | null {
 	if (!pricing) {
 		return null;
 	}

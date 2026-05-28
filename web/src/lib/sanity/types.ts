@@ -4701,6 +4701,29 @@ export type PropertyCardsByLocationQueryResult = Array<{
   } | null;
 }>;
 
+// Source: ../web/src/lib/sanity/queries/sitemap.ts
+// Variable: sitemapTaxonomyQuery
+// Query: *[    _type == "locationTaxonomy"    && defined(slug.current)  ]{    type,    "slug": slug.current,    "countrySlug": select(      type == "country" => slug.current,      type == "location" => parent->slug.current,      type == "community" => parent->parent->slug.current    ),    "locationSlug": select(      type == "location" => slug.current,      type == "community" => parent->slug.current,      null    ),    "communitySlug": select(type == "community" => slug.current, null),    _updatedAt  }
+export type SitemapTaxonomyQueryResult = Array<{
+  type: "community" | "country" | "location";
+  slug: string;
+  countrySlug: string | null;
+  locationSlug: string | null;
+  communitySlug: string | null;
+  _updatedAt: string;
+}>;
+
+// Source: ../web/src/lib/sanity/queries/sitemap.ts
+// Variable: sitemapListingsQuery
+// Query: *[    _type in ["propertyListing", "development"]    && (_type != "propertyListing" || listingKind in ["property", "unit"])    && defined(slug.current)    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"    && coalesce(seo.noindex, false) != true  ]{    "countrySlug": location.country->slug.current,    "locationSlug": location.location->slug.current,    "communitySlug": location.community->slug.current,    "slug": slug.current,    _updatedAt  }
+export type SitemapListingsQueryResult = Array<{
+  countrySlug: string | null;
+  locationSlug: string | null;
+  communitySlug: string | null;
+  slug: string;
+  _updatedAt: string;
+}>;
+
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
@@ -4723,5 +4746,7 @@ declare module "@sanity/client" {
     '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && slug.current == $slug\n    && location.country->slug.current == $countrySlug\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ]{ \n  "countrySlug": location.country->slug.current,\n  "locationSlug": location.location->slug.current,\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n }\n': PropertyStalePathQueryResult;
     '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && location.country->slug.current == $countrySlug\n    && location.location->slug.current == $locationSlug\n    && location.community->slug.current == $communitySlug\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ] | order(publicTitle asc)[$start...$end]{\n  _id,\n  ghiListingId,\n  publicTitle,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  }\n}\n': PropertyCardsByCommunityQueryResult;
     '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && location.country->slug.current == $countrySlug\n    && location.location->slug.current == $locationSlug\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ] | order(publicTitle asc)[$start...$end]{\n  _id,\n  ghiListingId,\n  publicTitle,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  }\n}\n': PropertyCardsByLocationQueryResult;
+    '\n  *[\n    _type == "locationTaxonomy"\n    && defined(slug.current)\n  ]{\n    type,\n    "slug": slug.current,\n    "countrySlug": select(\n      type == "country" => slug.current,\n      type == "location" => parent->slug.current,\n      type == "community" => parent->parent->slug.current\n    ),\n    "locationSlug": select(\n      type == "location" => slug.current,\n      type == "community" => parent->slug.current,\n      null\n    ),\n    "communitySlug": select(type == "community" => slug.current, null),\n    _updatedAt\n  }\n': SitemapTaxonomyQueryResult;
+    '\n  *[\n    _type in ["propertyListing", "development"]\n    && (_type != "propertyListing" || listingKind in ["property", "unit"])\n    && defined(slug.current)\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n    && coalesce(seo.noindex, false) != true\n  ]{\n    "countrySlug": location.country->slug.current,\n    "locationSlug": location.location->slug.current,\n    "communitySlug": location.community->slug.current,\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapListingsQueryResult;
   }
 }

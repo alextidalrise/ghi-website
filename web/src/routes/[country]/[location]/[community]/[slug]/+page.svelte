@@ -53,6 +53,9 @@
 	{/if}
 
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
+	{#if data.listingJsonLd}
+		{@html jsonLdScriptHtml(data.listingJsonLd)}
+	{/if}
 </svelte:head>
 
 {#if property}

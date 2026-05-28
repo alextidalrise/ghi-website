@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
+	import ListingResults from '$lib/components/listing/ListingResults.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
@@ -26,35 +27,32 @@
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
 
-<article class="location-stub">
+<article class="location-page">
 	<Breadcrumbs items={data.breadcrumbs} />
 
-	<div class="location-stub__body content-wrap">
+	<div class="location-page__body content-wrap">
 		<h1>{data.community.name}</h1>
-		<p class="location-stub__intro">
+		<p class="location-page__intro">
 			{data.community.publicDescription ?? placeholderBody}
 		</p>
 
-		{#if data.listings.length > 0}
-			<p class="location-stub__count">
-				{data.listings.length} listing{data.listings.length === 1 ? '' : 's'} in this community.
-			</p>
-		{/if}
+		<ListingResults
+			basePath={data.canonicalPath}
+			searchParams={data.searchParams}
+			cards={data.listingResults.cards}
+			total={data.listingResults.total}
+			pagination={data.listingResults.pagination}
+		/>
 	</div>
 </article>
 
 <style>
-	.location-stub__body {
+	.location-page__body {
 		padding-block: var(--space-xl) var(--space-2xl);
 	}
 
-	.location-stub__intro {
+	.location-page__intro {
 		margin-top: var(--space-md);
 		max-width: 42rem;
-	}
-
-	.location-stub__count {
-		margin-top: var(--space-lg);
-		color: var(--green);
 	}
 </style>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
+	import ListingResults from '$lib/components/listing/ListingResults.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
@@ -36,17 +37,25 @@
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
 
-<article class="location-stub">
+<article class="location-page">
 	<Breadcrumbs items={data.breadcrumbs} />
 
-	<div class="location-stub__body content-wrap">
+	<div class="location-page__body content-wrap">
 		<h1>{data.location.name}</h1>
-		<p class="location-stub__intro">
+		<p class="location-page__intro">
 			{data.location.publicDescription ?? placeholderBody}
 		</p>
 
+		<ListingResults
+			basePath={data.canonicalPath}
+			searchParams={data.searchParams}
+			cards={data.listingResults.cards}
+			total={data.listingResults.total}
+			pagination={data.listingResults.pagination}
+		/>
+
 		{#if data.directCommunities.length > 0}
-			<section class="location-stub__list" aria-labelledby="communities-heading">
+			<section class="location-page__list" aria-labelledby="communities-heading">
 				<h2 id="communities-heading">Communities</h2>
 				<ul>
 					{#each data.directCommunities as community (community._id)}
@@ -64,7 +73,7 @@
 		{/if}
 
 		{#if data.associatedCommunities.length > 0}
-			<section class="location-stub__list" aria-labelledby="associated-communities-heading">
+			<section class="location-page__list" aria-labelledby="associated-communities-heading">
 				<h2 id="associated-communities-heading">Also in this area</h2>
 				<ul>
 					{#each data.associatedCommunities as community (community._id)}
@@ -84,30 +93,30 @@
 </article>
 
 <style>
-	.location-stub__body {
+	.location-page__body {
 		padding-block: var(--space-xl) var(--space-2xl);
 	}
 
-	.location-stub__intro {
+	.location-page__intro {
 		margin-top: var(--space-md);
 		max-width: 42rem;
 	}
 
-	.location-stub__list {
+	.location-page__list {
 		margin-top: var(--space-xl);
 	}
 
-	.location-stub__list h2 {
+	.location-page__list h2 {
 		margin-bottom: var(--space-sm);
 	}
 
-	.location-stub__list ul {
+	.location-page__list ul {
 		list-style: none;
 		display: grid;
 		gap: var(--space-xs);
 	}
 
-	.location-stub__list a {
+	.location-page__list a {
 		color: var(--green);
 		text-decoration: underline;
 		text-underline-offset: 0.15em;

@@ -15,7 +15,7 @@ import {
 	breadcrumbListJsonLd
 } from '$lib/listing/breadcrumbs';
 import { buildCanonicalPath, pathsMatch } from '$lib/listing/canonicalPath';
-import { buildDevelopmentSeo, buildPropertySeo } from '$lib/listing/seo';
+import { buildDevelopmentSeo, buildPropertySeo, buildRealEstateListingJsonLd } from '$lib/listing/seo';
 import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
 
 type StalePathRow = {
@@ -126,6 +126,8 @@ function buildPropertyPagePayload(
 	const breadcrumbs = buildPropertyBreadcrumbs(property, canonicalPath);
 	const seo = buildPropertySeo(property, canonicalUrl);
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, siteOrigin);
+	const listingJsonLd =
+		seo.noindex ? null : buildRealEstateListingJsonLd(property, canonicalUrl);
 
 	return {
 		pageType: 'property' as const,
@@ -133,7 +135,8 @@ function buildPropertyPagePayload(
 		canonicalUrl,
 		breadcrumbs,
 		seo,
-		breadcrumbJsonLd
+		breadcrumbJsonLd,
+		listingJsonLd
 	};
 }
 
@@ -178,6 +181,7 @@ function buildDevelopmentPagePayload(
 		canonicalUrl,
 		breadcrumbs,
 		seo,
-		breadcrumbJsonLd
+		breadcrumbJsonLd,
+		listingJsonLd: null
 	};
 }

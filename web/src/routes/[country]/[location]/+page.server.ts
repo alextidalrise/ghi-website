@@ -2,10 +2,12 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { buildLocationBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
+import { parseListingSearchParams } from '$lib/listing/searchParams';
 import { buildLocationSeo } from '$lib/listing/seo';
 import {
 	communitiesByLocationQuery,
 	countryBySlugQuery,
+	fetchListingCards,
 	fetchPublic,
 	locationBySlugQuery
 } from '$lib/sanity/queries';
@@ -36,14 +38,26 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		error(404, 'Location not found.');
 	}
 
-	const communities = await fetchPublic<CommunityTaxonomyRow[]>(communitiesByLocationQuery, {
-		params: { locationId: location._id }
-	});
+	const searchParams = parseListingSearchParams(url);
+	const canonicalPath = `/${country.slug}/${location.slug}`;
+
+	const [communities, listingResults] = await Promise.all([
+		fetchPublic<CommunityTaxonomyRow[]>(communitiesByLocationQuery, {
+			params: { locationId: location._id }
+		}),
+		fetchListingCards({
+			scope: {
+				type: 'location',
+				countrySlug: params.country,
+				locationSlug: params.location
+			},
+			params: searchParams
+		})
+	]);
 
 	const directCommunities = (communities ?? []).filter((community) => !community.isAssociated);
 	const associatedCommunities = (communities ?? []).filter((community) => community.isAssociated);
 
-	const canonicalPath = `/${country.slug}/${location.slug}`;
 	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const breadcrumbs = buildLocationBreadcrumbs(country, location, canonicalPath);
 	const seo = buildLocationSeo(
@@ -63,6 +77,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		country,
 		directCommunities,
 		associatedCommunities,
+		canonicalPath,
+		searchParams,
+		listingResults,
 		canonicalUrl,
 		breadcrumbs,
 		seo,

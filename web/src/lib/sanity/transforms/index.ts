@@ -311,4 +311,12 @@ export function toPublicDevelopment(raw: RawDevelopment | null): PublicDevelopme
 export { filterMediaAsset, filterMediaAssetList, filterMediaBundle } from './mediaFilter';
 export { transformMapPrivacy, stripInternalLocationFields } from './mapPrivacy';
 export { filterPublicPricing } from './pricingFilter';
+export {
+	CARD_HERO_IMAGE,
+	toPublicPropertyCard,
+	type PublicPropertyCard,
+	type PublicPropertyCardLocation,
+	type PublicPropertyCardSpecs,
+	type RawPropertyCard
+} from './propertyCard';
 export { filterReservedUnits, filterReservedUnitTypes } from './reservedFilter';
