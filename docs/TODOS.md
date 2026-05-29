@@ -54,15 +54,16 @@ Foundation for every grid, carousel, and similar-properties block.
 
 ## F. Featured / frontline listings
 
-- [ ] **F-01** Decision: manual CMS flag vs `frontline_golf` rule  
-  - Done when: decision recorded in this file or CMS field mapping doc
+**F-01 decision (2026-05-29):**
 
-- [ ] **F-02** Frontline listings query + section component  
-  - Files: `web/src/lib/sanity/queries/featured.ts`, `FrontlineListings.svelte`  
-  - Done when: scoped by country or location; returns ≤8 cards; used on location page
+- **Frontline spotlight** — use existing `golf.golfRelevance == "frontline_golf"` on publishable `propertyListing` docs. No new CMS field. Developments may carry the same enum but v1 queries stay property-only (same as listing search).
+- **Featured carousel** (homepage / hand-picked 6–8) — ordered reference lists on `siteSettings` (homepage) and country `locationTaxonomy` docs. Shipped in F-03.
 
-- [ ] **F-03** Featured listings query (if manual flag chosen)  
-  - Done when: CMS field exists OR rule-based interim documented; homepage/country can render carousel placeholder
+
+- [x] **F-03** Featured listings query + UI _(2026-05-29)_
+  - CMS: `siteSettings.homepageFeaturedListings` (max 8) + country `featuredListings` (max 6)
+  - Files: `web/src/lib/sanity/queries/featured.ts`, `FeaturedListings.svelte`
+  - Done when: queries preserve editor order, apply public gates, omit unpublished refs; homepage + country pages render featured grid when picks exist; tests pass
 
 ---
 
@@ -154,3 +155,6 @@ _Move items here with completion date when done._
 - [x] **A-02** `PublicPropertyCard` type + `toPublicPropertyCard()` transform _(2026-05-28)_
 - [x] **A-03** `PropertyCard.svelte` (functional, not polished) _(2026-05-28)_
 - [x] **A-04** `ListingGrid.svelte` wrapper _(2026-05-28)_
+- [x] **F-01** Frontline vs featured decision — `frontline_golf` rule; featured carousel deferred _(2026-05-29)_
+- [x] **F-02** Frontline listings query + `FrontlineListings.svelte` on location page _(2026-05-29)_
+- [x] **F-03** Featured listings query + `FeaturedListings.svelte` on homepage and country pages _(2026-05-29)_

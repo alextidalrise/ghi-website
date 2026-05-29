@@ -3,11 +3,16 @@ import type { PageServerLoad } from './$types';
 import { buildCommunityBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
 import { buildCanonicalPath } from '$lib/listing/canonicalPath';
-import { parseListingSearchParams } from '$lib/listing/searchParams';
+import {
+	DEFAULT_LISTING_SEARCH_PARAMS,
+	buildListingSearchHref,
+	parseListingSearchParams
+} from '$lib/listing/searchParams';
 import { buildLocationSeo } from '$lib/listing/seo';
 import {
 	communityBySlugQuery,
 	countryBySlugQuery,
+	fetchFrontlineListingCards,
 	fetchListingCards,
 	fetchPublic,
 	listingLegacyThreeSegmentPathQuery,
@@ -80,15 +85,26 @@ async function loadCommunityPage(
 ) {
 	const searchParams = parseListingSearchParams(url);
 	const canonicalPath = `/${country.slug}/${location.slug}/${community.slug}`;
-	const listingResults = await fetchListingCards({
-		scope: {
-			type: 'community',
-			countrySlug: params.country,
-			locationSlug: params.location,
-			communitySlug: params.community
-		},
-		params: searchParams
-	});
+	const listingScope = {
+		type: 'community' as const,
+		countrySlug: params.country,
+		locationSlug: params.location,
+		communitySlug: params.community
+	};
+
+	const [listingResults, frontlineCards] = await Promise.all([
+		fetchListingCards({
+			scope: listingScope,
+			params: searchParams
+		}),
+		fetchFrontlineListingCards({ scope: listingScope })
+	]);
+
+	const frontlineViewAllHref = buildListingSearchHref(
+		canonicalPath,
+		DEFAULT_LISTING_SEARCH_PARAMS,
+		{ golfRelevance: ['frontline_golf'] }
+	);
 
 	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const breadcrumbs = buildCommunityBreadcrumbs(country, location, community, canonicalPath);
@@ -111,6 +127,8 @@ async function loadCommunityPage(
 		canonicalPath,
 		searchParams,
 		listingResults,
+		frontlineCards,
+		frontlineViewAllHref,
 		canonicalUrl,
 		breadcrumbs,
 		seo,

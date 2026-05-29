@@ -72,6 +72,16 @@ export const locationTaxonomy = defineType({
 			type: 'string',
 			options: { list: [...MAP_PRIVACY_LEVELS], layout: 'dropdown' },
 			description: 'Default map privacy for listings in this location when not overridden.'
+		}),
+		defineField({
+			name: 'featuredListings',
+			title: 'Featured listings',
+			type: 'array',
+			of: [{ type: 'reference', to: [{ type: 'propertyListing' }] }],
+			description:
+				'Hand-picked listings for this country landing page (4–6). Order here is preserved on the site.',
+			hidden: ({ document }) => document?.type !== 'country',
+			validation: (Rule) => Rule.max(6)
 		})
 	],
 	preview: {

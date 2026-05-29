@@ -4,11 +4,13 @@ import { development } from './development';
 import { golfCourse } from './golfCourse';
 import { locationTaxonomy } from './locationTaxonomy';
 import { propertyListing } from './propertyListing';
+import { siteSettings } from './siteSettings';
 import { unit } from './unit';
 import { unitType } from './unitType';
 
 /** Document schemas for GHI Sanity Studio. */
 export const documentTypes: SchemaTypeDefinition[] = [
+	siteSettings,
 	locationTaxonomy,
 	golfCourse,
 	development,
@@ -17,4 +19,12 @@ export const documentTypes: SchemaTypeDefinition[] = [
 	propertyListing
 ];
 
-export { development, golfCourse, locationTaxonomy, propertyListing, unit, unitType };
+export {
+	development,
+	golfCourse,
+	locationTaxonomy,
+	propertyListing,
+	siteSettings,
+	unit,
+	unitType
+};

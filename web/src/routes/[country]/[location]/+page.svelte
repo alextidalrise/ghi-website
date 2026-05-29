@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
+	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import ListingResults from '$lib/components/listing/ListingResults.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
@@ -45,6 +46,12 @@
 		<p class="location-page__intro">
 			{data.location.publicDescription ?? placeholderBody}
 		</p>
+
+		<FrontlineListings
+			cards={data.frontlineCards}
+			heading={`Frontline golf in ${data.location.name}`}
+			viewAllHref={data.frontlineViewAllHref}
+		/>
 
 		<ListingResults
 			basePath={data.canonicalPath}

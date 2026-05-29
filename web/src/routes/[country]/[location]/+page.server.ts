@@ -2,11 +2,16 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { buildLocationBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
-import { parseListingSearchParams } from '$lib/listing/searchParams';
+import {
+	DEFAULT_LISTING_SEARCH_PARAMS,
+	buildListingSearchHref,
+	parseListingSearchParams
+} from '$lib/listing/searchParams';
 import { buildLocationSeo } from '$lib/listing/seo';
 import {
 	communitiesByLocationQuery,
 	countryBySlugQuery,
+	fetchFrontlineListingCards,
 	fetchListingCards,
 	fetchPublic,
 	locationBySlugQuery
@@ -17,6 +22,12 @@ type LocationTaxonomyPage = LocationTaxonomyRef & {
 	seoTitle?: string | null;
 	metaDescription?: string | null;
 	publicDescription?: string | null;
+};
+
+type ResolvedLocationPage = LocationTaxonomyPage & {
+	_id: string;
+	name: string;
+	slug: string;
 };
 
 type CommunityTaxonomyRow = LocationTaxonomyPage & {
@@ -38,34 +49,50 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		error(404, 'Location not found.');
 	}
 
-	const searchParams = parseListingSearchParams(url);
-	const canonicalPath = `/${country.slug}/${location.slug}`;
+	const locationPage: ResolvedLocationPage = {
+		...location,
+		_id: location._id,
+		name: location.name,
+		slug: location.slug
+	};
 
-	const [communities, listingResults] = await Promise.all([
+	const searchParams = parseListingSearchParams(url);
+	const canonicalPath = `/${country.slug}/${locationPage.slug}`;
+
+	const listingScope = {
+		type: 'location' as const,
+		countrySlug: params.country,
+		locationSlug: params.location
+	};
+
+	const [communities, listingResults, frontlineCards] = await Promise.all([
 		fetchPublic<CommunityTaxonomyRow[]>(communitiesByLocationQuery, {
-			params: { locationId: location._id }
+			params: { locationId: locationPage._id }
 		}),
 		fetchListingCards({
-			scope: {
-				type: 'location',
-				countrySlug: params.country,
-				locationSlug: params.location
-			},
+			scope: listingScope,
 			params: searchParams
-		})
+		}),
+		fetchFrontlineListingCards({ scope: listingScope })
 	]);
+
+	const frontlineViewAllHref = buildListingSearchHref(
+		canonicalPath,
+		DEFAULT_LISTING_SEARCH_PARAMS,
+		{ golfRelevance: ['frontline_golf'] }
+	);
 
 	const directCommunities = (communities ?? []).filter((community) => !community.isAssociated);
 	const associatedCommunities = (communities ?? []).filter((community) => community.isAssociated);
 
 	const canonicalUrl = `${url.origin}${canonicalPath}`;
-	const breadcrumbs = buildLocationBreadcrumbs(country, location, canonicalPath);
+	const breadcrumbs = buildLocationBreadcrumbs(country, locationPage, canonicalPath);
 	const seo = buildLocationSeo(
 		{
-			name: location.name,
-			seoTitle: location.seoTitle,
-			metaDescription: location.metaDescription,
-			publicDescription: location.publicDescription
+			name: locationPage.name,
+			seoTitle: locationPage.seoTitle,
+			metaDescription: locationPage.metaDescription,
+			publicDescription: locationPage.publicDescription
 		},
 		canonicalUrl
 	);
@@ -73,13 +100,15 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	return {
 		pageType: 'location' as const,
-		location,
+		location: locationPage,
 		country,
 		directCommunities,
 		associatedCommunities,
 		canonicalPath,
 		searchParams,
 		listingResults,
+		frontlineCards,
+		frontlineViewAllHref,
 		canonicalUrl,
 		breadcrumbs,
 		seo,

@@ -50,4 +50,14 @@ export {
 
 export { fetchListingCards, type ListingSearchResult } from './fetchListings';
 
+export {
+	FRONTLINE_LISTING_LIMIT,
+	HOMEPAGE_FEATURED_LIMIT,
+	COUNTRY_FEATURED_LIMIT,
+	fetchFrontlineListingCards,
+	fetchHomepageFrontlineListingCards,
+	fetchHomepageFeaturedListingCards,
+	fetchCountryFeaturedListingCards
+} from './featured';
+
 export { sitemapListingsQuery, sitemapTaxonomyQuery } from './sitemap';

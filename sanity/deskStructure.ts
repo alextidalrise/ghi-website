@@ -24,6 +24,11 @@ export const deskStructure: StructureResolver = (S) =>
 		.title('Content')
 		.items([
 			S.listItem()
+				.title('Site settings')
+				.child(
+					S.document().schemaType('siteSettings').documentId('siteSettings').title('Site settings')
+				),
+			S.listItem()
 				.title('Properties')
 				.schemaType('propertyListing')
 				.child(S.documentTypeList('propertyListing').title('Properties')),

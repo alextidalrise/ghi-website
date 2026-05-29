@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
+	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
+	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
@@ -34,6 +36,17 @@
 		<p class="location-stub__intro">
 			{data.location.publicDescription ?? placeholderBody}
 		</p>
+
+		<FeaturedListings
+			cards={data.featuredCards}
+			heading={`Featured properties in ${data.location.name}`}
+		/>
+
+		<FrontlineListings
+			cards={data.frontlineCards}
+			heading={`Frontline golf in ${data.location.name}`}
+			viewAllHref={data.frontlineViewAllHref}
+		/>
 
 		{#if data.locations.length > 0}
 			<section class="location-stub__list" aria-labelledby="locations-heading">

@@ -23,12 +23,15 @@ export const SORT_ORDER_FRAGMENTS = {
 } as const satisfies Record<ListingSort, string>;
 
 export type ListingSearchScope =
+	| { type: 'global' }
 	| { type: 'community'; countrySlug: string; locationSlug: string; communitySlug: string }
 	| { type: 'location'; countrySlug: string; locationSlug: string }
 	| { type: 'country'; countrySlug: string };
 
 function scopeFilter(scope: ListingSearchScope): string {
 	switch (scope.type) {
+		case 'global':
+			return 'true';
 		case 'community':
 			return /* groq */ `
         location.country->slug.current == $countrySlug
@@ -113,7 +116,7 @@ export function listingSearchQueryParams(
 	}
 ) {
 	return {
-		countrySlug: scope.countrySlug,
+		...(scope.type !== 'global' ? { countrySlug: scope.countrySlug } : {}),
 		...(scope.type === 'location' || scope.type === 'community'
 			? { locationSlug: scope.locationSlug }
 			: {}),

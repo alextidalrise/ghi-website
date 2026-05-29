@@ -1,5 +1,10 @@
 import type { PageServerLoad } from './$types';
-import { fetchPublic, locationsByCountryQuery } from '$lib/sanity/queries';
+import {
+	fetchHomepageFeaturedListingCards,
+	fetchHomepageFrontlineListingCards,
+	fetchPublic,
+	locationsByCountryQuery
+} from '$lib/sanity/queries';
 
 type CountryOption = {
 	_id: string;
@@ -41,8 +46,15 @@ export const load: PageServerLoad = async () => {
 		})
 	);
 
+	const [featuredCards, frontlineCards] = await Promise.all([
+		fetchHomepageFeaturedListingCards(),
+		fetchHomepageFrontlineListingCards()
+	]);
+
 	return {
 		countries,
-		locations: locationGroups.flat()
+		locations: locationGroups.flat(),
+		featuredCards,
+		frontlineCards
 	};
 };

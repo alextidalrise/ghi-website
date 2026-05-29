@@ -1,5 +1,7 @@
 <script lang="ts">
 	import DiscoveryBar from '$lib/components/listing/DiscoveryBar.svelte';
+	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
+	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 
 	let { data } = $props();
 </script>
@@ -31,13 +33,21 @@
 	</div>
 </section>
 
-<section class="home-intro content-wrap">
-	<p class="text-overline">Coming soon</p>
-	<h2 class="text-h2 home-intro__heading">Property listings are on their way</h2>
-	<p class="text-body home-intro__body">
-		Editors can publish properties in Sanity Studio; this site will render them at their canonical
-		URLs as the foundation rolls out.
-	</p>
+<section class="home-content content-wrap">
+	<FeaturedListings cards={data.featuredCards} heading="Featured properties" />
+
+	<FrontlineListings cards={data.frontlineCards} heading="Frontline golf properties" />
+
+	{#if data.featuredCards.length === 0}
+		<div class="home-intro">
+			<p class="text-overline">Coming soon</p>
+			<h2 class="text-h2 home-intro__heading">Property listings are on their way</h2>
+			<p class="text-body home-intro__body">
+				Editors can publish properties in Sanity Studio; this site will render them at their canonical
+				URLs as the foundation rolls out.
+			</p>
+		</div>
+	{/if}
 </section>
 
 <style>
@@ -109,6 +119,10 @@
 	}
 
 	.home-intro {
+		padding-block: var(--section-gap);
+	}
+
+	.home-content {
 		padding-block: var(--section-gap);
 	}
 
