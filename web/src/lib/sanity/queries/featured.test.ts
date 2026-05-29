@@ -75,6 +75,10 @@ describe('fetchFrontlineListingCards', () => {
 				countrySlug: 'spain',
 				locationSlug: 'costa-del-sol',
 				golfRelevance: ['frontline_golf'],
+				propertyType: null,
+				minPrice: null,
+				maxPrice: null,
+				minBeds: null,
 				start: 0,
 				end: FRONTLINE_LISTING_LIMIT
 			});
@@ -105,6 +109,10 @@ describe('fetchHomepageFrontlineListingCards', () => {
 		mockedFetchPublic.mockImplementation(async (_query, options) => {
 			expect(options?.params).toMatchObject({
 				golfRelevance: ['frontline_golf'],
+				propertyType: null,
+				minPrice: null,
+				maxPrice: null,
+				minBeds: null,
 				start: 0,
 				end: FRONTLINE_LISTING_LIMIT
 			});

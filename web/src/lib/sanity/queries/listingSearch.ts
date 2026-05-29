@@ -115,20 +115,21 @@ export function listingSearchQueryParams(
 		end?: number;
 	}
 ) {
+	// Sanity requires every $param referenced in GROQ to be supplied — use null for inactive facets.
 	return {
 		...(scope.type !== 'global' ? { countrySlug: scope.countrySlug } : {}),
 		...(scope.type === 'location' || scope.type === 'community'
 			? { locationSlug: scope.locationSlug }
 			: {}),
 		...(scope.type === 'community' ? { communitySlug: scope.communitySlug } : {}),
-		propertyType: params.propertyType ?? undefined,
-		minPrice: params.minPrice ?? undefined,
-		maxPrice: params.maxPrice ?? undefined,
-		minBeds: params.minBeds ?? undefined,
+		propertyType: params.propertyType ?? null,
+		minPrice: params.minPrice ?? null,
+		maxPrice: params.maxPrice ?? null,
+		minBeds: params.minBeds ?? null,
 		golfRelevance:
 			params.golfRelevance && params.golfRelevance.length > 0
 				? params.golfRelevance
-				: undefined,
+				: null,
 		start: params.start,
 		end: params.end
 	};
