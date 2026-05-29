@@ -1,32 +1,16 @@
-import { getDraftId } from 'sanity';
 import {
 	defineDocuments,
-	type DocumentLocationResolver,
+	defineLocations,
 	type PresentationPluginOptions
 } from 'sanity/presentation';
-import { map } from 'rxjs';
 import { buildListingPreviewPath, buildTaxonomyPreviewPath } from '../lib/previewPaths';
 
-const listingLocationQuery = {
-	fetch: `*[_id==$id][0]{
-		"title": publicTitle,
-		"slug": slug.current,
-		"countrySlug": location.country->slug.current,
-		"locationSlug": location.location->slug.current,
-		"communitySlug": location.community->slug.current
-	}`,
-	listen: `*[_id in [$id, $draftId]]`
-} as const;
-
-const taxonomyLocationQuery = {
-	fetch: `*[_id==$id][0]{
-		name,
-		type,
-		"slug": slug.current,
-		"parentSlug": parent->slug.current,
-		"grandparentSlug": parent->parent->slug.current
-	}`,
-	listen: `*[_id in [$id, $draftId]]`
+const listingSelect = {
+	title: 'publicTitle',
+	slug: 'slug.current',
+	countrySlug: 'location.country.slug.current',
+	locationSlug: 'location.location.slug.current',
+	communitySlug: 'location.community.slug.current'
 } as const;
 
 function resolveListingLocation(doc: {
@@ -81,35 +65,30 @@ export function resolveTaxonomyLocationState(doc: {
 	};
 }
 
-/** listenQuery resolver — avoids observeForPreview hanging on unsaved drafts. */
-export const resolveDocumentLocations: DocumentLocationResolver = (
-	params,
-	{ documentStore }
-) => {
-	const queryParams = { id: params.id, draftId: getDraftId(params.id) };
-	const listenOptions = { perspective: params.perspectiveStack };
-
-	if (params.type === 'locationTaxonomy') {
-		return documentStore
-			.listenQuery(taxonomyLocationQuery, queryParams, listenOptions)
-			.pipe(map(resolveTaxonomyLocationState));
-	}
-
-	if (params.type === 'propertyListing' || params.type === 'development') {
-		return documentStore
-			.listenQuery(listingLocationQuery, queryParams, listenOptions)
-			.pipe(map(resolveListingLocation));
-	}
-
-	if (params.type === 'siteSettings') {
-		return {
-			message: 'Homepage settings',
-			tone: 'positive' as const,
-			locations: [{ title: 'Homepage', href: '/' }]
-		};
-	}
-
-	return null;
+const locations: NonNullable<PresentationPluginOptions['resolve']>['locations'] = {
+	propertyListing: defineLocations({
+		select: listingSelect,
+		resolve: resolveListingLocation
+	}),
+	development: defineLocations({
+		select: listingSelect,
+		resolve: resolveListingLocation
+	}),
+	locationTaxonomy: defineLocations({
+		select: {
+			name: 'name',
+			type: 'type',
+			slug: 'slug.current',
+			parentSlug: 'parent.slug.current',
+			grandparentSlug: 'parent.parent.slug.current'
+		},
+		resolve: resolveTaxonomyLocationState
+	}),
+	siteSettings: defineLocations({
+		message: 'Homepage settings',
+		tone: 'positive',
+		locations: [{ title: 'Homepage', href: '/' }]
+	})
 };
 
 export const mainDocuments = defineDocuments([
@@ -133,5 +112,5 @@ export const mainDocuments = defineDocuments([
 
 export const resolve: PresentationPluginOptions['resolve'] = {
 	mainDocuments,
-	locations: resolveDocumentLocations
+	locations
 };
