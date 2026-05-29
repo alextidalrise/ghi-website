@@ -9,11 +9,16 @@ import { schemaTypes } from './schemas';
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? 's88o8sjb';
 const previewOrigin = process.env.SANITY_STUDIO_PREVIEW_ORIGIN ?? 'http://localhost:5173';
 
+const sharedAuth = {
+	loginMethod: 'dual' as const
+};
+
 const sharedWorkspace: Pick<
 	WorkspaceOptions,
-	'projectId' | 'plugins' | 'schema'
+	'projectId' | 'auth' | 'plugins' | 'schema'
 > = {
 	projectId,
+	auth: sharedAuth,
 	plugins: [
 		structureTool({ structure: deskStructure }),
 		presentationTool({
