@@ -17,6 +17,7 @@ export const propertyListing = defineType({
 		{ name: 'specs', title: 'Specifications' },
 		{ name: 'content', title: 'Content & media' },
 		{ name: 'golf', title: 'Golf' },
+		{ name: 'related', title: 'Related listings' },
 		{ name: 'seo', title: 'SEO & CTAs' },
 		{ name: 'governance', title: 'Governance & workflow' }
 	],
@@ -131,6 +132,12 @@ export const propertyListing = defineType({
 			title: 'Media',
 			type: 'mediaFields',
 			group: 'content'
+		}),
+		defineField({
+			name: 'related',
+			title: 'Related listings',
+			type: 'relatedContentFields',
+			group: 'related'
 		}),
 		defineField({
 			name: 'ctas',

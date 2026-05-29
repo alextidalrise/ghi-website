@@ -142,12 +142,39 @@ export const SEO_PUBLIC = /* groq */ `{
   openGraphImage${MEDIA_ASSET_PUBLIC},
   noindex,
   schemaType,
-  similarPropertiesMode,
   backLinks[]{
     label,
     url
   },
   supportingArticles
+}`;
+
+/** Public related-listings fields — manual picks and tags fetched server-side only. */
+export const RELATED_PUBLIC = /* groq */ `{
+  similarPropertiesMode
+}`;
+
+/** Development card for grids (similar properties manual picks). */
+export const DEVELOPMENT_CARD_PUBLIC = /* groq */ `{
+  _id,
+  _type,
+  ghiListingId,
+  publicTitle,
+  "slug": slug.current,
+  listingKind,
+  developmentDisplayMode,
+  developmentStatus,
+  location{
+    country->{ name, "slug": slug.current },
+    location->{ name, "slug": slug.current },
+    community->{ name, "slug": slug.current },
+    addressDisplay
+  },
+  pricing${PRICING_PUBLIC},
+  media{
+    heroImage${MEDIA_ASSET_PUBLIC},
+    thumbnailOverride${MEDIA_ASSET_PUBLIC}
+  }
 }`;
 
 /** Card / search result minimal projection. */
@@ -195,6 +222,7 @@ export const PROPERTY_LISTING_PUBLIC = /* groq */ `{
   content${CONTENT_PUBLIC},
   media${MEDIA_PUBLIC},
   ctas${CTA_PUBLIC},
+  related${RELATED_PUBLIC},
   seo${SEO_PUBLIC}
 }`;
 
@@ -254,6 +282,7 @@ export const DEVELOPMENT_PUBLIC = /* groq */ `{
   content${CONTENT_PUBLIC},
   golf${GOLF_PUBLIC},
   ctas${CTA_PUBLIC},
+  related${RELATED_PUBLIC},
   seo${SEO_PUBLIC},
   unitTypes[]->${UNIT_TYPE_PUBLIC},
   units[]->${UNIT_PUBLIC}
@@ -288,6 +317,7 @@ export const PROPERTY_LISTING_WITH_CANONICAL = /* groq */ `{
   content${CONTENT_PUBLIC},
   media${MEDIA_PUBLIC},
   ctas${CTA_PUBLIC},
+  related${RELATED_PUBLIC},
   seo${SEO_PUBLIC},
   ${CANONICAL_PATH_FIELDS}
 }`;
@@ -325,6 +355,7 @@ export const DEVELOPMENT_WITH_CANONICAL = /* groq */ `{
   content${CONTENT_PUBLIC},
   golf${GOLF_PUBLIC},
   ctas${CTA_PUBLIC},
+  related${RELATED_PUBLIC},
   seo${SEO_PUBLIC},
   unitTypes[]->${UNIT_TYPE_PUBLIC},
   units[]->${UNIT_PUBLIC},

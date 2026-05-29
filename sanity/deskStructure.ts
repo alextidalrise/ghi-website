@@ -54,8 +54,42 @@ export const deskStructure: StructureResolver = (S) =>
 				),
 			S.listItem()
 				.title('Locations')
-				.schemaType('locationTaxonomy')
-				.child(S.documentTypeList('locationTaxonomy').title('Locations')),
+				.child(
+					S.list()
+						.title('Locations')
+						.items([
+							S.listItem()
+								.title('Countries')
+								.schemaType('locationTaxonomy')
+								.child(
+									S.documentList()
+										.title('Countries')
+										.schemaType('locationTaxonomy')
+										.filter('_type == "locationTaxonomy" && type == "country"')
+										.defaultOrdering([{ field: 'name', direction: 'asc' }])
+								),
+							S.listItem()
+								.title('Locations')
+								.schemaType('locationTaxonomy')
+								.child(
+									S.documentList()
+										.title('Locations')
+										.schemaType('locationTaxonomy')
+										.filter('_type == "locationTaxonomy" && type == "location"')
+										.defaultOrdering([{ field: 'name', direction: 'asc' }])
+								),
+							S.listItem()
+								.title('Communities')
+								.schemaType('locationTaxonomy')
+								.child(
+									S.documentList()
+										.title('Communities')
+										.schemaType('locationTaxonomy')
+										.filter('_type == "locationTaxonomy" && type == "community"')
+										.defaultOrdering([{ field: 'name', direction: 'asc' }])
+								)
+						])
+				),
 			S.listItem()
 				.title('Golf courses')
 				.schemaType('golfCourse')

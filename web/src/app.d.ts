@@ -3,7 +3,10 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			preview: boolean;
+			loadQuery: import('@sanity/svelte-loader').LoadQuery;
+		}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}

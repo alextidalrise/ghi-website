@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import ContentSection from '$lib/components/property/ContentSection.svelte';
-	import SimilarProperties from '$lib/components/listing/SimilarProperties.svelte';
 	import EnquiryCta from '$lib/components/property/EnquiryCta.svelte';
 	import Gallery from '$lib/components/property/Gallery.svelte';
 	import GolfInfo from '$lib/components/property/GolfInfo.svelte';
@@ -15,58 +14,93 @@
 	import SharedAmenities from '$lib/components/development/SharedAmenities.svelte';
 	import UnitTypesList from '$lib/components/development/UnitTypesList.svelte';
 	import UnitsList from '$lib/components/development/UnitsList.svelte';
-	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
+	import { withPreviewLocationSeo } from '$lib/listing/detailPage';
 	import {
 		shouldShowDevelopmentPricing,
 		showsUnitTypes,
 		showsUnits
 	} from '$lib/listing/developmentDisplay';
-	import ListingDetailPreview from './ListingDetailPreview.svelte';
+	import { buildDevelopmentSeo, buildPropertySeo } from '$lib/listing/seo';
+	import {
+		toPublicDevelopment,
+		toPublicPropertyListing,
+		type RawDevelopment,
+		type RawPropertyListing
+	} from '$lib/sanity/transforms';
+	import type { QueryResponseInitial } from '@sanity/svelte-loader';
+	import { useQuery } from '@sanity/svelte-loader';
 	import type { PageData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	type PreviewPageData = Extract<PageData, { preview: true }>;
 
-	const property = $derived(data.preview ? null : data.pageType === 'property' ? data.property : null);
-	const development = $derived(
-		data.preview ? null : data.pageType === 'development' ? data.development : null
+	let {
+		data
+	}: {
+		data: PreviewPageData;
+	} = $props();
+
+	const listingQuery = useQuery<RawPropertyListing | RawDevelopment | null>(
+		data.previewQuery,
+		data.queryParams,
+		{ initial: data.listingInitial as QueryResponseInitial<RawPropertyListing | RawDevelopment | null> }
 	);
+
+	const property = $derived.by(() => {
+		if (data.pageType !== 'property') {
+			return null;
+		}
+
+		const raw = $listingQuery.data as RawPropertyListing | null | undefined;
+		return toPublicPropertyListing(raw ?? null) ?? data.property;
+	});
+
+	const development = $derived.by(() => {
+		if (data.pageType !== 'development') {
+			return null;
+		}
+
+		const raw = $listingQuery.data as RawDevelopment | null | undefined;
+		return toPublicDevelopment(raw ?? null) ?? data.development;
+	});
+
+	const seo = $derived.by(() => {
+		if (property) {
+			return withPreviewLocationSeo(buildPropertySeo(property, data.canonicalUrl));
+		}
+
+		if (development) {
+			return withPreviewLocationSeo(buildDevelopmentSeo(development, data.canonicalUrl));
+		}
+
+		return data.seo;
+	});
+
 	const displayMode = $derived(development?.developmentDisplayMode ?? 'flat_listing');
 	const showInventoryPricing = $derived(shouldShowDevelopmentPricing(displayMode));
 </script>
 
 <svelte:head>
-	{#if !data.preview}
-		<title>{data.seo.title}</title>
-		{#if data.seo.description}
-			<meta name="description" content={data.seo.description} />
-		{/if}
-		<link rel="canonical" href={data.seo.canonicalUrl} />
-		{#if data.seo.noindex}
-			<meta name="robots" content="noindex, nofollow" />
-		{/if}
+	<title>{seo.title}</title>
+	{#if seo.description}
+		<meta name="description" content={seo.description} />
+	{/if}
+	<link rel="canonical" href={seo.canonicalUrl} />
+	<meta name="robots" content="noindex, nofollow" />
 
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content={data.seo.canonicalUrl} />
-		{#if data.seo.openGraphTitle}
-			<meta property="og:title" content={data.seo.openGraphTitle} />
-		{/if}
-		{#if data.seo.openGraphDescription}
-			<meta property="og:description" content={data.seo.openGraphDescription} />
-		{/if}
-		{#if data.seo.openGraphImageUrl}
-			<meta property="og:image" content={data.seo.openGraphImageUrl} />
-		{/if}
-
-		{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
-		{#if data.listingJsonLd}
-			{@html jsonLdScriptHtml(data.listingJsonLd)}
-		{/if}
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content={seo.canonicalUrl} />
+	{#if seo.openGraphTitle}
+		<meta property="og:title" content={seo.openGraphTitle} />
+	{/if}
+	{#if seo.openGraphDescription}
+		<meta property="og:description" content={seo.openGraphDescription} />
+	{/if}
+	{#if seo.openGraphImageUrl}
+		<meta property="og:image" content={seo.openGraphImageUrl} />
 	{/if}
 </svelte:head>
 
-{#if data.preview}
-	<ListingDetailPreview {data} />
-{:else if property}
+{#if property}
 	<article class="listing-page">
 		<Breadcrumbs items={data.breadcrumbs} />
 		<Hero listing={property} />
@@ -95,8 +129,6 @@
 				</ul>
 			</section>
 		{/if}
-
-		<SimilarProperties cards={data.similarCards} />
 
 		<EnquiryCta listing={property} />
 	</article>

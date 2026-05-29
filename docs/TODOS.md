@@ -69,14 +69,22 @@ Foundation for every grid, carousel, and similar-properties block.
 
 ## G. Similar properties
 
-- [ ] **G-01** `similarPropertiesQuery` — automatic mode  
+- [x] **G-01** `similarPropertiesQuery` — automatic mode _(2026-05-29)_
+  - Files: `web/src/lib/sanity/queries/similar.ts` (`automaticSimilarPropertiesQuery`)
   - Done when: same community + property type, exclude current, limit 4, public gates applied
 
-- [ ] **G-02** Manual + tags modes  
-  - Done when: respects `seo.similarPropertiesMode`; disabled returns empty
+- [x] **G-02** Manual + tags modes _(2026-05-29)_
+  - Files: `web/src/lib/sanity/queries/similar.ts`, `web/src/lib/sanity/transforms/similarListingCard.ts`
+  - Done when: respects `seo.similarPropertiesMode`; manual preserves order (properties + developments); tags overlap; disabled returns empty
 
-- [ ] **G-03** `SimilarProperties.svelte` on detail page  
-  - Done when: section on property template; hidden when mode disabled or zero results
+- [x] **G-03** `SimilarProperties.svelte` on detail page _(2026-05-29)_
+  - Files: `web/src/lib/components/listing/SimilarProperties.svelte`, property `[slug]/+page.server.ts` / `+page.svelte`
+  - Done when: section on property template above enquiry; hidden when mode disabled or zero results
+
+- [x] **G-04** Split similar-properties fields from `seoFields` → `relatedContentFields` _(2026-05-29)_
+  - CMS: new `related` object on `propertyListing` + `development`; migration copies `seo.similar*`
+  - Files: `sanity/schemas/objects/relatedContentFields.ts`, `sanity/migrations/related-content-migrate.ts`, `web/src/lib/sanity/queries/similar.ts`, allowlists + transforms
+  - Done when: Studio shows **Related listings** group with mode-conditional fields; existing docs migrated; similar-properties queries read `related.*`; tests + typegen pass; `backLinks` / `supportingArticles` remain on `seo`
 
 ---
 
@@ -100,10 +108,12 @@ Foundation for every grid, carousel, and similar-properties block.
 
 ## I. Navigation
 
-- [ ] **I-01** Wire `SiteNav` hrefs to real routes  
+- [x] **I-01** Wire `SiteNav` hrefs to real routes _(2026-05-29)_
+  - Files: `web/src/lib/nav/siteNav.ts`, `SiteNav.svelte`, `web/src/routes/about/+page.svelte`
   - Done when: Destinations → `/spain` (or country index); no `#` placeholders for primary items
 
-- [ ] **I-02** Optional `+layout.server.ts` taxonomy preload  
+- [x] **I-02** Optional `+layout.server.ts` taxonomy preload _(2026-05-29)_
+  - Files: `web/src/lib/sanity/queries/nav.ts`, `web/src/routes/+layout.server.ts`, `+page.server.ts`
   - Done when: country list available for nav dropdown OR documented skip if static nav preferred
 
 ---
@@ -123,12 +133,13 @@ Foundation for every grid, carousel, and similar-properties block.
 
 ## K. Sanity Studio QoL
 
-- [ ] **K-01** Desk structure — taxonomy grouped by type  
+- [x] **K-01** Desk structure — taxonomy grouped by type _(2026-05-29)_
   - Files: `sanity/deskStructure.ts`  
   - Done when: countries / locations / communities browsable separately
 
-- [ ] **K-02** Preview URLs → canonical frontend paths  
-  - Done when: opening preview from a listing resolves to `/{country}/{location}/{community}/{slug}`
+- [x] **K-02** Preview URLs → canonical frontend paths _(2026-05-29)_
+  - Files: `sanity/presentation/resolve.ts`, `sanity/lib/previewPaths.ts`, `sanity/sanity.config.ts`, `web/src/hooks.server.ts`, `web/src/lib/sanity/serverClient.ts`, listing + taxonomy preview loaders
+  - Done when: opening preview from a listing resolves to `/{country}/{location}/{community}/{slug}`; draft preview via Presentation tool + read token
 
 ---
 
@@ -157,4 +168,8 @@ _Move items here with completion date when done._
 - [x] **A-04** `ListingGrid.svelte` wrapper _(2026-05-28)_
 - [x] **F-01** Frontline vs featured decision — `frontline_golf` rule; featured carousel deferred _(2026-05-29)_
 - [x] **F-02** Frontline listings query + `FrontlineListings.svelte` on location page _(2026-05-29)_
+- [x] **G-01** Automatic similar properties query _(2026-05-29)_
+- [x] **G-02** Manual + tags similar properties modes _(2026-05-29)_
+- [x] **G-03** `SimilarProperties.svelte` on property detail _(2026-05-29)_
+- [x] **G-04** Split similar-properties fields to `relatedContentFields` _(2026-05-29)_
 - [x] **F-03** Featured listings query + `FeaturedListings.svelte` on homepage and country pages _(2026-05-29)_

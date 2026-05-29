@@ -18,6 +18,8 @@
 		"@portabletext/svelte": "^3.0.1",
 		"@sanity/client": "^7.14.0",
 		"@sanity/image-url": "^1.2.0",
+		"@sanity/svelte-loader": "^2.0.24",
+		"@sanity/visual-editing": "^5.4.3",
 		"groq": "^3.88.2"
 	},
 	"devDependencies": {

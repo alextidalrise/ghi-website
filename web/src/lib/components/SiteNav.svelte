@@ -1,10 +1,13 @@
 <script lang="ts">
-	const navItems = [
-		{ label: 'Properties', href: '#' },
-		{ label: 'Destinations', href: '#' },
-		{ label: 'Golf', href: '#' },
-		{ label: 'About', href: '#' }
-	];
+	import { buildSiteNavItems } from '$lib/nav/siteNav';
+
+	type Props = {
+		primaryCountrySlug: string;
+	};
+
+	let { primaryCountrySlug }: Props = $props();
+
+	const navItems = $derived(buildSiteNavItems(primaryCountrySlug));
 </script>
 
 <nav class="site-nav" aria-label="Main">

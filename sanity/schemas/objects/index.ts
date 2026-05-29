@@ -9,6 +9,7 @@ import { galleryGroup, mediaFields } from './mediaFields';
 import { pricingFields } from './pricingFields';
 import { privateReportingFields } from './privateReportingFields';
 import { sensitiveGovernanceFields } from './sensitiveGovernanceFields';
+import { relatedContentFields } from './relatedContentFields';
 import { seoFields } from './seoFields';
 import { sourceProvenance } from './sourceProvenance';
 import { specsFields } from './specsFields';
@@ -33,6 +34,7 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	contentFields,
 	mediaFields,
 	ctaFields,
+	relatedContentFields,
 	seoFields,
 	workflowFields,
 	sensitiveGovernanceFields,

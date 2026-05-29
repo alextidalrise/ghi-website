@@ -20,12 +20,15 @@ type SeoInput = {
 	openGraphImage?: Parameters<typeof filterMediaAsset>[0] | null;
 	noindex?: boolean | null;
 	schemaType?: string | null;
-	similarPropertiesMode?: string | null;
 	backLinks?: Array<{ label?: string | null; url?: string | null }> | null;
 	supportingArticles?: unknown;
 	primaryKeyword?: string | null;
 	secondaryKeywords?: unknown;
 	canonicalCluster?: unknown;
+};
+
+type RelatedInput = {
+	similarPropertiesMode?: string | null;
 	manualSimilarProperties?: unknown;
 	similarityTags?: unknown;
 };
@@ -93,6 +96,7 @@ export type RawPropertyListing = {
 	pricing?: PricingInput | null;
 	specs?: Record<string, unknown> | null;
 	media?: MediaBundleInput | null;
+	related?: RelatedInput | null;
 	seo?: SeoInput | null;
 	ctas?: CtaInput | null;
 	golf?: GolfInput | null;
@@ -107,9 +111,12 @@ export type PublicSeo = {
 	openGraphImage: ReturnType<typeof filterMediaAsset> | null;
 	noindex?: boolean | null;
 	schemaType?: string | null;
-	similarPropertiesMode?: string | null;
 	backLinks?: Array<{ label?: string | null; url?: string | null }> | null;
 	supportingArticles?: unknown;
+};
+
+export type PublicRelated = {
+	similarPropertiesMode?: string | null;
 };
 
 export type PublicCta = Omit<CtaInput, 'whatsAppMessageTemplate' | 'enquiryRouting'>;
@@ -149,6 +156,7 @@ export type RawDevelopment = {
 	location?: LocationMapInput | null;
 	pricing?: PricingInput | null;
 	media?: MediaBundleInput | null;
+	related?: RelatedInput | null;
 	seo?: SeoInput | null;
 	ctas?: CtaInput | null;
 	golf?: GolfInput | null;
@@ -160,11 +168,12 @@ export type RawDevelopment = {
 
 export type PublicPropertyListing = Omit<
 	RawPropertyListing,
-	'location' | 'pricing' | 'media' | 'seo' | 'ctas' | 'golf' | 'content'
+	'location' | 'pricing' | 'media' | 'related' | 'seo' | 'ctas' | 'golf' | 'content'
 > & {
 	location: ReturnType<typeof stripInternalLocationFields>;
 	pricing: PublicPricing | null;
 	media: ReturnType<typeof filterMediaBundle>;
+	related: PublicRelated | null;
 	seo: PublicSeo | null;
 	ctas: PublicCta | null;
 	golf: PublicGolf | null;
@@ -173,11 +182,12 @@ export type PublicPropertyListing = Omit<
 
 export type PublicDevelopment = Omit<
 	RawDevelopment,
-	'location' | 'pricing' | 'media' | 'seo' | 'ctas' | 'golf' | 'content' | 'units' | 'unitTypes' | 'sharedGallery'
+	'location' | 'pricing' | 'media' | 'related' | 'seo' | 'ctas' | 'golf' | 'content' | 'units' | 'unitTypes' | 'sharedGallery'
 > & {
 	location: ReturnType<typeof stripInternalLocationFields>;
 	pricing: ReturnType<typeof filterPublicPricing>;
 	media: ReturnType<typeof filterMediaBundle>;
+	related: ReturnType<typeof filterRelatedFields>;
 	seo: ReturnType<typeof filterSeoFields>;
 	ctas: ReturnType<typeof filterCtaFields>;
 	golf: ReturnType<typeof filterGolfFields>;
@@ -199,8 +209,6 @@ function filterSeoFields(seo: SeoInput | null | undefined): PublicSeo | null {
 		primaryKeyword: _pk,
 		secondaryKeywords: _sk,
 		canonicalCluster: _cc,
-		manualSimilarProperties: _msp,
-		similarityTags: _st,
 		...publicSeo
 	} = seo;
 
@@ -208,6 +216,15 @@ function filterSeoFields(seo: SeoInput | null | undefined): PublicSeo | null {
 		...publicSeo,
 		openGraphImage: filterMediaAsset(openGraphImage)
 	};
+}
+
+function filterRelatedFields(related: RelatedInput | null | undefined): PublicRelated | null {
+	if (!related) {
+		return null;
+	}
+
+	const { manualSimilarProperties: _msp, similarityTags: _st, ...publicRelated } = related;
+	return publicRelated;
 }
 
 function filterCtaFields(ctas: CtaInput | null | undefined): PublicCta | null {
@@ -280,6 +297,7 @@ export function toPublicPropertyListing(raw: RawPropertyListing | null): PublicP
 		location: stripInternalLocationFields(raw.location),
 		pricing: filterPublicPricing(raw.pricing),
 		media: filterMediaBundle(raw.media),
+		related: filterRelatedFields(raw.related),
 		seo: filterSeoFields(raw.seo),
 		ctas: filterCtaFields(raw.ctas),
 		golf: filterGolfFields(raw.golf),
@@ -298,6 +316,7 @@ export function toPublicDevelopment(raw: RawDevelopment | null): PublicDevelopme
 		location: stripInternalLocationFields(raw.location),
 		pricing: filterPublicPricing(raw.pricing),
 		media: filterMediaBundle(raw.media),
+		related: filterRelatedFields(raw.related),
 		seo: filterSeoFields(raw.seo),
 		ctas: filterCtaFields(raw.ctas),
 		golf: filterGolfFields(raw.golf),

@@ -386,8 +386,16 @@ Initial controlled feature vocabulary may include: frontline golf, golf views, p
 
 ### 11. Related content and SEO
 
-- `similarPropertiesMode`, `manualSimilarProperties`, `similarityTags`, `backLinks`, `supportingArticles`
+**Related listings** (`related` object on `propertyListing` and `development`):
+
+- `similarPropertiesMode`, `manualSimilarProperties`, `similarityTags`
   - Classification: **public** behaviour/content fields, provided selected related items are public-safe.
+  - Studio: **Related listings** group; manual picks and tags fields shown only when mode matches.
+
+**SEO metadata** (`seo` object):
+
+- `backLinks`, `supportingArticles`
+  - Classification: **public** behaviour/content fields.
 
 - `seoTitle`, `metaDescription`, `openGraphTitle`, `openGraphDescription`, `openGraphImage`, `noindex`, `schemaType`
   - Classification: **public**.

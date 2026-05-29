@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { buildCountryBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
+import { withPreviewLocationSeo } from '$lib/listing/detailPage';
 import {
 	DEFAULT_LISTING_SEARCH_PARAMS,
 	buildListingSearchHref
@@ -11,6 +12,7 @@ import {
 	countryBySlugQuery,
 	fetchCountryFeaturedListingCards,
 	fetchFrontlineListingCards,
+	fetchMaybePreview,
 	fetchPublic,
 	locationsByCountryQuery
 } from '$lib/sanity/queries';
@@ -22,10 +24,13 @@ type LocationTaxonomyPage = LocationTaxonomyRef & {
 	publicDescription?: string | null;
 };
 
-export const load: PageServerLoad = async ({ params, url }) => {
-	const country = await fetchPublic<CountryBySlugQueryResult>(countryBySlugQuery, {
-		params: { countrySlug: params.country }
-	});
+export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
+	const country = await fetchMaybePreview<CountryBySlugQueryResult>(
+		countryBySlugQuery,
+		{ countrySlug: params.country },
+		loadQuery,
+		preview
+	);
 
 	if (!country?.slug) {
 		error(404, 'Location not found.');
@@ -51,7 +56,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const breadcrumbs = buildCountryBreadcrumbs(country, canonicalPath);
-	const seo = buildLocationSeo(country, canonicalUrl);
+	const seo = preview
+		? withPreviewLocationSeo(buildLocationSeo(country, canonicalUrl))
+		: buildLocationSeo(country, canonicalUrl);
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, url.origin);
 
 	return {

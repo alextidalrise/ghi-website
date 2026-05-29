@@ -31,6 +31,19 @@ export const communityBySlugQuery = defineQuery(`
   ][0]${LOCATION_TAXONOMY_PUBLIC}
 `);
 
+/** All countries for navigation and discovery — ordered by name. */
+export const countriesForNavQuery = defineQuery(`
+  *[
+    _type == "locationTaxonomy"
+    && type == "country"
+    && defined(slug.current)
+  ] | order(name asc) {
+    _id,
+    name,
+    "slug": slug.current
+  }
+`);
+
 /** All locations under a country — for country page listings. */
 export const locationsByCountryQuery = defineQuery(`
   *[

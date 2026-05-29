@@ -1,4 +1,5 @@
 import type { QueryParams } from '@sanity/client';
+import type { LoadQuery } from '@sanity/svelte-loader';
 import { publicClient } from '../client';
 import { PUBLIC_QUERY_PARAMS } from '../constants';
 import {
@@ -27,6 +28,21 @@ export async function fetchPublic<T>(
 	options: PublicFetchOptions = {}
 ): Promise<T | null> {
 	return publicClient.fetch<T | null>(query, withPublicParams(options.params ?? {}));
+}
+
+/** Fetch taxonomy or other docs via preview drafts when preview mode is active. */
+export async function fetchMaybePreview<T>(
+	query: string,
+	params: QueryParams,
+	loadQuery: LoadQuery | undefined,
+	preview: boolean
+): Promise<T | null> {
+	if (preview && loadQuery) {
+		const result = await loadQuery<T>(query, params);
+		return result.data;
+	}
+
+	return fetchPublic<T>(query, { params });
 }
 
 export async function fetchPublicProperty(

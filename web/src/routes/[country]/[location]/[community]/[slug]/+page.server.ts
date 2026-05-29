@@ -1,22 +1,29 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import {
+	buildDevelopmentDetailPageData,
+	buildPropertyDetailPageData,
+	type ListingPathParams
+} from '$lib/listing/detailPage';
+import {
+	developmentByPathPreviewQuery,
 	developmentByPathQuery,
 	developmentStalePathQuery,
 	fetchPublic,
 	fetchPublicDevelopment,
 	fetchPublicProperty,
+	fetchSimilarListingCards,
+	propertyByPathPreviewQuery,
 	propertyByPathQuery,
 	propertyStalePathQuery
 } from '$lib/sanity/queries';
-import {
-	buildDevelopmentBreadcrumbs,
-	buildPropertyBreadcrumbs,
-	breadcrumbListJsonLd
-} from '$lib/listing/breadcrumbs';
 import { buildCanonicalPath, pathsMatch } from '$lib/listing/canonicalPath';
-import { buildDevelopmentSeo, buildPropertySeo, buildRealEstateListingJsonLd } from '$lib/listing/seo';
-import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
+import {
+	toPublicDevelopment,
+	toPublicPropertyListing,
+	type RawDevelopment,
+	type RawPropertyListing
+} from '$lib/sanity/transforms';
 
 type StalePathRow = {
 	countrySlug?: string | null;
@@ -25,25 +32,91 @@ type StalePathRow = {
 	slug?: string | null;
 };
 
-export const load: PageServerLoad = async ({ params, url }) => {
-	const countrySlug = params.country;
-	const locationSlug = params.location;
-	const communitySlug = params.community;
-	const slug = params.slug;
+export const load: PageServerLoad = async ({ params, url, locals }) => {
+	const pathParams: ListingPathParams = {
+		countrySlug: params.country,
+		locationSlug: params.location,
+		communitySlug: params.community,
+		slug: params.slug
+	};
+
+	if (locals.preview) {
+		return loadPreviewListing(pathParams, url.origin, locals.loadQuery);
+	}
+
+	return loadPublishedListing(pathParams, url.origin);
+};
+
+async function loadPreviewListing(
+	pathParams: ListingPathParams,
+	siteOrigin: string,
+	loadQuery: App.Locals['loadQuery']
+) {
+	const propertyInitial = await loadQuery<RawPropertyListing | null>(
+		propertyByPathPreviewQuery,
+		pathParams
+	);
+
+	const property = toPublicPropertyListing(propertyInitial.data);
+	if (property) {
+		const detail = buildPropertyDetailPageData(property, siteOrigin, pathParams, {
+			preview: true,
+			skipRedirect: true,
+			similarCards: []
+		});
+
+		return {
+			preview: true as const,
+			previewQuery: propertyByPathPreviewQuery,
+			queryParams: pathParams,
+			listingInitial: propertyInitial,
+			...detail
+		};
+	}
+
+	const developmentInitial = await loadQuery<RawDevelopment | null>(
+		developmentByPathPreviewQuery,
+		pathParams
+	);
+
+	const development = toPublicDevelopment(developmentInitial.data);
+	if (development) {
+		const detail = buildDevelopmentDetailPageData(development, siteOrigin, pathParams, {
+			preview: true,
+			skipRedirect: true
+		});
+
+		return {
+			preview: true as const,
+			previewQuery: developmentByPathPreviewQuery,
+			queryParams: pathParams,
+			listingInitial: developmentInitial,
+			...detail
+		};
+	}
+
+	error(404, 'Listing not found.');
+}
+
+async function loadPublishedListing(pathParams: ListingPathParams, siteOrigin: string) {
+	const { countrySlug, locationSlug, communitySlug, slug } = pathParams;
 
 	const property = await fetchPublicProperty(propertyByPathQuery, {
-		params: { countrySlug, locationSlug, communitySlug, slug }
+		params: pathParams
 	});
 
 	if (property) {
-		return buildPropertyPagePayload(
-			property,
-			url.origin,
-			countrySlug,
-			locationSlug,
-			communitySlug,
-			slug
-		);
+		const similarCards = await fetchSimilarListingCards({
+			listingId: property._id!,
+			mode: property.related?.similarPropertiesMode,
+			propertyType: property.propertyType,
+			location: property.location
+		});
+
+		return {
+			preview: false as const,
+			...buildPropertyDetailPageData(property, siteOrigin, pathParams, { similarCards })
+		};
 	}
 
 	const stalePropertyMatches = await fetchPublic<StalePathRow[]>(propertyStalePathQuery, {
@@ -61,18 +134,14 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	const development = await fetchPublicDevelopment(developmentByPathQuery, {
-		params: { countrySlug, locationSlug, communitySlug, slug }
+		params: pathParams
 	});
 
 	if (development) {
-		return buildDevelopmentPagePayload(
-			development,
-			url.origin,
-			countrySlug,
-			locationSlug,
-			communitySlug,
-			slug
-		);
+		return {
+			preview: false as const,
+			...buildDevelopmentDetailPageData(development, siteOrigin, pathParams)
+		};
 	}
 
 	const staleDevelopmentMatches = await fetchPublic<StalePathRow[]>(developmentStalePathQuery, {
@@ -90,98 +159,4 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	error(404, 'Listing not found.');
-};
-
-function buildPropertyPagePayload(
-	property: PublicPropertyListing,
-	siteOrigin: string,
-	countrySlug: string,
-	locationSlug: string,
-	communitySlug: string,
-	slug: string
-) {
-	const canonicalPath = buildCanonicalPath({
-		countrySlug: property.location?.country?.slug ?? countrySlug,
-		locationSlug: property.location?.location?.slug ?? locationSlug,
-		communitySlug: property.location?.community?.slug ?? communitySlug,
-		slug: property.slug ?? slug
-	});
-
-	if (!canonicalPath) {
-		error(404, 'Property not found.');
-	}
-
-	if (
-		!pathsMatch({ countrySlug, locationSlug, communitySlug, slug }, {
-			countrySlug: property.location?.country?.slug,
-			locationSlug: property.location?.location?.slug,
-			communitySlug: property.location?.community?.slug,
-			slug: property.slug
-		})
-	) {
-		redirect(301, canonicalPath);
-	}
-
-	const canonicalUrl = `${siteOrigin}${canonicalPath}`;
-	const breadcrumbs = buildPropertyBreadcrumbs(property, canonicalPath);
-	const seo = buildPropertySeo(property, canonicalUrl);
-	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, siteOrigin);
-	const listingJsonLd =
-		seo.noindex ? null : buildRealEstateListingJsonLd(property, canonicalUrl);
-
-	return {
-		pageType: 'property' as const,
-		property,
-		canonicalUrl,
-		breadcrumbs,
-		seo,
-		breadcrumbJsonLd,
-		listingJsonLd
-	};
-}
-
-function buildDevelopmentPagePayload(
-	development: PublicDevelopment,
-	siteOrigin: string,
-	countrySlug: string,
-	locationSlug: string,
-	communitySlug: string,
-	slug: string
-) {
-	const canonicalPath = buildCanonicalPath({
-		countrySlug: development.location?.country?.slug ?? countrySlug,
-		locationSlug: development.location?.location?.slug ?? locationSlug,
-		communitySlug: development.location?.community?.slug ?? communitySlug,
-		slug: development.slug ?? slug
-	});
-
-	if (!canonicalPath) {
-		error(404, 'Development not found.');
-	}
-
-	if (
-		!pathsMatch({ countrySlug, locationSlug, communitySlug, slug }, {
-			countrySlug: development.location?.country?.slug,
-			locationSlug: development.location?.location?.slug,
-			communitySlug: development.location?.community?.slug,
-			slug: development.slug
-		})
-	) {
-		redirect(301, canonicalPath);
-	}
-
-	const canonicalUrl = `${siteOrigin}${canonicalPath}`;
-	const breadcrumbs = buildDevelopmentBreadcrumbs(development, canonicalPath);
-	const seo = buildDevelopmentSeo(development, canonicalUrl);
-	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, siteOrigin);
-
-	return {
-		pageType: 'development' as const,
-		development,
-		canonicalUrl,
-		breadcrumbs,
-		seo,
-		breadcrumbJsonLd,
-		listingJsonLd: null
-	};
 }

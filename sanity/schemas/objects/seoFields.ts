@@ -1,9 +1,9 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { SCHEMA_TYPES, SIMILAR_PROPERTIES_MODES } from '../constants/enums';
+import { SCHEMA_TYPES } from '../constants/enums';
 
 export const seoFields = defineType({
 	name: 'seoFields',
-	title: 'SEO & related content',
+	title: 'SEO metadata',
 	type: 'object',
 	fields: [
 		defineField({
@@ -66,31 +66,6 @@ export const seoFields = defineType({
 			title: 'Canonical cluster',
 			type: 'string',
 			description: 'Private/internal SEO workflow grouping.'
-		}),
-		defineField({
-			name: 'similarPropertiesMode',
-			title: 'Similar properties mode',
-			type: 'string',
-			options: { list: [...SIMILAR_PROPERTIES_MODES], layout: 'dropdown' },
-			initialValue: 'automatic'
-		}),
-		defineField({
-			name: 'manualSimilarProperties',
-			title: 'Manual similar properties',
-			type: 'array',
-			of: [
-				defineArrayMember({
-					type: 'reference',
-					to: [{ type: 'propertyListing' }, { type: 'development' }]
-				})
-			],
-			description: 'Selected related items must be public-safe.'
-		}),
-		defineField({
-			name: 'similarityTags',
-			title: 'Similarity tags',
-			type: 'array',
-			of: [{ type: 'string' }]
 		}),
 		defineField({
 			name: 'backLinks',

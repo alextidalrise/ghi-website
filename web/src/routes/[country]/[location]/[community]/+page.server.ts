@@ -2,6 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { buildCommunityBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
+import { withPreviewLocationSeo } from '$lib/listing/detailPage';
 import { buildCanonicalPath } from '$lib/listing/canonicalPath';
 import {
 	DEFAULT_LISTING_SEARCH_PARAMS,
@@ -14,6 +15,7 @@ import {
 	countryBySlugQuery,
 	fetchFrontlineListingCards,
 	fetchListingCards,
+	fetchMaybePreview,
 	fetchPublic,
 	listingLegacyThreeSegmentPathQuery,
 	locationBySlugQuery
@@ -33,21 +35,30 @@ type LegacyPathRow = {
 	slug?: string | null;
 };
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
 	const [country, location, community] = await Promise.all([
-		fetchPublic<CountryBySlugQueryResult>(countryBySlugQuery, {
-			params: { countrySlug: params.country }
-		}),
-		fetchPublic<LocationTaxonomyPage | null>(locationBySlugQuery, {
-			params: { countrySlug: params.country, locationSlug: params.location }
-		}),
-		fetchPublic<LocationTaxonomyPage | null>(communityBySlugQuery, {
-			params: {
+		fetchMaybePreview<CountryBySlugQueryResult>(
+			countryBySlugQuery,
+			{ countrySlug: params.country },
+			loadQuery,
+			preview
+		),
+		fetchMaybePreview<LocationTaxonomyPage | null>(
+			locationBySlugQuery,
+			{ countrySlug: params.country, locationSlug: params.location },
+			loadQuery,
+			preview
+		),
+		fetchMaybePreview<LocationTaxonomyPage | null>(
+			communityBySlugQuery,
+			{
 				countrySlug: params.country,
 				locationSlug: params.location,
 				communitySlug: params.community
-			}
-		})
+			},
+			loadQuery,
+			preview
+		)
 	]);
 
 	if (!country?.slug || !location?.slug) {
@@ -55,7 +66,11 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	if (community?.slug && community.name) {
-		return loadCommunityPage(country, location, community, params, url);
+		return loadCommunityPage(country, location, community, params, url, preview);
+	}
+
+	if (preview) {
+		error(404, 'Community not found.');
 	}
 
 	const legacyMatches = await fetchPublic<LegacyPathRow[]>(listingLegacyThreeSegmentPathQuery, {
@@ -81,7 +96,8 @@ async function loadCommunityPage(
 	location: LocationTaxonomyPage,
 	community: LocationTaxonomyPage,
 	params: { country: string; location: string; community: string },
-	url: URL
+	url: URL,
+	preview: boolean
 ) {
 	const searchParams = parseListingSearchParams(url);
 	const canonicalPath = `/${country.slug}/${location.slug}/${community.slug}`;
@@ -108,15 +124,27 @@ async function loadCommunityPage(
 
 	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const breadcrumbs = buildCommunityBreadcrumbs(country, location, community, canonicalPath);
-	const seo = buildLocationSeo(
-		{
-			name: community.name!,
-			seoTitle: community.seoTitle,
-			metaDescription: community.metaDescription,
-			publicDescription: community.publicDescription
-		},
-		canonicalUrl
-	);
+	const seo = preview
+		? withPreviewLocationSeo(
+				buildLocationSeo(
+					{
+						name: community.name!,
+						seoTitle: community.seoTitle,
+						metaDescription: community.metaDescription,
+						publicDescription: community.publicDescription
+					},
+					canonicalUrl
+				)
+			)
+		: buildLocationSeo(
+				{
+					name: community.name!,
+					seoTitle: community.seoTitle,
+					metaDescription: community.metaDescription,
+					publicDescription: community.publicDescription
+				},
+				canonicalUrl
+			);
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, url.origin);
 
 	return {

@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { buildLocationBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
+import { withPreviewLocationSeo } from '$lib/listing/detailPage';
 import {
 	DEFAULT_LISTING_SEARCH_PARAMS,
 	buildListingSearchHref,
@@ -13,6 +14,7 @@ import {
 	countryBySlugQuery,
 	fetchFrontlineListingCards,
 	fetchListingCards,
+	fetchMaybePreview,
 	fetchPublic,
 	locationBySlugQuery
 } from '$lib/sanity/queries';
@@ -35,14 +37,20 @@ type CommunityTaxonomyRow = LocationTaxonomyPage & {
 	isAssociated?: boolean | null;
 };
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
 	const [country, location] = await Promise.all([
-		fetchPublic<CountryBySlugQueryResult>(countryBySlugQuery, {
-			params: { countrySlug: params.country }
-		}),
-		fetchPublic<LocationTaxonomyPage | null>(locationBySlugQuery, {
-			params: { countrySlug: params.country, locationSlug: params.location }
-		})
+		fetchMaybePreview<CountryBySlugQueryResult>(
+			countryBySlugQuery,
+			{ countrySlug: params.country },
+			loadQuery,
+			preview
+		),
+		fetchMaybePreview<LocationTaxonomyPage | null>(
+			locationBySlugQuery,
+			{ countrySlug: params.country, locationSlug: params.location },
+			loadQuery,
+			preview
+		)
 	]);
 
 	if (!country?.slug || !location?.slug || !location._id || !location.name) {
@@ -87,15 +95,27 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const breadcrumbs = buildLocationBreadcrumbs(country, locationPage, canonicalPath);
-	const seo = buildLocationSeo(
-		{
-			name: locationPage.name,
-			seoTitle: locationPage.seoTitle,
-			metaDescription: locationPage.metaDescription,
-			publicDescription: locationPage.publicDescription
-		},
-		canonicalUrl
-	);
+	const seo = preview
+		? withPreviewLocationSeo(
+				buildLocationSeo(
+					{
+						name: locationPage.name,
+						seoTitle: locationPage.seoTitle,
+						metaDescription: locationPage.metaDescription,
+						publicDescription: locationPage.publicDescription
+					},
+					canonicalUrl
+				)
+			)
+		: buildLocationSeo(
+				{
+					name: locationPage.name,
+					seoTitle: locationPage.seoTitle,
+					metaDescription: locationPage.metaDescription,
+					publicDescription: locationPage.publicDescription
+				},
+				canonicalUrl
+			);
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, url.origin);
 
 	return {

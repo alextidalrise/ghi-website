@@ -2,6 +2,17 @@ import { defineQuery } from 'groq';
 import { CANONICAL_PATH, DEVELOPMENT_PUBLIC, DEVELOPMENT_WITH_CANONICAL } from '../allowlists';
 import { PUBLIC_LISTING_FILTER } from './filters';
 
+/** Resolve a development by hierarchical URL segments (preview — no publish gates). */
+export const developmentByPathPreviewQuery = defineQuery(`
+  *[
+    _type == "development"
+    && location.country->slug.current == $countrySlug
+    && location.location->slug.current == $locationSlug
+    && location.community->slug.current == $communitySlug
+    && slug.current == $slug
+  ][0]${DEVELOPMENT_PUBLIC}
+`);
+
 /** Resolve a development by hierarchical URL segments. */
 export const developmentByPathQuery = defineQuery(`
   *[

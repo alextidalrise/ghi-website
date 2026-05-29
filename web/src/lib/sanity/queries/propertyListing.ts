@@ -7,6 +7,18 @@ import {
 } from '../allowlists';
 import { PUBLIC_LISTING_FILTER } from './filters';
 
+/** Resolve a property listing by hierarchical URL segments (preview — no publish gates). */
+export const propertyByPathPreviewQuery = defineQuery(`
+  *[
+    _type == "propertyListing"
+    && listingKind in ["property", "unit"]
+    && location.country->slug.current == $countrySlug
+    && location.location->slug.current == $locationSlug
+    && location.community->slug.current == $communitySlug
+    && slug.current == $slug
+  ][0]${PROPERTY_LISTING_PUBLIC}
+`);
+
 /** Resolve a property listing by hierarchical URL segments. */
 export const propertyByPathQuery = defineQuery(`
   *[
