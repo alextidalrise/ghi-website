@@ -1,3 +1,4 @@
+import { DesktopIcon, EarthAmericasIcon, EyeOpenIcon } from '@sanity/icons';
 import type { StructureResolver } from 'sanity/structure';
 
 /**
@@ -25,6 +26,7 @@ export const deskStructure: StructureResolver = (S) =>
 		.items([
 			S.listItem()
 				.title('Site settings')
+				.icon(DesktopIcon)
 				.child(
 					S.document().schemaType('siteSettings').documentId('siteSettings').title('Site settings')
 				),
@@ -52,40 +54,53 @@ export const deskStructure: StructureResolver = (S) =>
 								.child(S.documentTypeList('unitType').title('Unit types'))
 						])
 				),
-			S.listItem()
-				.title('Locations')
-				.child(
-					S.list()
-						.title('Locations')
-						.items([
+		S.listItem()
+			.title('Places')
+			.icon(EarthAmericasIcon)
+			.child(
+				S.list()
+					.title('Places')
+					.items([
 							S.listItem()
 								.title('Countries')
+								.id('location-taxonomy-countries')
 								.schemaType('locationTaxonomy')
 								.child(
 									S.documentList()
+										.id('location-taxonomy-countries-list')
 										.title('Countries')
 										.schemaType('locationTaxonomy')
-										.filter('_type == "locationTaxonomy" && type == "country"')
+										.apiVersion('2025-01-01')
+										.filter('_type == $schemaType && type == $taxonomyType')
+										.params({ schemaType: 'locationTaxonomy', taxonomyType: 'country' })
 										.defaultOrdering([{ field: 'name', direction: 'asc' }])
 								),
 							S.listItem()
 								.title('Locations')
+								.id('location-taxonomy-locations')
 								.schemaType('locationTaxonomy')
 								.child(
 									S.documentList()
+										.id('location-taxonomy-locations-list')
 										.title('Locations')
 										.schemaType('locationTaxonomy')
-										.filter('_type == "locationTaxonomy" && type == "location"')
+										.apiVersion('2025-01-01')
+										.filter('_type == $schemaType && type == $taxonomyType')
+										.params({ schemaType: 'locationTaxonomy', taxonomyType: 'location' })
 										.defaultOrdering([{ field: 'name', direction: 'asc' }])
 								),
 							S.listItem()
 								.title('Communities')
+								.id('location-taxonomy-communities')
 								.schemaType('locationTaxonomy')
 								.child(
 									S.documentList()
+										.id('location-taxonomy-communities-list')
 										.title('Communities')
 										.schemaType('locationTaxonomy')
-										.filter('_type == "locationTaxonomy" && type == "community"')
+										.apiVersion('2025-01-01')
+										.filter('_type == $schemaType && type == $taxonomyType')
+										.params({ schemaType: 'locationTaxonomy', taxonomyType: 'community' })
 										.defaultOrdering([{ field: 'name', direction: 'asc' }])
 								)
 						])
@@ -97,6 +112,7 @@ export const deskStructure: StructureResolver = (S) =>
 			S.divider(),
 			S.listItem()
 				.title('Needs review')
+				.icon(EyeOpenIcon)
 				.child(
 					S.documentList()
 						.title('Needs review')
