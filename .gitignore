@@ -2,6 +2,8 @@
 .vercel/
 .gstack/browse-audit.jsonl
 .gstack/
+.claude/
+.cursor/
 
 node_modules
 .pnpm-store

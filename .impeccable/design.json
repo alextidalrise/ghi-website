@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-01T00:00:00.000Z",
+  "title": "Design System: Golf Homes International",
+  "extensions": {
+    "colorMeta": {
+      "green": {
+        "role": "primary",
+        "displayName": "Deep Golf Green",
+        "canonical": "oklch(31% 0.03 165)",
+        "tonalRamp": [
+          "oklch(18% 0.025 165)",
+          "oklch(24% 0.028 165)",
+          "oklch(31% 0.03 165)",
+          "oklch(40% 0.03 165)",
+          "oklch(52% 0.028 165)",
+          "oklch(66% 0.025 165)",
+          "oklch(80% 0.02 165)",
+          "oklch(93% 0.012 165)"
+        ]
+      },
+      "gold": {
+        "role": "secondary",
+        "displayName": "Sand Gold",
+        "canonical": "oklch(81% 0.04 80)",
+        "tonalRamp": [
+          "oklch(30% 0.03 80)",
+          "oklch(42% 0.04 80)",
+          "oklch(54% 0.05 80)",
+          "oklch(65% 0.05 80)",
+          "oklch(74% 0.045 80)",
+          "oklch(81% 0.04 80)",
+          "oklch(89% 0.025 80)",
+          "oklch(95% 0.014 80)"
+        ]
+      },
+      "linen": {
+        "role": "neutral",
+        "displayName": "Soft Linen",
+        "canonical": "oklch(95% 0.012 85)",
+        "tonalRamp": [
+          "oklch(22% 0.01 85)",
+          "oklch(35% 0.012 85)",
+          "oklch(50% 0.012 85)",
+          "oklch(65% 0.012 85)",
+          "oklch(78% 0.012 85)",
+          "oklch(88% 0.012 85)",
+          "oklch(95% 0.012 85)",
+          "oklch(98% 0.008 85)"
+        ]
+      },
+      "charcoal": {
+        "role": "neutral",
+        "displayName": "Charcoal",
+        "canonical": "oklch(28% 0 0)",
+        "tonalRamp": [
+          "oklch(16% 0 0)",
+          "oklch(22% 0 0)",
+          "oklch(28% 0 0)",
+          "oklch(40% 0 0)",
+          "oklch(55% 0 0)",
+          "oklch(70% 0 0)",
+          "oklch(85% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Stone Border",
+        "canonical": "oklch(89% 0.01 85)",
+        "tonalRamp": [
+          "oklch(30% 0.01 85)",
+          "oklch(45% 0.01 85)",
+          "oklch(60% 0.01 85)",
+          "oklch(72% 0.01 85)",
+          "oklch(82% 0.01 85)",
+          "oklch(89% 0.01 85)",
+          "oklch(94% 0.008 85)",
+          "oklch(98% 0.005 85)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "oklch(57% 0 0)",
+        "tonalRamp": [
+          "oklch(20% 0 0)",
+          "oklch(32% 0 0)",
+          "oklch(44% 0 0)",
+          "oklch(57% 0 0)",
+          "oklch(68% 0 0)",
+          "oklch(78% 0 0)",
+          "oklch(88% 0 0)",
+          "oklch(96% 0 0)"
+        ]
+      },
+      "hero-dark": {
+        "role": "neutral",
+        "displayName": "Hero Dark",
+        "canonical": "oklch(16% 0.012 165)",
+        "tonalRamp": [
+          "oklch(10% 0.01 165)",
+          "oklch(16% 0.012 165)",
+          "oklch(24% 0.018 165)",
+          "oklch(33% 0.022 165)",
+          "oklch(45% 0.022 165)",
+          "oklch(60% 0.02 165)",
+          "oklch(76% 0.016 165)",
+          "oklch(90% 0.01 165)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headlines and page titles. Playfair Display SemiBold 600, fluid clamp." },
+      "h2": { "displayName": "Heading 2", "purpose": "Section headings. Playfair Display Regular 400." },
+      "h3": { "displayName": "Heading 3", "purpose": "Card titles and sub-sections. Playfair Display Regular 400." },
+      "h4": { "displayName": "Heading 4", "purpose": "Property names and lead text. Playfair Display Regular 400." },
+      "body": { "displayName": "Body", "purpose": "Long-form copy and inputs. Libre Franklin Light 300, line-height 1.7." },
+      "ui": { "displayName": "UI", "purpose": "Buttons, nav links, labels, prices. Libre Franklin Regular 400." },
+      "small": { "displayName": "Small", "purpose": "Metadata, captions, fine print. Libre Franklin Regular 400." },
+      "overline": { "displayName": "Overline", "purpose": "Uppercase labels and section markers. Libre Franklin Medium 500, tracked 0.12em." }
+    },
+    "shadows": [
+      { "name": "none-at-rest", "value": "none", "purpose": "Surfaces are flat at rest. Definition comes from the 1px Stone Border, never a shadow." },
+      { "name": "hover-lift", "value": "0 12px 28px rgba(31, 61, 52, 0.12)", "purpose": "Subtle lift on interactive cards during hover only, paired with translateY(-6px)." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Custom ease-out: starts fast, settles gently. Used for all transitions." },
+      { "name": "duration-hover", "value": "0.3s", "purpose": "Color changes, border reveals, arrow slides." },
+      { "name": "duration-lift", "value": "0.4s", "purpose": "Card lift on hover (translateY)." },
+      { "name": "duration-image", "value": "0.6s", "purpose": "Image scale within overflow-hidden container (scale 1.03)." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "640px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The default call to action. Square corners, 1px border, deep green fill that darkens to charcoal on hover.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Enquire now</button>",
+      "css": ".ds-btn { font-family: var(--sans); font-size: 0.85rem; font-weight: 400; letter-spacing: var(--tracking-wide); padding: 0.875rem 2rem; border-radius: 0; border: 1px solid; cursor: pointer; transition: background var(--duration-hover) var(--ease), color var(--duration-hover) var(--ease), border-color var(--duration-hover) var(--ease); } .ds-btn-primary { background: var(--green); color: var(--white); border-color: var(--green); } .ds-btn-primary:hover, .ds-btn-primary:focus-visible { background: var(--charcoal); border-color: var(--charcoal); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action. Transparent with a green hairline; fills green on hover.",
+      "html": "<button class=\"ds-btn ds-btn-outline\">View development</button>",
+      "css": ".ds-btn-outline { background: transparent; color: var(--green); border: 1px solid var(--green); font-family: var(--sans); font-size: 0.85rem; font-weight: 400; letter-spacing: var(--tracking-wide); padding: 0.875rem 2rem; border-radius: 0; cursor: pointer; transition: background var(--duration-hover) var(--ease), color var(--duration-hover) var(--ease); } .ds-btn-outline:hover, .ds-btn-outline:focus-visible { background: var(--green); color: var(--white); }"
+    },
+    {
+      "name": "Gold Button",
+      "kind": "button",
+      "refersTo": "button-gold",
+      "description": "Emphasis action, used sparingly. Sand gold fill with green text; inverts to green on hover. The live primary CTA on dark green sections (EnquiryCta).",
+      "html": "<button class=\"ds-btn ds-btn-gold\">Book a viewing</button>",
+      "css": ".ds-btn-gold { background: var(--gold); color: var(--green); border: 1px solid var(--gold); font-family: var(--sans); font-size: 0.85rem; font-weight: 400; letter-spacing: var(--tracking-wide); padding: 0.875rem 2rem; border-radius: 0; cursor: pointer; transition: background var(--duration-hover) var(--ease), color var(--duration-hover) var(--ease), border-color var(--duration-hover) var(--ease); } .ds-btn-gold:hover, .ds-btn-gold:focus-visible { background: var(--green); color: var(--white); border-color: var(--green); }"
+    },
+    {
+      "name": "Text Link",
+      "kind": "custom",
+      "refersTo": "text-link",
+      "description": "Inline editorial link. Underline appears on hover only; the arrow slides right and the color shifts from green to gold.",
+      "html": "<a class=\"ds-link\" href=\"#\">Read the area guide <span class=\"ds-link__arrow\" aria-hidden=\"true\">&rarr;</span></a>",
+      "css": ".ds-link { font-family: var(--sans); font-size: var(--text-ui); color: var(--green); text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; transition: color var(--duration-hover) var(--ease); } .ds-link:hover, .ds-link:focus-visible { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; } .ds-link__arrow { transition: transform var(--duration-hover) var(--ease); } .ds-link:hover .ds-link__arrow, .ds-link:focus-visible .ds-link__arrow { transform: translateX(3px); }"
+    },
+    {
+      "name": "Property Card",
+      "kind": "card",
+      "refersTo": "property-card",
+      "description": "Signature listing card. White surface, 1px Stone Border, no shadow at rest. Gold uppercase location overline, Playfair title, tabular-num price separated by a hairline.",
+      "html": "<a class=\"ds-property-card\" href=\"#\"><img class=\"ds-property-card__image\" src=\"/design-system/assets/andalucia-golf-villa.png\" alt=\"Andalucian golf villa with a pool and fairway view\" /><div class=\"ds-property-card__body\"><p class=\"ds-property-card__location\">Sotogrande, Andalucia</p><h3 class=\"ds-property-card__title\">Fairway villa with sea views</h3><p class=\"ds-property-card__specs\">4 bed &middot; 4 bath</p><p class=\"ds-property-card__price\">&euro;2,450,000</p></div></a>",
+      "css": ".ds-property-card { display: block; border: 1px solid var(--border); background: var(--white); color: inherit; text-decoration: none; transition: box-shadow var(--duration-lift) var(--ease), transform var(--duration-lift) var(--ease); } .ds-property-card:hover, .ds-property-card:focus-visible { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(31, 61, 52, 0.12); } .ds-property-card__image { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; } .ds-property-card__body { padding: var(--space-lg); } .ds-property-card__location { margin: 0 0 var(--space-sm); font-family: var(--sans); font-size: var(--text-overline); font-weight: 500; letter-spacing: var(--tracking-overline); text-transform: uppercase; color: var(--gold); } .ds-property-card__title { margin: 0; font-family: var(--serif); font-size: var(--text-h4); font-weight: 400; color: var(--green); line-height: 1.3; } .ds-property-card:hover .ds-property-card__title { color: var(--green); } .ds-property-card__specs { margin: var(--space-sm) 0 0; color: var(--muted); font-family: var(--sans); font-size: var(--text-ui); } .ds-property-card__price { margin: var(--space-md) 0 0; padding-top: var(--space-md); border-top: 1px solid var(--border); font-family: var(--sans); font-size: var(--text-ui); color: var(--charcoal); font-feature-settings: 'tnum'; }"
+    },
+    {
+      "name": "Bottom-Border Input",
+      "kind": "input",
+      "refersTo": "input-underline",
+      "description": "Form field as a considered questionnaire line, not a box. No background, no border except a 1px Stone Border underline that turns green on focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field__label\">Full name</span><input class=\"ds-field__input\" type=\"text\" placeholder=\"Your name\" /></label>",
+      "css": ".ds-field { display: block; } .ds-field__label { display: block; margin-bottom: 0.25rem; font-family: var(--sans); font-size: 0.8rem; font-weight: 400; color: var(--charcoal); } .ds-field__input { width: 100%; font-family: var(--sans); font-size: var(--text-body); font-weight: 300; color: var(--charcoal); background: transparent; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; padding: 0.875rem 0; transition: border-color var(--duration-hover) var(--ease); } .ds-field__input::placeholder { color: var(--muted); } .ds-field__input:focus { outline: none; border-bottom-color: var(--green); }"
+    },
+    {
+      "name": "Site Navigation",
+      "kind": "nav",
+      "refersTo": "site-nav",
+      "description": "Fixed top bar on deep green. Logo left, uppercase tracked links right that shift to gold on hover.",
+      "html": "<nav class=\"ds-site-nav\" aria-label=\"Main\"><a class=\"ds-site-nav__logo\" href=\"#\" aria-label=\"Golf Homes International home\"><img src=\"/design-system/assets/logo-white.svg\" alt=\"\" width=\"140\" height=\"32\" /></a><ul class=\"ds-site-nav__menu\"><li><a class=\"ds-site-nav__link\" href=\"#\">Spain</a></li><li><a class=\"ds-site-nav__link\" href=\"#\">Portugal</a></li><li><a class=\"ds-site-nav__link\" href=\"#\">About</a></li></ul></nav>",
+      "css": ".ds-site-nav { height: var(--nav-height); background: var(--green); border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; padding: 0 2.5rem; } .ds-site-nav__logo { width: 140px; flex-shrink: 0; line-height: 0; } .ds-site-nav__logo img { width: 100%; height: auto; } .ds-site-nav__menu { display: flex; align-items: center; margin-left: auto; list-style: none; padding: 0; } .ds-site-nav__link { font-family: var(--sans); font-size: var(--text-ui); font-weight: 500; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: rgba(255, 255, 255, 0.8); padding: 0 1.25rem; height: var(--nav-height); display: flex; align-items: center; text-decoration: none; white-space: nowrap; transition: color var(--duration-hover) var(--ease); } .ds-site-nav__link:hover, .ds-site-nav__link:focus-visible { color: var(--gold); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Private Portfolio",
+    "overview": "Golf Homes International is a curated portfolio of residential property tied to world-class golf, presented as an editorial marketing site rather than a search engine. The experience is calm, exclusive, and authoritative: walking into a quiet room in a private club where a leather portfolio is placed in front of you, everything considered, nothing competing for attention. Luxury is communicated by what is absent. Generous negative space, considered typography, and photography that carries the emotional weight. The site explicitly rejects the noise of property portals (Rightmove, Idealista, Zillow), the stock-photo gold-gradient cliches of generic luxury real estate, cold corporate formality, and parallax-overload motion for its own sake.",
+    "keyCharacteristics": [
+      "Zero border-radius on every element (square corners are a deliberate brand signal)",
+      "No drop shadows at rest; definition comes from 1px Stone Border hairlines",
+      "1px borders only, never thicker",
+      "Photography carries the emotional weight; UI stays out of the way",
+      "Generous negative space signals exclusivity",
+      "Restrained palette: green and linen with gold as the single accent",
+      "Playfair Display (600/400) over Libre Franklin (300/400/500) for editorial weight contrast"
+    ],
+    "rules": [
+      { "name": "The Single Accent Rule", "body": "Sand Gold is the only accent. It is reserved for interactive states, overlines, and hover underlines, used sparingly. Everything else is green, linen, charcoal, and white.", "section": "colors" },
+      { "name": "The Square Corner Rule", "body": "Border-radius is 0 everywhere, no exceptions. Most luxury real estate sites round their corners; this one does not. The square corner is the face of the brand.", "section": "elevation" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. There are no shadows except as a response to state (a subtle lift on card hover). Cards are defined by their 1px Stone Border, not by elevation.", "section": "elevation" },
+      { "name": "The Considered Questionnaire Rule", "body": "Form inputs are bottom-border only: no boxes, no fills. A form should feel like a considered questionnaire, not a web form.", "section": "components" }
+    ],
+    "dos": [
+      "Do keep border-radius at 0 on every element, including buttons, cards, inputs, and images.",
+      "Do define cards and panels with a single 1px Stone Border (#E2DED5), never a thicker border or a resting shadow.",
+      "Do reserve Sand Gold (#D6C3A3) for accents only: overlines, hover states, and moments that earn emphasis.",
+      "Do let photography carry the emotional weight and keep UI quiet around it.",
+      "Do use generous negative space; nothing should look crowded.",
+      "Do bump body weight to 350 with extra line-height and tracking when text sits on dark green surfaces."
+    ],
+    "donts": [
+      "Don't build like a property portal (Rightmove, Idealista, Zillow): no clutter, no noise, no transactional density.",
+      "Don't reach for generic luxury real estate cliches: stock photography, gold gradients, or 'exclusive lifestyle' in every headline.",
+      "Don't feel corporate, cold, or overly formal; warmth and human authority over institutional distance.",
+      "Don't add flashy motion: no parallax overload, no autoplay video, no movement for movement's sake. Motion exists only to provide feedback or signal state changes.",
+      "Don't use a side-stripe border-left/right greater than 1px as a colored accent.",
+      "Don't introduce gradient text, glassmorphism, or per-section uppercase tracked eyebrows."
+    ]
+  }
+}

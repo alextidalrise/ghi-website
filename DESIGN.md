@@ -245,4 +245,15 @@ Underline on hover (not at rest). Arrow (`→`) slides right 3px on hover. Color
 | 2026-05-12 | Display weight bumped to 600, italic introduced for select display moments | Display headings now SemiBold 600 (was Regular 400) to widen the stroke contrast against Light 300 body text -- the weight cascade is now 600 → 400 → 300. Playfair italic activated for hero taglines (e.g. "the fairway") to leverage the calligraphic quality at large sizes. Italic 600 weight added to the Google Fonts request. |
 
 ## Preview
-See `design-system/index.html` for a live rendering of all tokens and components.
+The live design system showcase renders from the real tokens and components at the
+`/internal/design-system` route (`web/src/routes/internal/design-system/`). It is
+env-gated (`ENABLE_DESIGN_SYSTEM=true`, or any non-production deploy) and `noindex`.
+Because it consumes `web/src/lib/styles/tokens.css` and the actual `$lib` components,
+it can never drift from what ships. The earlier hand-built static HTML showcase has
+been retired in favour of this page.
+
+## Decisions Log (continued)
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-06-01 | Consolidated two clashing design-system showcases into one | A frozen hand-built HTML page (`web/static/design-system/design-system/index.html`) and a live Svelte page (`/internal/design-system`) both showed the system and had drifted. The static page hardcoded its own `:root` tokens, so it could not stay in sync. Retired the static page; kept the live Svelte page as the single source-of-truth showcase. Load-bearing brand assets under `web/static/design-system/assets/` (logo, hero image, referenced by `SiteNav` and the homepage) were preserved. |
