@@ -165,7 +165,7 @@
 		border-bottom: 1px solid oklch(0.95 0.01 85 / 0.35);
 		border-radius: 0;
 		background: transparent;
-		color: var(--linen);
+		color: var(--on-green);
 		font: inherit;
 		appearance: none;
 	}
@@ -192,7 +192,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-xs);
-		color: var(--linen);
+		color: var(--on-green);
 		font-family: var(--sans);
 		font-size: var(--text-ui);
 	}

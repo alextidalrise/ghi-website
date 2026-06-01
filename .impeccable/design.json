@@ -34,10 +34,11 @@
           "oklch(95% 0.014 80)"
         ]
       },
-      "linen": {
+      "on-green": {
         "role": "neutral",
-        "displayName": "Soft Linen",
+        "displayName": "On Green",
         "canonical": "oklch(95% 0.012 85)",
+        "note": "Light ink for text and icons on green surfaces only. Not a page or panel surface. Replaced the former Soft Linen surface token on 2026-06-01.",
         "tonalRamp": [
           "oklch(22% 0.01 85)",
           "oklch(35% 0.012 85)",
@@ -201,11 +202,13 @@
       "1px borders only, never thicker",
       "Photography carries the emotional weight; UI stays out of the way",
       "Generous negative space signals exclusivity",
-      "Restrained palette: green and linen with gold as the single accent",
+      "White by default, deep green for punctuation, gold as the single accent (no tinted surface colour)",
       "Playfair Display (600/400) over Libre Franklin (300/400/500) for editorial weight contrast"
     ],
     "rules": [
-      { "name": "The Single Accent Rule", "body": "Sand Gold is the only accent. It is reserved for interactive states, overlines, and hover underlines, used sparingly. Everything else is green, linen, charcoal, and white.", "section": "colors" },
+      { "name": "The Single Accent Rule", "body": "Sand Gold is the only accent. It is reserved for interactive states, overlines, and hover underlines, used sparingly. Everything else is green, charcoal, and white.", "section": "colors" },
+      { "name": "The White-Default Rule", "body": "Feature sections, panels, and data blocks sit on white, not on a tinted surface. Where a data block (key facts) needs anchoring, it gets a 1px hairline frame, never a fill. The cream surface (--linen) was removed 2026-06-01; warmth comes from gold, photography, and typography.", "section": "colors" },
+      { "name": "The Green-Punctuation Rule", "body": "Deep green is the only full-bleed surface colour, used for one or two emphasis moments per page (hero, enquiry CTA). If a page feels flat, add imagery or a green moment, never beige.", "section": "colors" },
       { "name": "The Square Corner Rule", "body": "Border-radius is 0 everywhere, no exceptions. Most luxury real estate sites round their corners; this one does not. The square corner is the face of the brand.", "section": "elevation" },
       { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. There are no shadows except as a response to state (a subtle lift on card hover). Cards are defined by their 1px Stone Border, not by elevation.", "section": "elevation" },
       { "name": "The Considered Questionnaire Rule", "body": "Form inputs are bottom-border only: no boxes, no fills. A form should feel like a considered questionnaire, not a web form.", "section": "components" }

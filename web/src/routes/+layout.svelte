@@ -57,12 +57,12 @@
 		gap: 1rem;
 		padding: 0.5rem 1rem;
 		background: var(--green);
-		color: var(--linen);
+		color: var(--on-green);
 		font-size: var(--text-ui);
 	}
 
 	.preview-banner a {
-		color: var(--linen);
+		color: var(--on-green);
 		text-decoration: underline;
 	}
 </style>

@@ -130,7 +130,7 @@
 	.gallery__stage {
 		position: relative;
 		border: 1px solid var(--border);
-		background: var(--linen);
+		background: var(--white);
 		overflow: hidden;
 	}
 

@@ -70,24 +70,29 @@
 {#if facts.length > 0}
 	<section class="key-facts" aria-labelledby="development-key-facts-heading">
 		<div class="content-wrap">
-			<h2 id="development-key-facts-heading" class="key-facts__heading">Key facts</h2>
-			<dl class="key-facts__grid">
-				{#each facts as fact (fact.label + fact.value)}
-					<div class="key-facts__item">
-						<dt>{fact.label}</dt>
-						<dd>{fact.value}</dd>
-					</div>
-				{/each}
-			</dl>
+			<div class="key-facts__box">
+				<h2 id="development-key-facts-heading" class="key-facts__heading">Key facts</h2>
+				<dl class="key-facts__grid">
+					{#each facts as fact (fact.label + fact.value)}
+						<div class="key-facts__item">
+							<dt>{fact.label}</dt>
+							<dd>{fact.value}</dd>
+						</div>
+					{/each}
+				</dl>
+			</div>
 		</div>
 	</section>
 {/if}
 
 <style>
 	.key-facts {
-		background: var(--linen);
 		padding-block: var(--space-xl);
-		border-block: 1px solid var(--border);
+	}
+
+	.key-facts__box {
+		border: 1px solid var(--border);
+		padding: var(--space-xl);
 	}
 
 	.key-facts__heading {

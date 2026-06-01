@@ -100,7 +100,7 @@
 	.listing-pagination__page[aria-current='page'] {
 		background: var(--green);
 		border-color: var(--green);
-		color: var(--linen);
+		color: var(--on-green);
 	}
 
 	.listing-pagination__control--disabled {

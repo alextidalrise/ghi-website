@@ -73,16 +73,20 @@ Body text on dark surfaces (green backgrounds, dark mode panels) gets adjusted f
 ## Color
 
 ### Approach: Restrained
-Color is used sparingly and with intent. The palette traces back to the landscape: fairway greens, coastal sand, Mediterranean linen, and stone white. Gold is the only accent and is reserved for interactive states and emphasis.
+Color is used sparingly and with intent. The system is **white by default, deep green for punctuation**: white carries every surface, deep green appears as the occasional dramatic band (hero, enquiry), and gold is the only accent, reserved for interactive states and emphasis. There is no tinted "surface" colour. Rhythm comes from whitespace, 1px hairlines, photography, and the green bands.
+
+**The White-Default Rule.** Feature sections, panels, and data blocks sit on white, not on a tinted surface. Where a data block (key facts) needs anchoring, it gets a 1px hairline frame, never a fill. The warm cream that once tinted these panels (`--linen`) was removed on 2026-06-01; warmth now comes from gold, photography, and typography, not from the background.
+
+**The Green-Punctuation Rule.** Deep green is the only full-bleed surface colour, used for one or two emphasis moments per page (hero, enquiry CTA). If a page feels flat, the fix is more imagery or a green moment, never a return to beige.
 
 ### Palette
 
 | Name | Hex | CSS Variable | Usage |
 |------|-----|-------------|-------|
 | Deep Golf Green | `#1F3D34` | `--green` | Primary. Typography, structural borders, dark backgrounds, primary buttons. |
-| Soft Linen | `#F5F1E8` | `--linen` | Surface. Warm tone for feature sections, alternating panels, and photography mounts. |
 | Sand Gold | `#D6C3A3` | `--gold` | Accent. Interactive states, overlines, hover underlines. Used sparingly. |
-| White | `#FFFFFF` | `--white` | Background. Primary canvas across all surfaces; cards are defined by 1px borders. |
+| White | `#FFFFFF` | `--white` | Background. The canvas for every surface, including feature sections and panels. Sections are defined by whitespace, 1px borders, and hairline frames, never fills. |
+| On Green | `#F5F1E8` | `--on-green` | Light ink for text and icons on green surfaces only. Never a page or panel surface. |
 | Charcoal | `#2B2B2B` | `--charcoal` | Body text, secondary headings. |
 | Stone Border | `#E2DED5` | `--border` | 1px structural borders, dividers, input underlines. |
 | Muted | `#7A7A7A` | `--muted` | Secondary text, descriptions, metadata. |
@@ -99,7 +103,7 @@ The palette inverts with care, not mechanically.
 | Token | Light | Dark |
 |-------|-------|------|
 | `--green` | `#1F3D34` | `#C5D6C0` |
-| `--linen` | `#F5F1E8` | `#151B17` |
+| `--on-green` | `#F5F1E8` | `#F5F1E8` (light ink, unchanged) |
 | `--charcoal` | `#2B2B2B` | `#E8E5DF` |
 | `--white` | `#FFFFFF` | `#1C231E` |
 | `--border` | `#E2DED5` | `#2A332C` |
@@ -171,7 +175,7 @@ Three tiers, all square-cornered, all with 1px borders:
 | Primary | `--green` | `--white` | `--green` | bg becomes `--charcoal` |
 | Outline | transparent | `--green` | `--green` | bg becomes `--green`, text becomes `--white` |
 | Gold | `--gold` | `--green` | `--gold` | bg becomes `--green`, text becomes `--white` |
-| On Dark | transparent | `--linen` | `rgba(linen, 0.4)` | bg becomes `--linen`, text becomes `--green` |
+| On Dark | transparent | `--on-green` | `rgba(on-green, 0.4)` | bg becomes `--on-green`, text becomes `--green` |
 
 Button padding: `0.875rem 2rem`
 Font: Libre Franklin, Regular 400, 0.85rem, letter-spacing 0.04em
@@ -206,7 +210,7 @@ Underline on hover (not at rest). Arrow (`→`) slides right 3px on hover. Color
 ```css
 :root {
     --green: #1F3D34;
-    --linen: #F5F1E8;
+    --on-green: #F5F1E8; /* light ink on green only, not a surface */
     --gold: #D6C3A3;
     --charcoal: #2B2B2B;
     --white: #FFFFFF;
@@ -257,3 +261,4 @@ been retired in favour of this page.
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-06-01 | Consolidated two clashing design-system showcases into one | A frozen hand-built HTML page (`web/static/design-system/design-system/index.html`) and a live Svelte page (`/internal/design-system`) both showed the system and had drifted. The static page hardcoded its own `:root` tokens, so it could not stay in sync. Retired the static page; kept the live Svelte page as the single source-of-truth showcase. Load-bearing brand assets under `web/static/design-system/assets/` (logo, hero image, referenced by `SiteNav` and the homepage) were preserved. |
+| 2026-06-01 | Removed the cream surface (`--linen`); moved to white-default + green-punctuation | Partner no longer liked the warm cream tint on feature panels. Tested the data-heavy sections (key facts, amenities) on white and confirmed they hold: key facts now sits in a 1px hairline frame, amenities became outline chips, image-led sections (gallery, location) go straight to white. Cream had no remaining job. `--linen` deleted; its only other role (light ink on green) renamed to `--on-green`. Rhythm now carried by whitespace, hairlines, photography, and the deep-green emphasis bands. |

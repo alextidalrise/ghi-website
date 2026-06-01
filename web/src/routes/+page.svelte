@@ -98,7 +98,7 @@
 	}
 
 	.home-hero__title {
-		color: var(--linen);
+		color: var(--on-green);
 		margin-bottom: var(--space-lg);
 	}
 

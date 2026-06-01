@@ -104,7 +104,7 @@
 		width: 100%;
 		height: min(24rem, 55vw);
 		border: 1px solid var(--border);
-		background: var(--linen);
+		background: var(--white);
 	}
 
 	.location__map-note {

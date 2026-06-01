@@ -11,10 +11,10 @@
 			usage: 'Primary typography, structural borders, dark surfaces, and primary actions.'
 		},
 		{
-			name: 'Soft Linen',
-			token: '--linen',
-			value: 'var(--linen)',
-			usage: 'Warm editorial panels, feature backgrounds, and light-on-dark text.'
+			name: 'On Green',
+			token: '--on-green',
+			value: 'var(--on-green)',
+			usage: 'Light ink for text and icons on green surfaces. Not a page or panel surface.'
 		},
 		{
 			name: 'Sand Gold',
@@ -240,13 +240,13 @@
 				</div>
 			</article>
 
-			<article class="property-card property-card--linen">
+			<article class="property-card">
 				<div class="property-card__body">
 					<p class="property-card__meta">Quinta do Lago, Portugal</p>
 					<h3>Low-Built Fairway Home</h3>
 					<p>
-						Linen surfaces are used when the page needs warmth without losing the editorial
-						discipline of the grid.
+						When a price is withheld, the card states "Price on request" and holds the same
+						editorial grid as every other listing.
 					</p>
 					<div class="property-card__footer">
 						<span>Price on request</span>
@@ -334,7 +334,7 @@
 
 	.ds-hero h1,
 	.ds-feature h2 {
-		color: var(--linen);
+		color: var(--on-green);
 		margin-top: var(--space-md);
 	}
 
@@ -383,8 +383,8 @@
 
 	.ds-jump a:hover,
 	.ds-jump a:focus-visible {
-		background: var(--linen);
-		color: var(--charcoal);
+		background: var(--green);
+		color: var(--white);
 	}
 
 	.ds-section {
@@ -535,7 +535,7 @@
 		align-items: center;
 		gap: var(--space-sm);
 		padding: var(--space-xl);
-		background: var(--linen);
+		background: var(--white);
 		border: 1px solid var(--border);
 	}
 
@@ -595,12 +595,12 @@
 
 	.button--on-dark {
 		border-color: oklch(0.88 0.02 85 / 0.45);
-		color: var(--linen);
+		color: var(--on-green);
 	}
 
 	.button--on-dark:hover,
 	.button--on-dark:focus-visible {
-		background: var(--linen);
+		background: var(--on-green);
 		color: var(--green);
 	}
 
@@ -645,12 +645,6 @@
 	.property-card {
 		border: 1px solid var(--border);
 		background: var(--white);
-	}
-
-	.property-card--linen {
-		display: flex;
-		align-items: flex-end;
-		background: var(--linen);
 	}
 
 	.property-card img {

@@ -68,7 +68,6 @@
 
 <style>
 	.golf {
-		background: var(--linen);
 		padding-block: var(--space-xl);
 		border-block: 1px solid var(--border);
 	}

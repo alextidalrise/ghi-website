@@ -157,7 +157,6 @@
 		font-size: var(--text-ui);
 		padding: 0.45rem 0.85rem;
 		border: 1px solid var(--border);
-		background: var(--linen);
 		color: var(--green);
 	}
 </style>
