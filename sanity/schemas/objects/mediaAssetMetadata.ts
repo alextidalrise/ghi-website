@@ -47,7 +47,7 @@ export const mediaAssetMetadata = defineType({
 			name: 'altText',
 			title: 'Alt text',
 			type: 'string',
-			description: 'Public when attached to an approved public asset.'
+			description: 'Descriptive text for screen readers and search engines (e.g. "Living room with sea view"). Required for accessibility on approved public images.'
 		}),
 		defineField({
 			name: 'caption',
@@ -59,7 +59,8 @@ export const mediaAssetMetadata = defineType({
 			title: 'Asset branding type',
 			type: 'string',
 			options: { list: [...ASSET_BRANDING_TYPES], layout: 'dropdown' },
-			initialValue: 'unknown'
+			initialValue: 'unknown',
+			description: 'Whether this image carries GHI branding, developer branding, or is unbranded.'
 		}),
 		defineField({
 			name: 'imageRightsStatus',
@@ -75,45 +76,46 @@ export const mediaAssetMetadata = defineType({
 			type: 'boolean',
 			initialValue: false,
 			description:
-				'Required for non-GHI branded assets before public output. Blocked when rights status is rejected.'
+				'Tick to approve this image for use on the website. Required for any non-GHI branded image, and only valid when image rights have been confirmed.'
 		}),
 		defineField({
 			name: 'requiresRebrandOrCrop',
 			title: 'Requires rebrand or crop',
 			type: 'boolean',
-			initialValue: false
+			initialValue: false,
+			description: 'Tick if this image needs to be rebranded or cropped before it can be used on the website.'
 		}),
 		defineField({
 			name: 'brandingNotes',
 			title: 'Branding notes',
 			type: 'text',
 			rows: 3,
-			description: 'Private/internal — never expose publicly.'
+			description: 'Internal notes about branding work needed for this image. Not shown on the website.'
 		}),
 		defineField({
 			name: 'imageUsageNotes',
 			title: 'Image usage notes',
 			type: 'text',
 			rows: 3,
-			description: 'Private/internal — never expose publicly.'
+			description: 'Internal notes about how or where this image may be used. Not shown on the website.'
 		}),
 		defineField({
 			name: 'sourceDriveFileId',
 			title: 'Source Drive file ID',
 			type: 'string',
-			description: 'Private/internal — never expose publicly.'
+			description: 'Internal Google Drive file ID for this image. For provenance tracking only.'
 		}),
 		defineField({
 			name: 'sourceMediaFolderUrl',
 			title: 'Source media folder URL',
 			type: 'url',
-			description: 'Private/internal — never expose publicly.'
+			description: 'Internal link to the folder where this image was sourced. Not shown on the website.'
 		}),
 		defineField({
 			name: 'sourceFileName',
 			title: 'Source file name',
 			type: 'string',
-			description: 'Original filename from Drive/Dropbox/source media folder. Internal provenance only.'
+			description: 'The original file name from the source folder (e.g. villa_front_v2.jpg). For internal tracking only.'
 		}),
 		defineField({
 			name: 'approvedBy',

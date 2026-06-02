@@ -70,14 +70,10 @@ type ContentInput = {
 	shortDescription?: string | null;
 	heroHeadline?: string | null;
 	aboutDescription?: PortableTextBlock[] | null;
-	longDescription?: PortableTextBlock[] | null;
 	locationDescription?: PortableTextBlock[] | null;
 	golfDescription?: PortableTextBlock[] | null;
-	lifestyleDescription?: PortableTextBlock[] | null;
 	featureHighlights?: FeatureHighlight[] | null;
 	amenities?: string[] | null;
-	investmentDescription?: PortableTextBlock[] | null;
-	buyerFitNotes?: string | null;
 	humanReviewed?: boolean | null;
 	reviewer?: string | null;
 	reviewDate?: string | null;
@@ -87,7 +83,7 @@ export type RawPropertyListing = {
 	_id?: string;
 	_type?: 'propertyListing';
 	ghiListingId?: string;
-	publicTitle?: string;
+	title?: string;
 	slug?: string;
 	listingKind?: string;
 	propertyType?: string;
@@ -126,14 +122,14 @@ export type PublicGolf = Omit<
 	'golfNotes' | 'golfEnrichmentStatus' | 'golfEnrichedBy' | 'golfEnrichedAt'
 >;
 
-export type PublicContent = Omit<ContentInput, 'buyerFitNotes' | 'humanReviewed' | 'reviewer' | 'reviewDate'>;
+export type PublicContent = Omit<ContentInput, 'humanReviewed' | 'reviewer' | 'reviewDate'>;
 
 export type RawDevelopment = {
 	_id?: string;
 	_type?: 'development';
 	ghiListingId?: string;
 	developmentName?: string;
-	publicTitle?: string;
+	title?: string;
 	slug?: string;
 	listingKind?: string;
 	developmentDisplayMode?:
@@ -258,7 +254,6 @@ function filterContentFields(content: ContentInput | null | undefined): PublicCo
 	}
 
 	const {
-		buyerFitNotes: _buyer,
 		humanReviewed: _reviewed,
 		reviewer: _reviewer,
 		reviewDate: _date,

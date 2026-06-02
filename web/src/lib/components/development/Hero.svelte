@@ -14,7 +14,7 @@
 	const heroUrl = $derived(
 		buildPublicImageUrl(heroImage, { width: 1920, height: 900, fit: 'crop', quality: 85 })
 	);
-	const headline = $derived(development.content?.heroHeadline ?? development.publicTitle);
+	const headline = $derived(development.content?.heroHeadline ?? development.title);
 	const overline = $derived(
 		[development.location?.community?.name, development.location?.country?.name]
 			.filter(Boolean)
@@ -30,7 +30,7 @@
 		<div class="hero__media">
 			<img
 				src={heroUrl}
-				alt={heroImage?.altText ?? development.publicTitle ?? 'Development hero'}
+				alt={heroImage?.altText ?? development.title ?? 'Development hero'}
 				width="1920"
 				height="900"
 				fetchpriority="high"

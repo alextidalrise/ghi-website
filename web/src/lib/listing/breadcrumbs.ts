@@ -28,6 +28,14 @@ function locationRefs(source: { location?: unknown }): BreadcrumbLocation | null
 	return (source.location as BreadcrumbLocation | null | undefined) ?? null;
 }
 
+function communityFilterHref(
+	countrySlug: string,
+	locationSlug: string,
+	communitySlug: string
+): string {
+	return `/${countrySlug}/${locationSlug}?community=${encodeURIComponent(communitySlug)}`;
+}
+
 /** Build breadcrumb trail from resolved location taxonomy refs (not URL parsing). */
 export function buildPropertyBreadcrumbs(
 	listing: PublicPropertyListing,
@@ -51,12 +59,12 @@ export function buildPropertyBreadcrumbs(
 	if (community?.slug && loc?.slug && country?.slug && labelFor(community)) {
 		items.push({
 			label: labelFor(community)!,
-			href: `/${country.slug}/${loc.slug}/${community.slug}`
+			href: communityFilterHref(country.slug, loc.slug, community.slug)
 		});
 	}
 
 	items.push({
-		label: listing.publicTitle ?? listing.content?.heroHeadline ?? 'Property',
+		label: listing.title ?? listing.content?.heroHeadline ?? 'Property',
 		href: canonicalPath
 	});
 
@@ -95,31 +103,6 @@ export function buildLocationBreadcrumbs(
 	return items;
 }
 
-/** Build breadcrumb trail for a community stub page. */
-export function buildCommunityBreadcrumbs(
-	country: LocationTaxonomyRef,
-	location: LocationTaxonomyRef,
-	community: LocationTaxonomyRef,
-	canonicalPath: string
-): BreadcrumbItem[] {
-	const items: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
-
-	if (country?.slug && labelFor(country)) {
-		items.push({ label: labelFor(country)!, href: `/${country.slug}` });
-	}
-
-	if (location?.slug && country?.slug && labelFor(location)) {
-		items.push({ label: labelFor(location)!, href: `/${country.slug}/${location.slug}` });
-	}
-
-	const communityLabel = labelFor(community);
-	if (communityLabel) {
-		items.push({ label: communityLabel, href: canonicalPath });
-	}
-
-	return items;
-}
-
 /** Build breadcrumb trail for a development from resolved location taxonomy refs. */
 export function buildDevelopmentBreadcrumbs(
 	development: PublicDevelopment,
@@ -143,12 +126,12 @@ export function buildDevelopmentBreadcrumbs(
 	if (community?.slug && loc?.slug && country?.slug && labelFor(community)) {
 		items.push({
 			label: labelFor(community)!,
-			href: `/${country.slug}/${loc.slug}/${community.slug}`
+			href: communityFilterHref(country.slug, loc.slug, community.slug)
 		});
 	}
 
 	items.push({
-		label: development.publicTitle ?? development.content?.heroHeadline ?? 'Development',
+		label: development.title ?? development.content?.heroHeadline ?? 'Development',
 		href: canonicalPath
 	});
 

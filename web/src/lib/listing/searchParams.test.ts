@@ -33,6 +33,13 @@ describe('parseListingSearchParams', () => {
 		});
 	});
 
+	it('parses community filter slug', () => {
+		const params = parseListingSearchParams(
+			new URL('https://example.com/spain/marbella?community=la-quinta')
+		);
+		expect(params.community).toBe('la-quinta');
+	});
+
 	it('falls back to defaults for invalid values and page < 1', () => {
 		const params = parseListingSearchParams(
 			new URL(

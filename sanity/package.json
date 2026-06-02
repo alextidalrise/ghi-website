@@ -22,6 +22,20 @@
 		"migrate:image-rights:dry-run": "tsx migrations/image-rights-migrate.ts --dry-run",
 		"migrate:related-content": "tsx migrations/related-content-migrate.ts",
 		"migrate:related-content:dry-run": "tsx migrations/related-content-migrate.ts --dry-run",
+		"migrate:micro-location-unset": "tsx migrations/micro-location-unset-migrate.ts",
+		"migrate:micro-location-unset:dry-run": "tsx migrations/micro-location-unset-migrate.ts --dry-run",
+		"migrate:listing-title": "tsx migrations/listing-title-migrate.ts",
+		"migrate:listing-title:dry-run": "tsx migrations/listing-title-migrate.ts --dry-run",
+		"migrate:content-to-marketing": "tsx migrations/content-to-marketing-migrate.ts",
+		"migrate:content-to-marketing:dry-run": "tsx migrations/content-to-marketing-migrate.ts --dry-run",
+		"migrate:taxonomy-parent-refs": "tsx migrations/taxonomy-parent-refs-migrate.ts",
+		"migrate:taxonomy-parent-refs:dry-run": "tsx migrations/taxonomy-parent-refs-migrate.ts --dry-run",
+		"migrate:taxonomy-dotted-ids": "tsx migrations/taxonomy-dotted-ids-migrate.ts",
+		"migrate:taxonomy-dotted-ids:dry-run": "tsx migrations/taxonomy-dotted-ids-migrate.ts --dry-run",
+		"seed:location-taxonomy": "tsx migrations/seed-location-taxonomy.ts",
+		"seed:location-taxonomy:dry-run": "tsx migrations/seed-location-taxonomy.ts --dry-run",
+		"wipe:location-taxonomy": "tsx migrations/wipe-location-taxonomy.ts",
+		"wipe:location-taxonomy:dry-run": "tsx migrations/wipe-location-taxonomy.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {
@@ -32,7 +46,8 @@
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0",
 		"sanity": "^5.28.0",
-		"styled-components": "^6.3.12"
+		"styled-components": "^6.3.12",
+		"rxjs": "^7.8.2"
 	},
 	"devDependencies": {
 		"@types/react": "^19.2.0",

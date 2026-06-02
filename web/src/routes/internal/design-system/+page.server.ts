@@ -38,7 +38,7 @@ function rawCardFromFixture(
 	return {
 		_id: raw._id!,
 		ghiListingId: raw.ghiListingId!,
-		publicTitle: raw.publicTitle!,
+		title: raw.title!,
 		slug: raw.slug!,
 		listingKind: raw.listingKind as RawPropertyCard['listingKind'],
 		propertyType: raw.propertyType as RawPropertyCard['propertyType'],
@@ -60,7 +60,7 @@ function buildDemoCards(): PublicPropertyCard[] {
 	const poa = toPublicPropertyCard(
 		rawCardFromFixture(goldenPropertyRaw, {
 			_id: 'verificationFixture.property.poa',
-			publicTitle: 'Verification POA Villa',
+			title: 'Verification POA Villa',
 			slug: 'verification-poa-villa',
 			media: null,
 			pricing: {

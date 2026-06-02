@@ -39,14 +39,14 @@ export const unitType = defineType({
 			type: 'pricingFields',
 			group: 'details',
 			description:
-				'Use price from for representative pricing. Reserved status forces hidden visibility.'
+				"Typical pricing for this unit type. Use 'Price from' to show a starting figure. Reserved status means this type will not appear on the website."
 		}),
 		defineField({
 			name: 'specs',
 			title: 'Specification range',
 			type: 'specsFields',
 			group: 'details',
-			description: 'Representative bedroom, bathroom, and area range for this typology.'
+			description: 'Typical bedroom count, bathroom count, and size for this unit type. Use ranges if individual units vary.'
 		}),
 		defineField({
 			name: 'floorplans',
@@ -54,7 +54,7 @@ export const unitType = defineType({
 			type: 'array',
 			group: 'details',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
-			description: 'Public only when approved.'
+			description: 'Floorplan images for this unit type. Shown on the website once approved.'
 		}),
 		defineField({
 			name: 'gallery',
@@ -62,7 +62,7 @@ export const unitType = defineType({
 			type: 'array',
 			group: 'details',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
-			description: 'Public only when approved.'
+			description: 'Gallery images for this unit type. Shown on the website once approved.'
 		}),
 		defineField({
 			name: 'sourceProvenance',
@@ -70,7 +70,7 @@ export const unitType = defineType({
 			type: 'array',
 			group: 'governance',
 			of: [defineArrayMember({ type: 'sourceProvenance' })],
-			description: 'Private/internal — never returned in public payloads.'
+			description: 'Internal audit trail showing where this unit type\'s data came from. Not shown on the website.'
 		}),
 		defineField({
 			name: 'workflow',

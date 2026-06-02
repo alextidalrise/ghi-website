@@ -7,7 +7,7 @@ import {
 } from './sitemap';
 
 describe('buildTaxonomyPath', () => {
-	it('builds country, location, and community paths', () => {
+	it('builds country and location paths; community taxonomy is not indexed', () => {
 		expect(buildTaxonomyPath({ type: 'country', countrySlug: 'spain' })).toBe('/spain');
 		expect(
 			buildTaxonomyPath({
@@ -23,7 +23,7 @@ describe('buildTaxonomyPath', () => {
 				locationSlug: 'costa-del-sol',
 				communitySlug: 'marbella'
 			})
-		).toBe('/spain/costa-del-sol/marbella');
+		).toBeNull();
 	});
 });
 

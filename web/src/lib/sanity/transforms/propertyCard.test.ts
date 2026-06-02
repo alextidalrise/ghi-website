@@ -57,7 +57,7 @@ function baseCard(overrides: Partial<RawPropertyCard> = {}): RawPropertyCard {
 	return {
 		_id: goldenPropertyRaw._id!,
 		ghiListingId: goldenPropertyRaw.ghiListingId!,
-		publicTitle: goldenPropertyRaw.publicTitle!,
+		title: goldenPropertyRaw.title!,
 		slug: goldenPropertyRaw.slug!,
 		listingKind: 'property',
 		propertyType: 'villa',
@@ -128,7 +128,7 @@ describe('toPublicPropertyCard', () => {
 			baseCard({
 				_id: mediaPrivacyPropertyRaw._id!,
 				ghiListingId: mediaPrivacyPropertyRaw.ghiListingId!,
-				publicTitle: mediaPrivacyPropertyRaw.publicTitle!,
+				title: mediaPrivacyPropertyRaw.title!,
 				slug: mediaPrivacyPropertyRaw.slug!,
 				pricing: mediaPrivacyPropertyRaw.pricing as RawPropertyCard['pricing'],
 				specs: mediaPrivacyPropertyRaw.specs as RawPropertyCard['specs'],

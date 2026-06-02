@@ -36,7 +36,7 @@ describe('buildTaxonomyPreviewPath', () => {
 		).toBe('/spain/costa-del-sol');
 	});
 
-	it('builds community path', () => {
+	it('builds community path as a filtered location URL', () => {
 		expect(
 			buildTaxonomyPreviewPath({
 				type: 'community',
@@ -44,7 +44,7 @@ describe('buildTaxonomyPreviewPath', () => {
 				parentSlug: 'costa-del-sol',
 				grandparentSlug: 'spain'
 			})
-		).toBe('/spain/costa-del-sol/marbella');
+		).toBe('/spain/costa-del-sol?community=marbella');
 	});
 
 	it('returns null for incomplete community hierarchy', () => {

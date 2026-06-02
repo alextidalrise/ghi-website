@@ -23,7 +23,7 @@ export const relatedContentFields = defineType({
 					to: [{ type: 'propertyListing' }, { type: 'development' }]
 				})
 			],
-			description: 'Selected related items must be public-safe. Order is preserved on the site.',
+			description: "Hand-pick up to 4 listings to show as 'similar properties'. Only select listings that are already live on the website. The order set here is the order buyers will see.",
 			hidden: ({ parent }) => parent?.similarPropertiesMode !== 'manual',
 			validation: (Rule) => Rule.max(4)
 		}),
@@ -32,7 +32,8 @@ export const relatedContentFields = defineType({
 			title: 'Similarity tags',
 			type: 'array',
 			of: [{ type: 'string' }],
-			hidden: ({ parent }) => parent?.similarPropertiesMode !== 'tags'
+			hidden: ({ parent }) => parent?.similarPropertiesMode !== 'tags',
+			description: "Tags used to automatically find and display similar listings when the mode is set to 'tags'."
 		})
 	],
 	preview: {

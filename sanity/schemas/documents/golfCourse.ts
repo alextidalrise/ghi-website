@@ -39,7 +39,7 @@ export const golfCourse = defineType({
 			type: 'text',
 			group: 'details',
 			rows: 3,
-			description: 'Public after review.'
+			description: 'A brief description of this golf course shown publicly after review.'
 		}),
 		defineField({
 			name: 'holes',
@@ -60,14 +60,14 @@ export const golfCourse = defineType({
 			title: 'Design style',
 			type: 'string',
 			group: 'details',
-			description: 'Public when known (e.g. links, parkland, desert).'
+			description: "The course's layout style (e.g. links, parkland, desert). Shown publicly when confirmed."
 		}),
 		defineField({
 			name: 'websiteUrl',
 			title: 'Website URL',
 			type: 'url',
 			group: 'details',
-			description: 'Public only when approved.'
+			description: "The course's official website. Shown on the website once confirmed and approved."
 		}),
 		defineField({
 			name: 'media',
@@ -75,7 +75,7 @@ export const golfCourse = defineType({
 			type: 'array',
 			group: 'details',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
-			description: 'Public only when assets are approved for public use.'
+			description: 'Photos of this golf course. Only images with public use approved will appear on the website.'
 		}),
 		defineField({
 			name: 'coordinates',
@@ -83,7 +83,7 @@ export const golfCourse = defineType({
 			type: 'geopoint',
 			group: 'governance',
 			description:
-				'Private/internal unless map privacy is approved. Never sent directly to public pages.'
+				'Exact GPS location of this course. Internal only — only shown publicly if map privacy has been approved.'
 		}),
 		defineField({
 			name: 'reviewStatus',
@@ -92,7 +92,7 @@ export const golfCourse = defineType({
 			group: 'governance',
 			options: { list: [...GOLF_COURSE_REVIEW_STATUSES], layout: 'dropdown' },
 			initialValue: 'draft',
-			description: 'Private/internal workflow field.'
+			description: 'Internal publishing status for this golf course record.'
 		})
 	],
 	preview: {

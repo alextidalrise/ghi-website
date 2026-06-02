@@ -18,7 +18,7 @@ export function buildPropertySeo(
 	canonicalUrl: string
 ): PropertySeoMeta & { canonicalUrl: string } {
 	const seo = listing.seo;
-	const fallbackTitle = listing.publicTitle ?? 'Property';
+	const fallbackTitle = listing.title ?? 'Property';
 	const fallbackDescription = listing.content?.shortDescription ?? null;
 
 	return {
@@ -62,6 +62,27 @@ export function buildLocationSeo(
 	};
 }
 
+/** SEO for a location page with an active community filter — canonical stays on the unfiltered location URL. */
+export function buildFilteredLocationSeo(
+	location: LocationSeoFields,
+	community: LocationSeoFields,
+	unfilteredCanonicalUrl: string
+): PropertySeoMeta & { canonicalUrl: string } {
+	const base = buildLocationSeo(location, unfilteredCanonicalUrl);
+	const title = `${community.name} — ${location.name}`;
+
+	return {
+		...base,
+		canonicalUrl: unfilteredCanonicalUrl,
+		title: community.seoTitle ?? title,
+		description: community.metaDescription ?? community.publicDescription ?? base.description,
+		openGraphTitle: community.seoTitle ?? title,
+		openGraphDescription:
+			community.metaDescription ?? community.publicDescription ?? base.openGraphDescription,
+		noindex: true
+	};
+}
+
 type ListingLocation = NonNullable<PublicPropertyListing['location']>;
 
 function buildPostalAddress(location: ListingLocation | null): Record<string, unknown> | undefined {
@@ -71,7 +92,7 @@ function buildPostalAddress(location: ListingLocation | null): Record<string, un
 
 	const locality =
 		location.community?.name ?? location.location?.name ?? location.country?.name ?? undefined;
-	const streetAddress = location.addressDisplay ?? location.microLocation ?? undefined;
+	const streetAddress = location.addressDisplay ?? undefined;
 
 	if (!streetAddress && !locality) {
 		return undefined;
@@ -164,7 +185,7 @@ export function buildRealEstateListingJsonLd(
 	const jsonLd: Record<string, unknown> = {
 		'@context': 'https://schema.org',
 		'@type': seo?.schemaType ?? 'RealEstateListing',
-		name: listing.publicTitle ?? 'Property',
+		name: listing.title ?? 'Property',
 		url: canonicalUrl
 	};
 
@@ -205,7 +226,7 @@ export function buildDevelopmentSeo(
 	canonicalUrl: string
 ): PropertySeoMeta & { canonicalUrl: string } {
 	const seo = development.seo;
-	const fallbackTitle = development.publicTitle ?? development.developmentName ?? 'Development';
+	const fallbackTitle = development.title ?? development.developmentName ?? 'Development';
 	const fallbackDescription = development.content?.shortDescription ?? null;
 
 	return {

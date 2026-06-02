@@ -10,38 +10,38 @@ export const sourceProvenance = defineType({
 	title: 'Source provenance',
 	type: 'object',
 	description:
-		'Structured provenance for publish-critical facts and internal reporting. Never expose raw Drive IDs, links, or extraction notes publicly.',
+		'Internal audit record of where a specific piece of information came from. None of these fields are shown on the website.',
 	fields: [
 		defineField({
 			name: 'factField',
 			title: 'Fact / field',
 			type: 'string',
-			description: 'Which field or claim this provenance record supports (e.g. price, bedrooms, golf).'
+			description: 'The field or claim this record supports (e.g. price, bedrooms, golf course distance).'
 		}),
 		defineField({
 			name: 'sourceFolderUrl',
 			title: 'Source folder URL',
 			type: 'url',
-			description: 'Private/internal — never expose publicly.'
+			description: 'Internal Google Drive reference for this source. Not shown on the website.'
 		}),
 		defineField({
 			name: 'sourceFolderId',
 			title: 'Source folder ID',
 			type: 'string',
-			description: 'Private/internal — never expose publicly.'
+			description: 'Internal Google Drive reference for this source. Not shown on the website.'
 		}),
 		defineField({
 			name: 'driveFolderReference',
 			title: 'Drive folder reference',
 			type: 'string',
-			description: 'Private/internal — never expose publicly.'
+			description: 'Internal Google Drive reference for this source. Not shown on the website.'
 		}),
 		defineField({
 			name: 'sourceFileReferences',
 			title: 'Source file references',
 			type: 'array',
 			of: [{ type: 'string' }],
-			description: 'Private/internal file names or IDs — never expose publicly.'
+			description: 'Internal list of source file names or IDs. Not shown on the website.'
 		}),
 		defineField({
 			name: 'sourceExtractedAt',
@@ -59,7 +59,8 @@ export const sourceProvenance = defineType({
 			title: 'Source confidence',
 			type: 'string',
 			options: { list: [...SOURCE_CONFIDENCE], layout: 'dropdown' },
-			initialValue: 'unknown'
+			initialValue: 'unknown',
+			description: 'How confident we are that this information is accurate (e.g. confirmed, uncertain, unverified).'
 		}),
 		defineField({
 			name: 'publicSafeStatus',
@@ -67,14 +68,14 @@ export const sourceProvenance = defineType({
 			type: 'string',
 			options: { list: [...PUBLIC_SAFE_STATUSES], layout: 'dropdown' },
 			initialValue: 'unknown',
-			description: 'Whether the sourced fact is safe for public output after review.'
+			description: 'Whether this piece of information has been reviewed and confirmed safe to show on the website.'
 		}),
 		defineField({
 			name: 'notes',
 			title: 'Internal notes',
 			type: 'text',
 			rows: 3,
-			description: 'Private/internal extraction or review notes — never expose publicly.'
+			description: 'Internal notes from when this information was extracted or reviewed. Not shown on the website.'
 		})
 	],
 	preview: {

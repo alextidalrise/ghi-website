@@ -31,4 +31,4 @@
 	});
 </script>
 
-<Gallery media={media} title={development.publicTitle ?? 'Development'} />
+<Gallery media={media} title={development.title ?? 'Development'} />

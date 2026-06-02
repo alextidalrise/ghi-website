@@ -25,7 +25,7 @@ export const pricingFields = defineType({
 			name: 'priceFrom',
 			title: 'Price from',
 			type: 'number',
-			description: 'Development range summary — public when approved.',
+			description: 'The lowest price in the range. Used for developments — shown publicly once approved.',
 			validation: (Rule) => Rule.min(0)
 		}),
 		defineField({
@@ -38,7 +38,7 @@ export const pricingFields = defineType({
 			name: 'priceDisplay',
 			title: 'Price display',
 			type: 'string',
-			description: 'Approved public price string (exact, from, guide, POA, reduced, sold, enquiry-led).'
+			description: 'The price text shown to buyers on the website (e.g. "From €450,000", "POA", "Sold"). Must be approved before it goes live.'
 		}),
 		defineField({
 			name: 'currency',
@@ -60,7 +60,7 @@ export const pricingFields = defineType({
 			options: { list: [...PRICE_SOURCE_STATUSES], layout: 'dropdown' },
 			initialValue: 'unknown',
 			validation: (Rule) => Rule.required(),
-			description: 'Private/internal governance. Public price cannot rely on folder_hint_only.'
+			description: 'Records where the price came from. A price based only on a folder hint cannot be displayed publicly.'
 		}),
 		defineField({
 			name: 'priceReviewedAt',
@@ -86,7 +86,7 @@ export const pricingFields = defineType({
 			type: 'string',
 			options: { list: [...PUBLIC_VISIBILITY], layout: 'dropdown' },
 			initialValue: 'visible',
-			description: 'Reserved items must be hidden or internal only — they are excluded from all public output.'
+			description: 'Controls whether this listing appears on the website. Reserved listings must be set to hidden or internal — they will not appear publicly.'
 		}),
 		defineField({
 			name: 'completionStatus',
@@ -109,34 +109,34 @@ export const pricingFields = defineType({
 			name: 'communityFeesAmount',
 			title: 'Community fees amount',
 			type: 'number',
-			description: 'Private/internal for v1 — never expose publicly.',
+			description: 'Annual community fees for this property. Internal only — not shown on the website yet.',
 			validation: (Rule) => Rule.min(0)
 		}),
 		defineField({
 			name: 'communityFeesPeriod',
 			title: 'Community fees period',
 			type: 'string',
-			description: 'Private/internal for v1 — e.g. monthly, annual.'
+			description: 'Whether community fees are charged monthly or annually. Internal only.'
 		}),
 		defineField({
 			name: 'ibiAmount',
 			title: 'IBI amount',
 			type: 'number',
-			description: 'Private/internal for v1 — never expose publicly.',
+			description: 'Spanish property tax (IBI) annual amount. Internal only — not shown on the website yet.',
 			validation: (Rule) => Rule.min(0)
 		}),
 		defineField({
 			name: 'garbageTaxAmount',
 			title: 'Garbage tax amount',
 			type: 'number',
-			description: 'Private/internal for v1 — never expose publicly.',
+			description: 'Annual garbage collection tax. Internal only — not shown on the website yet.',
 			validation: (Rule) => Rule.min(0)
 		}),
 		defineField({
 			name: 'feesTaxSource',
 			title: 'Fees / tax source',
 			type: 'string',
-			description: 'Private/internal — source note for fees and taxes.'
+			description: 'Where the fees and tax figures came from. Internal use only.'
 		}),
 		defineField({
 			name: 'feesTaxVisibility',

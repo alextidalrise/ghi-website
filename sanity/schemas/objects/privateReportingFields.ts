@@ -37,7 +37,8 @@ export const privateReportingFields = defineType({
 		defineField({
 			name: 'commissionSource',
 			title: 'Commission source',
-			type: 'string'
+			type: 'string',
+			description: 'Where this commission figure came from (e.g. developer agreement, listing sheet).'
 		}),
 		defineField({
 			name: 'commissionVisibility',

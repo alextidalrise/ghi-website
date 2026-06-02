@@ -27,7 +27,6 @@ export const LOCATION_PUBLIC = /* groq */ `{
   country->${LOCATION_TAXONOMY_PUBLIC},
   location->${LOCATION_TAXONOMY_PUBLIC},
   community->${LOCATION_TAXONOMY_PUBLIC},
-  microLocation,
   addressDisplay,
   mapPrivacyLevel,
   mapDisplayApproved,
@@ -78,15 +77,13 @@ export const MEDIA_PUBLIC = /* groq */ `{
   brochureVisibility
 }`;
 
-/** Public content fields — editorial workflow fields excluded. */
+/** Public website content fields — marketing source and editorial workflow excluded. */
 export const CONTENT_PUBLIC = /* groq */ `{
   shortDescription,
   heroHeadline,
   aboutDescription,
-  longDescription,
   locationDescription,
   golfDescription,
-  lifestyleDescription,
   featureHighlights[]{
     label,
     value,
@@ -94,8 +91,7 @@ export const CONTENT_PUBLIC = /* groq */ `{
     isFilterable,
     isHighlighted
   },
-  amenities,
-  investmentDescription
+  amenities
 }`;
 
 /** Public specs object — full specsFields group is public when approved. */
@@ -159,7 +155,7 @@ export const DEVELOPMENT_CARD_PUBLIC = /* groq */ `{
   _id,
   _type,
   ghiListingId,
-  publicTitle,
+  title,
   "slug": slug.current,
   listingKind,
   developmentDisplayMode,
@@ -181,7 +177,7 @@ export const DEVELOPMENT_CARD_PUBLIC = /* groq */ `{
 export const PROPERTY_CARD_PUBLIC = /* groq */ `{
   _id,
   ghiListingId,
-  publicTitle,
+  title,
   "slug": slug.current,
   listingKind,
   propertyType,
@@ -210,7 +206,7 @@ export const PROPERTY_LISTING_PUBLIC = /* groq */ `{
   _id,
   _type,
   ghiListingId,
-  publicTitle,
+  title,
   "slug": slug.current,
   listingKind,
   propertyType,
@@ -255,7 +251,7 @@ export const DEVELOPMENT_PUBLIC = /* groq */ `{
   _type,
   ghiListingId,
   developmentName,
-  publicTitle,
+  title,
   "slug": slug.current,
   listingKind,
   developmentDisplayMode,
@@ -290,8 +286,8 @@ export const DEVELOPMENT_PUBLIC = /* groq */ `{
 
 /** Canonical path fields for slug resolution and 301 redirects. */
 export const CANONICAL_PATH_FIELDS = /* groq */ `
-  "countrySlug": location.country->slug.current,
-  "locationSlug": location.location->slug.current,
+  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),
+  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),
   "communitySlug": location.community->slug.current,
   "slug": slug.current,
   listingKind
@@ -305,7 +301,7 @@ export const PROPERTY_LISTING_WITH_CANONICAL = /* groq */ `{
   _id,
   _type,
   ghiListingId,
-  publicTitle,
+  title,
   "slug": slug.current,
   listingKind,
   propertyType,
@@ -328,7 +324,7 @@ export const DEVELOPMENT_WITH_CANONICAL = /* groq */ `{
   _type,
   ghiListingId,
   developmentName,
-  publicTitle,
+  title,
   "slug": slug.current,
   listingKind,
   developmentDisplayMode,

@@ -1,6 +1,7 @@
 import type { SchemaTypeDefinition } from 'sanity';
 
 import { contentFields, featureHighlight } from './contentFields';
+import { marketingChannelNotes, marketingFields } from './marketingFields';
 import { ctaFields, enquiryRouting } from './ctaFields';
 import { golfFields } from './golfFields';
 import { locationFields } from './locationFields';
@@ -26,12 +27,14 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	reviewItem,
 	mediaAssetMetadata,
 	sourceProvenance,
+	marketingChannelNotes,
 	// Primary field groups
 	locationFields,
 	pricingFields,
 	specsFields,
 	golfFields,
 	contentFields,
+	marketingFields,
 	mediaFields,
 	ctaFields,
 	relatedContentFields,
@@ -45,6 +48,8 @@ export {
 	channelReadinessItem,
 	reviewItem,
 	contentFields,
+	marketingFields,
+	marketingChannelNotes,
 	ctaFields,
 	enquiryRouting,
 	featureHighlight,

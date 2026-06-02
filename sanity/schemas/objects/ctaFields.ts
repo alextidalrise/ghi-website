@@ -4,7 +4,7 @@ export const enquiryRouting = defineType({
 	name: 'enquiryRouting',
 	title: 'Enquiry routing',
 	type: 'object',
-	description: 'Private/internal routing configuration — never expose recipient details publicly.',
+	description: 'Internal settings for routing buyer enquiries to the right team member or inbox. Never shown publicly.',
 	fields: [
 		defineField({
 			name: 'teamSlug',
@@ -74,7 +74,7 @@ export const ctaFields = defineType({
 			title: 'Brochure CTA enabled',
 			type: 'boolean',
 			initialValue: false,
-			description: 'Must obey brochureVisibility on the linked media fields.'
+			description: "Shows the 'Download brochure' button on the listing. Only enable if the brochure visibility is also set to allow downloads."
 		}),
 		defineField({
 			name: 'whatsAppEnabled',
@@ -87,7 +87,7 @@ export const ctaFields = defineType({
 			title: 'WhatsApp message template',
 			type: 'text',
 			rows: 3,
-			description: 'Private/internal template with placeholders — public behaviour only exposes enabled state.'
+			description: 'The pre-filled message sent when a buyer taps the WhatsApp button. Internal only — buyers only see the button itself, not this template.'
 		}),
 		defineField({
 			name: 'enquiryRouting',

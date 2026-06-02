@@ -46,7 +46,7 @@ export const workflowFields = defineType({
 	name: 'workflowFields',
 	title: 'Workflow & readiness',
 	type: 'object',
-	description: 'Private/internal workflow fields — never returned in public payloads.',
+	description: 'Internal publishing workflow — none of these fields appear on the website.',
 	fields: [
 		defineField({
 			name: 'contentStatus',
@@ -75,7 +75,7 @@ export const workflowFields = defineType({
 			title: 'Review items',
 			type: 'array',
 			of: [defineArrayMember({ type: 'reviewItem' })],
-			description: 'Structured review queue — use instead of legacy string arrays.',
+			description: "Items flagged for review before this listing can be approved for publishing. Use this instead of the older 'facts needing confirmation' field.",
 			components: {
 				input: ReviewItemsInput
 			}
@@ -106,7 +106,7 @@ export const workflowFields = defineType({
 			name: 'approvedBy',
 			title: 'Approved by',
 			type: 'string',
-			description: 'Any approved team member — capture identity rather than hard-coding a single owner.'
+			description: 'The name of the team member who approved this listing.'
 		}),
 		defineField({
 			name: 'approvedAt',
@@ -123,7 +123,7 @@ export const workflowFields = defineType({
 			title: 'Do not publish reason',
 			type: 'text',
 			rows: 3,
-			description: 'Private/internal blocker — never expose publicly.'
+			description: 'The reason this listing must not be published. Internal only — never shown on the website.'
 		}),
 		defineField({
 			name: 'humanReviewed',

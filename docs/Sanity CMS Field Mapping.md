@@ -293,24 +293,43 @@ Every field or field group in this document is classified as one of:
 - `distanceToPrimaryGolfCourse`, `golfView`, `buggyAccess`, `golfMembershipInfo`
   - Classification: **public** only when source-supported/reviewed; otherwise private/internal or omitted.
 
-### 7. Content fields
+### 7. Website content (`content`)
 
-- `shortDescription`, `heroHeadline`, `aboutDescription`, `longDescription`, `locationDescription`, `golfDescription`, `lifestyleDescription`, `featureHighlights`, `amenities`
-  - Classification: **public** after human review.
-  - Types: text/rich text/array.
-  - Validation: no unsupported investment/scarcity claims; no commission/source/legal contamination; source-supported facts only.
+Public website copy only. Campaign and extended marketing copy lives in **§7b Marketing source** (`marketing`).
 
-- `investmentDescription`
-  - Classification: **public** only if source-supported and approved; otherwise **rejected** for unsupported claims.
+- `shortDescription`, `aboutDescription`
+  - Classification: **public** after human review (required for publish).
+  - Types: text / rich text.
+  - Roles: card teaser (`shortDescription`); canonical listing body (`aboutDescription`).
 
-- `buyerFitNotes`
-  - Classification: **private/internal** by default; may inform CRM/sales workflows, not public copy unless rewritten and approved.
+- `heroHeadline`, `locationDescription`, `golfDescription`, `featureHighlights`, `amenities`
+  - Classification: **public** after human review when populated.
+  - Types: string / rich text / array.
+  - `locationDescription` and `golfDescription` are optional section copy only — not alternate main descriptions.
 
 - `humanReviewed`, `reviewer`, `reviewDate`
-  - Classification: **private/internal** workflow fields.
+  - Classification: **private/internal** workflow fields on `contentFields`.
 
-- Unsupported investment/scarcity claims
+- Unsupported investment/scarcity claims in public website fields
   - Classification: **rejected**.
+
+### 7b. Marketing source (`marketing`)
+
+Campaign and sales source material. **Never** exposed in public GROQ queries or rendered on listing pages.
+
+- `longFormDescription`, `lifestyleAngle`, `investmentAngle`
+  - Classification: **private/internal**.
+  - Types: rich text.
+  - Purpose: brochure/email, emotional hooks, investor-facing drafts. `investmentAngle` only when source-supported and approved.
+
+- `keyHooks`, `audienceFit`
+  - Classification: **private/internal**.
+  - Types: string array / text.
+  - Purpose: ad bullets, buyer persona notes (e.g. family, golfer, investor).
+
+- `channelNotes` (`email`, `social`, `paidAds`, `crm`, `brochure`)
+  - Classification: **private/internal**.
+  - Purpose: per-channel scratchpad for campaigns.
 
 ### 8. Feature taxonomy
 

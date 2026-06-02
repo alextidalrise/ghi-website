@@ -41,7 +41,9 @@ export function buildTaxonomyPreviewPath({
 		case 'location':
 			return parentSlug ? `/${parentSlug}/${slug}` : null;
 		case 'community':
-			return parentSlug && grandparentSlug ? `/${grandparentSlug}/${parentSlug}/${slug}` : null;
+			return parentSlug && grandparentSlug
+				? `/${grandparentSlug}/${parentSlug}?community=${encodeURIComponent(slug)}`
+				: null;
 		default:
 			return null;
 	}

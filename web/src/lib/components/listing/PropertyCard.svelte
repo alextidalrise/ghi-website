@@ -17,7 +17,7 @@
 	const price = $derived(formatListingPrice(card.pricing));
 	const locationLine = $derived(card.location?.addressDisplay ?? null);
 	const specsLine = $derived(formatSpecs(card.specs));
-	const imageAlt = $derived(card.heroImageAlt ?? card.publicTitle ?? 'Property listing');
+	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Property listing');
 
 	function formatSpecs(specs: PublicPropertyCardSpecs): string | null {
 		if (!specs) return null;
@@ -47,8 +47,8 @@
 			<p class="property-card__location">{locationLine}</p>
 		{/if}
 
-		{#if card.publicTitle}
-			<h3 class="property-card__title">{card.publicTitle}</h3>
+		{#if card.title}
+			<h3 class="property-card__title">{card.title}</h3>
 		{/if}
 
 		{#if specsLine}
@@ -62,7 +62,7 @@
 {/snippet}
 
 {#if href}
-	<a class="property-card" {href} aria-label={card.publicTitle ?? 'View property listing'}>
+	<a class="property-card" {href} aria-label={card.title ?? 'View property listing'}>
 		{@render cardBody()}
 	</a>
 {:else}

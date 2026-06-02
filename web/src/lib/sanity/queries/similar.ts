@@ -34,7 +34,7 @@ const MANUAL_SIMILAR_PROJECTION = /* groq */ `{
   _type,
   _id,
   ghiListingId,
-  publicTitle,
+  title,
   "slug": slug.current,
   listingKind,
   propertyType,

@@ -27,7 +27,8 @@ export {
 export {
 	countryBySlugQuery,
 	locationBySlugQuery,
-	communityBySlugQuery,
+	locationPageContextQuery,
+	communityInLocationContextQuery,
 	countriesForNavQuery,
 	locationsByCountryQuery,
 	communitiesByLocationQuery,
@@ -47,6 +48,7 @@ export {
 export {
 	buildListingCardsCountQuery,
 	buildPaginatedListingCardsQuery,
+	buildLocationGridIds,
 	listingSearchQueryParams,
 	SORT_ORDER_FRAGMENTS,
 	type ListingSearchScope

@@ -46,7 +46,8 @@ export const reviewItem = defineType({
 			type: 'string',
 			options: { list: [...REVIEW_SOURCE_LEVELS], layout: 'dropdown' },
 			initialValue: 'derived',
-			validation: (Rule) => Rule.required()
+			validation: (Rule) => Rule.required(),
+			description: 'Whether this review item was flagged automatically or raised manually by a team member.'
 		}),
 		defineField({
 			name: 'visibleToReviewer',
@@ -60,7 +61,7 @@ export const reviewItem = defineType({
 			title: 'Blocks publish',
 			type: 'boolean',
 			initialValue: true,
-			description: 'When true, prevents approval for publish until resolved.'
+			description: 'When ticked, this listing cannot be approved for publishing until this item is resolved.'
 		}),
 		defineField({
 			name: 'category',

@@ -53,7 +53,7 @@ function baseCard(overrides: Partial<RawPropertyCard> = {}): RawPropertyCard {
 	return {
 		_id: goldenPropertyRaw._id!,
 		ghiListingId: goldenPropertyRaw.ghiListingId!,
-		publicTitle: goldenPropertyRaw.publicTitle!,
+		title: goldenPropertyRaw.title!,
 		slug: goldenPropertyRaw.slug!,
 		listingKind: 'property',
 		propertyType: 'villa',
@@ -89,7 +89,8 @@ describe('fetchFrontlineListingCards', () => {
 			scope: {
 				type: 'location',
 				countrySlug: 'spain',
-				locationSlug: 'costa-del-sol'
+				locationSlug: 'costa-del-sol',
+				locationIds: ['location-id']
 			}
 		});
 
@@ -129,8 +130,8 @@ describe('fetchHomepageFrontlineListingCards', () => {
 
 describe('fetchHomepageFeaturedListingCards', () => {
 	it('fetches ordered featured cards from site settings and filters null refs', async () => {
-		const first = baseCard({ _id: 'listing-1', publicTitle: 'First pick' });
-		const second = baseCard({ _id: 'listing-2', publicTitle: 'Second pick' });
+		const first = baseCard({ _id: 'listing-1', title: 'First pick' });
+		const second = baseCard({ _id: 'listing-2', title: 'Second pick' });
 
 		mockedFetchPublic.mockImplementation(async (query) => {
 			expect(typeof query).toBe('string');
@@ -149,7 +150,7 @@ describe('fetchHomepageFeaturedListingCards', () => {
 
 	it('applies homepage featured limit', async () => {
 		const cards = Array.from({ length: HOMEPAGE_FEATURED_LIMIT + 2 }, (_, index) =>
-			baseCard({ _id: `listing-${index}`, publicTitle: `Pick ${index}` })
+			baseCard({ _id: `listing-${index}`, title: `Pick ${index}` })
 		);
 
 		mockedFetchPublic.mockResolvedValue({ cards });
@@ -181,7 +182,7 @@ describe('fetchCountryFeaturedListingCards', () => {
 
 	it('applies country featured limit', async () => {
 		const cards = Array.from({ length: COUNTRY_FEATURED_LIMIT + 2 }, (_, index) =>
-			baseCard({ _id: `country-listing-${index}`, publicTitle: `Country pick ${index}` })
+			baseCard({ _id: `country-listing-${index}`, title: `Country pick ${index}` })
 		);
 
 		mockedFetchPublic.mockResolvedValue({ cards });

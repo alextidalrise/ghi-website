@@ -1,6 +1,11 @@
 import { defineQuery } from 'groq';
 import { CANONICAL_PATH, CANONICAL_PATH_FIELDS } from '../allowlists';
-import { PUBLIC_LISTING_FILTER } from './filters';
+import {
+	LISTING_COUNTRY_SLUG,
+	LISTING_LOCATION_SLUG,
+	LISTING_PATH_FILTER,
+	PUBLIC_LISTING_FILTER
+} from './filters';
 
 /**
  * Single resolver query for /[country]/[location]/[community]/[slug].
@@ -9,10 +14,7 @@ import { PUBLIC_LISTING_FILTER } from './filters';
 export const listingByPathQuery = defineQuery(`
   *[
     _type in ["propertyListing", "development"]
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
-    && location.community->slug.current == $communitySlug
-    && slug.current == $slug
+    && ${LISTING_PATH_FILTER}
     && (
       (_type == "propertyListing" && listingKind in ["property", "unit"])
       || _type == "development"
@@ -33,8 +35,8 @@ export const listingLegacyThreeSegmentPathQuery = defineQuery(`
   *[
     _type in ["propertyListing", "development"]
     && slug.current == $slug
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
+    && ${LISTING_COUNTRY_SLUG} == $countrySlug
+    && ${LISTING_LOCATION_SLUG} == $locationSlug
     && (
       (_type == "propertyListing" && listingKind in ["property", "unit"])
       || _type == "development"

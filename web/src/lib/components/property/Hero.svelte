@@ -13,7 +13,7 @@
 	const heroUrl = $derived(
 		buildPublicImageUrl(heroImage, { width: 1920, height: 900, fit: 'crop', quality: 85 })
 	);
-	const headline = $derived(listing.content?.heroHeadline ?? listing.publicTitle);
+	const headline = $derived(listing.content?.heroHeadline ?? listing.title);
 	const overline = $derived(
 		[listing.location?.community?.name, listing.location?.country?.name].filter(Boolean).join(', ')
 	);
@@ -27,7 +27,7 @@
 		<div class="hero__media">
 			<img
 				src={heroUrl}
-				alt={heroImage?.altText ?? listing.publicTitle ?? 'Property hero'}
+				alt={heroImage?.altText ?? listing.title ?? 'Property hero'}
 				width="1920"
 				height="900"
 				fetchpriority="high"

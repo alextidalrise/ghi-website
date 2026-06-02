@@ -5,12 +5,21 @@ export const seoFields = defineType({
 	name: 'seoFields',
 	title: 'SEO metadata',
 	type: 'object',
+	fieldsets: [
+		{
+			name: 'openGraph',
+			title: 'Social sharing',
+			description:
+				'Controls how this page appears when shared on WhatsApp, LinkedIn, and similar apps. Leave blank to fall back to SEO title, description, and hero image.',
+			options: { collapsible: true, collapsed: false }
+		}
+	],
 	fields: [
 		defineField({
 			name: 'seoTitle',
 			title: 'SEO title',
 			type: 'string',
-			description: 'Must not include commission, fees, raw source references, or private fields.',
+			description: 'Page title shown in Google search results and browser tabs. Keep under 70 characters. No prices, fees, or internal notes.',
 			validation: (Rule) => Rule.max(70).warning('Keep SEO titles under 70 characters where possible.')
 		}),
 		defineField({
@@ -23,18 +32,21 @@ export const seoFields = defineType({
 		defineField({
 			name: 'openGraphTitle',
 			title: 'Open Graph title',
-			type: 'string'
+			type: 'string',
+			fieldset: 'openGraph'
 		}),
 		defineField({
 			name: 'openGraphDescription',
 			title: 'Open Graph description',
 			type: 'text',
-			rows: 3
+			rows: 3,
+			fieldset: 'openGraph'
 		}),
 		defineField({
 			name: 'openGraphImage',
 			title: 'Open Graph image',
-			type: 'mediaAssetMetadata'
+			type: 'mediaAssetMetadata',
+			fieldset: 'openGraph'
 		}),
 		defineField({
 			name: 'noindex',
@@ -53,7 +65,7 @@ export const seoFields = defineType({
 			name: 'primaryKeyword',
 			title: 'Primary keyword',
 			type: 'string',
-			description: 'Private/internal SEO workflow — need not be exposed as a raw public field.'
+			description: 'The main search phrase this page is targeting. Internal use only — not shown on the website.'
 		}),
 		defineField({
 			name: 'secondaryKeywords',
@@ -65,7 +77,7 @@ export const seoFields = defineType({
 			name: 'canonicalCluster',
 			title: 'Canonical cluster',
 			type: 'string',
-			description: 'Private/internal SEO workflow grouping.'
+			description: 'Internal label used to group related pages for SEO strategy. Not shown publicly.'
 		}),
 		defineField({
 			name: 'backLinks',
@@ -86,7 +98,7 @@ export const seoFields = defineType({
 			title: 'Supporting articles',
 			type: 'array',
 			of: [{ type: 'string' }],
-			description: 'URLs or slugs for supporting editorial content when available.'
+			description: "Links to related editorial articles that support this listing's search ranking. Add when available."
 		})
 	],
 	preview: {

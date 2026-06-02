@@ -7,7 +7,7 @@ export type RawDevelopmentCard = {
 	_id: string;
 	listingKind?: string | null;
 	ghiListingId?: string | null;
-	publicTitle?: string | null;
+	title?: string | null;
 	slug?: string | null;
 	developmentDisplayMode?:
 		| 'flat_listing'
@@ -25,7 +25,7 @@ export type RawDevelopmentCard = {
 export type PublicDevelopmentCard = {
 	_id: string;
 	ghiListingId?: string | null;
-	publicTitle?: string | null;
+	title?: string | null;
 	slug?: string | null;
 	listingKind?: string | null;
 	developmentDisplayMode: RawDevelopmentCard['developmentDisplayMode'];
@@ -58,7 +58,7 @@ export function toPublicDevelopmentCard(raw: RawDevelopmentCard): PublicDevelopm
 	return {
 		_id: raw._id,
 		ghiListingId: raw.ghiListingId,
-		publicTitle: raw.publicTitle,
+		title: raw.title,
 		slug: raw.slug,
 		listingKind: raw.listingKind,
 		developmentDisplayMode: raw.developmentDisplayMode ?? 'flat_listing',
@@ -66,7 +66,7 @@ export function toPublicDevelopmentCard(raw: RawDevelopmentCard): PublicDevelopm
 		location: raw.location ?? null,
 		pricing: filterPublicPricing(raw.pricing),
 		heroImageUrl,
-		heroImageAlt: heroAsset?.altText ?? raw.publicTitle ?? null
+		heroImageAlt: heroAsset?.altText ?? raw.title ?? null
 	};
 }
 

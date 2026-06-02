@@ -2,6 +2,7 @@
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import ListingResults from '$lib/components/listing/ListingResults.svelte';
+	import { buildListingSearchHref } from '$lib/listing/searchParams';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
@@ -20,14 +21,27 @@
 			.map((community) => ({ label: community.name, value: community.slug }))
 	);
 
-	function communityHref(community: {
-		slug?: string | null;
-		canonicalLocationSlug?: string | null;
-	}) {
-		if (!community.slug || !community.canonicalLocationSlug || !data.country.slug) {
-			return null;
-		}
-		return `/${data.country.slug}/${community.canonicalLocationSlug}/${community.slug}`;
+	const pageHeading = $derived(
+		data.activeCommunity?.name
+			? `${data.activeCommunity.name} — ${data.location.name}`
+			: data.location.name
+	);
+
+	const introText = $derived(
+		data.activeCommunity?.publicDescription ??
+			data.location.publicDescription ??
+			placeholderBody
+	);
+
+	function communityFilterHref(communitySlug: string) {
+		return buildListingSearchHref(data.canonicalPath, data.searchParams, {
+			community: communitySlug,
+			page: 1
+		});
+	}
+
+	function relatedAreaHref(slug: string) {
+		return `/${data.country.slug}/${slug}`;
 	}
 </script>
 
@@ -37,6 +51,9 @@
 		<meta name="description" content={data.seo.description} />
 	{/if}
 	<link rel="canonical" href={data.seo.canonicalUrl} />
+	{#if data.seo.noindex}
+		<meta name="robots" content="noindex, follow" />
+	{/if}
 
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={data.seo.canonicalUrl} />
@@ -52,10 +69,25 @@
 	<Breadcrumbs items={data.breadcrumbs} />
 
 	<div class="location-page__top content-wrap">
-		<h1>{data.location.name}</h1>
-		<p class="location-page__intro">
-			{data.location.publicDescription ?? placeholderBody}
-		</p>
+		<h1>{pageHeading}</h1>
+		<p class="location-page__intro">{introText}</p>
+
+		{#if data.relatedAreaLinks.length > 0}
+			<section class="location-page__list" aria-labelledby="related-areas-heading">
+				<h2 id="related-areas-heading">Related areas</h2>
+				<ul>
+					{#each data.relatedAreaLinks as entry (entry.location?._id)}
+						{@const slug = entry.location?.slug}
+						{@const name = entry.location?.breadcrumbLabel ?? entry.location?.name}
+						{#if slug && name}
+							<li>
+								<a href={relatedAreaHref(slug)}>{name}</a>
+							</li>
+						{/if}
+					{/each}
+				</ul>
+			</section>
+		{/if}
 
 		<FrontlineListings
 			cards={data.frontlineCards}
@@ -81,14 +113,11 @@
 					<h2 id="communities-heading">Communities</h2>
 					<ul>
 						{#each data.directCommunities as community (community._id)}
-							{@const href = communityHref(community)}
-							<li>
-								{#if href}
-									<a {href}>{community.name}</a>
-								{:else}
-									{community.name}
-								{/if}
-							</li>
+							{#if community.slug && community.name}
+								<li>
+									<a href={communityFilterHref(community.slug)}>{community.name}</a>
+								</li>
+							{/if}
 						{/each}
 					</ul>
 				</section>
@@ -99,14 +128,11 @@
 					<h2 id="associated-communities-heading">Also in this area</h2>
 					<ul>
 						{#each data.associatedCommunities as community (community._id)}
-							{@const href = communityHref(community)}
-							<li>
-								{#if href}
-									<a {href}>{community.name}</a>
-								{:else}
-									{community.name}
-								{/if}
-							</li>
+							{#if community.slug && community.name}
+								<li>
+									<a href={communityFilterHref(community.slug)}>{community.name}</a>
+								</li>
+							{/if}
 						{/each}
 					</ul>
 				</section>

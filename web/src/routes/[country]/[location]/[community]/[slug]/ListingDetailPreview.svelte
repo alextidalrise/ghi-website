@@ -104,12 +104,10 @@
 	<article class="listing-page">
 		<Breadcrumbs items={data.breadcrumbs} />
 		<Hero listing={property} />
-		<Gallery media={property.media} title={property.publicTitle ?? 'Property'} />
+		<Gallery media={property.media} title={property.title ?? 'Property'} />
 		<KeyFacts listing={property} />
 
 		<ContentSection title="About" body={property.content?.aboutDescription} />
-		<ContentSection title="Overview" body={property.content?.longDescription} />
-		<ContentSection title="Lifestyle" body={property.content?.lifestyleDescription} />
 
 		<LocationSection
 			description={property.content?.locationDescription}
@@ -140,8 +138,6 @@
 		<DevelopmentKeyFacts {development} />
 
 		<ContentSection title="About" body={development.content?.aboutDescription} />
-		<ContentSection title="Overview" body={development.content?.longDescription} />
-		<ContentSection title="Lifestyle" body={development.content?.lifestyleDescription} />
 
 		{#if showsUnitTypes(displayMode)}
 			<UnitTypesList unitTypes={development.unitTypes} showPricing={showInventoryPricing} />

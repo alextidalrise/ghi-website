@@ -53,7 +53,7 @@ function basePropertyCard(overrides: Partial<RawPropertyCard> = {}): RawProperty
 	return {
 		_id: 'similar-property-1',
 		ghiListingId: 'GHI00002',
-		publicTitle: 'Similar villa',
+		title: 'Similar villa',
 		slug: 'similar-villa',
 		listingKind: 'property',
 		propertyType: 'villa',
@@ -70,7 +70,7 @@ function baseDevelopmentCard(overrides: Partial<RawDevelopmentCard> = {}): RawDe
 	return {
 		_id: 'similar-development-1',
 		ghiListingId: 'GHI00003',
-		publicTitle: 'Similar development',
+		title: 'Similar development',
 		slug: 'similar-development',
 		listingKind: 'development',
 		developmentDisplayMode: 'unit_types',
@@ -202,7 +202,7 @@ describe('fetchSimilarListingCards', () => {
 
 	it('excludes current listing and applies limit for manual mode', async () => {
 		const items = Array.from({ length: SIMILAR_LISTING_LIMIT + 2 }, (_, index) =>
-			basePropertyCard({ _id: `manual-${index}`, publicTitle: `Pick ${index}` })
+			basePropertyCard({ _id: `manual-${index}`, title: `Pick ${index}` })
 		);
 
 		mockedFetchPublic.mockResolvedValue({ items });

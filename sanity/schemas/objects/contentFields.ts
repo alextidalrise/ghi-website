@@ -25,7 +25,7 @@ export const featureHighlight = defineType({
 			name: 'value',
 			title: 'Value',
 			type: 'string',
-			description: 'Optional detail value. Private/internal if source uncertainty exists.'
+			description: 'Optional extra detail for this feature (e.g. "47 m²" for a terrace). Keep internal if the figure isn\'t confirmed.'
 		}),
 		defineField({
 			name: 'category',
@@ -53,57 +53,54 @@ export const featureHighlight = defineType({
 
 export const contentFields = defineType({
 	name: 'contentFields',
-	title: 'Content',
+	title: 'Website content',
 	type: 'object',
+	description:
+		'Public website copy only. Use short + about as the canonical listing text. Campaign and extended copy belongs in Marketing source.',
 	fields: [
 		defineField({
 			name: 'shortDescription',
 			title: 'Short description',
 			type: 'text',
 			rows: 3,
-			description: 'Public after human review. No unsupported investment or scarcity claims.',
+			description:
+				'Required. Brief summary for search results and listing cards. Must be reviewed before going live. Do not include investment or urgency claims unless confirmed from a source.',
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
 			name: 'heroHeadline',
 			title: 'Hero headline',
 			type: 'string',
-			description: 'Plain string for hero display.'
+			description: 'A bold headline displayed prominently at the top of the listing page, above the main description.'
 		}),
 		portableTextField(
 			'aboutDescription',
 			'About description',
-			'Public after human review. Source-supported facts only.'
+			"Required for publish. The main 'About' section on the listing page — canonical website body copy. Include only facts that can be verified from a source."
 		),
-		portableTextField('longDescription', 'Long description'),
-		portableTextField('locationDescription', 'Location description'),
-		portableTextField('golfDescription', 'Golf description'),
-		portableTextField('lifestyleDescription', 'Lifestyle description'),
+		portableTextField(
+			'locationDescription',
+			'Location description',
+			'Optional. Shown in the location section when this listing has location-specific copy beyond the About section.'
+		),
+		portableTextField(
+			'golfDescription',
+			'Golf description',
+			'Optional. Shown in the golf section when this listing has golf-specific copy.'
+		),
 		defineField({
 			name: 'featureHighlights',
 			title: 'Feature highlights',
 			type: 'array',
 			of: [defineArrayMember({ type: 'featureHighlight' })],
-			description: 'Curated feature set for public display after review.'
+			description: 'A handpicked list of standout features shown prominently on the listing (e.g. sea view, private pool). Must be reviewed before going live.'
 		}),
 		defineField({
 			name: 'amenities',
 			title: 'Amenities',
 			type: 'array',
 			of: [{ type: 'string' }],
-			description: 'Simple amenity labels for public display.'
-		}),
-		portableTextField(
-			'investmentDescription',
-			'Investment description',
-			'Public only if source-supported and approved; otherwise leave empty.'
-		),
-		defineField({
-			name: 'buyerFitNotes',
-			title: 'Buyer fit notes',
-			type: 'text',
-			rows: 3,
-			description: 'Private/internal — may inform CRM/sales workflows, not public copy unless rewritten.'
+			description: 'A list of amenity labels shown on the listing (e.g. "Air conditioning", "Private pool").'
 		}),
 		defineField({
 			name: 'humanReviewed',

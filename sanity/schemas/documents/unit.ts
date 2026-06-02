@@ -21,7 +21,7 @@ export const unit = defineType({
 			name: 'unitNumber',
 			title: 'Unit number',
 			type: 'string',
-			description: 'Public only when approved for display.'
+			description: "The developer's unit number or plot reference. Shown publicly only once approved."
 		}),
 		defineField({
 			name: 'parentDevelopment',
@@ -44,7 +44,7 @@ export const unit = defineType({
 			type: 'pricingFields',
 			group: 'details',
 			description:
-				'Reserved units must be hidden or internal only — excluded entirely from public output.'
+				'Pricing and availability for this unit. Reserved units must be set to hidden or internal — they will not appear on the website.'
 		}),
 		defineField({
 			name: 'specs',
@@ -57,7 +57,7 @@ export const unit = defineType({
 			title: 'Floorplan',
 			type: 'mediaAssetMetadata',
 			group: 'details',
-			description: 'Public only when approved.'
+			description: 'The floorplan image for this unit. Shown on the website only once approved.'
 		}),
 		defineField({
 			name: 'unitGallery',
@@ -65,7 +65,7 @@ export const unit = defineType({
 			type: 'array',
 			group: 'details',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
-			description: 'Public only when approved.'
+			description: 'Photos specific to this unit. Shown on the website only once approved.'
 		}),
 		defineField({
 			name: 'unitSpecificNotes',
@@ -73,7 +73,7 @@ export const unit = defineType({
 			type: 'text',
 			group: 'governance',
 			rows: 3,
-			description: 'Private/internal — source or sales notes, never public.'
+			description: 'Internal notes about this unit from the source or sales team. Not shown on the website.'
 		}),
 		defineField({
 			name: 'sourceProvenance',
@@ -81,7 +81,7 @@ export const unit = defineType({
 			type: 'array',
 			group: 'governance',
 			of: [defineArrayMember({ type: 'sourceProvenance' })],
-			description: 'Private/internal — never returned in public payloads.'
+			description: 'Internal audit trail showing where this unit\'s data came from. Not shown on the website.'
 		}),
 		defineField({
 			name: 'workflow',

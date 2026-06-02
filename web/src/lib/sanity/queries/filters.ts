@@ -18,6 +18,29 @@ export const NOT_RESERVED_FILTER = /* groq */ `
   coalesce(pricing.availabilityStatus, "") != "reserved"
 `;
 
+/** Country slug for listing URLs — from stored ref or community taxonomy parent chain. */
+export const LISTING_COUNTRY_SLUG = /* groq */ `coalesce(
+  location.country->slug.current,
+  location.community->parent->parent->slug.current
+)`;
+
+/** Location slug for listing URLs — from stored ref or community taxonomy parent chain. */
+export const LISTING_LOCATION_SLUG = /* groq */ `coalesce(
+  location.location->slug.current,
+  location.community->parent->slug.current
+)`;
+
+/** Community slug for listing URLs. */
+export const LISTING_COMMUNITY_SLUG = /* groq */ `location.community->slug.current`;
+
+/** Match a listing document to its hierarchical URL segments. */
+export const LISTING_PATH_FILTER = /* groq */ `
+  ${LISTING_COUNTRY_SLUG} == $countrySlug
+  && ${LISTING_LOCATION_SLUG} == $locationSlug
+  && ${LISTING_COMMUNITY_SLUG} == $communitySlug
+  && slug.current == $slug
+`;
+
 /** Combined gate for publishable property listings and developments. */
 export const PUBLIC_LISTING_FILTER = /* groq */ `
   ${PUBLISH_READINESS_FILTER}

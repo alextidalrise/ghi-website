@@ -39,7 +39,7 @@ export const mediaFields = defineType({
 			name: 'heroImage',
 			title: 'Hero image',
 			type: 'mediaAssetMetadata',
-			description: 'Public only when selected and approved for public use.'
+			description: 'The main image displayed at the top of the listing page. Must be approved before it appears publicly.'
 		}),
 		defineField({
 			name: 'gallery',
@@ -78,7 +78,7 @@ export const mediaFields = defineType({
 			name: 'brochure',
 			title: 'Brochure',
 			type: 'mediaAssetMetadata',
-			description: 'Private/internal by default; public or request-only only after approval.'
+			description: 'The downloadable property brochure. Hidden by default — must be approved before buyers can access it.'
 		}),
 		defineField({
 			name: 'brochureVisibility',
@@ -87,7 +87,7 @@ export const mediaFields = defineType({
 			options: { list: [...BROCHURE_VISIBILITY], layout: 'dropdown' },
 			initialValue: 'request_only',
 			description:
-				'Brochure downloads must be disabled or request-only unless set to public approved.'
+				'Controls whether buyers can download the brochure — disabled, available on request, or openly downloadable. Must be explicitly set to allow downloads.'
 		})
 	],
 	preview: {

@@ -35,7 +35,7 @@ export const specsFields = defineType({
 			name: 'plotSize',
 			title: 'Plot size',
 			type: 'number',
-			description: 'Typically required for villas. Apartments may use terrace/garden fields instead.',
+			description: 'Total land plot size. Usually required for villas — apartments typically use the terrace or garden area fields instead.',
 			validation: (Rule) => Rule.min(0)
 		}),
 		defineField({

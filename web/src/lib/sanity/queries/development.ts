@@ -1,15 +1,16 @@
 import { defineQuery } from 'groq';
 import { CANONICAL_PATH, DEVELOPMENT_PUBLIC, DEVELOPMENT_WITH_CANONICAL } from '../allowlists';
-import { PUBLIC_LISTING_FILTER } from './filters';
+import {
+	LISTING_COUNTRY_SLUG,
+	LISTING_PATH_FILTER,
+	PUBLIC_LISTING_FILTER
+} from './filters';
 
 /** Resolve a development by hierarchical URL segments (preview — no publish gates). */
 export const developmentByPathPreviewQuery = defineQuery(`
   *[
     _type == "development"
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
-    && location.community->slug.current == $communitySlug
-    && slug.current == $slug
+    && ${LISTING_PATH_FILTER}
   ][0]${DEVELOPMENT_PUBLIC}
 `);
 
@@ -17,10 +18,7 @@ export const developmentByPathPreviewQuery = defineQuery(`
 export const developmentByPathQuery = defineQuery(`
   *[
     _type == "development"
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
-    && location.community->slug.current == $communitySlug
-    && slug.current == $slug
+    && ${LISTING_PATH_FILTER}
     && ${PUBLIC_LISTING_FILTER}
   ][0]${DEVELOPMENT_PUBLIC}
 `);
@@ -29,10 +27,7 @@ export const developmentByPathQuery = defineQuery(`
 export const developmentCanonicalPathQuery = defineQuery(`
   *[
     _type == "development"
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
-    && location.community->slug.current == $communitySlug
-    && slug.current == $slug
+    && ${LISTING_PATH_FILTER}
     && ${PUBLIC_LISTING_FILTER}
   ][0]${CANONICAL_PATH}
 `);
@@ -54,7 +49,7 @@ export const developmentStalePathQuery = defineQuery(`
   *[
     _type == "development"
     && slug.current == $slug
-    && location.country->slug.current == $countrySlug
+    && ${LISTING_COUNTRY_SLUG} == $countrySlug
     && ${PUBLIC_LISTING_FILTER}
   ]${CANONICAL_PATH}
 `);

@@ -15,7 +15,7 @@ export const CARD_HERO_IMAGE = { width: 600, height: 400, fit: 'crop' as const, 
 export type PublicPropertyCard = {
 	_id: RawPropertyCard['_id'];
 	ghiListingId: RawPropertyCard['ghiListingId'];
-	publicTitle: RawPropertyCard['publicTitle'];
+	title: RawPropertyCard['title'];
 	slug: RawPropertyCard['slug'];
 	listingKind: RawPropertyCard['listingKind'];
 	propertyType: RawPropertyCard['propertyType'];
@@ -39,7 +39,7 @@ export function toPublicPropertyCard(raw: RawPropertyCard): PublicPropertyCard {
 	return {
 		_id: raw._id,
 		ghiListingId: raw.ghiListingId,
-		publicTitle: raw.publicTitle,
+		title: raw.title,
 		slug: raw.slug,
 		listingKind: raw.listingKind,
 		propertyType: raw.propertyType,
@@ -48,6 +48,6 @@ export function toPublicPropertyCard(raw: RawPropertyCard): PublicPropertyCard {
 		pricing: filterPublicPricing(raw.pricing),
 		specs: raw.specs,
 		heroImageUrl,
-		heroImageAlt: heroAsset?.altText ?? raw.publicTitle ?? null
+		heroImageAlt: heroAsset?.altText ?? raw.title ?? null
 	};
 }

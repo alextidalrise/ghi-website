@@ -1,14 +1,13 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { buildLocationBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
-import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
 import { withPreviewLocationSeo } from '$lib/listing/detailPage';
 import {
 	DEFAULT_LISTING_SEARCH_PARAMS,
 	buildListingSearchHref,
 	parseListingSearchParams
 } from '$lib/listing/searchParams';
-import { buildLocationSeo } from '$lib/listing/seo';
+import { buildFilteredLocationSeo, buildLocationSeo } from '$lib/listing/seo';
 import {
 	communitiesByLocationQuery,
 	countryBySlugQuery,
@@ -16,67 +15,92 @@ import {
 	fetchListingCards,
 	fetchMaybePreview,
 	fetchPublic,
-	locationBySlugQuery
+	locationPageContextQuery
 } from '$lib/sanity/queries';
+import { buildLocationGridIds } from '$lib/sanity/queries/listingSearch';
 import type { CountryBySlugQueryResult } from '$lib/sanity/types';
 
-type LocationTaxonomyPage = LocationTaxonomyRef & {
-	seoTitle?: string | null;
-	metaDescription?: string | null;
-	publicDescription?: string | null;
+type LinkedLocationEntry = {
+	includeInGrid?: boolean | null;
+	showLink?: boolean | null;
+	location?: {
+		_id?: string;
+		name?: string | null;
+		slug?: string | null;
+		breadcrumbLabel?: string | null;
+	} | null;
 };
 
-type ResolvedLocationPage = LocationTaxonomyPage & {
+type LocationPageContext = {
 	_id: string;
 	name: string;
 	slug: string;
+	seoTitle?: string | null;
+	metaDescription?: string | null;
+	publicDescription?: string | null;
+	linkedLocations?: LinkedLocationEntry[] | null;
 };
 
-type CommunityTaxonomyRow = LocationTaxonomyPage & {
-	canonicalLocationSlug?: string | null;
+type CommunityTaxonomyRow = {
+	_id: string;
+	name?: string | null;
+	slug?: string | null;
+	publicDescription?: string | null;
 	isAssociated?: boolean | null;
 };
 
 export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
-	const [country, location] = await Promise.all([
+	const [country, locationPage] = await Promise.all([
 		fetchMaybePreview<CountryBySlugQueryResult>(
 			countryBySlugQuery,
 			{ countrySlug: params.country },
 			loadQuery,
 			preview
 		),
-		fetchMaybePreview<LocationTaxonomyPage | null>(
-			locationBySlugQuery,
+		fetchMaybePreview<LocationPageContext | null>(
+			locationPageContextQuery,
 			{ countrySlug: params.country, locationSlug: params.location },
 			loadQuery,
 			preview
 		)
 	]);
 
-	if (!country?.slug || !location?.slug || !location._id || !location.name) {
+	if (!country?.slug || !locationPage?.slug || !locationPage._id || !locationPage.name) {
 		error(404, 'Location not found.');
 	}
 
-	const locationPage: ResolvedLocationPage = {
-		...location,
-		_id: location._id,
-		name: location.name,
-		slug: location.slug
-	};
-
-	const searchParams = parseListingSearchParams(url);
+	const parsedSearchParams = parseListingSearchParams(url);
 	const canonicalPath = `/${country.slug}/${locationPage.slug}`;
+	const unfilteredCanonicalUrl = `${url.origin}${canonicalPath}`;
 
-	const listingScope = {
-		type: 'location' as const,
-		countrySlug: params.country,
-		locationSlug: params.location
-	};
-
-	const [communities, listingResults, frontlineCards] = await Promise.all([
+	const [communities, linkedLocations] = await Promise.all([
 		fetchPublic<CommunityTaxonomyRow[]>(communitiesByLocationQuery, {
 			params: { locationId: locationPage._id }
 		}),
+		Promise.resolve(locationPage.linkedLocations ?? [])
+	]);
+
+	const allowedCommunities = communities ?? [];
+	const activeCommunity =
+		parsedSearchParams.community != null
+			? (allowedCommunities.find((community) => community.slug === parsedSearchParams.community) ??
+				null)
+			: null;
+
+	const searchParams = activeCommunity
+		? parsedSearchParams
+		: { ...parsedSearchParams, community: null };
+
+	const locationIds = buildLocationGridIds(locationPage._id, linkedLocations);
+	const listingScope = {
+		type: 'location' as const,
+		countrySlug: params.country,
+		locationSlug: params.location,
+		locationIds,
+		communityId: activeCommunity?._id ?? null
+	};
+
+	const [listingResults, frontlineCards] = await Promise.all([
 		fetchListingCards({
 			scope: listingScope,
 			params: searchParams
@@ -90,46 +114,38 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		{ golfRelevance: ['frontline_golf'] }
 	);
 
-	const directCommunities = (communities ?? []).filter((community) => !community.isAssociated);
-	const associatedCommunities = (communities ?? []).filter((community) => community.isAssociated);
+	const directCommunities = allowedCommunities.filter((community) => !community.isAssociated);
+	const associatedCommunities = allowedCommunities.filter((community) => community.isAssociated);
+	const relatedAreaLinks = linkedLocations.filter(
+		(entry) => entry.showLink && entry.location?.slug && entry.location?.name
+	);
 
-	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const breadcrumbs = buildLocationBreadcrumbs(country, locationPage, canonicalPath);
-	const seo = preview
-		? withPreviewLocationSeo(
-				buildLocationSeo(
-					{
-						name: locationPage.name,
-						seoTitle: locationPage.seoTitle,
-						metaDescription: locationPage.metaDescription,
-						publicDescription: locationPage.publicDescription
-					},
-					canonicalUrl
+	const seoBase =
+		activeCommunity?.name != null
+			? buildFilteredLocationSeo(
+					locationPage,
+					{ name: activeCommunity.name, publicDescription: activeCommunity.publicDescription },
+					unfilteredCanonicalUrl
 				)
-			)
-		: buildLocationSeo(
-				{
-					name: locationPage.name,
-					seoTitle: locationPage.seoTitle,
-					metaDescription: locationPage.metaDescription,
-					publicDescription: locationPage.publicDescription
-				},
-				canonicalUrl
-			);
+			: buildLocationSeo(locationPage, unfilteredCanonicalUrl);
+	const seo = preview ? withPreviewLocationSeo(seoBase) : seoBase;
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, url.origin);
 
 	return {
 		pageType: 'location' as const,
 		location: locationPage,
 		country,
+		activeCommunity,
 		directCommunities,
 		associatedCommunities,
+		relatedAreaLinks,
 		canonicalPath,
 		searchParams,
 		listingResults,
 		frontlineCards,
 		frontlineViewAllHref,
-		canonicalUrl,
+		canonicalUrl: seo.canonicalUrl,
 		breadcrumbs,
 		seo,
 		breadcrumbJsonLd

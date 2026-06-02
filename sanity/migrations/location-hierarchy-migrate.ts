@@ -75,6 +75,13 @@ function slugToName(slug: string): string {
 		.join(' ');
 }
 
+function stableTaxonomyId(refId: string, inferredType: string, slug: string): string {
+	if (refId.includes('.') && refId.startsWith('location.')) {
+		return `taxonomy-${inferredType}-${slug}`;
+	}
+	return refId;
+}
+
 function ref(value: string): Reference {
 	return { _type: 'reference', _ref: value };
 }
@@ -246,16 +253,20 @@ async function main() {
 			continue;
 		}
 
+		const slug = inferred.slug?.current ?? refId;
+		const stableId = stableTaxonomyId(refId, inferred.type, slug);
+
 		const doc: TaxonomyDoc = {
-			_id: refId,
+			_id: stableId,
 			_type: 'locationTaxonomy',
 			name: inferred.name,
-			slug: { _type: 'slug', current: inferred.slug?.current ?? refId },
+			slug: { _type: 'slug', current: slug },
 			type: inferred.type
 		};
 
 		taxonomyById.set(refId, doc);
-		actions.push(`create taxonomy ${refId} (${inferred.type})`);
+		taxonomyById.set(stableId, doc);
+		actions.push(`create taxonomy ${stableId} (${inferred.type})`);
 
 		if (!dryRun) {
 			await client.createIfNotExists(doc);

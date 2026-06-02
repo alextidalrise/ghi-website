@@ -164,6 +164,23 @@ Proceed to a search index only when one or more triggers apply:
 
 ---
 
+## M. Location hierarchy restructure
+
+Two-level public URLs (country → location), community as filter not page, location-to-location links, remove `microLocation`. Full implementation plan: agent plan **Two-level location URLs** (`Two-level location URLs-e4f0f206.plan.md`).
+
+---
+
+## M-deferred. Location hierarchy — follow-ups
+
+Out of scope for initial restructure; do not block ship.
+
+- [ ] **M-01 DEFERRED** Merged grid location badge _(added 2026-05-29)_
+  - When a location page merges properties from linked locations (e.g. Nueva Andalucía listings on Marbella), badge property cards with their canonical location name so users know why a property appears outside the primary area.
+  - Files: likely `PropertyCard.svelte`, `toPublicPropertyCard()` / card query projection
+  - Done when: cards sourced from linked locations show a visible location label; cards from the primary location are unchanged; styling matches design system
+
+---
+
 ## Completed
 
 _Move items here with completion date when done._

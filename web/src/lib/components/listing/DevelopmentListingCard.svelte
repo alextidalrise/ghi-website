@@ -19,7 +19,7 @@
 	);
 	const locationLine = $derived(card.location?.addressDisplay ?? null);
 	const statusLine = $derived(formatEnumLabel(card.developmentStatus));
-	const imageAlt = $derived(card.heroImageAlt ?? card.publicTitle ?? 'Development listing');
+	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Development listing');
 </script>
 
 {#snippet cardBody()}
@@ -41,8 +41,8 @@
 			<p class="development-card__location">{locationLine}</p>
 		{/if}
 
-		{#if card.publicTitle}
-			<h3 class="development-card__title">{card.publicTitle}</h3>
+		{#if card.title}
+			<h3 class="development-card__title">{card.title}</h3>
 		{/if}
 
 		{#if statusLine}
@@ -56,7 +56,7 @@
 {/snippet}
 
 {#if href}
-	<a class="development-card" {href} aria-label={card.publicTitle ?? 'View development listing'}>
+	<a class="development-card" {href} aria-label={card.title ?? 'View development listing'}>
 		{@render cardBody()}
 	</a>
 {:else}

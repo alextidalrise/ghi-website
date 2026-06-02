@@ -17,7 +17,6 @@ export type LocationMapInput = {
 	country?: LocationTaxonomyRef | null;
 	location?: LocationTaxonomyRef | null;
 	community?: LocationTaxonomyRef | null;
-	microLocation?: string | null;
 	mapPrivacyLevel?: MapPrivacyLevel | string | null;
 	mapDisplayApproved?: boolean | null;
 	coordinates?: GeoPoint | null;

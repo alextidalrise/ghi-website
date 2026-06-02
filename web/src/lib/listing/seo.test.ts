@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { buildRealEstateListingJsonLd } from './seo';
+import { buildFilteredLocationSeo, buildLocationSeo, buildRealEstateListingJsonLd } from './seo';
 import type { PublicPropertyListing } from '$lib/sanity/transforms';
 import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
 
 function baseListing(overrides: Partial<PublicPropertyListing> = {}): PublicPropertyListing {
 	return {
-		publicTitle: 'Test Villa',
+		title: 'Test Villa',
 		slug: 'test-villa',
 		location: {
 			country: { name: 'Spain', slug: 'spain' },
@@ -28,6 +28,29 @@ function baseListing(overrides: Partial<PublicPropertyListing> = {}): PublicProp
 		...overrides
 	} as PublicPropertyListing;
 }
+
+describe('buildFilteredLocationSeo', () => {
+	it('uses community-aware title and noindex while canonical stays on the location page', () => {
+		const seo = buildFilteredLocationSeo(
+			{ name: 'Marbella', seoTitle: null, metaDescription: null, publicDescription: null },
+			{ name: 'La Quinta', seoTitle: null, metaDescription: null, publicDescription: null },
+			'https://example.com/spain/marbella'
+		);
+
+		expect(seo.title).toBe('La Quinta — Marbella');
+		expect(seo.canonicalUrl).toBe('https://example.com/spain/marbella');
+		expect(seo.noindex).toBe(true);
+	});
+
+	it('buildLocationSeo leaves location pages indexable', () => {
+		const seo = buildLocationSeo(
+			{ name: 'Marbella', seoTitle: null, metaDescription: null, publicDescription: null },
+			'https://example.com/spain/marbella'
+		);
+
+		expect(seo.noindex).toBe(false);
+	});
+});
 
 describe('buildRealEstateListingJsonLd', () => {
 	it('includes geo only when map level is exact', () => {

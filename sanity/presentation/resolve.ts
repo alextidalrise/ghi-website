@@ -1,19 +1,40 @@
+import { getDraftId } from 'sanity';
 import {
 	defineDocuments,
-	defineLocations,
+	type DocumentLocationResolver,
 	type PresentationPluginOptions
 } from 'sanity/presentation';
+import { map } from 'rxjs';
+import {
+	LISTING_COMMUNITY_SLUG,
+	LISTING_COUNTRY_SLUG,
+	LISTING_LOCATION_SLUG
+} from '../lib/listingLocationSlugs';
 import { buildListingPreviewPath, buildTaxonomyPreviewPath } from '../lib/previewPaths';
 
-const listingSelect = {
-	title: 'publicTitle',
-	slug: 'slug.current',
-	countrySlug: 'location.country.slug.current',
-	locationSlug: 'location.location.slug.current',
-	communitySlug: 'location.community.slug.current'
+const LISTING_LOCATION_QUERY = {
+	fetch: `*[_id==$id][0]{
+		title,
+		"slug": slug.current,
+		"countrySlug": ${LISTING_COUNTRY_SLUG},
+		"locationSlug": ${LISTING_LOCATION_SLUG},
+		"communitySlug": ${LISTING_COMMUNITY_SLUG}
+	}`,
+	listen: `*[_id in [$id, $draftId]]`
 } as const;
 
-function resolveListingLocation(doc: {
+const TAXONOMY_LOCATION_QUERY = {
+	fetch: `*[_id==$id][0]{
+		name,
+		type,
+		"slug": slug.current,
+		"parentSlug": parent->slug.current,
+		"grandparentSlug": parent->parent->slug.current
+	}`,
+	listen: `*[_id in [$id, $draftId]]`
+} as const;
+
+export function resolveListingLocation(doc: {
 	title?: string | null;
 	slug?: string | null;
 	countrySlug?: string | null;
@@ -29,7 +50,7 @@ function resolveListingLocation(doc: {
 
 	if (!href) {
 		return {
-			message: 'Complete location (country, location, community) and slug to preview.',
+			message: 'Select a community and add a slug to preview.',
 			tone: 'caution' as const
 		};
 	}
@@ -65,30 +86,31 @@ export function resolveTaxonomyLocationState(doc: {
 	};
 }
 
-const locations: NonNullable<PresentationPluginOptions['resolve']>['locations'] = {
-	propertyListing: defineLocations({
-		select: listingSelect,
-		resolve: resolveListingLocation
-	}),
-	development: defineLocations({
-		select: listingSelect,
-		resolve: resolveListingLocation
-	}),
-	locationTaxonomy: defineLocations({
-		select: {
-			name: 'name',
-			type: 'type',
-			slug: 'slug.current',
-			parentSlug: 'parent.slug.current',
-			grandparentSlug: 'parent.parent.slug.current'
-		},
-		resolve: resolveTaxonomyLocationState
-	}),
-	siteSettings: defineLocations({
-		message: 'Homepage settings',
-		tone: 'positive',
-		locations: [{ title: 'Homepage', href: '/' }]
-	})
+export const resolveDocumentLocations: DocumentLocationResolver = (params, context) => {
+	if (params.type === 'siteSettings') {
+		return {
+			message: 'Homepage settings',
+			tone: 'positive',
+			locations: [{ title: 'Homepage', href: '/' }]
+		};
+	}
+
+	const queryParams = { id: params.id, draftId: getDraftId(params.id) };
+	const listenOptions = { perspective: params.perspectiveStack };
+
+	if (params.type === 'propertyListing' || params.type === 'development') {
+		return context.documentStore
+			.listenQuery(LISTING_LOCATION_QUERY, queryParams, listenOptions)
+			.pipe(map((doc) => resolveListingLocation(doc)));
+	}
+
+	if (params.type === 'locationTaxonomy') {
+		return context.documentStore
+			.listenQuery(TAXONOMY_LOCATION_QUERY, queryParams, listenOptions)
+			.pipe(map((doc) => resolveTaxonomyLocationState(doc)));
+	}
+
+	return null;
 };
 
 export const mainDocuments = defineDocuments([
@@ -112,5 +134,5 @@ export const mainDocuments = defineDocuments([
 
 export const resolve: PresentationPluginOptions['resolve'] = {
 	mainDocuments,
-	locations
+	locations: resolveDocumentLocations
 };

@@ -74,7 +74,7 @@ export function validateFeesTaxVisibility(value: string | undefined) {
 	return true;
 }
 
-/** Exact map display requires map display approval. */
+/** Map privacy rules for location fields. Country/location refs are auto-derived from community. */
 export function validateLocationFields(
 	value:
 		| {

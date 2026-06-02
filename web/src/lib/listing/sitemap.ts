@@ -30,10 +30,6 @@ export function buildTaxonomyPath(row: SitemapTaxonomyRow): string | null {
 		return `/${row.countrySlug}/${row.locationSlug}`;
 	}
 
-	if (row.type === 'community' && row.locationSlug && row.communitySlug) {
-		return `/${row.countrySlug}/${row.locationSlug}/${row.communitySlug}`;
-	}
-
 	return null;
 }
 

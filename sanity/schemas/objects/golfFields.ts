@@ -13,53 +13,53 @@ export const golfFields = defineType({
 			options: { list: [...GOLF_RELEVANCE], layout: 'dropdown' },
 			initialValue: 'unknown',
 			validation: (Rule) => Rule.required(),
-			description: 'Public after manual enrichment and review.'
+			description: 'How relevant golf is to this property. Shown publicly only after a team member has verified and approved the information.'
 		}),
 		defineField({
 			name: 'primaryGolfCourse',
 			title: 'Primary golf course',
 			type: 'reference',
 			to: [{ type: 'golfCourse' }],
-			description: 'Public when manually enriched and approved.'
+			description: 'The main golf course associated with this property. Shown publicly once confirmed and approved.'
 		}),
 		defineField({
 			name: 'linkedGolfCourses',
 			title: 'Linked golf courses',
 			type: 'array',
 			of: [{ type: 'reference', to: [{ type: 'golfCourse' }] }],
-			description: 'Public when manually enriched and approved.'
+			description: 'Additional golf courses nearby or associated with this property. Shown publicly once confirmed and approved.'
 		}),
 		defineField({
 			name: 'distanceToPrimaryGolfCourse',
 			title: 'Distance to primary golf course',
 			type: 'string',
-			description: 'Public only when source-supported and reviewed (e.g. "200m", "5 min walk").'
+			description: 'How far the property is from the main golf course (e.g. "200m", "5 min walk"). Publish only if confirmed from a source.'
 		}),
 		defineField({
 			name: 'golfView',
 			title: 'Golf view',
 			type: 'boolean',
-			description: 'Public only when source-supported and reviewed.'
+			description: 'Tick if the property has a view of a golf course. A confirmed source is required before this can be published.'
 		}),
 		defineField({
 			name: 'buggyAccess',
 			title: 'Buggy access',
 			type: 'boolean',
-			description: 'Public only when source-supported and reviewed.'
+			description: 'Tick if the property has direct buggy access to the course. A confirmed source is required before this can be published.'
 		}),
 		defineField({
 			name: 'golfMembershipInfo',
 			title: 'Golf membership info',
 			type: 'text',
 			rows: 3,
-			description: 'Public only when source-supported and reviewed; otherwise omit from public output.'
+			description: 'Details about any included or available golf membership. Only publish if confirmed from a reliable source — leave blank if unsure.'
 		}),
 		defineField({
 			name: 'golfNotes',
 			title: 'Golf notes',
 			type: 'text',
 			rows: 3,
-			description: 'Private/internal — manual enrichment workflow notes.'
+			description: 'Internal notes from the team when researching golf details for this property. Not shown on the website.'
 		}),
 		defineField({
 			name: 'golfEnrichmentStatus',

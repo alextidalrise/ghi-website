@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { HideFieldTitle } from '../../components/HideFieldTitle';
 import { PROPERTY_LISTING_KINDS, PROPERTY_TYPES, TRANSACTION_TYPES } from '../constants/enums';
 import {
 	ghiListingIdRule,
@@ -12,10 +13,11 @@ export const propertyListing = defineType({
 	type: 'document',
 	groups: [
 		{ name: 'identity', title: 'Identity', default: true },
-		{ name: 'location', title: 'Location' },
+		{ name: 'location', title: 'Place' },
 		{ name: 'pricing', title: 'Pricing & availability' },
 		{ name: 'specs', title: 'Specifications' },
 		{ name: 'content', title: 'Content & media' },
+		{ name: 'marketing', title: 'Marketing source' },
 		{ name: 'golf', title: 'Golf' },
 		{ name: 'related', title: 'Related listings' },
 		{ name: 'seo', title: 'SEO & CTAs' },
@@ -27,23 +29,16 @@ export const propertyListing = defineType({
 			title: 'GHI listing ID',
 			type: 'string',
 			group: 'identity',
-			description: 'Canonical public ID in GHIXXXXX format.',
+			description: 'The unique listing reference used across the site (e.g. GHI00123). Auto-assigned — do not edit manually.',
 			validation: (Rule) => ghiListingIdRule(Rule)
 		}),
 		defineField({
-			name: 'internalTitle',
-			title: 'Internal title',
+			name: 'title',
+			title: 'Title',
 			type: 'string',
 			group: 'identity',
 			description:
-				'Private/internal working title. May include source shorthand — not used for slugs or public titles.'
-		}),
-		defineField({
-			name: 'publicTitle',
-			title: 'Public title',
-			type: 'string',
-			group: 'identity',
-			description: 'Page H1/title — clean of commission, source shorthand, and unreviewed price hints.',
+				'The headline shown on the listing page and in search results. Write for buyers — no internal codes, commission notes, or unconfirmed prices.',
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
@@ -51,7 +46,7 @@ export const propertyListing = defineType({
 			title: 'Slug',
 			type: 'slug',
 			group: 'identity',
-			options: { source: 'publicTitle', maxLength: 96 },
+			options: { source: 'title', maxLength: 96 },
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
@@ -62,7 +57,7 @@ export const propertyListing = defineType({
 			options: { list: [...PROPERTY_LISTING_KINDS], layout: 'radio' },
 			initialValue: 'property',
 			validation: (Rule) => Rule.required(),
-			description: 'Discriminator for frontend template selection.'
+			description: 'Controls which page template is used to display this listing (property or unit).'
 		}),
 		defineField({
 			name: 'propertyType',
@@ -86,20 +81,22 @@ export const propertyListing = defineType({
 			title: 'Source reference',
 			type: 'string',
 			group: 'governance',
-			description: 'Private/internal — source or brochure reference for reporting.'
+			description: 'Internal reference from the source brochure or data provider. Not shown on the website.'
 		}),
 		defineField({
 			name: 'developerReference',
 			title: 'Developer reference',
 			type: 'string',
 			group: 'governance',
-			description: 'Private/internal unless separately approved for public display.'
+			description: "The developer's own reference code for this property. Internal only unless specifically approved for public display."
 		}),
 		defineField({
 			name: 'location',
-			title: 'Location',
 			type: 'locationFields',
-			group: 'location'
+			group: 'location',
+			components: {
+				field: HideFieldTitle
+			}
 		}),
 		defineField({
 			name: 'pricing',
@@ -107,7 +104,7 @@ export const propertyListing = defineType({
 			type: 'pricingFields',
 			group: 'pricing',
 			description:
-				'Public price cannot rely on folder_hint_only. Reserved status forces hidden visibility.'
+				'A price sourced only from a folder hint cannot be shown publicly. Reserved listings must be set to hidden or internal.'
 		}),
 		defineField({
 			name: 'specs',
@@ -123,9 +120,15 @@ export const propertyListing = defineType({
 		}),
 		defineField({
 			name: 'content',
-			title: 'Content',
+			title: 'Website content',
 			type: 'contentFields',
 			group: 'content'
+		}),
+		defineField({
+			name: 'marketing',
+			title: 'Marketing source',
+			type: 'marketingFields',
+			group: 'marketing'
 		}),
 		defineField({
 			name: 'media',
@@ -157,7 +160,7 @@ export const propertyListing = defineType({
 			type: 'array',
 			group: 'governance',
 			of: [defineArrayMember({ type: 'sourceProvenance' })],
-			description: 'Private/internal — never returned in public payloads.'
+			description: 'Internal audit trail showing where this listing\'s data came from. Never shown on the website or in any public data.'
 		}),
 		defineField({
 			name: 'workflow',
@@ -176,7 +179,7 @@ export const propertyListing = defineType({
 			title: 'Private reporting',
 			type: 'privateReportingFields',
 			group: 'governance',
-			description: 'Commission and internal financial fields — never public.'
+			description: 'Commission and financial details for internal reporting only. Never shown on the website.'
 		})
 	],
 	validation: (Rule) =>
@@ -198,20 +201,19 @@ export const propertyListing = defineType({
 		}),
 	preview: {
 		select: {
-			title: 'publicTitle',
-			internalTitle: 'internalTitle',
+			title: 'title',
 			ghiId: 'ghiListingId',
 			propertyType: 'propertyType',
 			listingKind: 'listingKind',
 			location: 'location.location.name',
 			priceDisplay: 'pricing.priceDisplay'
 		},
-		prepare({ title, internalTitle, ghiId, propertyType, listingKind, location: locationName, priceDisplay }) {
+		prepare({ title, ghiId, propertyType, listingKind, location: locationName, priceDisplay }) {
 			const subtitle = [ghiId, propertyType, listingKind, locationName, priceDisplay]
 				.filter(Boolean)
 				.join(' · ');
 			return {
-				title: title || internalTitle || 'Property listing',
+				title: title || 'Property listing',
 				subtitle: subtitle || undefined
 			};
 		}

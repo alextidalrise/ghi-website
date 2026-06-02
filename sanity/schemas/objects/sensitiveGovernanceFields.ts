@@ -6,13 +6,14 @@ export const sensitiveGovernanceFields = defineType({
 	title: 'Sensitive governance',
 	type: 'object',
 	description:
-		'Private/internal summary flags and workflow blockers — never expose details or notes publicly.',
+		'Internal flags for sensitive content review. None of these fields are shown on the website.',
 	fields: [
 		defineField({
 			name: 'sensitiveAssetsPresent',
 			title: 'Sensitive assets present',
 			type: 'boolean',
-			initialValue: false
+			initialValue: false,
+			description: 'Tick if this listing involves sensitive materials (e.g. images with usage restrictions, disputed ownership).'
 		}),
 		defineField({
 			name: 'sensitiveAssetTypes',
@@ -43,7 +44,7 @@ export const sensitiveGovernanceFields = defineType({
 			title: 'Internal only notes',
 			type: 'text',
 			rows: 4,
-			description: 'Never expose publicly.'
+			description: 'Sensitive internal notes about this listing. Never shown on the website.'
 		}),
 		defineField({
 			name: 'requiresHumanApproval',
@@ -67,14 +68,14 @@ export const sensitiveGovernanceFields = defineType({
 			name: 'legalDocsDriveFolderId',
 			title: 'Legal docs Drive folder ID',
 			type: 'string',
-			description: 'Private/internal — never expose publicly.'
+			description: 'Internal Google Drive folder ID for legal documents. Not shown on the website.'
 		}),
 		defineField({
 			name: 'legalPublicUseAllowed',
 			title: 'Legal public use allowed',
 			type: 'boolean',
 			initialValue: false,
-			description: 'Defaults to false. Legal/cadastral contents stay in Drive unless explicitly approved.'
+			description: 'Tick only if legal or cadastral documents have been explicitly approved for public use. Off by default — documents stay in Drive until approved.'
 		})
 	],
 	preview: {

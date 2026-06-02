@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { HideFieldTitle } from '../../components/HideFieldTitle';
 import {
 	BROCHURE_VISIBILITY,
 	BUILD_STATUSES,
@@ -14,11 +15,12 @@ export const development = defineType({
 	type: 'document',
 	groups: [
 		{ name: 'identity', title: 'Identity', default: true },
-		{ name: 'location', title: 'Location' },
+		{ name: 'location', title: 'Place' },
 		{ name: 'development', title: 'Development details' },
 		{ name: 'pricing', title: 'Pricing & availability' },
 		{ name: 'units', title: 'Units & typologies' },
 		{ name: 'content', title: 'Content & media' },
+		{ name: 'marketing', title: 'Marketing source' },
 		{ name: 'golf', title: 'Golf' },
 		{ name: 'related', title: 'Related listings' },
 		{ name: 'seo', title: 'SEO & CTAs' },
@@ -30,7 +32,7 @@ export const development = defineType({
 			title: 'GHI listing ID',
 			type: 'string',
 			group: 'identity',
-			description: 'Canonical public ID in GHIXXXXX format.',
+			description: 'The unique listing reference used across the site (e.g. GHI00123). Auto-assigned — do not edit manually.',
 			validation: (Rule) => ghiListingIdRule(Rule)
 		}),
 		defineField({
@@ -41,11 +43,12 @@ export const development = defineType({
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
-			name: 'publicTitle',
-			title: 'Public title',
+			name: 'title',
+			title: 'Title',
 			type: 'string',
 			group: 'identity',
-			description: 'Page H1/title — clean of internal shorthand and unreviewed price hints.',
+			description:
+				'The headline shown on the development page and in search results. Write for buyers — no internal codes, commission notes, or unconfirmed prices.',
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
@@ -53,7 +56,7 @@ export const development = defineType({
 			title: 'Slug',
 			type: 'slug',
 			group: 'identity',
-			options: { source: 'publicTitle', maxLength: 96 },
+			options: { source: 'title', maxLength: 96 },
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
@@ -73,13 +76,15 @@ export const development = defineType({
 			options: { list: [...DEVELOPMENT_DISPLAY_MODES], layout: 'dropdown' },
 			validation: (Rule) => Rule.required(),
 			description:
-				'Private/internal template control — how the public development page renders units and pricing.'
+				'Controls how units and pricing are laid out on the development\'s public page.'
 		}),
 		defineField({
 			name: 'location',
-			title: 'Location',
 			type: 'locationFields',
-			group: 'location'
+			group: 'location',
+			components: {
+				field: HideFieldTitle
+			}
 		}),
 		defineField({
 			name: 'developmentStatus',
@@ -113,14 +118,14 @@ export const development = defineType({
 			title: 'Developer name',
 			type: 'string',
 			group: 'development',
-			description: 'Public only when source-supported and approved.'
+			description: 'The developer\'s name. Shown publicly only when confirmed from a reliable source and approved.'
 		}),
 		defineField({
 			name: 'architectureStudio',
 			title: 'Architecture studio',
 			type: 'string',
 			group: 'development',
-			description: 'Public only when source-supported and approved.'
+			description: 'The architecture studio name. Shown publicly only when confirmed from a reliable source and approved.'
 		}),
 		defineField({
 			name: 'developmentComposition',
@@ -135,14 +140,14 @@ export const development = defineType({
 			title: 'Pricing & availability',
 			type: 'pricingFields',
 			group: 'pricing',
-			description: 'Use price from / price to for development range summaries.'
+			description: "Use 'Price from' and 'Price to' to show a price range for this development."
 		}),
 		defineField({
 			name: 'availabilitySummary',
 			title: 'Availability summary',
 			type: 'string',
 			group: 'pricing',
-			description: 'Public summary when approved (e.g. "12 units remaining").'
+			description: 'A short availability note shown publicly once approved (e.g. "12 units remaining").'
 		}),
 		defineField({
 			name: 'unitTypes',
@@ -150,7 +155,7 @@ export const development = defineType({
 			type: 'array',
 			group: 'units',
 			of: [defineArrayMember({ type: 'reference', to: [{ type: 'unitType' }] })],
-			description: 'Linked typologies — public output filtered by visibility and reserved status.'
+			description: 'Unit types linked to this development (e.g. apartment, villa). Only those set to visible will appear on the website.'
 		}),
 		defineField({
 			name: 'units',
@@ -158,7 +163,7 @@ export const development = defineType({
 			type: 'array',
 			group: 'units',
 			of: [defineArrayMember({ type: 'reference', to: [{ type: 'unit' }] })],
-			description: 'Linked units — reserved and hidden units excluded from public output.'
+			description: 'Individual units linked to this development. Reserved or hidden units are excluded from the website.'
 		}),
 		defineField({
 			name: 'sharedAmenities',
@@ -173,7 +178,7 @@ export const development = defineType({
 			type: 'array',
 			group: 'content',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
-			description: 'Approved shared development imagery.'
+			description: 'Approved images shared across all units in this development.'
 		}),
 		defineField({
 			name: 'media',
@@ -188,13 +193,19 @@ export const development = defineType({
 			group: 'content',
 			options: { list: [...BROCHURE_VISIBILITY], layout: 'dropdown' },
 			initialValue: 'request_only',
-			description: 'Disabled or request-only until explicitly approved for public download.'
+			description: 'Controls whether buyers can download the brochure. Must be explicitly approved before it is set to publicly available.'
 		}),
 		defineField({
 			name: 'content',
-			title: 'Content',
+			title: 'Website content',
 			type: 'contentFields',
 			group: 'content'
+		}),
+		defineField({
+			name: 'marketing',
+			title: 'Marketing source',
+			type: 'marketingFields',
+			group: 'marketing'
 		}),
 		defineField({
 			name: 'golf',
@@ -225,7 +236,7 @@ export const development = defineType({
 			title: 'Source folder URL',
 			type: 'url',
 			group: 'governance',
-			description: 'Private/internal — Google Drive folder reference.'
+			description: 'Internal link to the source files in Google Drive. Not shown on the website.'
 		}),
 		defineField({
 			name: 'sourceProvenance',
@@ -233,7 +244,7 @@ export const development = defineType({
 			type: 'array',
 			group: 'governance',
 			of: [defineArrayMember({ type: 'sourceProvenance' })],
-			description: 'Private/internal — never returned in public payloads.'
+			description: 'Internal audit trail showing where this listing\'s data came from. Never shown on the website or in any public data.'
 		}),
 		defineField({
 			name: 'workflow',
@@ -263,16 +274,16 @@ export const development = defineType({
 		}),
 	preview: {
 		select: {
-			title: 'developmentName',
-			publicTitle: 'publicTitle',
+			developmentName: 'developmentName',
+			title: 'title',
 			ghiId: 'ghiListingId',
 			location: 'location.location.name',
 			displayMode: 'developmentDisplayMode'
 		},
-		prepare({ title, publicTitle, ghiId, location: locationName, displayMode }) {
+		prepare({ developmentName, title, ghiId, location: locationName, displayMode }) {
 			const subtitle = [ghiId, locationName, displayMode?.replace(/_/g, ' ')].filter(Boolean).join(' · ');
 			return {
-				title: title || publicTitle || 'Development',
+				title: developmentName || title || 'Development',
 				subtitle: subtitle || undefined
 			};
 		}

@@ -5,17 +5,20 @@ import {
 	PROPERTY_LISTING_PUBLIC,
 	PROPERTY_LISTING_WITH_CANONICAL
 } from '../allowlists';
-import { PUBLIC_LISTING_FILTER } from './filters';
+import {
+	LISTING_COMMUNITY_SLUG,
+	LISTING_COUNTRY_SLUG,
+	LISTING_LOCATION_SLUG,
+	LISTING_PATH_FILTER,
+	PUBLIC_LISTING_FILTER
+} from './filters';
 
 /** Resolve a property listing by hierarchical URL segments (preview — no publish gates). */
 export const propertyByPathPreviewQuery = defineQuery(`
   *[
     _type == "propertyListing"
     && listingKind in ["property", "unit"]
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
-    && location.community->slug.current == $communitySlug
-    && slug.current == $slug
+    && ${LISTING_PATH_FILTER}
   ][0]${PROPERTY_LISTING_PUBLIC}
 `);
 
@@ -24,10 +27,7 @@ export const propertyByPathQuery = defineQuery(`
   *[
     _type == "propertyListing"
     && listingKind in ["property", "unit"]
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
-    && location.community->slug.current == $communitySlug
-    && slug.current == $slug
+    && ${LISTING_PATH_FILTER}
     && ${PUBLIC_LISTING_FILTER}
   ][0]${PROPERTY_LISTING_PUBLIC}
 `);
@@ -37,10 +37,7 @@ export const propertyCanonicalPathQuery = defineQuery(`
   *[
     _type == "propertyListing"
     && listingKind in ["property", "unit"]
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
-    && location.community->slug.current == $communitySlug
-    && slug.current == $slug
+    && ${LISTING_PATH_FILTER}
     && ${PUBLIC_LISTING_FILTER}
   ][0]${CANONICAL_PATH}
 `);
@@ -64,7 +61,7 @@ export const propertyStalePathQuery = defineQuery(`
     _type == "propertyListing"
     && listingKind in ["property", "unit"]
     && slug.current == $slug
-    && location.country->slug.current == $countrySlug
+    && ${LISTING_COUNTRY_SLUG} == $countrySlug
     && ${PUBLIC_LISTING_FILTER}
   ]${CANONICAL_PATH}
 `);
@@ -74,11 +71,11 @@ export const propertyCardsByCommunityQuery = defineQuery(`
   *[
     _type == "propertyListing"
     && listingKind in ["property", "unit"]
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
-    && location.community->slug.current == $communitySlug
+    && ${LISTING_COUNTRY_SLUG} == $countrySlug
+    && ${LISTING_LOCATION_SLUG} == $locationSlug
+    && ${LISTING_COMMUNITY_SLUG} == $communitySlug
     && ${PUBLIC_LISTING_FILTER}
-  ] | order(publicTitle asc)[$start...$end]${PROPERTY_CARD_PUBLIC}
+  ] | order(title asc)[$start...$end]${PROPERTY_CARD_PUBLIC}
 `);
 
 /** Minimal card projection for listings grids within a location (all communities). */
@@ -86,8 +83,8 @@ export const propertyCardsByLocationQuery = defineQuery(`
   *[
     _type == "propertyListing"
     && listingKind in ["property", "unit"]
-    && location.country->slug.current == $countrySlug
-    && location.location->slug.current == $locationSlug
+    && ${LISTING_COUNTRY_SLUG} == $countrySlug
+    && ${LISTING_LOCATION_SLUG} == $locationSlug
     && ${PUBLIC_LISTING_FILTER}
-  ] | order(publicTitle asc)[$start...$end]${PROPERTY_CARD_PUBLIC}
+  ] | order(title asc)[$start...$end]${PROPERTY_CARD_PUBLIC}
 `);

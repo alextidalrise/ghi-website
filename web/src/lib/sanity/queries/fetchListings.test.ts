@@ -41,7 +41,7 @@ function baseCard(overrides: Partial<RawPropertyCard> = {}): RawPropertyCard {
 	return {
 		_id: goldenPropertyRaw._id!,
 		ghiListingId: goldenPropertyRaw.ghiListingId!,
-		publicTitle: goldenPropertyRaw.publicTitle!,
+		title: goldenPropertyRaw.title!,
 		slug: goldenPropertyRaw.slug!,
 		listingKind: 'property',
 		propertyType: 'villa',

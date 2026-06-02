@@ -18,14 +18,20 @@ const PRICE_FILTERABLE = /* groq */ `coalesce(pricing.priceSourceStatus, "") != 
 export const SORT_ORDER_FRAGMENTS = {
 	price_asc: `${PRICE_NUMERIC} asc, _id asc`,
 	price_desc: `${PRICE_NUMERIC} desc, _id asc`,
-	title: 'publicTitle asc, _id asc',
+	title: 'title asc, _id asc',
 	newest: '_createdAt desc, _id asc'
 } as const satisfies Record<ListingSort, string>;
 
 export type ListingSearchScope =
 	| { type: 'global' }
 	| { type: 'community'; countrySlug: string; locationSlug: string; communitySlug: string }
-	| { type: 'location'; countrySlug: string; locationSlug: string }
+	| {
+			type: 'location';
+			countrySlug: string;
+			locationSlug: string;
+			locationIds: string[];
+			communityId?: string | null;
+	  }
 	| { type: 'country'; countrySlug: string };
 
 function scopeFilter(scope: ListingSearchScope): string {
@@ -39,9 +45,15 @@ function scopeFilter(scope: ListingSearchScope): string {
         && location.community->slug.current == $communitySlug
       `;
 		case 'location':
+			if (scope.communityId) {
+				return /* groq */ `
+          location.country->slug.current == $countrySlug
+          && location.community._ref == $communityId
+        `;
+			}
 			return /* groq */ `
         location.country->slug.current == $countrySlug
-        && location.location->slug.current == $locationSlug
+        && location.location._ref in $locationIds
       `;
 		case 'country':
 			return /* groq */ `location.country->slug.current == $countrySlug`;
@@ -123,6 +135,8 @@ export function listingSearchQueryParams(
 		...(scope.type === 'location' || scope.type === 'community'
 			? { locationSlug: scope.locationSlug }
 			: {}),
+		...(scope.type === 'location' ? { locationIds: scope.locationIds } : {}),
+		...(scope.type === 'location' && scope.communityId ? { communityId: scope.communityId } : {}),
 		...(scope.type === 'community' ? { communitySlug: scope.communitySlug } : {}),
 		propertyType: params.propertyType ?? null,
 		community: params.community ?? null,
@@ -136,4 +150,18 @@ export function listingSearchQueryParams(
 		start: params.start,
 		end: params.end
 	};
+}
+
+/** Build locationIds for grid scope: primary location plus linked locations with includeInGrid. */
+export function buildLocationGridIds(
+	locationId: string,
+	linkedLocations: Array<{ includeInGrid?: boolean | null; location?: { _id?: string } | null }>
+): string[] {
+	const ids = new Set<string>([locationId]);
+	for (const entry of linkedLocations) {
+		if (entry.includeInGrid && entry.location?._id) {
+			ids.add(entry.location._id);
+		}
+	}
+	return [...ids];
 }

@@ -20,14 +20,45 @@ export const locationBySlugQuery = defineQuery(`
   ][0]${LOCATION_TAXONOMY_PUBLIC}
 `);
 
-/** Community stub page within a location. */
-export const communityBySlugQuery = defineQuery(`
+/** Location page context — linked locations for grid merge and related-area links. */
+export const locationPageContextQuery = defineQuery(`
+  *[
+    _type == "locationTaxonomy"
+    && type == "location"
+    && slug.current == $locationSlug
+    && parent->slug.current == $countrySlug
+  ][0]{
+    _id,
+    name,
+    "slug": slug.current,
+    type,
+    breadcrumbLabel,
+    seoTitle,
+    metaDescription,
+    publicDescription,
+    linkedLocations[]{
+      includeInGrid,
+      showLink,
+      location->{
+        _id,
+        name,
+        "slug": slug.current,
+        breadcrumbLabel
+      }
+    }
+  }
+`);
+
+/** Community within a location context — direct parent or associated location. */
+export const communityInLocationContextQuery = defineQuery(`
   *[
     _type == "locationTaxonomy"
     && type == "community"
     && slug.current == $communitySlug
-    && parent->slug.current == $locationSlug
-    && parent->parent->slug.current == $countrySlug
+    && (
+      parent._ref == $locationId
+      || $locationId in associatedLocations[]._ref
+    )
   ][0]${LOCATION_TAXONOMY_PUBLIC}
 `);
 
