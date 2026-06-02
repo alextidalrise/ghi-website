@@ -19,7 +19,7 @@
 	const price = $derived(formatListingPrice(card.pricing));
 	const locationLine = $derived(card.location?.addressDisplay ?? null);
 	const specs = $derived(buildSpecs(card.propertyType, card.specs));
-	const imageAlt = $derived(card.heroImageAlt ?? card.publicTitle ?? 'Property listing');
+	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Property listing');
 
 	function buildSpecs(
 		propertyType: PublicPropertyCard['propertyType'],
@@ -60,8 +60,8 @@
 			</span>
 		{/if}
 
-		{#if card.publicTitle}
-			<h3 class="spotlight-card__title">{card.publicTitle}</h3>
+		{#if card.title}
+			<h3 class="spotlight-card__title">{card.title}</h3>
 		{/if}
 
 		{#if price}
@@ -74,7 +74,7 @@
 	<a
 		class="spotlight-card spotlight-card--{surface}"
 		{href}
-		aria-label={card.publicTitle ?? 'View property listing'}
+		aria-label={card.title ?? 'View property listing'}
 	>
 		{@render cardBody()}
 	</a>

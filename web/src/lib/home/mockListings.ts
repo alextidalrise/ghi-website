@@ -29,7 +29,7 @@ function mockCard(
 	return {
 		_id: `mock-${id}`,
 		ghiListingId: `GHI-MOCK-${id}`,
-		publicTitle: title,
+		title,
 		slug: `mock-listing-${id}`,
 		listingKind: 'property',
 		propertyType,

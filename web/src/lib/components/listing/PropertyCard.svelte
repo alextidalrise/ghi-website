@@ -51,12 +51,15 @@
 			<h3 class="property-card__title">{card.title}</h3>
 		{/if}
 
-		{#if specsLine}
-			<p class="property-card__specs">{specsLine}</p>
-		{/if}
-
-		{#if price}
-			<p class="property-card__price tabular-nums">{price}</p>
+		{#if specsLine || price}
+			<div class="property-card__meta">
+				{#if specsLine}
+					<span class="property-card__specs">{specsLine}</span>
+				{/if}
+				{#if price}
+					<span class="property-card__price tabular-nums">{price}</span>
+				{/if}
+			</div>
 		{/if}
 	</div>
 {/snippet}
@@ -73,7 +76,9 @@
 
 <style>
 	.property-card {
-		display: block;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
 		border: 1px solid var(--border);
 		background: var(--white);
 		color: inherit;
@@ -88,16 +93,20 @@
 	.property-card__image {
 		display: block;
 		width: 100%;
+		height: auto; /* let aspect-ratio drive height; the width/height attrs only reserve CLS space */
 		aspect-ratio: 3 / 2;
 		object-fit: cover;
 	}
 
 	.property-card__body {
-		padding: var(--space-lg);
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		padding: clamp(0.875rem, 0.6rem + 1vw, 1.125rem);
 	}
 
 	.property-card__location {
-		margin-bottom: var(--space-sm);
+		margin-bottom: 0.375rem;
 		font-family: var(--sans);
 		font-size: var(--text-overline);
 		font-weight: 500;
@@ -107,27 +116,42 @@
 	}
 
 	.property-card__title {
-		margin: 0;
+		margin: 0 0 0.75rem;
 		font-family: var(--serif);
-		font-size: var(--text-h4);
+		font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.1875rem);
 		font-weight: 400;
 		color: var(--green);
-		line-height: 1.3;
+		line-height: 1.25;
+		text-wrap: balance;
+		/* Cap at two lines so card heights stay even across the grid row. */
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.property-card__meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.125rem 0.75rem;
+		margin-top: auto; /* bottom-anchor so prices align across a grid row */
+		padding-top: 0.75rem;
+		border-top: 1px solid var(--border);
 	}
 
 	.property-card__specs {
-		margin-top: var(--space-sm);
 		color: var(--muted);
 		font-family: var(--sans);
 		font-size: var(--text-ui);
 	}
 
 	.property-card__price {
-		margin-top: var(--space-md);
-		padding-top: var(--space-md);
-		border-top: 1px solid var(--border);
 		font-family: var(--sans);
 		font-size: var(--text-ui);
-		color: var(--charcoal);
+		font-weight: 500;
+		color: var(--green);
 	}
 </style>
