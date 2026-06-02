@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Re-key locationTaxonomy documents that use dotted IDs (e.g. location.country.spain).
- * Sanity hides dotted IDs from Studio document lists and anonymous API clients.
+ * Re-key locationTaxonomy documents to stable places-* IDs (no dots).
+ * Sanity hides dotted IDs (location.* / places.*) from anonymous API clients.
  *
  * Usage:
  *   pnpm --filter sanity migrate:taxonomy-dotted-ids -- --dataset development
@@ -12,6 +12,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { legacyRefToStablePlacesId, parseDottedPlacesId, stablePlacesId } from './lib/placesIds';
 
 loadEnvFile(join(dirname(fileURLToPath(import.meta.url)), '..', '.env.local'));
 
@@ -19,12 +20,12 @@ const PROJECT_ID = process.env.SANITY_STUDIO_PROJECT_ID ?? 's88o8sjb';
 const TOKEN =
 	process.env.SANITY_API_TOKEN ?? process.env.SANITY_AUTH_TOKEN ?? readSanityCliAuthToken();
 
-type Reference = { _type: 'reference'; _ref: string };
-
 type TaxonomyDoc = {
 	_id: string;
 	_type: 'locationTaxonomy';
 	_rev?: string;
+	type?: string;
+	slug?: { current?: string };
 	[key: string]: unknown;
 };
 
@@ -34,13 +35,6 @@ const datasetArg = args.find((arg) => arg.startsWith('--dataset='))?.split('=')[
 const datasetIndex = args.indexOf('--dataset');
 const dataset =
 	datasetArg ?? (datasetIndex >= 0 ? args[datasetIndex + 1] : undefined) ?? 'development';
-
-/** Map legacy dotted IDs to stable, Studio-visible IDs. */
-const ID_MAP: Record<string, string> = {
-	'location.country.spain': 'taxonomy-country-spain',
-	'location.municipality.marbella': 'taxonomy-location-marbella',
-	'location.area.marbella-golden-mile': 'taxonomy-community-marbella-golden-mile'
-};
 
 function readSanityCliAuthToken(): string | undefined {
 	const configPath = join(homedir(), '.config', 'sanity', 'config.json');
@@ -82,9 +76,29 @@ function createMigrationClient(): SanityClient {
 	});
 }
 
+function docSlug(doc: TaxonomyDoc): string {
+	if (doc.slug?.current) return doc.slug.current;
+	const parsed = parseDottedPlacesId(doc._id);
+	if (parsed) return parsed.slug;
+	return doc._id.split('.').pop() ?? doc._id;
+}
+
+function docLevel(doc: TaxonomyDoc): string {
+	if (typeof doc.type === 'string') return doc.type;
+	const parsed = parseDottedPlacesId(doc._id);
+	return parsed?.type ?? 'taxonomy';
+}
+
+function typeRank(type: unknown): number {
+	if (type === 'country') return 0;
+	if (type === 'location') return 1;
+	if (type === 'community') return 2;
+	return 3;
+}
+
 function mapRef(ref: string | undefined, idMap: Record<string, string>): string | undefined {
 	if (!ref) return ref;
-	return idMap[ref] ?? ref;
+	return idMap[ref] ?? legacyRefToStablePlacesId(ref) ?? ref;
 }
 
 function remapReferences(value: unknown, idMap: Record<string, string>): unknown {
@@ -125,38 +139,53 @@ function buildReplacementDoc(doc: TaxonomyDoc, newId: string, idMap: Record<stri
 
 async function main() {
 	console.log(
-		`Taxonomy dotted ID migration → ${PROJECT_ID}/${dataset}${dryRun ? ' (dry run)' : ''}`
+		`Place taxonomy ID migration → ${PROJECT_ID}/${dataset}${dryRun ? ' (dry run)' : ''}`
 	);
 
 	const client = createMigrationClient();
 	const actions: string[] = [];
 
-	const dottedDocs = await client.fetch<TaxonomyDoc[]>(
-		`*[_type == "locationTaxonomy" && _id match "location.*"]`
+	const docsToMigrate = await client.fetch<TaxonomyDoc[]>(
+		`*[
+			_type == "locationTaxonomy"
+			&& !(_id in path("drafts.**"))
+			&& (
+				_id match "location.*"
+				|| _id match "places.*"
+				|| (!(_id match "places-*") && !(_id match "*.*"))
+			)
+		]`
 	);
 
-	const idMap = { ...ID_MAP };
-	for (const doc of dottedDocs) {
-		if (!idMap[doc._id]) {
-			const slug =
-				typeof doc.slug === 'object' &&
-				doc.slug !== null &&
-				'current' in doc.slug &&
-				typeof doc.slug.current === 'string'
-					? doc.slug.current
-					: doc._id.split('.').pop() ?? doc._id;
-			const level = typeof doc.type === 'string' ? doc.type : 'taxonomy';
-			idMap[doc._id] = `taxonomy-${level}-${slug}`;
-		}
+	const idMap: Record<string, string> = {};
+	for (const doc of docsToMigrate) {
+		if (idMap[doc._id]) continue;
+		const slug = docSlug(doc);
+		const level = docLevel(doc);
+		idMap[doc._id] = stablePlacesId(level, slug);
 	}
 
-	const sortedDottedDocs = [...dottedDocs].sort((a, b) => {
-		const rank = (type: unknown) =>
-			type === 'country' ? 0 : type === 'location' ? 1 : type === 'community' ? 2 : 3;
-		return rank(a.type) - rank(b.type);
-	});
+	// Resolve duplicate targets (keep first source per stable ID).
+	const targetToSource = new Map<string, string>();
+	for (const [oldId, newId] of Object.entries(idMap)) {
+		if (!targetToSource.has(newId)) {
+			targetToSource.set(newId, oldId);
+			continue;
+		}
+		const existing = targetToSource.get(newId)!;
+		const keepExisting = typeRank(docLevel({ _id: existing, _type: 'locationTaxonomy' })) <= typeRank(docLevel({ _id: oldId, _type: 'locationTaxonomy' }));
+		const drop = keepExisting ? oldId : existing;
+		const keep = keepExisting ? existing : oldId;
+		targetToSource.set(newId, keep);
+		delete idMap[drop];
+		actions.push(`skip duplicate target ${newId} (drop ${drop}, keep ${keep})`);
+	}
 
-	for (const doc of sortedDottedDocs) {
+	const sortedDocs = [...docsToMigrate]
+		.filter((doc) => idMap[doc._id])
+		.sort((a, b) => typeRank(docLevel(a)) - typeRank(docLevel(b)));
+
+	for (const doc of sortedDocs) {
 		const newId = idMap[doc._id];
 		actions.push(`create ${newId} ← copy of ${doc._id}`);
 		if (!dryRun) {
@@ -188,15 +217,20 @@ async function main() {
 	}
 
 	for (const oldId of [...oldIds].sort((a, b) => {
-		const docA = dottedDocs.find((doc) => doc._id === a);
-		const docB = dottedDocs.find((doc) => doc._id === b);
-		const rank = (type: unknown) =>
-			type === 'country' ? 0 : type === 'location' ? 1 : type === 'community' ? 2 : 3;
-		return rank(docB?.type) - rank(docA?.type);
+		const docA = docsToMigrate.find((doc) => doc._id === a);
+		const docB = docsToMigrate.find((doc) => doc._id === b);
+		return typeRank(docLevel(docB ?? { _id: b, _type: 'locationTaxonomy' })) - typeRank(docLevel(docA ?? { _id: a, _type: 'locationTaxonomy' }));
 	})) {
 		actions.push(`delete ${oldId}`);
 		if (!dryRun) {
 			await client.delete(oldId);
+			if (!oldId.includes('.')) {
+				try {
+					await client.delete(`drafts.${oldId}`);
+				} catch {
+					// Draft may not exist.
+				}
+			}
 		}
 	}
 
@@ -204,22 +238,57 @@ async function main() {
 	for (const action of actions) console.log(`  • ${action}`);
 
 	const verify = await client.fetch<{
-		dottedRemaining: number;
-		countriesVisible: number;
+		dottedLocationRemaining: number;
+		dottedPlacesRemaining: number;
+		legacyIdsRemaining: number;
+		countries: number;
+		locations: number;
+		communities: number;
 	}>(
 		`{
-      "dottedRemaining": count(*[_type == "locationTaxonomy" && _id match "location.*"]),
-      "countriesVisible": count(*[_type == "locationTaxonomy" && type == "country"])
+      "dottedLocationRemaining": count(*[_type == "locationTaxonomy" && _id match "location.*"]),
+      "dottedPlacesRemaining": count(*[_type == "locationTaxonomy" && _id match "places.*"]),
+      "legacyIdsRemaining": count(*[
+        _type == "locationTaxonomy"
+        && !(_id match "places-*")
+        && !(_id in path("drafts.**"))
+      ]),
+      "countries": count(*[_type == "locationTaxonomy" && type == "country"]),
+      "locations": count(*[_type == "locationTaxonomy" && type == "location"]),
+      "communities": count(*[_type == "locationTaxonomy" && type == "community"])
     }`,
 		{},
 		{ perspective: 'raw', cacheMode: 'noStale' }
 	);
 
 	console.log('\nPost-migration verification (authenticated):');
-	console.log(`  dotted taxonomy IDs remaining: ${verify.dottedRemaining}`);
-	console.log(`  countries found: ${verify.countriesVisible}`);
+	console.log(`  location.* IDs remaining: ${verify.dottedLocationRemaining}`);
+	console.log(`  places.* IDs remaining: ${verify.dottedPlacesRemaining}`);
+	console.log(`  non-places-* root IDs remaining: ${verify.legacyIdsRemaining}`);
+	console.log(`  countries / locations / communities: ${verify.countries} / ${verify.locations} / ${verify.communities}`);
 
-	if (!dryRun && verify.dottedRemaining > 0) {
+	if (!dryRun) {
+		const anon = createClient({
+			projectId: PROJECT_ID,
+			dataset,
+			apiVersion: '2025-05-01',
+			useCdn: false,
+			perspective: 'published'
+		});
+		const marbella = await anon.fetch(
+			`*[_type == "locationTaxonomy" && type == "location" && slug.current == "marbella" && parent->slug.current == "spain"][0]{ _id, name }`
+		);
+		console.log('\nAnonymous API check (marbella location):');
+		console.log(marbella ? `  OK — ${marbella._id}` : '  FAILED — still not visible without auth');
+		if (!marbella) process.exitCode = 1;
+	}
+
+	if (
+		!dryRun &&
+		(verify.dottedLocationRemaining > 0 ||
+			verify.dottedPlacesRemaining > 0 ||
+			verify.legacyIdsRemaining > 0)
+	) {
 		console.error('\nMigration verification failed.');
 		process.exitCode = 1;
 	}

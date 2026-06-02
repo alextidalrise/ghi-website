@@ -30,62 +30,62 @@ type SeedDoc = {
 
 /** Stable IDs — no dots. See sanity/fixtures/verification/constants.ts */
 const SEED_DOCS: SeedDoc[] = [
-	{ _id: 'taxonomy-country-spain', name: 'Spain', slug: 'spain', type: 'country' },
+	{ _id: 'places-country-spain', name: 'Spain', slug: 'spain', type: 'country' },
 	{
-		_id: 'taxonomy-location-sotogrande',
+		_id: 'places-location-sotogrande',
 		name: 'Sotogrande',
 		slug: 'sotogrande',
 		type: 'location',
-		parentId: 'taxonomy-country-spain'
+		parentId: 'places-country-spain'
 	},
 	{
-		_id: 'taxonomy-location-benahavis',
+		_id: 'places-location-benahavis',
 		name: 'Benahavis',
 		slug: 'benahavis',
 		type: 'location',
-		parentId: 'taxonomy-country-spain'
+		parentId: 'places-country-spain'
 	},
 	{
-		_id: 'taxonomy-location-marbella',
+		_id: 'places-location-marbella',
 		name: 'Marbella',
 		slug: 'marbella',
 		type: 'location',
-		parentId: 'taxonomy-country-spain'
+		parentId: 'places-country-spain'
 	},
 	{
-		_id: 'taxonomy-community-kings-and-queens',
+		_id: 'places-community-kings-and-queens',
 		name: 'Kings and Queens',
 		slug: 'kings-and-queens',
 		type: 'community',
-		parentId: 'taxonomy-location-sotogrande'
+		parentId: 'places-location-sotogrande'
 	},
 	{
-		_id: 'taxonomy-community-la-quinta',
+		_id: 'places-community-la-quinta',
 		name: 'La Quinta',
 		slug: 'la-quinta',
 		type: 'community',
-		parentId: 'taxonomy-location-benahavis'
+		parentId: 'places-location-benahavis'
 	},
 	{
-		_id: 'taxonomy-community-san-pedro-de-alcantara',
+		_id: 'places-community-san-pedro-de-alcantara',
 		name: 'San Pedro de Alcántara',
 		slug: 'san-pedro-de-alcantara',
 		type: 'community',
-		parentId: 'taxonomy-location-marbella'
+		parentId: 'places-location-marbella'
 	},
 	{
-		_id: 'taxonomy-community-el-rosario',
+		_id: 'places-community-el-rosario',
 		name: 'El Rosario',
 		slug: 'el-rosario',
 		type: 'community',
-		parentId: 'taxonomy-location-marbella'
+		parentId: 'places-location-marbella'
 	},
 	{
-		_id: 'taxonomy-community-marbella-golden-mile',
+		_id: 'places-community-marbella-golden-mile',
 		name: 'Marbella Golden Mile',
 		slug: 'marbella-golden-mile',
 		type: 'community',
-		parentId: 'taxonomy-location-marbella'
+		parentId: 'places-location-marbella'
 	}
 ];
 
@@ -156,12 +156,12 @@ function remapTaxonomyRef(ref: string): string {
 	if (bySlug) return ref;
 
 	const legacyMap: Record<string, string> = {
-		'3aeb4bde-5d9e-4065-a0ad-b5d41c8b1c5b': 'taxonomy-location-sotogrande',
-		'f0231086-cf13-43c2-8bd2-095d85adbda3': 'taxonomy-location-benahavis',
-		'5bed3d4e-a0aa-4528-8186-b1527c43204e': 'taxonomy-community-kings-and-queens',
-		'8cff10c4-44a7-48fc-aac4-58dc1d913293': 'taxonomy-community-la-quinta',
-		'03809825-9727-49ad-b5e7-8f3e0b4c03f0': 'taxonomy-community-san-pedro-de-alcantara',
-		'ea121e21-1002-4cf5-86d3-1202cd1bc74f': 'taxonomy-community-el-rosario'
+		'3aeb4bde-5d9e-4065-a0ad-b5d41c8b1c5b': 'places-location-sotogrande',
+		'f0231086-cf13-43c2-8bd2-095d85adbda3': 'places-location-benahavis',
+		'5bed3d4e-a0aa-4528-8186-b1527c43204e': 'places-community-kings-and-queens',
+		'8cff10c4-44a7-48fc-aac4-58dc1d913293': 'places-community-la-quinta',
+		'03809825-9727-49ad-b5e7-8f3e0b4c03f0': 'places-community-san-pedro-de-alcantara',
+		'ea121e21-1002-4cf5-86d3-1202cd1bc74f': 'places-community-el-rosario'
 	};
 
 	return legacyMap[ref] ?? ref;

@@ -12,6 +12,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { legacyRefToStablePlacesId, parseDottedPlacesId, stablePlacesId } from './lib/placesIds';
 
 loadEnvFile(join(dirname(fileURLToPath(import.meta.url)), '..', '.env.local'));
 
@@ -39,7 +40,7 @@ const dataset =
 
 /** Communities with no parent that should belong to a known location ref. */
 const COMMUNITY_PARENT_OVERRIDES: Record<string, string> = {
-	'ea121e21-1002-4cf5-86d3-1202cd1bc74f': 'taxonomy-location-marbella'
+	'ea121e21-1002-4cf5-86d3-1202cd1bc74f': stablePlacesId('location', 'marbella')
 };
 
 function readSanityCliAuthToken(): string | undefined {
@@ -77,19 +78,7 @@ function slugToName(slug: string): string {
 }
 
 function legacyRefToStableId(refId: string): string | null {
-	if (refId.startsWith('location.country.')) {
-		return `taxonomy-country-${refId.slice('location.country.'.length)}`;
-	}
-	if (refId.startsWith('location.municipality.') || refId.startsWith('location.area.')) {
-		const slug = refId.startsWith('location.municipality.')
-			? refId.slice('location.municipality.'.length)
-			: refId.slice('location.area.'.length);
-		return `taxonomy-location-${slug}`;
-	}
-	if (refId.startsWith('location.subarea.')) {
-		return `taxonomy-community-${refId.slice('location.subarea.'.length)}`;
-	}
-	return null;
+	return legacyRefToStablePlacesId(refId);
 }
 
 function refExists(refId: string, existingIds: Set<string>): boolean {
@@ -103,40 +92,21 @@ function ref(value: string): Reference {
 }
 
 function inferTaxonomyFromLegacyId(id: string): Pick<TaxonomyDoc, 'name' | 'slug' | 'type' | 'parent'> & { _id: string } | null {
-	if (id.startsWith('location.country.')) {
-		const slug = id.slice('location.country.'.length);
-		return {
-			_id: `taxonomy-country-${slug}`,
-			type: 'country',
-			name: slugToName(slug),
-			slug: { _type: 'slug', current: slug }
-		};
+	const parsed = parseDottedPlacesId(id);
+	if (!parsed) return null;
+
+	const doc = {
+		_id: stablePlacesId(parsed.type, parsed.slug),
+		type: parsed.type,
+		name: slugToName(parsed.slug),
+		slug: { _type: 'slug' as const, current: parsed.slug }
+	};
+
+	if (parsed.type === 'location') {
+		return { ...doc, parent: ref(stablePlacesId('country', 'spain')) };
 	}
 
-	if (id.startsWith('location.area.') || id.startsWith('location.municipality.')) {
-		const slug = id.startsWith('location.area.')
-			? id.slice('location.area.'.length)
-			: id.slice('location.municipality.'.length);
-		return {
-			_id: `taxonomy-location-${slug}`,
-			type: 'location',
-			name: slugToName(slug),
-			slug: { _type: 'slug', current: slug },
-			parent: ref('taxonomy-country-spain')
-		};
-	}
-
-	if (id.startsWith('location.subarea.')) {
-		const slug = id.slice('location.subarea.'.length);
-		return {
-			_id: `taxonomy-community-${slug}`,
-			type: 'community',
-			name: slugToName(slug),
-			slug: { _type: 'slug', current: slug }
-		};
-	}
-
-	return null;
+	return doc;
 }
 
 function createMigrationClient(): SanityClient {
@@ -174,9 +144,11 @@ async function main() {
 	}
 
 	function refSortPriority(id: string): number {
-		if (id.startsWith('location.country.')) return 0;
-		if (id.startsWith('location.area.') || id.startsWith('location.municipality.')) return 1;
-		if (id.startsWith('location.subarea.')) return 2;
+		const parsed = parseDottedPlacesId(id);
+		if (!parsed) return 3;
+		if (parsed.type === 'country') return 0;
+		if (parsed.type === 'location') return 1;
+		if (parsed.type === 'community') return 2;
 		return 3;
 	}
 
