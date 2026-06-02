@@ -17,7 +17,7 @@ describe('parseListingSearchParams', () => {
 	it('parses valid filters and normalizes page to at least 1', () => {
 		const params = parseListingSearchParams(
 			new URL(
-				'https://example.com/spain/marbella?page=2&sort=price_asc&propertyType=villa&minPrice=500000&maxPrice=2000000&minBeds=3&golfRelevance=frontline_golf&golfRelevance=golf_view'
+				'https://example.com/spain/marbella?page=2&sort=price_asc&propertyType=villa&minPrice=500000&maxPrice=2000000&minBeds=3&community=nueva-andalucia&golfRelevance=frontline_golf&golfRelevance=golf_view'
 			)
 		);
 
@@ -28,6 +28,7 @@ describe('parseListingSearchParams', () => {
 			minPrice: 500_000,
 			maxPrice: 2_000_000,
 			minBeds: 3,
+			community: 'nueva-andalucia',
 			golfRelevance: ['frontline_golf', 'golf_view']
 		});
 	});
@@ -35,17 +36,31 @@ describe('parseListingSearchParams', () => {
 	it('falls back to defaults for invalid values and page < 1', () => {
 		const params = parseListingSearchParams(
 			new URL(
-				'https://example.com/spain/marbella?page=0&sort=invalid&propertyType=castle&minPrice=-1&maxPrice=abc&minBeds=0&golfRelevance=not_real'
+				'https://example.com/spain/marbella?page=0&sort=invalid&propertyType=castle&minPrice=-1&maxPrice=abc&minBeds=0&community=Nueva%20Andalucia!&golfRelevance=not_real'
 			)
 		);
 
 		expect(params.page).toBe(1);
-		expect(params.sort).toBe('title');
+		expect(params.sort).toBe('newest');
 		expect(params.propertyType).toBeNull();
 		expect(params.minPrice).toBeNull();
 		expect(params.maxPrice).toBeNull();
 		expect(params.minBeds).toBeNull();
+		expect(params.community).toBeNull();
 		expect(params.golfRelevance).toEqual([]);
+	});
+
+	it('normalizes a valid community slug and rejects non-slug values', () => {
+		expect(
+			parseListingSearchParams(
+				new URL('https://example.com/spain/marbella?community=NUEVA-ANDALUCIA')
+			).community
+		).toBe('nueva-andalucia');
+
+		expect(
+			parseListingSearchParams(new URL('https://example.com/spain/marbella?community=a/b'))
+				.community
+		).toBeNull();
 	});
 });
 
@@ -104,10 +119,10 @@ describe('listingSearchParamsToQueryParams', () => {
 		const params = parseListingSearchParams(
 			new URL('https://example.com/spain/marbella?sort=price_desc&propertyType=villa&page=2')
 		);
-		const query = listingSearchParamsToQueryParams(params, { page: 3, sort: 'title' });
+		const query = listingSearchParamsToQueryParams(params, { page: 3, sort: 'newest' });
 
 		expect(query.get('page')).toBe('3');
-		expect(query.get('sort')).toBeNull();
+		expect(query.get('sort')).toBeNull(); // newest is the default, so it is omitted
 		expect(query.get('propertyType')).toBe('villa');
 	});
 });

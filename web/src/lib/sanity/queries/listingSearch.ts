@@ -51,6 +51,7 @@ function scopeFilter(scope: ListingSearchScope): string {
 /** Optional facet filters — omitted params disable each constraint. */
 const FACET_FILTERS = /* groq */ `
   (!defined($propertyType) || propertyType == $propertyType)
+  && (!defined($community) || location.community->slug.current == $community)
   && (!defined($minBeds) || coalesce(specs.bedrooms, 0) >= $minBeds)
   && (
     !defined($minPrice)
@@ -107,6 +108,7 @@ export function listingSearchQueryParams(
 	scope: ListingSearchScope,
 	params: {
 		propertyType?: string | null;
+		community?: string | null;
 		minPrice?: number | null;
 		maxPrice?: number | null;
 		minBeds?: number | null;
@@ -123,6 +125,7 @@ export function listingSearchQueryParams(
 			: {}),
 		...(scope.type === 'community' ? { communitySlug: scope.communitySlug } : {}),
 		propertyType: params.propertyType ?? null,
+		community: params.community ?? null,
 		minPrice: params.minPrice ?? null,
 		maxPrice: params.maxPrice ?? null,
 		minBeds: params.minBeds ?? null,

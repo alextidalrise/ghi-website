@@ -16,16 +16,18 @@ export type ListingSearchParams = {
 	minPrice: number | null;
 	maxPrice: number | null;
 	minBeds: number | null;
+	community: string | null;
 	golfRelevance: GolfRelevanceValue[];
 };
 
 export const DEFAULT_LISTING_SEARCH_PARAMS: ListingSearchParams = {
 	page: 1,
-	sort: 'title',
+	sort: 'newest',
 	propertyType: null,
 	minPrice: null,
 	maxPrice: null,
 	minBeds: null,
+	community: null,
 	golfRelevance: []
 };
 
@@ -63,6 +65,15 @@ function parseMinBeds(value: string | null): number | null {
 	return parsed != null && parsed >= 1 ? parsed : null;
 }
 
+/** Validate a community slug from the URL — lowercase, hyphen-separated alphanumerics only. */
+const COMMUNITY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+function parseCommunity(value: string | null): string | null {
+	if (!value) return null;
+	const trimmed = value.trim().toLowerCase();
+	return COMMUNITY_SLUG_PATTERN.test(trimmed) ? trimmed : null;
+}
+
 function parseGolfRelevance(values: string[]): GolfRelevanceValue[] {
 	const allowed = new Set<string>(GOLF_RELEVANCE_VALUES);
 	const seen = new Set<GolfRelevanceValue>();
@@ -88,6 +99,7 @@ export function parseListingSearchParams(url: URL): ListingSearchParams {
 		minPrice: parsePositiveInt(url.searchParams.get('minPrice')),
 		maxPrice: parsePositiveInt(url.searchParams.get('maxPrice')),
 		minBeds: parseMinBeds(url.searchParams.get('minBeds')),
+		community: parseCommunity(url.searchParams.get('community')),
 		golfRelevance: parseGolfRelevance(url.searchParams.getAll('golfRelevance'))
 	};
 }
@@ -113,6 +125,7 @@ export function serializeListingSearchParams(params: ListingSearchParams): URLSe
 	appendIfSet(searchParams, 'minPrice', params.minPrice);
 	appendIfSet(searchParams, 'maxPrice', params.maxPrice);
 	appendIfSet(searchParams, 'minBeds', params.minBeds);
+	appendIfSet(searchParams, 'community', params.community);
 
 	for (const value of params.golfRelevance) {
 		searchParams.append('golfRelevance', value);

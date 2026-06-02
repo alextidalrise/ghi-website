@@ -10,6 +10,16 @@
 		`Property listings and editorial content for ${data.location.name} coming soon.`
 	);
 
+	// Only direct communities (sub-areas whose listings live under this location) can
+	// filter this location's results; associated communities resolve elsewhere.
+	const communityOptions = $derived(
+		data.directCommunities
+			.filter((community): community is typeof community & { slug: string; name: string } =>
+				Boolean(community.slug && community.name)
+			)
+			.map((community) => ({ label: community.name, value: community.slug }))
+	);
+
 	function communityHref(community: {
 		slug?: string | null;
 		canonicalLocationSlug?: string | null;
@@ -41,7 +51,7 @@
 <article class="location-page">
 	<Breadcrumbs items={data.breadcrumbs} />
 
-	<div class="location-page__body content-wrap">
+	<div class="location-page__top content-wrap">
 		<h1>{data.location.name}</h1>
 		<p class="location-page__intro">
 			{data.location.publicDescription ?? placeholderBody}
@@ -52,56 +62,66 @@
 			heading={`Frontline golf in ${data.location.name}`}
 			viewAllHref={data.frontlineViewAllHref}
 		/>
-
-		<ListingResults
-			basePath={data.canonicalPath}
-			searchParams={data.searchParams}
-			cards={data.listingResults.cards}
-			total={data.listingResults.total}
-			pagination={data.listingResults.pagination}
-		/>
-
-		{#if data.directCommunities.length > 0}
-			<section class="location-page__list" aria-labelledby="communities-heading">
-				<h2 id="communities-heading">Communities</h2>
-				<ul>
-					{#each data.directCommunities as community (community._id)}
-						{@const href = communityHref(community)}
-						<li>
-							{#if href}
-								<a {href}>{community.name}</a>
-							{:else}
-								{community.name}
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			</section>
-		{/if}
-
-		{#if data.associatedCommunities.length > 0}
-			<section class="location-page__list" aria-labelledby="associated-communities-heading">
-				<h2 id="associated-communities-heading">Also in this area</h2>
-				<ul>
-					{#each data.associatedCommunities as community (community._id)}
-						{@const href = communityHref(community)}
-						<li>
-							{#if href}
-								<a {href}>{community.name}</a>
-							{:else}
-								{community.name}
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			</section>
-		{/if}
 	</div>
+
+	<ListingResults
+		basePath={data.canonicalPath}
+		searchParams={data.searchParams}
+		cards={data.listingResults.cards}
+		total={data.listingResults.total}
+		pagination={data.listingResults.pagination}
+		heading={`All properties in ${data.location.name}`}
+		{communityOptions}
+	/>
+
+	{#if data.directCommunities.length > 0 || data.associatedCommunities.length > 0}
+		<div class="location-page__after content-wrap">
+			{#if data.directCommunities.length > 0}
+				<section class="location-page__list" aria-labelledby="communities-heading">
+					<h2 id="communities-heading">Communities</h2>
+					<ul>
+						{#each data.directCommunities as community (community._id)}
+							{@const href = communityHref(community)}
+							<li>
+								{#if href}
+									<a {href}>{community.name}</a>
+								{:else}
+									{community.name}
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				</section>
+			{/if}
+
+			{#if data.associatedCommunities.length > 0}
+				<section class="location-page__list" aria-labelledby="associated-communities-heading">
+					<h2 id="associated-communities-heading">Also in this area</h2>
+					<ul>
+						{#each data.associatedCommunities as community (community._id)}
+							{@const href = communityHref(community)}
+							<li>
+								{#if href}
+									<a {href}>{community.name}</a>
+								{:else}
+									{community.name}
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				</section>
+			{/if}
+		</div>
+	{/if}
 </article>
 
 <style>
-	.location-page__body {
-		padding-block: var(--space-xl) var(--space-2xl);
+	.location-page {
+		padding-bottom: var(--space-2xl);
+	}
+
+	.location-page__top {
+		padding-top: var(--space-xl);
 	}
 
 	.location-page__intro {
@@ -109,7 +129,11 @@
 		max-width: 42rem;
 	}
 
-	.location-page__list {
+	.location-page__after {
+		margin-top: var(--section-gap);
+	}
+
+	.location-page__list + .location-page__list {
 		margin-top: var(--space-xl);
 	}
 

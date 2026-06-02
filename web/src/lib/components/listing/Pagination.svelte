@@ -69,8 +69,8 @@
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: center;
-		gap: var(--space-md);
-		margin-top: var(--space-xl);
+		gap: var(--space-sm);
+		margin-top: var(--space-2xl);
 	}
 
 	.listing-pagination__pages {
@@ -87,14 +87,26 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		min-width: 2.5rem;
-		padding: 0.5rem 0.75rem;
+		min-width: 2.75rem;
+		min-height: 2.75rem;
+		padding: 0.5rem 0.875rem;
 		border: 1px solid var(--border);
 		background: var(--white);
 		color: var(--green);
 		font-family: var(--sans);
 		font-size: var(--text-ui);
+		letter-spacing: var(--tracking-wide);
 		text-decoration: none;
+		transition: border-color var(--duration-hover) var(--ease),
+			color var(--duration-hover) var(--ease);
+	}
+
+	a.listing-pagination__control:hover,
+	a.listing-pagination__control:focus-visible,
+	a.listing-pagination__page:hover,
+	a.listing-pagination__page:focus-visible {
+		border-color: var(--green);
+		color: var(--green);
 	}
 
 	.listing-pagination__page[aria-current='page'] {
@@ -106,6 +118,7 @@
 	.listing-pagination__control--disabled {
 		color: var(--muted);
 		border-color: var(--border);
+		cursor: default;
 	}
 
 	.listing-pagination__ellipsis {

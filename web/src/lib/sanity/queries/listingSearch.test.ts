@@ -10,6 +10,7 @@ describe('listingSearchQueryParams', () => {
 			)
 		).toEqual({
 			propertyType: null,
+			community: null,
 			minPrice: null,
 			maxPrice: null,
 			minBeds: null,

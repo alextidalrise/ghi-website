@@ -31,7 +31,7 @@
 <article class="location-page">
 	<Breadcrumbs items={data.breadcrumbs} />
 
-	<div class="location-page__body content-wrap">
+	<div class="location-page__top content-wrap">
 		<h1>{data.community.name}</h1>
 		<p class="location-page__intro">
 			{data.community.publicDescription ?? placeholderBody}
@@ -42,20 +42,25 @@
 			heading={`Frontline golf in ${data.community.name}`}
 			viewAllHref={data.frontlineViewAllHref}
 		/>
-
-		<ListingResults
-			basePath={data.canonicalPath}
-			searchParams={data.searchParams}
-			cards={data.listingResults.cards}
-			total={data.listingResults.total}
-			pagination={data.listingResults.pagination}
-		/>
 	</div>
+
+	<ListingResults
+		basePath={data.canonicalPath}
+		searchParams={data.searchParams}
+		cards={data.listingResults.cards}
+		total={data.listingResults.total}
+		pagination={data.listingResults.pagination}
+		heading={`All properties in ${data.community.name}`}
+	/>
 </article>
 
 <style>
-	.location-page__body {
-		padding-block: var(--space-xl) var(--space-2xl);
+	.location-page {
+		padding-bottom: var(--space-2xl);
+	}
+
+	.location-page__top {
+		padding-top: var(--space-xl);
 	}
 
 	.location-page__intro {
