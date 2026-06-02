@@ -75,7 +75,14 @@
 		<!-- Tier 1: brand + invitation -->
 		<div class="footer__masthead">
 			<div class="footer__brand">
-				<a href="/" class="footer__wordmark">Golf Homes International</a>
+				<a href="/" class="footer__wordmark" aria-label="Golf Homes International home">
+					<img
+						src="/design-system/assets/logo-white.svg"
+						alt="Golf Homes International"
+						width="180"
+						height="66"
+					/>
+				</a>
 				<p class="footer__statement">
 					Curated residential property on and near the finest golf courses of Spain and Portugal.
 				</p>
@@ -93,26 +100,24 @@
 		<!-- Tier 2: index columns + newsletter -->
 		<div class="footer__columns">
 			{#each countryColumns as country (country._id)}
-				{#if country.locations.length > 0}
-					<nav class="footer__col" aria-label={country.name}>
-						<h2 class="footer__heading">{country.name}</h2>
-						<ul class="footer__list">
-							{#each country.locations as location (location._id)}
-								<li>
-									<a class="footer__link" href={`/${country.slug}/${location.slug}`}>
-										{location.name}
-									</a>
-								</li>
-							{/each}
+				<nav class="footer__col" aria-label={country.name}>
+					<h2 class="footer__heading">{country.name}</h2>
+					<ul class="footer__list">
+						{#each country.locations as location (location._id)}
 							<li>
-								<a class="footer__link footer__link--all" href={`/${country.slug}`}>
-									All {country.name}
-									<span class="footer__arrow" aria-hidden="true">&rarr;</span>
+								<a class="footer__link" href={`/${country.slug}/${location.slug}`}>
+									{location.name}
 								</a>
 							</li>
-						</ul>
-					</nav>
-				{/if}
+						{/each}
+						<li>
+							<a class="footer__link footer__link--all" href={`/${country.slug}`}>
+								{country.locations.length ? `All ${country.name}` : `Explore ${country.name}`}
+								<span class="footer__arrow" aria-hidden="true">&rarr;</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
 			{/each}
 
 			<nav class="footer__col" aria-label="Resources">
@@ -123,48 +128,45 @@
 					{/each}
 				</ul>
 			</nav>
+		</div>
 
-			<div class="footer__col footer__col--signup">
-				<h2 class="footer__heading">Stay in touch</h2>
-				{#if status === 'success'}
-					<p class="footer__signup-success" role="status">{message}</p>
-				{:else}
-					<p class="footer__signup-lead">
-						Occasional notes on new listings and the markets we cover. A few times a year, no more.
+		<!-- Newsletter — its own block so the column count never affects its placement -->
+		<div class="footer__signup">
+			<h2 class="footer__heading">Stay in touch</h2>
+			{#if status === 'success'}
+				<p class="footer__signup-success" role="status">{message}</p>
+			{:else}
+				<p class="footer__signup-lead">
+					Occasional notes on new listings and the markets we cover. A few times a year, no more.
+				</p>
+				<form class="footer__signup-form" onsubmit={subscribe} novalidate>
+					<label class="footer__signup-label" for="footer-email">Email address</label>
+					<div class="footer__signup-row">
+						<input
+							id="footer-email"
+							class="footer__signup-input"
+							type="email"
+							name="email"
+							placeholder="you@example.com"
+							autocomplete="email"
+							bind:value={email}
+							disabled={status === 'submitting'}
+							aria-describedby="footer-signup-msg"
+						/>
+						<button class="footer__signup-button" type="submit" disabled={status === 'submitting'}>
+							{status === 'submitting' ? 'Sending' : 'Subscribe'}
+						</button>
+					</div>
+					<p
+						id="footer-signup-msg"
+						class="footer__signup-error"
+						class:is-visible={status === 'error'}
+						role="alert"
+					>
+						{status === 'error' ? message : ''}
 					</p>
-					<form class="footer__signup-form" onsubmit={subscribe} novalidate>
-						<label class="footer__signup-label" for="footer-email">Email address</label>
-						<div class="footer__signup-row">
-							<input
-								id="footer-email"
-								class="footer__signup-input"
-								type="email"
-								name="email"
-								placeholder="you@example.com"
-								autocomplete="email"
-								bind:value={email}
-								disabled={status === 'submitting'}
-								aria-describedby="footer-signup-msg"
-							/>
-							<button
-								class="footer__signup-button"
-								type="submit"
-								disabled={status === 'submitting'}
-							>
-								{status === 'submitting' ? 'Sending' : 'Subscribe'}
-							</button>
-						</div>
-						<p
-							id="footer-signup-msg"
-							class="footer__signup-error"
-							class:is-visible={status === 'error'}
-							role="alert"
-						>
-							{status === 'error' ? message : ''}
-						</p>
-					</form>
-				{/if}
-			</div>
+				</form>
+			{/if}
 		</div>
 
 		<!-- Tier 3: legal + social -->
@@ -215,19 +217,21 @@
 	}
 
 	.footer__wordmark {
-		font-family: var(--serif);
-		font-weight: 600;
-		font-size: var(--text-h3);
-		line-height: 1.1;
-		letter-spacing: var(--tracking-tight);
-		color: var(--on-green);
-		text-decoration: none;
-		transition: color var(--duration-hover) var(--ease);
+		display: inline-block;
+		width: 180px;
+		max-width: 60%;
+		line-height: 0;
+		transition: opacity var(--duration-hover) var(--ease);
+	}
+
+	.footer__wordmark img {
+		width: 100%;
+		height: auto;
 	}
 
 	.footer__wordmark:hover,
 	.footer__wordmark:focus-visible {
-		color: var(--gold);
+		opacity: 0.82;
 	}
 
 	.footer__statement {
@@ -283,18 +287,17 @@
 		transform: translateX(3px);
 	}
 
-	/* Tier 2 — index columns; newsletter is the widest column and wraps to full width
-	   first on narrow viewports. */
+	/* Tier 2 — index columns. Newsletter lives in its own block below, so the number
+	   of country columns never pushes it around. */
 	.footer__columns {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 		gap: var(--space-xl) var(--space-lg);
-		padding-block: var(--space-xl);
+		padding-top: var(--space-xl);
 	}
 
-	.footer__col--signup {
-		grid-column: span 2;
-		min-width: 16rem;
+	.footer__signup {
+		padding-block: var(--space-xl);
 	}
 
 	.footer__heading {
@@ -492,10 +495,6 @@
 
 		.footer__invite {
 			text-align: left;
-		}
-
-		.footer__col--signup {
-			grid-column: 1 / -1;
 		}
 	}
 
