@@ -1,6 +1,7 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
 	import SiteNav from '$lib/components/SiteNav.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 	import { isPreviewing, useLiveMode } from '@sanity/svelte-loader';
 	import { enableVisualEditing } from '@sanity/visual-editing';
 	import { env as publicEnv } from '$env/dynamic/public';
@@ -40,11 +41,13 @@
 	</div>
 {/if}
 
-<SiteNav primaryCountrySlug={data.nav.primaryCountrySlug} />
+<SiteNav />
 
 <main class="site-main">
 	{@render children()}
 </main>
+
+<Footer countries={data.nav.countries} locations={data.nav.locations} />
 
 <style>
 	.preview-banner {

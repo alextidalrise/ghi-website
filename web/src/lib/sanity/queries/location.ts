@@ -76,6 +76,23 @@ export const communitiesByLocationQuery = defineQuery(`
   }
 `);
 
+/** All communities with their canonical location + country slugs — for the homepage discovery cascade. */
+export const communitiesForNavQuery = defineQuery(`
+  *[
+    _type == "locationTaxonomy"
+    && type == "community"
+    && defined(slug.current)
+    && defined(parent->slug.current)
+    && defined(parent->parent->slug.current)
+  ] | order(name asc) {
+    _id,
+    name,
+    "slug": slug.current,
+    "locationSlug": parent->slug.current,
+    "countrySlug": parent->parent->slug.current
+  }
+`);
+
 /** Breadcrumb chain from a taxonomy reference upward through parents (country → location → community). */
 export const locationBreadcrumbQuery = defineQuery(`
   *[_id == $taxonomyId][0]{

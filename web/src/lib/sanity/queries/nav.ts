@@ -1,5 +1,9 @@
 import { fetchPublic } from './fetch';
-import { countriesForNavQuery, locationsByCountryQuery } from './location';
+import {
+	communitiesForNavQuery,
+	countriesForNavQuery,
+	locationsByCountryQuery
+} from './location';
 
 export type NavCountryOption = {
 	_id: string;
@@ -14,9 +18,18 @@ export type NavLocationOption = {
 	countrySlug: string;
 };
 
+export type NavCommunityOption = {
+	_id: string;
+	name: string;
+	slug: string;
+	locationSlug: string;
+	countrySlug: string;
+};
+
 export type NavTaxonomy = {
 	countries: NavCountryOption[];
 	locations: NavLocationOption[];
+	communities: NavCommunityOption[];
 	primaryCountrySlug: string;
 };
 
@@ -52,9 +65,34 @@ export async function fetchNavTaxonomy(): Promise<NavTaxonomy> {
 		})
 	);
 
+	const communityRows = await fetchPublic<
+		Array<{
+			_id: string;
+			name: string;
+			slug?: string | null;
+			locationSlug?: string | null;
+			countrySlug?: string | null;
+		}>
+	>(communitiesForNavQuery);
+
+	const communities = (communityRows ?? []).flatMap((row) =>
+		row.slug && row.locationSlug && row.countrySlug
+			? [
+					{
+						_id: row._id,
+						name: row.name,
+						slug: row.slug,
+						locationSlug: row.locationSlug,
+						countrySlug: row.countrySlug
+					}
+				]
+			: []
+	);
+
 	return {
 		countries,
 		locations: locationGroups.flat(),
+		communities,
 		primaryCountrySlug: countries[0]?.slug ?? DEFAULT_PRIMARY_COUNTRY_SLUG
 	};
 }

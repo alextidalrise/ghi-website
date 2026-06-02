@@ -35,19 +35,26 @@
 	--tracking-wide: 0.04em;
 	--tracking-overline: 0.12em;
 
-	/* Spacing (8px base) */
+	/* Spacing (8px base).
+	   Small steps (xs–md) stay fixed: tight groupings read the same at every width.
+	   Large steps (lg–2xl) are mostly internal padding and big gaps, so they go fluid
+	   to stop desktop-sized padding crowding phones. Desktop maxima are unchanged. */
 	--space-xs: 0.5rem;
 	--space-sm: 1rem;
 	--space-md: 1.5rem;
-	--space-lg: 2rem;
-	--space-xl: 3rem;
-	--space-2xl: 5rem;
+	--space-lg: clamp(1.5rem, 1rem + 2vw, 2rem); /* 24px → 32px */
+	--space-xl: clamp(1.75rem, 0.75rem + 4vw, 3rem); /* 28px → 48px */
+	--space-2xl: clamp(3rem, 1rem + 8vw, 5rem); /* 48px → 80px */
 
 	/* Layout */
 	--content-max: 1060px;
-	--content-padding: 3rem;
+	/* Fluid gutters and section rhythm: tighten on phones, keep the generous
+	   desktop values (the brand's negative space) intact at the top end.
+	   --content-padding: 24px @ ~390px → 48px from ~960px up.
+	   --section-gap:     44px @ ~390px → 112px from ~1120px up. */
+	--content-padding: clamp(1.5rem, 5vw, 3rem);
 	--nav-height: 3.75rem;
-	--section-gap: 7rem;
+	--section-gap: clamp(2.75rem, 0.25rem + 10vw, 7rem);
 	--hero-padding-y: 5rem;
 
 	/* Motion */

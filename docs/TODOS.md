@@ -65,6 +65,12 @@ Foundation for every grid, carousel, and similar-properties block.
   - Files: `web/src/lib/sanity/queries/featured.ts`, `FeaturedListings.svelte`
   - Done when: queries preserve editor order, apply public gates, omit unpublished refs; homepage + country pages render featured grid when picks exist; tests pass
 
+- [ ] **F-04** Global frontline golf index page
+  - Route: a dedicated page (e.g. `/frontline-golf`) listing **all** publishable `golf.golfRelevance == "frontline_golf"` properties across every country, not scoped to one taxonomy node
+  - Reuses: frontline GROQ (`golfRelevance` filter), paginated `fetchListingCards()`, `PropertyCard` / `ListingGrid`; optional `ListingFilters` (country / type / price)
+  - Wire: point the homepage `FrontlineListings` "View all frontline" CTA at this route. It is currently a **placeholder** → primary country landing page; see `frontlineViewAllHref` in `web/src/routes/+page.svelte` (has a TODO)
+  - Done when: route lists all frontline properties (paginated, public gates applied); homepage CTA links here; SEO title/meta + sitemap entry added; tests pass
+
 ---
 
 ## G. Similar properties

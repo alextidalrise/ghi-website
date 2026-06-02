@@ -140,6 +140,10 @@ h4,
 .site-main {
 	padding-top: var(--nav-height);
 	min-height: 100dvh;
+	/* Absorbs the scrollbar gutter so full-bleed bands (e.g. the Frontline band's
+	   100vw breakout) never trigger a horizontal scrollbar. `clip` (not `hidden`)
+	   does not create a scroll container, so it can't trap sticky descendants. */
+	overflow-x: clip;
 }
 
 @media (prefers-reduced-motion: reduce) {
