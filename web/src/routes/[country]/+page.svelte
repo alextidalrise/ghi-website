@@ -1,14 +1,32 @@
 <script lang="ts">
-	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
+	import PageHero from '$lib/components/PageHero.svelte';
+	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
+	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
+	import {
+		countryFeatureBySlug,
+		countryHeadline,
+		locationFeaturesForCountry
+	} from '$lib/home/curated';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
 
+	const countryFeature = $derived(countryFeatureBySlug(data.location.slug ?? ''));
+	const countryLocations = $derived(locationFeaturesForCountry(data.location.name));
+
 	const placeholderBody = $derived(
 		`Property listings and editorial content for ${data.location.name} coming soon.`
 	);
+
+	const locationsSummary = $derived.by(() => {
+		if (countryLocations.length === 0) return undefined;
+		const names = countryLocations.map((location) => location.name);
+		if (names.length === 1) return names[0];
+		if (names.length === 2) return `${names[0]} and ${names[1]}.`;
+		return `${names.slice(0, -1).join(', ')} and ${names.at(-1)}.`;
+	});
 </script>
 
 <svelte:head>
@@ -28,72 +46,83 @@
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
 
-<article class="location-stub">
-	<Breadcrumbs items={data.breadcrumbs} />
+{#if countryFeature}
+	<PageHero
+		image={countryFeature.image}
+		alt={countryFeature.alt}
+		lead={countryFeature.tagline}
+		compact
+		fetchpriority="high"
+	>
+		{#snippet title()}
+			{countryHeadline(data.location.name)}
+		{/snippet}
+	</PageHero>
+{/if}
 
-	<div class="location-stub__body content-wrap">
-		<h1>{data.location.name}</h1>
-		<p class="location-stub__intro">
+<article class="country-page">
+	<div class="country-page__intro content-wrap">
+		<Breadcrumbs items={data.breadcrumbs} />
+
+		{#if !countryFeature}
+			<h1 class="country-page__title">{countryHeadline(data.location.name)}</h1>
+		{/if}
+
+		<p class="country-page__lead">
 			{data.location.publicDescription ?? placeholderBody}
 		</p>
+	</div>
+
+	<section class="country-page__content content-wrap">
+		{#if countryLocations.length > 0}
+			<FeaturedLocations
+				locations={countryLocations}
+				heading="Locations"
+				summary={locationsSummary}
+			/>
+		{/if}
 
 		<FeaturedListings
 			cards={data.featuredCards}
 			heading={`Featured properties in ${data.location.name}`}
+			summary={`Hand-picked listings across ${data.location.name}.`}
 		/>
 
 		<FrontlineListings
 			cards={data.frontlineCards}
 			heading={`Frontline golf in ${data.location.name}`}
+			summary={`Homes directly on the fairway in ${data.location.name}.`}
 			viewAllHref={data.frontlineViewAllHref}
 		/>
-
-		{#if data.locations.length > 0}
-			<section class="location-stub__list" aria-labelledby="locations-heading">
-				<h2 id="locations-heading">Locations</h2>
-				<ul>
-					{#each data.locations as location (location._id)}
-						<li>
-							{#if location.slug}
-								<a href="/{data.location.slug}/{location.slug}">{location.name}</a>
-							{:else}
-								{location.name}
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			</section>
-		{/if}
-	</div>
+	</section>
 </article>
 
 <style>
-	.location-stub__body {
-		padding-block: var(--space-xl) var(--space-2xl);
+	.country-page__intro {
+		padding-block: var(--space-xl) 0;
 	}
 
-	.location-stub__intro {
+	.country-page__title {
+		margin-top: var(--space-md);
+	}
+
+	.country-page__lead {
 		margin-top: var(--space-md);
 		max-width: 42rem;
+		color: var(--muted);
+		font-family: var(--sans);
+		font-size: var(--text-body);
+		line-height: 1.7;
 	}
 
-	.location-stub__list {
-		margin-top: var(--space-xl);
-	}
-
-	.location-stub__list h2 {
-		margin-bottom: var(--space-sm);
-	}
-
-	.location-stub__list ul {
-		list-style: none;
+	.country-page__content {
 		display: grid;
-		gap: var(--space-xs);
+		grid-template-columns: minmax(0, 1fr);
+		padding-block: var(--section-gap) var(--space-2xl);
+		row-gap: var(--section-gap);
 	}
 
-	.location-stub__list a {
-		color: var(--green);
-		text-decoration: underline;
-		text-underline-offset: 0.15em;
+	.country-page__content > :global(*) {
+		margin-block: 0;
 	}
 </style>

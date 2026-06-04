@@ -45,6 +45,19 @@ export const COUNTRY_FEATURES: CountryFeature[] = [
 	}
 ];
 
+/** Country landing-page hero headline — aligned with keyword map primary titles. */
+export function countryHeadline(name: string): string {
+	return `Golf property for sale in ${name}`;
+}
+
+export function countryFeatureBySlug(slug: string): CountryFeature | undefined {
+	return COUNTRY_FEATURES.find((country) => country.href === `/${slug}`);
+}
+
+export function locationFeaturesForCountry(countryName: string): LocationFeature[] {
+	return LOCATION_FEATURES.filter((location) => location.countryLabel === countryName);
+}
+
 export const LOCATION_FEATURES: LocationFeature[] = [
 	{
 		name: 'Marbella',

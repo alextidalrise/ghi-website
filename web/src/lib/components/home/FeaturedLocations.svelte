@@ -3,16 +3,24 @@
 
 	type Props = {
 		locations: LocationFeature[];
+		heading?: string;
+		summary?: string;
 	};
 
-	let { locations }: Props = $props();
+	let {
+		locations,
+		heading = 'Featured locations',
+		summary = 'Six destinations across Spain and Portugal.'
+	}: Props = $props();
 </script>
 
 {#if locations.length > 0}
 	<section class="featured-locations" aria-labelledby="locations-heading">
 		<div class="featured-locations__head">
-			<h2 id="locations-heading">Featured locations</h2>
-			<p class="featured-locations__summary">Six destinations across Spain and Portugal.</p>
+			<h2 id="locations-heading">{heading}</h2>
+			{#if summary}
+				<p class="featured-locations__summary">{summary}</p>
+			{/if}
 		</div>
 
 		<!-- Two rows of three on desktop; a single swipeable rail on phones. -->
