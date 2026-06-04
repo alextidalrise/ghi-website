@@ -64,7 +64,7 @@ export function buildPropertyBreadcrumbs(
 	}
 
 	items.push({
-		label: listing.title ?? listing.content?.heroHeadline ?? 'Property',
+		label: listing.title ?? 'Property',
 		href: canonicalPath
 	});
 
@@ -131,7 +131,7 @@ export function buildDevelopmentBreadcrumbs(
 	}
 
 	items.push({
-		label: development.title ?? development.content?.heroHeadline ?? 'Development',
+		label: development.title ?? 'Development',
 		href: canonicalPath
 	});
 

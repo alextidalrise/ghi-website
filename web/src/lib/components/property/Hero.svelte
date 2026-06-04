@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { buildPublicImageUrl } from '$lib/sanity/image';
 	import type { PublicPropertyListing } from '$lib/sanity/transforms';
+	import { resolveListingHeroImage } from '$lib/sanity/transforms/mediaFilter';
 	import { formatListingPrice, formatPropertyType, formatTransactionType } from '$lib/listing/formatPrice';
 
 	type Props = {
@@ -9,11 +10,11 @@
 
 	let { listing }: Props = $props();
 
-	const heroImage = $derived(listing.media?.heroImage ?? listing.media?.thumbnailOverride);
+	const heroImage = $derived(resolveListingHeroImage(listing.media));
 	const heroUrl = $derived(
 		buildPublicImageUrl(heroImage, { width: 1920, height: 900, fit: 'crop', quality: 85 })
 	);
-	const headline = $derived(listing.content?.heroHeadline ?? listing.title);
+	const headline = $derived(listing.title);
 	const overline = $derived(
 		[listing.location?.community?.name, listing.location?.country?.name].filter(Boolean).join(', ')
 	);

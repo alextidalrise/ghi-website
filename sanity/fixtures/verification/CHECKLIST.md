@@ -41,7 +41,7 @@ Open Studio at `/development` and confirm invalid states are **blocked on save**
 ### Golden property (`GHI99001`)
 
 - [ ] Document saves successfully with `publishReadiness = approved_for_publish`
-- [ ] Approved hero has `imageRightsStatus = approved` (or legacy non-rejected) and GHI branding or `publicUseApproved = true`
+- [ ] Hero image has an uploaded file and alt text
 - [ ] Pricing uses `priceSourceStatus = source_confirmed` with a numeric price
 
 ### Privacy development (`GHI99002`)
@@ -53,9 +53,8 @@ Open Studio at `/development` and confirm invalid states are **blocked on save**
 
 ### Media privacy property (`GHI99003`)
 
-- [ ] Document saves (CMS stores blocked assets for editorial review)
-- [ ] Hero with `imageRightsStatus = rejected` cannot have `publicUseApproved = true` → **validation error if toggled**
-- [ ] Gallery item with `rejected` + `publicUseApproved = true` → **validation error**
+- [ ] Document saves with first gallery slot as placeholder (alt text, no file)
+- [ ] Second gallery item has an uploaded file
 
 ---
 
@@ -137,7 +136,8 @@ URL: `/spain/costa-del-sol-verification/verification-community/verification-gold
 - [ ] Price displays (~€895,000 or guide price)
 - [ ] Hero image renders
 - [ ] Gallery shows **1** approved image
-- [ ] View source / network: no `priceSourceStatus`, `publicVisibility`, or raw `coordinates` in serialized data
+- [ ] View source / network: no `priceSourceStatus`, `publicVisibility`, or listing-level map fields in serialized data
+- [ ] Community taxonomy (`verificationFixture-community-costa-del-sol`) has `coordinates` set; listing page map shows community area
 
 ### Fixture 2 — Privacy development
 
@@ -155,10 +155,8 @@ URL: `/spain/costa-del-sol-verification/verification-community/verification-priv
 URL: `/spain/costa-del-sol-verification/verification-community/verification-media-privacy`
 
 - [ ] Page returns **200**
-- [ ] No hero image rendered (fallback layout / no `<img>` for rejected asset)
-- [ ] Gallery shows **1** image (approved item only)
-- [ ] Restricted/rejected gallery item absent from HTML and JSON-LD
-- [ ] Inspect Sanity CDN URLs in page source — none tagged `verification-do-not-use-hero` or `verification-restricted-gallery`
+- [ ] No hero image rendered (first gallery slot has no uploaded file)
+- [ ] Gallery shows **1** image (placeholder slot omitted from public output)
 
 ---
 
@@ -194,12 +192,21 @@ pnpm --filter sanity migrate:review-items:dry-run -- --dataset development
 SANITY_API_TOKEN=… pnpm --filter sanity migrate:review-items -- --dataset development
 ```
 
-Migrate legacy image rights values:
+Unset legacy media rights / branding governance fields (after schema deploy):
 
 ```bash
-pnpm --filter sanity migrate:image-rights:dry-run -- --dataset development
-SANITY_API_TOKEN=… pnpm --filter sanity migrate:image-rights -- --dataset development
+pnpm --filter sanity migrate:unset-media-rights:dry-run -- --dataset development
+SANITY_API_TOKEN=… pnpm --filter sanity migrate:unset-media-rights -- --dataset development
 ```
+
+Remove obsolete workflow review items (media rights, public-use status, aerial privacy):
+
+```bash
+pnpm --filter sanity migrate:prune-media-privacy-review-items:dry-run -- --dataset development
+SANITY_API_TOKEN=… pnpm --filter sanity migrate:prune-media-privacy-review-items -- --dataset development
+```
+
+Media checklist items should cover gallery order (first image is hero) and alt text only. If intake automation recreates rights/aerial labels, update that pipeline separately.
 
 ---
 
@@ -207,7 +214,7 @@ SANITY_API_TOKEN=… pnpm --filter sanity migrate:image-rights -- --dataset deve
 
 `web/src/lib/sanity/verification/privacy-layers.test.ts` asserts the same three fixtures against:
 
-1. Schema validator functions (`validatePricingFields`, `validateMediaAssetMetadata`)
+1. Schema validator functions (`validatePricingFields`)
 2. Query gate mirror (`passesPublicListingGate`)
 3. Transform pipeline (`toPublicPropertyListing`, `toPublicDevelopment`)
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Migrate legacy imageRightsStatus values to the refreshed enum.
+ * Unset legacy media rights / branding governance fields from all mediaAssetMetadata objects.
  *
  * Usage:
- *   pnpm --filter sanity migrate:image-rights -- --dataset development
- *   pnpm --filter sanity migrate:image-rights -- --dataset development --dry-run
+ *   pnpm --filter sanity migrate:unset-media-rights -- --dataset development
+ *   pnpm --filter sanity migrate:unset-media-rights -- --dataset development --dry-run
  */
 import { createClient, type SanityClient } from '@sanity/client';
 import { readFileSync, existsSync } from 'node:fs';
@@ -23,29 +23,19 @@ const DOCUMENT_TYPES = [
 	'golfCourse'
 ] as const;
 
-const RIGHTS_MAP: Record<string, string> = {
-	assumed_approved: 'source_pack_provided',
-	confirmed_approved: 'approved',
-	needs_review: 'needs_rights_review',
-	restricted: 'rejected',
-	do_not_use: 'rejected'
-};
-
-const MEDIA_PATHS = [
-	'media.heroImage',
-	'media.gallery',
-	'media.floorplans',
-	'media.brochure',
-	'media.thumbnailOverride',
-	'media.galleryGroups',
-	'sharedGallery',
-	'floorplans',
-	'seo.openGraphImage'
+const GOVERNANCE_FIELDS = [
+	'assetBrandingType',
+	'imageRightsStatus',
+	'publicUseApproved',
+	'requiresRebrandOrCrop',
+	'brandingNotes',
+	'imageUsageNotes',
+	'approvedBy',
+	'approvedAt'
 ] as const;
 
 type MediaAsset = {
 	_type?: string;
-	imageRightsStatus?: string;
 	images?: MediaAsset[];
 	[key: string]: unknown;
 };
@@ -56,6 +46,9 @@ type DocumentRecord = {
 	media?: Record<string, unknown>;
 	sharedGallery?: MediaAsset[];
 	floorplans?: MediaAsset[];
+	gallery?: MediaAsset[];
+	unitGallery?: MediaAsset[];
+	floorplan?: MediaAsset;
 	seo?: { openGraphImage?: MediaAsset };
 };
 
@@ -77,31 +70,31 @@ function readSanityCliAuthToken(): string | undefined {
 	}
 }
 
-function mapRightsStatus(status: string | undefined): string | undefined {
-	if (!status) return undefined;
-	return RIGHTS_MAP[status] ?? status;
+function stripGovernanceFields(asset: MediaAsset): { asset: MediaAsset; changed: boolean } {
+	let changed = false;
+	const next = { ...asset };
+
+	for (const field of GOVERNANCE_FIELDS) {
+		if (field in next) {
+			delete next[field];
+			changed = true;
+		}
+	}
+
+	return { asset: next, changed };
 }
 
-function migrateAsset(asset: MediaAsset | null | undefined): {
+function processAsset(asset: MediaAsset | null | undefined): {
 	asset: MediaAsset | null | undefined;
 	changed: boolean;
 } {
 	if (!asset || typeof asset !== 'object') {
 		return { asset, changed: false };
 	}
-
-	const nextStatus = mapRightsStatus(asset.imageRightsStatus);
-	if (!nextStatus || nextStatus === asset.imageRightsStatus) {
-		return { asset, changed: false };
-	}
-
-	return {
-		asset: { ...asset, imageRightsStatus: nextStatus },
-		changed: true
-	};
+	return stripGovernanceFields(asset);
 }
 
-function migrateAssetList(
+function processAssetList(
 	assets: MediaAsset[] | null | undefined
 ): { assets: MediaAsset[] | null | undefined; changed: boolean } {
 	if (!Array.isArray(assets)) {
@@ -110,7 +103,7 @@ function migrateAssetList(
 
 	let changed = false;
 	const next = assets.map((item) => {
-		const result = migrateAsset(item);
+		const result = processAsset(item);
 		if (result.changed) changed = true;
 		return result.asset ?? item;
 	});
@@ -118,7 +111,7 @@ function migrateAssetList(
 	return { assets: next, changed };
 }
 
-function migrateGalleryGroups(
+function processGalleryGroups(
 	groups: Array<{ images?: MediaAsset[]; [key: string]: unknown }> | null | undefined
 ): { groups: typeof groups; changed: boolean } {
 	if (!Array.isArray(groups)) {
@@ -127,7 +120,7 @@ function migrateGalleryGroups(
 
 	let changed = false;
 	const next = groups.map((group) => {
-		const result = migrateAssetList(group.images);
+		const result = processAssetList(group.images);
 		if (result.changed) changed = true;
 		return { ...group, images: result.assets ?? undefined };
 	});
@@ -142,8 +135,8 @@ function migrateDocument(doc: DocumentRecord): { patch: Record<string, unknown>;
 	if (doc.media) {
 		const media = doc.media as Record<string, unknown>;
 
-		for (const key of ['heroImage', 'brochure', 'thumbnailOverride'] as const) {
-			const result = migrateAsset(media[key] as MediaAsset);
+		for (const key of ['brochure', 'thumbnailOverride'] as const) {
+			const result = processAsset(media[key] as MediaAsset);
 			if (result.changed) {
 				patch[`media.${key}`] = result.asset;
 				changed = true;
@@ -151,14 +144,14 @@ function migrateDocument(doc: DocumentRecord): { patch: Record<string, unknown>;
 		}
 
 		for (const key of ['gallery', 'floorplans'] as const) {
-			const result = migrateAssetList(media[key] as MediaAsset[]);
+			const result = processAssetList(media[key] as MediaAsset[]);
 			if (result.changed) {
 				patch[`media.${key}`] = result.assets;
 				changed = true;
 			}
 		}
 
-		const groupsResult = migrateGalleryGroups(
+		const groupsResult = processGalleryGroups(
 			media.galleryGroups as Array<{ images?: MediaAsset[] }> | undefined
 		);
 		if (groupsResult.changed) {
@@ -168,7 +161,7 @@ function migrateDocument(doc: DocumentRecord): { patch: Record<string, unknown>;
 	}
 
 	if (doc.sharedGallery) {
-		const result = migrateAssetList(doc.sharedGallery);
+		const result = processAssetList(doc.sharedGallery);
 		if (result.changed) {
 			patch.sharedGallery = result.assets;
 			changed = true;
@@ -176,15 +169,39 @@ function migrateDocument(doc: DocumentRecord): { patch: Record<string, unknown>;
 	}
 
 	if (doc.floorplans) {
-		const result = migrateAssetList(doc.floorplans);
+		const result = processAssetList(doc.floorplans);
 		if (result.changed) {
 			patch.floorplans = result.assets;
 			changed = true;
 		}
 	}
 
+	if (doc.gallery) {
+		const result = processAssetList(doc.gallery);
+		if (result.changed) {
+			patch.gallery = result.assets;
+			changed = true;
+		}
+	}
+
+	if (doc.unitGallery) {
+		const result = processAssetList(doc.unitGallery);
+		if (result.changed) {
+			patch.unitGallery = result.assets;
+			changed = true;
+		}
+	}
+
+	if (doc.floorplan) {
+		const result = processAsset(doc.floorplan);
+		if (result.changed) {
+			patch.floorplan = result.asset;
+			changed = true;
+		}
+	}
+
 	if (doc.seo?.openGraphImage) {
-		const result = migrateAsset(doc.seo.openGraphImage);
+		const result = processAsset(doc.seo.openGraphImage);
 		if (result.changed) {
 			patch['seo.openGraphImage'] = result.asset;
 			changed = true;
@@ -202,6 +219,9 @@ async function fetchDocuments(client: SanityClient): Promise<DocumentRecord[]> {
 			media,
 			sharedGallery,
 			floorplans,
+			gallery,
+			unitGallery,
+			floorplan,
 			seo{ openGraphImage }
 		}`,
 		{ types: DOCUMENT_TYPES }
@@ -232,7 +252,7 @@ async function main() {
 		if (!changed) continue;
 
 		migratedCount++;
-		console.log(`  ${doc._type} ${doc._id}: updating image rights`);
+		console.log(`  ${doc._type} ${doc._id}: unsetting media governance fields`);
 
 		if (dryRun) continue;
 
@@ -241,7 +261,7 @@ async function main() {
 
 	console.log(
 		migratedCount === 0
-			? 'No documents needed image rights migration.'
+			? 'No documents had media governance fields to unset.'
 			: dryRun
 				? `Dry run: ${migratedCount} document(s) would be updated.`
 				: `Migration complete: ${migratedCount} document(s) updated.`

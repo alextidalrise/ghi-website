@@ -12,7 +12,7 @@ function baseListing(overrides: Partial<PublicPropertyListing> = {}): PublicProp
 			location: { name: 'Costa del Sol', slug: 'costa-del-sol' },
 			community: { name: 'Marbella', slug: 'marbella' },
 			addressDisplay: 'Marbella Golf Resort',
-			map: { level: 'hidden', coordinates: null, label: 'Marbella Golf Resort' }
+			map: { level: 'none', coordinates: null, label: 'Marbella Golf Resort' }
 		},
 		pricing: {
 			price: 1_250_000,
@@ -53,13 +53,13 @@ describe('buildFilteredLocationSeo', () => {
 });
 
 describe('buildRealEstateListingJsonLd', () => {
-	it('includes geo only when map level is exact', () => {
-		const approximate = buildRealEstateListingJsonLd(
+	it('omits geo for community area map (no exact listing coordinates)', () => {
+		const withCommunityMap = buildRealEstateListingJsonLd(
 			baseListing({
 				location: {
 					...baseListing().location!,
 					map: {
-						level: 'approximate',
+						level: 'area_only',
 						coordinates: { lat: 36.5, lng: -4.9 },
 						label: 'Marbella Golf Resort'
 					}
@@ -68,27 +68,14 @@ describe('buildRealEstateListingJsonLd', () => {
 			'https://example.com/spain/costa-del-sol/marbella/test-villa'
 		);
 
-		expect(approximate.geo).toBeUndefined();
+		expect(withCommunityMap.geo).toBeUndefined();
 
-		const exact = buildRealEstateListingJsonLd(
-			baseListing({
-				location: {
-					...baseListing().location!,
-					map: {
-						level: 'exact',
-						coordinates: { lat: 36.510123, lng: -4.885456 },
-						label: 'Marbella Golf Resort'
-					}
-				}
-			}),
+		const withoutMap = buildRealEstateListingJsonLd(
+			baseListing(),
 			'https://example.com/spain/costa-del-sol/marbella/test-villa'
 		);
 
-		expect(exact.geo).toEqual({
-			'@type': 'GeoCoordinates',
-			latitude: 36.510123,
-			longitude: -4.885456
-		});
+		expect(withoutMap.geo).toBeUndefined();
 	});
 
 	it('omits offers when price is unavailable (POA)', () => {
@@ -106,15 +93,15 @@ describe('buildRealEstateListingJsonLd', () => {
 		expect(jsonLd.offers).toBeUndefined();
 	});
 
-	it('omits image when hero asset is not public-safe', () => {
+	it('omits image when gallery has no uploaded file', () => {
 		const jsonLd = buildRealEstateListingJsonLd(
 			baseListing({
 				media: {
-					heroImage: {
-						asset: { _ref: 'image-rejected' },
-						imageRightsStatus: 'rejected',
-						publicUseApproved: true
-					} as MediaAssetInput
+					gallery: [
+						{
+							altText: 'Gallery placeholder without file'
+						} as MediaAssetInput
+					]
 				} as PublicPropertyListing['media']
 			}),
 			'https://example.com/spain/costa-del-sol/marbella/test-villa'
@@ -123,15 +110,15 @@ describe('buildRealEstateListingJsonLd', () => {
 		expect(jsonLd.image).toBeUndefined();
 	});
 
-	it('includes image when hero asset is approved', () => {
+	it('includes image when first gallery item has an uploaded file', () => {
 		const jsonLd = buildRealEstateListingJsonLd(
 			baseListing({
 				media: {
-					heroImage: {
-						asset: { _ref: 'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-2000x3000-jpg' },
-						imageRightsStatus: 'source_pack_provided',
-						assetBrandingType: 'ghi_branded'
-					} as MediaAssetInput
+					gallery: [
+						{
+							asset: { _ref: 'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-2000x3000-jpg' }
+						} as MediaAssetInput
+					]
 				} as PublicPropertyListing['media']
 			}),
 			'https://example.com/spain/costa-del-sol/marbella/test-villa'

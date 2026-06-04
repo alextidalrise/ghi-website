@@ -68,7 +68,6 @@ type GolfInput = {
 
 type ContentInput = {
 	shortDescription?: string | null;
-	heroHeadline?: string | null;
 	aboutDescription?: PortableTextBlock[] | null;
 	locationDescription?: PortableTextBlock[] | null;
 	golfDescription?: PortableTextBlock[] | null;

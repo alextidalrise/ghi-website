@@ -1,5 +1,5 @@
 import { buildPublicImageUrl } from '../image';
-import { filterMediaAsset } from './mediaFilter';
+import { resolveListingHeroImage } from './mediaFilter';
 import { filterPublicPricing, type PublicPricing } from './pricingFilter';
 import { CARD_HERO_IMAGE, toPublicPropertyCard, type PublicPropertyCard, type RawPropertyCard } from './propertyCard';
 
@@ -48,12 +48,8 @@ export function isRawDevelopmentCard(raw: RawSimilarListingItem): raw is RawDeve
 
 /** Map a development card query row to a component-ready payload. */
 export function toPublicDevelopmentCard(raw: RawDevelopmentCard): PublicDevelopmentCard {
-	const heroImageUrl =
-		buildPublicImageUrl(raw.media?.heroImage, CARD_HERO_IMAGE) ??
-		buildPublicImageUrl(raw.media?.thumbnailOverride, CARD_HERO_IMAGE);
-
-	const heroAsset =
-		filterMediaAsset(raw.media?.heroImage) ?? filterMediaAsset(raw.media?.thumbnailOverride);
+	const heroAsset = resolveListingHeroImage(raw.media);
+	const heroImageUrl = buildPublicImageUrl(heroAsset, CARD_HERO_IMAGE);
 
 	return {
 		_id: raw._id,

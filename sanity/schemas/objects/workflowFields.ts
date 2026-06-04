@@ -75,7 +75,8 @@ export const workflowFields = defineType({
 			title: 'Review items',
 			type: 'array',
 			of: [defineArrayMember({ type: 'reviewItem' })],
-			description: "Items flagged for review before this listing can be approved for publishing. Use this instead of the older 'facts needing confirmation' field.",
+			description:
+				"Items flagged for review before this listing can be approved for publishing. Media checks should cover gallery order (first image is hero), and alt text — not image rights, public-use status, or aerial privacy. Use this instead of the older 'facts needing confirmation' field.",
 			components: {
 				input: ReviewItemsInput
 			}

@@ -37,8 +37,6 @@
 			});
 		};
 
-		pushAsset(media.heroImage, 'hero');
-
 		for (const image of media.gallery ?? []) {
 			pushAsset(image, image.asset?._ref ?? `gallery-${collected.length}`);
 		}

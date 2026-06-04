@@ -10,12 +10,6 @@ type PricingValue = {
 	publicVisibility?: string | null;
 };
 
-type MediaAssetValue = {
-	assetBrandingType?: string | null;
-	imageRightsStatus?: string | null;
-	publicUseApproved?: boolean | null;
-};
-
 /** Public price cannot rely on folder_hint_only source status. */
 export function validatePricingFields(value: PricingValue | undefined) {
 	if (!value) return true;
@@ -41,19 +35,6 @@ export function validatePricingFields(value: PricingValue | undefined) {
 	return true;
 }
 
-/** Restricted assets cannot be marked public-use approved. */
-export function validateMediaAssetMetadata(value: MediaAssetValue | undefined) {
-	if (!value) return true;
-
-	const blockedRights = new Set(['restricted', 'do_not_use', 'rejected']);
-
-	if (blockedRights.has(value.imageRightsStatus ?? '') && value.publicUseApproved) {
-		return 'Assets marked rejected (or legacy restricted/do-not-use) cannot be approved for public use.';
-	}
-
-	return true;
-}
-
 /** Commission visibility must remain private/internal for v1. */
 export function validatePrivateReportingFields(value: { commissionVisibility?: string } | undefined) {
 	if (!value) return true;
@@ -69,25 +50,6 @@ export function validatePrivateReportingFields(value: { commissionVisibility?: s
 export function validateFeesTaxVisibility(value: string | undefined) {
 	if (value && value !== 'private_internal') {
 		return 'Fees and tax visibility must remain private/internal for v1.';
-	}
-
-	return true;
-}
-
-/** Map privacy rules for location fields. Country/location refs are auto-derived from community. */
-export function validateLocationFields(
-	value:
-		| {
-				mapPrivacyLevel?: string;
-				mapDisplayApproved?: boolean;
-				coordinates?: { lat?: number; lng?: number };
-		  }
-		| undefined
-) {
-	if (!value) return true;
-
-	if (value.mapPrivacyLevel === 'exact' && value.coordinates && !value.mapDisplayApproved) {
-		return 'Exact map privacy requires map display approval when coordinates are set.';
 	}
 
 	return true;

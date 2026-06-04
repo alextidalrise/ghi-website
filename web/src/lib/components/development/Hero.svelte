@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { buildPublicImageUrl } from '$lib/sanity/image';
 	import type { PublicDevelopment } from '$lib/sanity/transforms';
+	import { resolveDevelopmentHeroImage } from '$lib/sanity/transforms/mediaFilter';
 	import { formatListingPrice } from '$lib/listing/formatPrice';
 	import { formatEnumLabel, shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
 
@@ -10,11 +11,13 @@
 
 	let { development }: Props = $props();
 
-	const heroImage = $derived(development.media?.heroImage ?? development.media?.thumbnailOverride);
+	const heroImage = $derived(
+		resolveDevelopmentHeroImage(development.media, development.sharedGallery)
+	);
 	const heroUrl = $derived(
 		buildPublicImageUrl(heroImage, { width: 1920, height: 900, fit: 'crop', quality: 85 })
 	);
-	const headline = $derived(development.content?.heroHeadline ?? development.title);
+	const headline = $derived(development.title);
 	const overline = $derived(
 		[development.location?.community?.name, development.location?.country?.name]
 			.filter(Boolean)

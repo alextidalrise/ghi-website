@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	validateMediaAssetMetadata,
-	validatePricingFields
-} from '../../../../../sanity/schemas/validators/rules';
+import { validatePricingFields } from '../../../../../sanity/schemas/validators/rules';
 import { formatListingPrice } from '$lib/listing/formatPrice';
 import { passesPublicListingGate } from '$lib/sanity/queries/listingGates';
 import {
@@ -13,6 +10,7 @@ import {
 	schemaViolationExamples
 } from './fixture-payloads';
 import { toPublicDevelopment, toPublicPropertyListing } from '../transforms';
+import { resolveListingHeroImage } from '../transforms/mediaFilter';
 import { MEDIA_ASSET_PUBLIC } from '../allowlists';
 
 describe('privacy layer 1 — schema validation', () => {
@@ -26,15 +24,8 @@ describe('privacy layer 1 — schema validation', () => {
 		expect(validatePricingFields(schemaViolationExamples.reservedVisible)).toMatch(/Reserved items/);
 	});
 
-	it('rejects publicUseApproved on rejected assets', () => {
-		expect(validateMediaAssetMetadata(schemaViolationExamples.restrictedApproved)).toMatch(
-			/rejected/
-		);
-	});
-
-	it('allows golden fixture pricing and media metadata', () => {
+	it('allows golden fixture pricing', () => {
 		expect(validatePricingFields(goldenPropertyRaw.pricing ?? undefined)).toBe(true);
-		expect(validateMediaAssetMetadata(goldenPropertyRaw.media?.heroImage ?? undefined)).toBe(true);
 	});
 
 	it('allows privacy development POA with folder_hint_only (no numeric public price in CMS)', () => {
@@ -88,13 +79,13 @@ describe('privacy layer 2 — query gates (GROQ filter mirror)', () => {
 });
 
 describe('privacy layer 3 — server transforms', () => {
-	it('fixture 1: golden property renders price and approved media', () => {
+	it('fixture 1: golden property renders price and media with uploaded files', () => {
 		const pub = toPublicPropertyListing(goldenPropertyRaw);
 		expect(pub).not.toBeNull();
 		expect(pub!.pricing?.price).toBe(895_000);
 		expect(formatListingPrice(pub!.pricing)).toContain('895');
-		expect(pub!.media?.heroImage).not.toBeNull();
-		expect(pub!.media?.gallery).toHaveLength(1);
+		expect(resolveListingHeroImage(pub!.media)).not.toBeNull();
+		expect(pub!.media?.gallery).toHaveLength(2);
 	});
 
 	it('fixture 2: strips folder_hint_only prices and hides reserved unit', () => {
@@ -111,12 +102,11 @@ describe('privacy layer 3 — server transforms', () => {
 		expect(pub!.units.some((u) => u.unitName?.includes('reserved'))).toBe(false);
 	});
 
-	it('fixture 3: removes do_not_use hero and restricted gallery items', () => {
+	it('fixture 3: skips gallery slots without files and resolves hero from first public image', () => {
 		const pub = toPublicPropertyListing(mediaPrivacyPropertyRaw);
 		expect(pub).not.toBeNull();
-		expect(pub!.media?.heroImage).toBeNull();
 		expect(pub!.media?.gallery).toHaveLength(1);
-		expect(pub!.media?.gallery[0]?.altText).toContain('Approved');
+		expect(resolveListingHeroImage(pub!.media)?.altText).toContain('Gallery');
 	});
 
 	it('MEDIA_ASSET_PUBLIC allowlist excludes private media provenance fields', () => {

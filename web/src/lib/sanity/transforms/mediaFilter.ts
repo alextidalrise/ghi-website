@@ -5,60 +5,35 @@ export type MediaAssetInput = {
 	order?: number | null;
 	altText?: string | null;
 	caption?: string | null;
-	assetBrandingType?: string | null;
-	imageRightsStatus?: string | null;
-	publicUseApproved?: boolean | null;
 };
 
-const BLOCKED_RIGHTS = new Set(['restricted', 'do_not_use', 'rejected']);
-
-const GHI_BRANDED = new Set(['ghi_branded', 'unbranded']);
-
-/** Whether an asset may be used in public output (query + transform gate). */
+/** Whether an asset may be used in public output (has an uploaded file). */
 export function isPublicMediaAsset(asset: MediaAssetInput | null | undefined): boolean {
-	if (!asset?.asset && !asset?.fileAsset) {
-		return false;
-	}
-
-	const rights = asset.imageRightsStatus ?? 'source_pack_provided';
-	if (BLOCKED_RIGHTS.has(rights)) {
-		return false;
-	}
-
-	const branding = asset.assetBrandingType ?? 'unknown';
-	if (!GHI_BRANDED.has(branding) && !asset.publicUseApproved) {
-		return false;
-	}
-
-	return true;
+	return Boolean(asset?.asset || asset?.fileAsset);
 }
 
-/** Strip blocked assets and private governance fields from a single media item. */
+/** Return a media item for public output, or null when no file is attached. */
 export function filterMediaAsset<T extends MediaAssetInput>(
 	asset: T | null | undefined
-): Omit<T, 'imageRightsStatus' | 'publicUseApproved' | 'assetBrandingType'> | null {
+): T | null {
 	if (!isPublicMediaAsset(asset) || !asset) {
 		return null;
 	}
 
-	const { imageRightsStatus: _rights, publicUseApproved: _approved, assetBrandingType: _branding, ...publicAsset } =
-		asset;
-
-	return publicAsset;
+	return asset;
 }
 
 export function filterMediaAssetList<T extends MediaAssetInput>(
 	assets: T[] | null | undefined
-): Array<Omit<T, 'imageRightsStatus' | 'publicUseApproved' | 'assetBrandingType'>> {
+): T[] {
 	if (!Array.isArray(assets)) {
 		return [];
 	}
 
-	return assets.map((item) => filterMediaAsset(item)).filter((item): item is NonNullable<typeof item> => item != null);
+	return assets.map((item) => filterMediaAsset(item)).filter((item): item is T => item != null);
 }
 
 export type MediaBundleInput = {
-	heroImage?: MediaAssetInput | null;
 	gallery?: MediaAssetInput[] | null;
 	galleryGroups?: Array<{ title?: string; images?: MediaAssetInput[] | null }> | null;
 	thumbnailOverride?: MediaAssetInput | null;
@@ -70,7 +45,6 @@ export type MediaBundleInput = {
 };
 
 export type PublicMediaBundle = {
-	heroImage: ReturnType<typeof filterMediaAsset> | null;
 	gallery: ReturnType<typeof filterMediaAssetList>;
 	galleryGroups: Array<{ title?: string; images: ReturnType<typeof filterMediaAssetList> }>;
 	thumbnailOverride: ReturnType<typeof filterMediaAsset> | null;
@@ -80,6 +54,25 @@ export type PublicMediaBundle = {
 	brochure: ReturnType<typeof filterMediaAsset> | null;
 	brochureVisibility: string | null;
 };
+
+/** First public gallery image, then thumbnail override — used for hero, cards, and OG fallbacks. */
+export function resolveListingHeroImage(
+	media: MediaBundleInput | null | undefined
+): ReturnType<typeof filterMediaAsset> | null {
+	const gallery = filterMediaAssetList(media?.gallery);
+	return gallery[0] ?? filterMediaAsset(media?.thumbnailOverride) ?? null;
+}
+
+/** Development hero — shared gallery images precede media.gallery (same order as the gallery UI). */
+export function resolveDevelopmentHeroImage(
+	media: MediaBundleInput | null | undefined,
+	sharedGallery: MediaAssetInput[] | null | undefined
+): ReturnType<typeof filterMediaAsset> | null {
+	return resolveListingHeroImage({
+		gallery: [...filterMediaAssetList(sharedGallery), ...filterMediaAssetList(media?.gallery)],
+		thumbnailOverride: media?.thumbnailOverride
+	});
+}
 
 /** Filter an entire mediaFields object for public rendering. */
 export function filterMediaBundle(media: MediaBundleInput | null | undefined): PublicMediaBundle | null {
@@ -92,7 +85,6 @@ export function filterMediaBundle(media: MediaBundleInput | null | undefined): P
 		brochureVisibility === 'public_approved' && isPublicMediaAsset(media.brochure ?? undefined);
 
 	return {
-		heroImage: filterMediaAsset(media.heroImage),
 		gallery: filterMediaAssetList(media.gallery),
 		galleryGroups: (media.galleryGroups ?? []).map((group) => ({
 			title: group.title,

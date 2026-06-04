@@ -194,7 +194,6 @@ export type RelatedContentFields = {
 
 export type MediaFields = {
   _type: "mediaFields";
-  heroImage?: MediaAssetMetadata;
   gallery?: Array<
     {
       _key: string;
@@ -285,7 +284,6 @@ export type MarketingFields = {
 export type ContentFields = {
   _type: "contentFields";
   shortDescription: string;
-  heroHeadline?: string;
   aboutDescription?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -402,8 +400,6 @@ export type SpecsFields = {
   exteriorArea?: number;
   gardenArea?: number;
   levels?: number;
-  parkingSpaces?: number;
-  garageSpaces?: number;
   pool?: "private" | "communal" | "none" | "unknown";
   garden?: "private" | "communal" | "none" | "unknown";
   orientation?:
@@ -484,18 +480,6 @@ export type LocationFields = {
   community: LocationTaxonomyReference;
   addressDisplay: string;
   exactAddressInternal?: string;
-  coordinates?: Geopoint;
-  coordinateSource?:
-    | "source_brochure"
-    | "agent_supplied"
-    | "manually_geocoded"
-    | "estimated"
-    | "unknown";
-  mapPrivacyLevel: "exact" | "approximate" | "area_only" | "hidden";
-  mapDisplayApproved?: boolean;
-  mapDisplayApprovedBy?: string;
-  mapDisplayApprovedAt?: string;
-  publicMapNotes?: string;
 };
 
 export type Slug = {
@@ -573,28 +557,9 @@ export type MediaAssetMetadata = {
   order?: number;
   altText?: string;
   caption?: string;
-  assetBrandingType?:
-    | "ghi_branded"
-    | "developer_branded"
-    | "agency_branded"
-    | "third_party_branded"
-    | "unbranded"
-    | "unknown";
-  imageRightsStatus:
-    | "source_pack_provided"
-    | "specific_concern"
-    | "needs_rights_review"
-    | "approved"
-    | "rejected";
-  publicUseApproved?: boolean;
-  requiresRebrandOrCrop?: boolean;
-  brandingNotes?: string;
-  imageUsageNotes?: string;
   sourceDriveFileId?: string;
   sourceMediaFolderUrl?: string;
   sourceFileName?: string;
-  approvedBy?: string;
-  approvedAt?: string;
 };
 
 export type UnitType = {
@@ -809,7 +774,7 @@ export type LocationTaxonomy = {
   seoTitle?: string;
   metaDescription?: string;
   publicDescription?: string;
-  mapPrivacyDefault?: "exact" | "approximate" | "area_only" | "hidden";
+  coordinates?: Geopoint;
   featuredListings?: Array<
     {
       _key: string;
@@ -1058,7 +1023,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../web/src/lib/sanity/queries/development.ts
 // Variable: developmentByPathPreviewQuery
-// Query: *[    _type == "development"    &&   coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug  && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug  && location.community->slug.current == $communitySlug  && slug.current == $slug  ][0]{  _id,  _type,  ghiListingId,  developmentName,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  buildStatus,  completionDate,  completionStatus,  developerName,  architectureStudio,  developmentComposition,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  addressDisplay,  mapPrivacyLevel,  mapDisplayApproved,  coordinates},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  availabilitySummary,  sharedAmenities[]{    label,    value,    category,    isFilterable,    isHighlighted  },  sharedGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  media{  heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  brochureVisibility},  brochureVisibility,  content{  shortDescription,  heroHeadline,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},  unitTypes[]->{  _id,  unitTypeName,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}},  units[]->{  _id,  unitName,  unitNumber,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplan{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  unitGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}}}
+// Query: *[    _type == "development"    &&   coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug  && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug  && location.community->slug.current == $communitySlug  && slug.current == $slug  ][0]{  _id,  _type,  ghiListingId,  developmentName,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  buildStatus,  completionDate,  completionStatus,  developerName,  architectureStudio,  developmentComposition,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  addressDisplay},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  availabilitySummary,  sharedAmenities[]{    label,    value,    category,    isFilterable,    isHighlighted  },  sharedGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  media{  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  brochureVisibility},  brochureVisibility,  content{  shortDescription,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},  unitTypes[]->{  _id,  unitTypeName,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}},  units[]->{  _id,  unitName,  unitNumber,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplan{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  unitGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}}}
 export type DevelopmentByPathPreviewQueryResult = {
   _id: string;
   _type: "development";
@@ -1105,6 +1070,7 @@ export type DevelopmentByPathPreviewQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     location: {
       _id: string;
@@ -1115,6 +1081,7 @@ export type DevelopmentByPathPreviewQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     community: {
       _id: string;
@@ -1125,11 +1092,9 @@ export type DevelopmentByPathPreviewQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     };
     addressDisplay: string;
-    mapPrivacyLevel: "approximate" | "area_only" | "exact" | "hidden";
-    mapDisplayApproved: boolean | null;
-    coordinates: Geopoint | null;
   } | null;
   pricing: {
     price: number | null;
@@ -1217,67 +1182,8 @@ export type DevelopmentByPathPreviewQueryResult = {
     order: number | null;
     altText: string | null;
     caption: string | null;
-    assetBrandingType:
-      | "agency_branded"
-      | "developer_branded"
-      | "ghi_branded"
-      | "third_party_branded"
-      | "unbranded"
-      | "unknown"
-      | null;
-    imageRightsStatus:
-      | "approved"
-      | "needs_rights_review"
-      | "rejected"
-      | "source_pack_provided"
-      | "specific_concern";
-    publicUseApproved: boolean | null;
   }> | null;
   media: {
-    heroImage: {
-      asset: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        alt?: string;
-        _type: "image";
-      } | null;
-      fileAsset: {
-        asset?: SanityFileAssetReference;
-        media?: unknown;
-        _type: "file";
-      } | null;
-      assetCategory:
-        | "brochure"
-        | "floorplan"
-        | "gallery"
-        | "hero"
-        | "lifestyle"
-        | "location"
-        | "render"
-        | "source_document"
-        | "video"
-        | null;
-      order: number | null;
-      altText: string | null;
-      caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
     gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
@@ -1306,21 +1212,6 @@ export type DevelopmentByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
       title: string;
@@ -1352,21 +1243,6 @@ export type DevelopmentByPathPreviewQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
       }> | null;
     }> | null;
     thumbnailOverride: {
@@ -1397,21 +1273,6 @@ export type DevelopmentByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
       asset: {
@@ -1441,21 +1302,6 @@ export type DevelopmentByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
     virtualTourUrl: string | null;
@@ -1487,21 +1333,6 @@ export type DevelopmentByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
       | "disabled"
@@ -1518,7 +1349,6 @@ export type DevelopmentByPathPreviewQueryResult = {
     | null;
   content: {
     shortDescription: string;
-    heroHeadline: string | null;
     aboutDescription: Array<{
       children?: Array<{
         marks?: Array<string>;
@@ -1664,21 +1494,6 @@ export type DevelopmentByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
     schemaType:
@@ -1772,21 +1587,6 @@ export type DevelopmentByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     gallery: Array<{
       asset: {
@@ -1816,21 +1616,6 @@ export type DevelopmentByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
   }> | null;
   units: Array<{
@@ -1912,21 +1697,6 @@ export type DevelopmentByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     unitGallery: Array<{
       asset: {
@@ -1956,28 +1726,13 @@ export type DevelopmentByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
   }> | null;
 } | null;
 
 // Source: ../web/src/lib/sanity/queries/development.ts
 // Variable: developmentByPathQuery
-// Query: *[    _type == "development"    &&   coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug  && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug  && location.community->slug.current == $communitySlug  && slug.current == $slug    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ][0]{  _id,  _type,  ghiListingId,  developmentName,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  buildStatus,  completionDate,  completionStatus,  developerName,  architectureStudio,  developmentComposition,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  addressDisplay,  mapPrivacyLevel,  mapDisplayApproved,  coordinates},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  availabilitySummary,  sharedAmenities[]{    label,    value,    category,    isFilterable,    isHighlighted  },  sharedGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  media{  heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  brochureVisibility},  brochureVisibility,  content{  shortDescription,  heroHeadline,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},  unitTypes[]->{  _id,  unitTypeName,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}},  units[]->{  _id,  unitName,  unitNumber,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplan{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  unitGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}}}
+// Query: *[    _type == "development"    &&   coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug  && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug  && location.community->slug.current == $communitySlug  && slug.current == $slug    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ][0]{  _id,  _type,  ghiListingId,  developmentName,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  buildStatus,  completionDate,  completionStatus,  developerName,  architectureStudio,  developmentComposition,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  addressDisplay},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  availabilitySummary,  sharedAmenities[]{    label,    value,    category,    isFilterable,    isHighlighted  },  sharedGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  media{  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  brochureVisibility},  brochureVisibility,  content{  shortDescription,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},  unitTypes[]->{  _id,  unitTypeName,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}},  units[]->{  _id,  unitName,  unitNumber,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplan{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  unitGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}}}
 export type DevelopmentByPathQueryResult = {
   _id: string;
   _type: "development";
@@ -2024,6 +1779,7 @@ export type DevelopmentByPathQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     location: {
       _id: string;
@@ -2034,6 +1790,7 @@ export type DevelopmentByPathQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     community: {
       _id: string;
@@ -2044,11 +1801,9 @@ export type DevelopmentByPathQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     };
     addressDisplay: string;
-    mapPrivacyLevel: "approximate" | "area_only" | "exact" | "hidden";
-    mapDisplayApproved: boolean | null;
-    coordinates: Geopoint | null;
   } | null;
   pricing: {
     price: number | null;
@@ -2136,67 +1891,8 @@ export type DevelopmentByPathQueryResult = {
     order: number | null;
     altText: string | null;
     caption: string | null;
-    assetBrandingType:
-      | "agency_branded"
-      | "developer_branded"
-      | "ghi_branded"
-      | "third_party_branded"
-      | "unbranded"
-      | "unknown"
-      | null;
-    imageRightsStatus:
-      | "approved"
-      | "needs_rights_review"
-      | "rejected"
-      | "source_pack_provided"
-      | "specific_concern";
-    publicUseApproved: boolean | null;
   }> | null;
   media: {
-    heroImage: {
-      asset: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        alt?: string;
-        _type: "image";
-      } | null;
-      fileAsset: {
-        asset?: SanityFileAssetReference;
-        media?: unknown;
-        _type: "file";
-      } | null;
-      assetCategory:
-        | "brochure"
-        | "floorplan"
-        | "gallery"
-        | "hero"
-        | "lifestyle"
-        | "location"
-        | "render"
-        | "source_document"
-        | "video"
-        | null;
-      order: number | null;
-      altText: string | null;
-      caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
     gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
@@ -2225,21 +1921,6 @@ export type DevelopmentByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
       title: string;
@@ -2271,21 +1952,6 @@ export type DevelopmentByPathQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
       }> | null;
     }> | null;
     thumbnailOverride: {
@@ -2316,21 +1982,6 @@ export type DevelopmentByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
       asset: {
@@ -2360,21 +2011,6 @@ export type DevelopmentByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
     virtualTourUrl: string | null;
@@ -2406,21 +2042,6 @@ export type DevelopmentByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
       | "disabled"
@@ -2437,7 +2058,6 @@ export type DevelopmentByPathQueryResult = {
     | null;
   content: {
     shortDescription: string;
-    heroHeadline: string | null;
     aboutDescription: Array<{
       children?: Array<{
         marks?: Array<string>;
@@ -2583,21 +2203,6 @@ export type DevelopmentByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
     schemaType:
@@ -2691,21 +2296,6 @@ export type DevelopmentByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     gallery: Array<{
       asset: {
@@ -2735,21 +2325,6 @@ export type DevelopmentByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
   }> | null;
   units: Array<{
@@ -2831,21 +2406,6 @@ export type DevelopmentByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     unitGallery: Array<{
       asset: {
@@ -2875,21 +2435,6 @@ export type DevelopmentByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
   }> | null;
 } | null;
@@ -2907,7 +2452,7 @@ export type DevelopmentCanonicalPathQueryResult = {
 
 // Source: ../web/src/lib/sanity/queries/development.ts
 // Variable: developmentByGhiIdQuery
-// Query: *[    _type == "development"    && ghiListingId == $ghiId    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ][0]{  _id,  _type,  ghiListingId,  developmentName,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  buildStatus,  completionDate,  completionStatus,  developerName,  architectureStudio,  developmentComposition,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  addressDisplay,  mapPrivacyLevel,  mapDisplayApproved,  coordinates},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  availabilitySummary,  sharedAmenities[]{    label,    value,    category,    isFilterable,    isHighlighted  },  sharedGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  media{  heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  brochureVisibility},  brochureVisibility,  content{  shortDescription,  heroHeadline,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},  unitTypes[]->{  _id,  unitTypeName,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}},  units[]->{  _id,  unitName,  unitNumber,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplan{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  unitGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}},    "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),  "communitySlug": location.community->slug.current,  "slug": slug.current,  listingKind}
+// Query: *[    _type == "development"    && ghiListingId == $ghiId    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ][0]{  _id,  _type,  ghiListingId,  developmentName,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  buildStatus,  completionDate,  completionStatus,  developerName,  architectureStudio,  developmentComposition,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  addressDisplay},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  availabilitySummary,  sharedAmenities[]{    label,    value,    category,    isFilterable,    isHighlighted  },  sharedGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  media{  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  brochureVisibility},  brochureVisibility,  content{  shortDescription,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},  unitTypes[]->{  _id,  unitTypeName,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}},  units[]->{  _id,  unitName,  unitNumber,  listingKind,  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  floorplan{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  unitGallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}},    "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),  "communitySlug": location.community->slug.current,  "slug": slug.current,  listingKind}
 export type DevelopmentByGhiIdQueryResult = {
   _id: string;
   _type: "development";
@@ -2954,6 +2499,7 @@ export type DevelopmentByGhiIdQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     location: {
       _id: string;
@@ -2964,6 +2510,7 @@ export type DevelopmentByGhiIdQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     community: {
       _id: string;
@@ -2974,11 +2521,9 @@ export type DevelopmentByGhiIdQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     };
     addressDisplay: string;
-    mapPrivacyLevel: "approximate" | "area_only" | "exact" | "hidden";
-    mapDisplayApproved: boolean | null;
-    coordinates: Geopoint | null;
   } | null;
   pricing: {
     price: number | null;
@@ -3066,67 +2611,8 @@ export type DevelopmentByGhiIdQueryResult = {
     order: number | null;
     altText: string | null;
     caption: string | null;
-    assetBrandingType:
-      | "agency_branded"
-      | "developer_branded"
-      | "ghi_branded"
-      | "third_party_branded"
-      | "unbranded"
-      | "unknown"
-      | null;
-    imageRightsStatus:
-      | "approved"
-      | "needs_rights_review"
-      | "rejected"
-      | "source_pack_provided"
-      | "specific_concern";
-    publicUseApproved: boolean | null;
   }> | null;
   media: {
-    heroImage: {
-      asset: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        alt?: string;
-        _type: "image";
-      } | null;
-      fileAsset: {
-        asset?: SanityFileAssetReference;
-        media?: unknown;
-        _type: "file";
-      } | null;
-      assetCategory:
-        | "brochure"
-        | "floorplan"
-        | "gallery"
-        | "hero"
-        | "lifestyle"
-        | "location"
-        | "render"
-        | "source_document"
-        | "video"
-        | null;
-      order: number | null;
-      altText: string | null;
-      caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
     gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
@@ -3155,21 +2641,6 @@ export type DevelopmentByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
       title: string;
@@ -3201,21 +2672,6 @@ export type DevelopmentByGhiIdQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
       }> | null;
     }> | null;
     thumbnailOverride: {
@@ -3246,21 +2702,6 @@ export type DevelopmentByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
       asset: {
@@ -3290,21 +2731,6 @@ export type DevelopmentByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
     virtualTourUrl: string | null;
@@ -3336,21 +2762,6 @@ export type DevelopmentByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
       | "disabled"
@@ -3367,7 +2778,6 @@ export type DevelopmentByGhiIdQueryResult = {
     | null;
   content: {
     shortDescription: string;
-    heroHeadline: string | null;
     aboutDescription: Array<{
       children?: Array<{
         marks?: Array<string>;
@@ -3513,21 +2923,6 @@ export type DevelopmentByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
     schemaType:
@@ -3621,21 +3016,6 @@ export type DevelopmentByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     gallery: Array<{
       asset: {
@@ -3665,21 +3045,6 @@ export type DevelopmentByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
   }> | null;
   units: Array<{
@@ -3761,21 +3126,6 @@ export type DevelopmentByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     unitGallery: Array<{
       asset: {
@@ -3805,21 +3155,6 @@ export type DevelopmentByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
   }> | null;
   countrySlug: string | null;
@@ -3840,7 +3175,7 @@ export type DevelopmentStalePathQueryResult = Array<{
 
 // Source: ../web/src/lib/sanity/queries/featured.ts
 // Variable: homepageFeaturedListingsQuery
-// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{    "cards": homepageFeaturedListings[]->[        _type == "propertyListing"  && listingKind in ["property", "unit"]  &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"    ]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  }}  }
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{    "cards": homepageFeaturedListings[]->[        _type == "propertyListing"  && listingKind in ["property", "unit"]  &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"    ]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  }}  }
 export type HomepageFeaturedListingsQueryResult = {
   cards: Array<{
     _id: string;
@@ -3924,7 +3259,7 @@ export type HomepageFeaturedListingsQueryResult = {
       builtAreaUnit: "sqft" | "sqm" | null;
     } | null;
     media: {
-      heroImage: {
+      gallery: Array<{
         asset: {
           asset?: SanityImageAssetReference;
           media?: unknown;
@@ -3952,22 +3287,7 @@ export type HomepageFeaturedListingsQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
-      } | null;
+      }> | null;
       thumbnailOverride: {
         asset: {
           asset?: SanityImageAssetReference;
@@ -3996,21 +3316,6 @@ export type HomepageFeaturedListingsQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
       } | null;
     } | null;
   }> | null;
@@ -4018,7 +3323,7 @@ export type HomepageFeaturedListingsQueryResult = {
 
 // Source: ../web/src/lib/sanity/queries/featured.ts
 // Variable: countryFeaturedListingsQuery
-// Query: *[    _type == "locationTaxonomy"    && type == "country"    && slug.current == $countrySlug  ][0]{    "cards": featuredListings[]->[        _type == "propertyListing"  && listingKind in ["property", "unit"]  &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"    ]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  }}  }
+// Query: *[    _type == "locationTaxonomy"    && type == "country"    && slug.current == $countrySlug  ][0]{    "cards": featuredListings[]->[        _type == "propertyListing"  && listingKind in ["property", "unit"]  &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"    ]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  }}  }
 export type CountryFeaturedListingsQueryResult = {
   cards: Array<{
     _id: string;
@@ -4102,7 +3407,7 @@ export type CountryFeaturedListingsQueryResult = {
       builtAreaUnit: "sqft" | "sqm" | null;
     } | null;
     media: {
-      heroImage: {
+      gallery: Array<{
         asset: {
           asset?: SanityImageAssetReference;
           media?: unknown;
@@ -4130,22 +3435,7 @@ export type CountryFeaturedListingsQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
-      } | null;
+      }> | null;
       thumbnailOverride: {
         asset: {
           asset?: SanityImageAssetReference;
@@ -4174,21 +3464,6 @@ export type CountryFeaturedListingsQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
       } | null;
     } | null;
   }> | null;
@@ -4238,7 +3513,7 @@ export type ListingLegacyThreeSegmentPathQueryResult = Array<
 
 // Source: ../web/src/lib/sanity/queries/location.ts
 // Variable: countryBySlugQuery
-// Query: *[    _type == "locationTaxonomy"    && type == "country"    && slug.current == $countrySlug  ][0]{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription}
+// Query: *[    _type == "locationTaxonomy"    && type == "country"    && slug.current == $countrySlug  ][0]{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates}
 export type CountryBySlugQueryResult = {
   _id: string;
   name: string;
@@ -4248,11 +3523,12 @@ export type CountryBySlugQueryResult = {
   seoTitle: string | null;
   metaDescription: string | null;
   publicDescription: string | null;
+  coordinates: Geopoint | null;
 } | null;
 
 // Source: ../web/src/lib/sanity/queries/location.ts
 // Variable: locationBySlugQuery
-// Query: *[    _type == "locationTaxonomy"    && type == "location"    && slug.current == $locationSlug    && parent->slug.current == $countrySlug  ][0]{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription}
+// Query: *[    _type == "locationTaxonomy"    && type == "location"    && slug.current == $locationSlug    && parent->slug.current == $countrySlug  ][0]{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates}
 export type LocationBySlugQueryResult = {
   _id: string;
   name: string;
@@ -4262,6 +3538,7 @@ export type LocationBySlugQueryResult = {
   seoTitle: string | null;
   metaDescription: string | null;
   publicDescription: string | null;
+  coordinates: Geopoint | null;
 } | null;
 
 // Source: ../web/src/lib/sanity/queries/location.ts
@@ -4290,7 +3567,7 @@ export type LocationPageContextQueryResult = {
 
 // Source: ../web/src/lib/sanity/queries/location.ts
 // Variable: communityInLocationContextQuery
-// Query: *[    _type == "locationTaxonomy"    && type == "community"    && slug.current == $communitySlug    && (      parent._ref == $locationId      || $locationId in associatedLocations[]._ref    )  ][0]{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription}
+// Query: *[    _type == "locationTaxonomy"    && type == "community"    && slug.current == $communitySlug    && (      parent._ref == $locationId      || $locationId in associatedLocations[]._ref    )  ][0]{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates}
 export type CommunityInLocationContextQueryResult = {
   _id: string;
   name: string;
@@ -4300,6 +3577,7 @@ export type CommunityInLocationContextQueryResult = {
   seoTitle: string | null;
   metaDescription: string | null;
   publicDescription: string | null;
+  coordinates: Geopoint | null;
 } | null;
 
 // Source: ../web/src/lib/sanity/queries/location.ts
@@ -4313,7 +3591,7 @@ export type CountriesForNavQueryResult = Array<{
 
 // Source: ../web/src/lib/sanity/queries/location.ts
 // Variable: locationsByCountryQuery
-// Query: *[    _type == "locationTaxonomy"    && type == "location"    && parent->slug.current == $countrySlug  ] | order(name asc){  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription}
+// Query: *[    _type == "locationTaxonomy"    && type == "location"    && parent->slug.current == $countrySlug  ] | order(name asc){  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates}
 export type LocationsByCountryQueryResult = Array<{
   _id: string;
   name: string;
@@ -4323,6 +3601,7 @@ export type LocationsByCountryQueryResult = Array<{
   seoTitle: string | null;
   metaDescription: string | null;
   publicDescription: string | null;
+  coordinates: Geopoint | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries/location.ts
@@ -4354,7 +3633,7 @@ export type CommunitiesForNavQueryResult = Array<{
 
 // Source: ../web/src/lib/sanity/queries/location.ts
 // Variable: locationBreadcrumbQuery
-// Query: *[_id == $taxonomyId][0]{    "chain": [      ...*[_id == ^._id][0].parent->parent->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},      ...*[_id == ^._id][0].parent->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},      {  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription}    ][defined(name)]  }
+// Query: *[_id == $taxonomyId][0]{    "chain": [      ...*[_id == ^._id][0].parent->parent->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},      ...*[_id == ^._id][0].parent->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},      {  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates}    ][defined(name)]  }
 export type LocationBreadcrumbQueryResult =
   | {
       chain: Array<never>;
@@ -4369,6 +3648,7 @@ export type LocationBreadcrumbQueryResult =
         seoTitle: null;
         metaDescription: null;
         publicDescription: null;
+        coordinates: Geopoint | null;
       }>;
     }
   | {
@@ -4381,13 +3661,14 @@ export type LocationBreadcrumbQueryResult =
         seoTitle: string | null;
         metaDescription: string | null;
         publicDescription: string | null;
+        coordinates: Geopoint | null;
       }>;
     }
   | null;
 
 // Source: ../web/src/lib/sanity/queries/propertyListing.ts
 // Variable: propertyByPathPreviewQuery
-// Query: *[    _type == "propertyListing"    && listingKind in ["property", "unit"]    &&   coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug  && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug  && location.community->slug.current == $communitySlug  && slug.current == $slug  ][0]{  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  addressDisplay,  mapPrivacyLevel,  mapDisplayApproved,  coordinates},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  content{  shortDescription,  heroHeadline,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  media{  heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  brochureVisibility},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles}}
+// Query: *[    _type == "propertyListing"    && listingKind in ["property", "unit"]    &&   coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug  && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug  && location.community->slug.current == $communitySlug  && slug.current == $slug  ][0]{  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  addressDisplay},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  content{  shortDescription,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  media{  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  brochureVisibility},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles}}
 export type PropertyByPathPreviewQueryResult = {
   _id: string;
   _type: "propertyListing";
@@ -4414,6 +3695,7 @@ export type PropertyByPathPreviewQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     location: {
       _id: string;
@@ -4424,6 +3706,7 @@ export type PropertyByPathPreviewQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     community: {
       _id: string;
@@ -4434,11 +3717,9 @@ export type PropertyByPathPreviewQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     };
     addressDisplay: string;
-    mapPrivacyLevel: "approximate" | "area_only" | "exact" | "hidden";
-    mapDisplayApproved: boolean | null;
-    coordinates: Geopoint | null;
   } | null;
   pricing: {
     price: number | null;
@@ -4510,7 +3791,6 @@ export type PropertyByPathPreviewQueryResult = {
   } | null;
   content: {
     shortDescription: string;
-    heroHeadline: string | null;
     aboutDescription: Array<{
       children?: Array<{
         marks?: Array<string>;
@@ -4585,50 +3865,6 @@ export type PropertyByPathPreviewQueryResult = {
     amenities: Array<string> | null;
   } | null;
   media: {
-    heroImage: {
-      asset: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        alt?: string;
-        _type: "image";
-      } | null;
-      fileAsset: {
-        asset?: SanityFileAssetReference;
-        media?: unknown;
-        _type: "file";
-      } | null;
-      assetCategory:
-        | "brochure"
-        | "floorplan"
-        | "gallery"
-        | "hero"
-        | "lifestyle"
-        | "location"
-        | "render"
-        | "source_document"
-        | "video"
-        | null;
-      order: number | null;
-      altText: string | null;
-      caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
     gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
@@ -4657,21 +3893,6 @@ export type PropertyByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
       title: string;
@@ -4703,21 +3924,6 @@ export type PropertyByPathPreviewQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
       }> | null;
     }> | null;
     thumbnailOverride: {
@@ -4748,21 +3954,6 @@ export type PropertyByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
       asset: {
@@ -4792,21 +3983,6 @@ export type PropertyByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
     virtualTourUrl: string | null;
@@ -4838,21 +4014,6 @@ export type PropertyByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
       | "disabled"
@@ -4906,21 +4067,6 @@ export type PropertyByPathPreviewQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
     schemaType:
@@ -4940,7 +4086,7 @@ export type PropertyByPathPreviewQueryResult = {
 
 // Source: ../web/src/lib/sanity/queries/propertyListing.ts
 // Variable: propertyByPathQuery
-// Query: *[    _type == "propertyListing"    && listingKind in ["property", "unit"]    &&   coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug  && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug  && location.community->slug.current == $communitySlug  && slug.current == $slug    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ][0]{  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  addressDisplay,  mapPrivacyLevel,  mapDisplayApproved,  coordinates},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  content{  shortDescription,  heroHeadline,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  media{  heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  brochureVisibility},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles}}
+// Query: *[    _type == "propertyListing"    && listingKind in ["property", "unit"]    &&   coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug  && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug  && location.community->slug.current == $communitySlug  && slug.current == $slug    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ][0]{  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  addressDisplay},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  content{  shortDescription,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  media{  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  brochureVisibility},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles}}
 export type PropertyByPathQueryResult = {
   _id: string;
   _type: "propertyListing";
@@ -4967,6 +4113,7 @@ export type PropertyByPathQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     location: {
       _id: string;
@@ -4977,6 +4124,7 @@ export type PropertyByPathQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     community: {
       _id: string;
@@ -4987,11 +4135,9 @@ export type PropertyByPathQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     };
     addressDisplay: string;
-    mapPrivacyLevel: "approximate" | "area_only" | "exact" | "hidden";
-    mapDisplayApproved: boolean | null;
-    coordinates: Geopoint | null;
   } | null;
   pricing: {
     price: number | null;
@@ -5063,7 +4209,6 @@ export type PropertyByPathQueryResult = {
   } | null;
   content: {
     shortDescription: string;
-    heroHeadline: string | null;
     aboutDescription: Array<{
       children?: Array<{
         marks?: Array<string>;
@@ -5138,50 +4283,6 @@ export type PropertyByPathQueryResult = {
     amenities: Array<string> | null;
   } | null;
   media: {
-    heroImage: {
-      asset: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        alt?: string;
-        _type: "image";
-      } | null;
-      fileAsset: {
-        asset?: SanityFileAssetReference;
-        media?: unknown;
-        _type: "file";
-      } | null;
-      assetCategory:
-        | "brochure"
-        | "floorplan"
-        | "gallery"
-        | "hero"
-        | "lifestyle"
-        | "location"
-        | "render"
-        | "source_document"
-        | "video"
-        | null;
-      order: number | null;
-      altText: string | null;
-      caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
     gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
@@ -5210,21 +4311,6 @@ export type PropertyByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
       title: string;
@@ -5256,21 +4342,6 @@ export type PropertyByPathQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
       }> | null;
     }> | null;
     thumbnailOverride: {
@@ -5301,21 +4372,6 @@ export type PropertyByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
       asset: {
@@ -5345,21 +4401,6 @@ export type PropertyByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
     virtualTourUrl: string | null;
@@ -5391,21 +4432,6 @@ export type PropertyByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
       | "disabled"
@@ -5459,21 +4485,6 @@ export type PropertyByPathQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
     schemaType:
@@ -5504,7 +4515,7 @@ export type PropertyCanonicalPathQueryResult = {
 
 // Source: ../web/src/lib/sanity/queries/propertyListing.ts
 // Variable: propertyByGhiIdQuery
-// Query: *[    _type == "propertyListing"    && ghiListingId == $ghiId    && listingKind in ["property", "unit"]    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ][0]{  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription},  addressDisplay,  mapPrivacyLevel,  mapDisplayApproved,  coordinates},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  content{  shortDescription,  heroHeadline,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  media{  heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  brochureVisibility},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},    "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),  "communitySlug": location.community->slug.current,  "slug": slug.current,  listingKind}
+// Query: *[    _type == "propertyListing"    && ghiListingId == $ghiId    && listingKind in ["property", "unit"]    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ][0]{  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{  country->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  location->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  community->{  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  seoTitle,  metaDescription,  publicDescription,  coordinates},  addressDisplay},  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs,  golf{  golfRelevance,  primaryGolfCourse->{    _id,    name,    "slug": slug.current,    shortDescription  },  linkedGolfCourses[]->{    _id,    name,    "slug": slug.current,    shortDescription  },  distanceToPrimaryGolfCourse,  golfView,  buggyAccess,  golfMembershipInfo},  content{  shortDescription,  aboutDescription,  locationDescription,  golfDescription,  featureHighlights[]{    label,    value,    category,    isFilterable,    isHighlighted  },  amenities},  media{  gallery[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  galleryGroups[]{    title,    images[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  },  thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  floorplans[]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  videoUrl,  virtualTourUrl,  brochure{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  brochureVisibility},  ctas{  primaryCtaLabel,  secondaryCtaLabel,  formIntroText,  responseTimeText,  brochureCtaText,  brochureCtaEnabled,  whatsAppEnabled},  related{  similarPropertiesMode},  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},    "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),  "communitySlug": location.community->slug.current,  "slug": slug.current,  listingKind}
 export type PropertyByGhiIdQueryResult = {
   _id: string;
   _type: "propertyListing";
@@ -5531,6 +4542,7 @@ export type PropertyByGhiIdQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     location: {
       _id: string;
@@ -5541,6 +4553,7 @@ export type PropertyByGhiIdQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     } | null;
     community: {
       _id: string;
@@ -5551,11 +4564,9 @@ export type PropertyByGhiIdQueryResult = {
       seoTitle: string | null;
       metaDescription: string | null;
       publicDescription: string | null;
+      coordinates: Geopoint | null;
     };
     addressDisplay: string;
-    mapPrivacyLevel: "approximate" | "area_only" | "exact" | "hidden";
-    mapDisplayApproved: boolean | null;
-    coordinates: Geopoint | null;
   } | null;
   pricing: {
     price: number | null;
@@ -5627,7 +4638,6 @@ export type PropertyByGhiIdQueryResult = {
   } | null;
   content: {
     shortDescription: string;
-    heroHeadline: string | null;
     aboutDescription: Array<{
       children?: Array<{
         marks?: Array<string>;
@@ -5702,50 +4712,6 @@ export type PropertyByGhiIdQueryResult = {
     amenities: Array<string> | null;
   } | null;
   media: {
-    heroImage: {
-      asset: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        alt?: string;
-        _type: "image";
-      } | null;
-      fileAsset: {
-        asset?: SanityFileAssetReference;
-        media?: unknown;
-        _type: "file";
-      } | null;
-      assetCategory:
-        | "brochure"
-        | "floorplan"
-        | "gallery"
-        | "hero"
-        | "lifestyle"
-        | "location"
-        | "render"
-        | "source_document"
-        | "video"
-        | null;
-      order: number | null;
-      altText: string | null;
-      caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
     gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
@@ -5774,21 +4740,6 @@ export type PropertyByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     galleryGroups: Array<{
       title: string;
@@ -5820,21 +4771,6 @@ export type PropertyByGhiIdQueryResult = {
         order: number | null;
         altText: string | null;
         caption: string | null;
-        assetBrandingType:
-          | "agency_branded"
-          | "developer_branded"
-          | "ghi_branded"
-          | "third_party_branded"
-          | "unbranded"
-          | "unknown"
-          | null;
-        imageRightsStatus:
-          | "approved"
-          | "needs_rights_review"
-          | "rejected"
-          | "source_pack_provided"
-          | "specific_concern";
-        publicUseApproved: boolean | null;
       }> | null;
     }> | null;
     thumbnailOverride: {
@@ -5865,21 +4801,6 @@ export type PropertyByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     floorplans: Array<{
       asset: {
@@ -5909,21 +4830,6 @@ export type PropertyByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     }> | null;
     videoUrl: string | null;
     virtualTourUrl: string | null;
@@ -5955,21 +4861,6 @@ export type PropertyByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     brochureVisibility:
       | "disabled"
@@ -6023,21 +4914,6 @@ export type PropertyByGhiIdQueryResult = {
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
     noindex: boolean | null;
     schemaType:
@@ -6071,7 +4947,7 @@ export type PropertyStalePathQueryResult = Array<{
 
 // Source: ../web/src/lib/sanity/queries/propertyListing.ts
 // Variable: propertyCardsByCommunityQuery
-// Query: *[    _type == "propertyListing"    && listingKind in ["property", "unit"]    && coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug    && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug    && location.community->slug.current == $communitySlug    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ] | order(title asc)[$start...$end]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  }}
+// Query: *[    _type == "propertyListing"    && listingKind in ["property", "unit"]    && coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug    && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug    && location.community->slug.current == $communitySlug    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ] | order(title asc)[$start...$end]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  }}
 export type PropertyCardsByCommunityQueryResult = Array<{
   _id: string;
   ghiListingId: string;
@@ -6149,7 +5025,7 @@ export type PropertyCardsByCommunityQueryResult = Array<{
     builtAreaUnit: "sqft" | "sqm" | null;
   } | null;
   media: {
-    heroImage: {
+    gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
         media?: unknown;
@@ -6177,22 +5053,7 @@ export type PropertyCardsByCommunityQueryResult = Array<{
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
+    }> | null;
     thumbnailOverride: {
       asset: {
         asset?: SanityImageAssetReference;
@@ -6221,28 +5082,13 @@ export type PropertyCardsByCommunityQueryResult = Array<{
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
   } | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries/propertyListing.ts
 // Variable: propertyCardsByLocationQuery
-// Query: *[    _type == "propertyListing"    && listingKind in ["property", "unit"]    && coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug    && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ] | order(title asc)[$start...$end]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  }}
+// Query: *[    _type == "propertyListing"    && listingKind in ["property", "unit"]    && coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug    && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug    &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"  ] | order(title asc)[$start...$end]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  }}
 export type PropertyCardsByLocationQueryResult = Array<{
   _id: string;
   ghiListingId: string;
@@ -6320,7 +5166,7 @@ export type PropertyCardsByLocationQueryResult = Array<{
     builtAreaUnit: "sqft" | "sqm" | null;
   } | null;
   media: {
-    heroImage: {
+    gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
         media?: unknown;
@@ -6348,22 +5194,7 @@ export type PropertyCardsByLocationQueryResult = Array<{
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
+    }> | null;
     thumbnailOverride: {
       asset: {
         asset?: SanityImageAssetReference;
@@ -6392,28 +5223,13 @@ export type PropertyCardsByLocationQueryResult = Array<{
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
   } | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries/similar.ts
 // Variable: automaticSimilarPropertiesQuery
-// Query: *[      _type == "propertyListing"  && listingKind in ["property", "unit"]  &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"    && _id != $excludeId    && propertyType == $propertyType    && location.country->slug.current == $countrySlug    && location.location->slug.current == $locationSlug    && location.community->slug.current == $communitySlug  ] | order(_createdAt desc)[0...$limit]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  }}
+// Query: *[      _type == "propertyListing"  && listingKind in ["property", "unit"]  &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"    && _id != $excludeId    && propertyType == $propertyType    && location.country->slug.current == $countrySlug    && location.location->slug.current == $locationSlug    && location.community->slug.current == $communitySlug  ] | order(_createdAt desc)[0...$limit]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  }}
 export type AutomaticSimilarPropertiesQueryResult = Array<{
   _id: string;
   ghiListingId: string;
@@ -6491,7 +5307,7 @@ export type AutomaticSimilarPropertiesQueryResult = Array<{
     builtAreaUnit: "sqft" | "sqm" | null;
   } | null;
   media: {
-    heroImage: {
+    gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
         media?: unknown;
@@ -6519,22 +5335,7 @@ export type AutomaticSimilarPropertiesQueryResult = Array<{
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
+    }> | null;
     thumbnailOverride: {
       asset: {
         asset?: SanityImageAssetReference;
@@ -6563,28 +5364,13 @@ export type AutomaticSimilarPropertiesQueryResult = Array<{
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
   } | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries/similar.ts
 // Variable: tagsSimilarPropertiesQuery
-// Query: *[      _type == "propertyListing"  && listingKind in ["property", "unit"]  &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"    && _id != $excludeId    && count((related.similarityTags)[@ in $tags]) > 0  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  }}
+// Query: *[      _type == "propertyListing"  && listingKind in ["property", "unit"]  &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved"    && _id != $excludeId    && count((related.similarityTags)[@ in $tags]) > 0  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  }}
 export type TagsSimilarPropertiesQueryResult = Array<{
   _id: string;
   ghiListingId: string;
@@ -6662,7 +5448,7 @@ export type TagsSimilarPropertiesQueryResult = Array<{
     builtAreaUnit: "sqft" | "sqm" | null;
   } | null;
   media: {
-    heroImage: {
+    gallery: Array<{
       asset: {
         asset?: SanityImageAssetReference;
         media?: unknown;
@@ -6690,22 +5476,7 @@ export type TagsSimilarPropertiesQueryResult = Array<{
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
-    } | null;
+    }> | null;
     thumbnailOverride: {
       asset: {
         asset?: SanityImageAssetReference;
@@ -6734,28 +5505,13 @@ export type TagsSimilarPropertiesQueryResult = Array<{
       order: number | null;
       altText: string | null;
       caption: string | null;
-      assetBrandingType:
-        | "agency_branded"
-        | "developer_branded"
-        | "ghi_branded"
-        | "third_party_branded"
-        | "unbranded"
-        | "unknown"
-        | null;
-      imageRightsStatus:
-        | "approved"
-        | "needs_rights_review"
-        | "rejected"
-        | "source_pack_provided"
-        | "specific_concern";
-      publicUseApproved: boolean | null;
     } | null;
   } | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries/similar.ts
 // Variable: manualSimilarPropertiesQuery
-// Query: *[_id == $listingId][0]{    "items": related.manualSimilarProperties[]->[        (_type == "propertyListing" && listingKind in ["property", "unit"] &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved")  || (_type == "development" &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved")    ]{  _type,  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  developmentDisplayMode,  developmentStatus,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    heroImage{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption,  assetBrandingType,  imageRightsStatus,  publicUseApproved}  }}  }
+// Query: *[_id == $listingId][0]{    "items": related.manualSimilarProperties[]->[        (_type == "propertyListing" && listingKind in ["property", "unit"] &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved")  || (_type == "development" &&     coalesce(workflow.publishReadiness, "") in $approvedReadiness  &&   coalesce(pricing.publicVisibility, "visible") == "visible"  &&   coalesce(pricing.availabilityStatus, "") != "reserved")    ]{  _type,  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  developmentDisplayMode,  developmentStatus,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  assetCategory,  order,  altText,  caption},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText,  caption}  }}  }
 export type ManualSimilarPropertiesQueryResult =
   | {
       items: null;
@@ -6848,7 +5604,7 @@ export type ManualSimilarPropertiesQueryResult =
             } | null;
             specs: null;
             media: {
-              heroImage: {
+              gallery: Array<{
                 asset: {
                   asset?: SanityImageAssetReference;
                   media?: unknown;
@@ -6876,22 +5632,7 @@ export type ManualSimilarPropertiesQueryResult =
                 order: number | null;
                 altText: string | null;
                 caption: string | null;
-                assetBrandingType:
-                  | "agency_branded"
-                  | "developer_branded"
-                  | "ghi_branded"
-                  | "third_party_branded"
-                  | "unbranded"
-                  | "unknown"
-                  | null;
-                imageRightsStatus:
-                  | "approved"
-                  | "needs_rights_review"
-                  | "rejected"
-                  | "source_pack_provided"
-                  | "specific_concern";
-                publicUseApproved: boolean | null;
-              } | null;
+              }> | null;
               thumbnailOverride: {
                 asset: {
                   asset?: SanityImageAssetReference;
@@ -6920,21 +5661,6 @@ export type ManualSimilarPropertiesQueryResult =
                 order: number | null;
                 altText: string | null;
                 caption: string | null;
-                assetBrandingType:
-                  | "agency_branded"
-                  | "developer_branded"
-                  | "ghi_branded"
-                  | "third_party_branded"
-                  | "unbranded"
-                  | "unknown"
-                  | null;
-                imageRightsStatus:
-                  | "approved"
-                  | "needs_rights_review"
-                  | "rejected"
-                  | "source_pack_provided"
-                  | "specific_concern";
-                publicUseApproved: boolean | null;
               } | null;
             } | null;
           }
@@ -7023,7 +5749,7 @@ export type ManualSimilarPropertiesQueryResult =
               builtAreaUnit: "sqft" | "sqm" | null;
             } | null;
             media: {
-              heroImage: {
+              gallery: Array<{
                 asset: {
                   asset?: SanityImageAssetReference;
                   media?: unknown;
@@ -7051,22 +5777,7 @@ export type ManualSimilarPropertiesQueryResult =
                 order: number | null;
                 altText: string | null;
                 caption: string | null;
-                assetBrandingType:
-                  | "agency_branded"
-                  | "developer_branded"
-                  | "ghi_branded"
-                  | "third_party_branded"
-                  | "unbranded"
-                  | "unknown"
-                  | null;
-                imageRightsStatus:
-                  | "approved"
-                  | "needs_rights_review"
-                  | "rejected"
-                  | "source_pack_provided"
-                  | "specific_concern";
-                publicUseApproved: boolean | null;
-              } | null;
+              }> | null;
               thumbnailOverride: {
                 asset: {
                   asset?: SanityImageAssetReference;
@@ -7095,21 +5806,6 @@ export type ManualSimilarPropertiesQueryResult =
                 order: number | null;
                 altText: string | null;
                 caption: string | null;
-                assetBrandingType:
-                  | "agency_branded"
-                  | "developer_branded"
-                  | "ghi_branded"
-                  | "third_party_branded"
-                  | "unbranded"
-                  | "unknown"
-                  | null;
-                imageRightsStatus:
-                  | "approved"
-                  | "needs_rights_review"
-                  | "rejected"
-                  | "source_pack_provided"
-                  | "specific_concern";
-                publicUseApproved: boolean | null;
               } | null;
             } | null;
           }
@@ -7156,34 +5852,34 @@ export type SitemapListingsQueryResult = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '\n  *[\n    _type == "development"\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  developmentName,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  buildStatus,\n  completionDate,\n  completionStatus,\n  developerName,\n  architectureStudio,\n  developmentComposition,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  addressDisplay,\n  mapPrivacyLevel,\n  mapDisplayApproved,\n  coordinates\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  availabilitySummary,\n  sharedAmenities[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  sharedGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  media{\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  brochureVisibility\n},\n  brochureVisibility,\n  content{\n  shortDescription,\n  heroHeadline,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n  unitTypes[]->{\n  _id,\n  unitTypeName,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n},\n  units[]->{\n  _id,\n  unitName,\n  unitNumber,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplan{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  unitGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n}\n}\n': DevelopmentByPathPreviewQueryResult;
-    '\n  *[\n    _type == "development"\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  developmentName,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  buildStatus,\n  completionDate,\n  completionStatus,\n  developerName,\n  architectureStudio,\n  developmentComposition,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  addressDisplay,\n  mapPrivacyLevel,\n  mapDisplayApproved,\n  coordinates\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  availabilitySummary,\n  sharedAmenities[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  sharedGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  media{\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  brochureVisibility\n},\n  brochureVisibility,\n  content{\n  shortDescription,\n  heroHeadline,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n  unitTypes[]->{\n  _id,\n  unitTypeName,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n},\n  units[]->{\n  _id,\n  unitName,\n  unitNumber,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplan{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  unitGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n}\n}\n': DevelopmentByPathQueryResult;
+    '\n  *[\n    _type == "development"\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  developmentName,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  buildStatus,\n  completionDate,\n  completionStatus,\n  developerName,\n  architectureStudio,\n  developmentComposition,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  addressDisplay\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  availabilitySummary,\n  sharedAmenities[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  sharedGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  media{\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  brochureVisibility\n},\n  brochureVisibility,\n  content{\n  shortDescription,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n  unitTypes[]->{\n  _id,\n  unitTypeName,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n},\n  units[]->{\n  _id,\n  unitName,\n  unitNumber,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplan{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  unitGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n}\n}\n': DevelopmentByPathPreviewQueryResult;
+    '\n  *[\n    _type == "development"\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  developmentName,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  buildStatus,\n  completionDate,\n  completionStatus,\n  developerName,\n  architectureStudio,\n  developmentComposition,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  addressDisplay\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  availabilitySummary,\n  sharedAmenities[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  sharedGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  media{\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  brochureVisibility\n},\n  brochureVisibility,\n  content{\n  shortDescription,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n  unitTypes[]->{\n  _id,\n  unitTypeName,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n},\n  units[]->{\n  _id,\n  unitName,\n  unitNumber,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplan{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  unitGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n}\n}\n': DevelopmentByPathQueryResult;
     '\n  *[\n    _type == "development"\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{ \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n }\n': DevelopmentCanonicalPathQueryResult;
-    '\n  *[\n    _type == "development"\n    && ghiListingId == $ghiId\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  developmentName,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  buildStatus,\n  completionDate,\n  completionStatus,\n  developerName,\n  architectureStudio,\n  developmentComposition,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  addressDisplay,\n  mapPrivacyLevel,\n  mapDisplayApproved,\n  coordinates\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  availabilitySummary,\n  sharedAmenities[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  sharedGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  media{\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  brochureVisibility\n},\n  brochureVisibility,\n  content{\n  shortDescription,\n  heroHeadline,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n  unitTypes[]->{\n  _id,\n  unitTypeName,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n},\n  units[]->{\n  _id,\n  unitName,\n  unitNumber,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplan{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  unitGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n},\n  \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n\n}\n': DevelopmentByGhiIdQueryResult;
+    '\n  *[\n    _type == "development"\n    && ghiListingId == $ghiId\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  developmentName,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  buildStatus,\n  completionDate,\n  completionStatus,\n  developerName,\n  architectureStudio,\n  developmentComposition,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  addressDisplay\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  availabilitySummary,\n  sharedAmenities[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  sharedGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  media{\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  brochureVisibility\n},\n  brochureVisibility,\n  content{\n  shortDescription,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n  unitTypes[]->{\n  _id,\n  unitTypeName,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n},\n  units[]->{\n  _id,\n  unitName,\n  unitNumber,\n  listingKind,\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  floorplan{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  unitGallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n},\n  \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n\n}\n': DevelopmentByGhiIdQueryResult;
     '\n  *[\n    _type == "development"\n    && slug.current == $slug\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ]{ \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n }\n': DevelopmentStalePathQueryResult;
-    '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    "cards": homepageFeaturedListings[]->[\n      \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n\n    ]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  }\n}\n  }\n': HomepageFeaturedListingsQueryResult;
-    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && slug.current == $countrySlug\n  ][0]{\n    "cards": featuredListings[]->[\n      \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n\n    ]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  }\n}\n  }\n': CountryFeaturedListingsQueryResult;
+    '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    "cards": homepageFeaturedListings[]->[\n      \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n\n    ]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  }\n}\n  }\n': HomepageFeaturedListingsQueryResult;
+    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && slug.current == $countrySlug\n  ][0]{\n    "cards": featuredListings[]->[\n      \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n\n    ]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  }\n}\n  }\n': CountryFeaturedListingsQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n    && (\n      (_type == "propertyListing" && listingKind in ["property", "unit"])\n      || _type == "development"\n    )\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{\n    _type,\n    listingKind,\n    \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n\n  }\n': ListingByPathQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && slug.current == $slug\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n    && (\n      (_type == "propertyListing" && listingKind in ["property", "unit"])\n      || _type == "development"\n    )\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ]{ \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n }\n': ListingLegacyThreeSegmentPathQueryResult;
-    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && slug.current == $countrySlug\n  ][0]{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n}\n': CountryBySlugQueryResult;
-    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && slug.current == $locationSlug\n    && parent->slug.current == $countrySlug\n  ][0]{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n}\n': LocationBySlugQueryResult;
+    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && slug.current == $countrySlug\n  ][0]{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n}\n': CountryBySlugQueryResult;
+    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && slug.current == $locationSlug\n    && parent->slug.current == $countrySlug\n  ][0]{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n}\n': LocationBySlugQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && slug.current == $locationSlug\n    && parent->slug.current == $countrySlug\n  ][0]{\n    _id,\n    name,\n    "slug": slug.current,\n    type,\n    breadcrumbLabel,\n    seoTitle,\n    metaDescription,\n    publicDescription,\n    linkedLocations[]{\n      includeInGrid,\n      showLink,\n      location->{\n        _id,\n        name,\n        "slug": slug.current,\n        breadcrumbLabel\n      }\n    }\n  }\n': LocationPageContextQueryResult;
-    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && slug.current == $communitySlug\n    && (\n      parent._ref == $locationId\n      || $locationId in associatedLocations[]._ref\n    )\n  ][0]{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n}\n': CommunityInLocationContextQueryResult;
+    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && slug.current == $communitySlug\n    && (\n      parent._ref == $locationId\n      || $locationId in associatedLocations[]._ref\n    )\n  ][0]{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n}\n': CommunityInLocationContextQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && defined(slug.current)\n  ] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current\n  }\n': CountriesForNavQueryResult;
-    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && parent->slug.current == $countrySlug\n  ] | order(name asc){\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n}\n': LocationsByCountryQueryResult;
+    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && parent->slug.current == $countrySlug\n  ] | order(name asc){\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n}\n': LocationsByCountryQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && (\n      parent._ref == $locationId\n      || $locationId in associatedLocations[]._ref\n    )\n  ] | order(name asc){\n    _id,\n    name,\n    "slug": slug.current,\n    type,\n    breadcrumbLabel,\n    seoTitle,\n    metaDescription,\n    publicDescription,\n    "canonicalLocationSlug": parent->slug.current,\n    "isAssociated": $locationId in associatedLocations[]._ref && parent._ref != $locationId\n  }\n': CommunitiesByLocationQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && defined(slug.current)\n    && defined(parent->slug.current)\n    && defined(parent->parent->slug.current)\n  ] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    "locationSlug": parent->slug.current,\n    "countrySlug": parent->parent->slug.current\n  }\n': CommunitiesForNavQueryResult;
-    '\n  *[_id == $taxonomyId][0]{\n    "chain": [\n      ...*[_id == ^._id][0].parent->parent->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n      ...*[_id == ^._id][0].parent->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n      {\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n}\n    ][defined(name)]\n  }\n': LocationBreadcrumbQueryResult;
-    '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  addressDisplay,\n  mapPrivacyLevel,\n  mapDisplayApproved,\n  coordinates\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  content{\n  shortDescription,\n  heroHeadline,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  media{\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  brochureVisibility\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': PropertyByPathPreviewQueryResult;
-    '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  addressDisplay,\n  mapPrivacyLevel,\n  mapDisplayApproved,\n  coordinates\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  content{\n  shortDescription,\n  heroHeadline,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  media{\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  brochureVisibility\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': PropertyByPathQueryResult;
+    '\n  *[_id == $taxonomyId][0]{\n    "chain": [\n      ...*[_id == ^._id][0].parent->parent->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n      ...*[_id == ^._id][0].parent->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n      {\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n}\n    ][defined(name)]\n  }\n': LocationBreadcrumbQueryResult;
+    '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  addressDisplay\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  content{\n  shortDescription,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  media{\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  brochureVisibility\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': PropertyByPathPreviewQueryResult;
+    '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  addressDisplay\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  content{\n  shortDescription,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  media{\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  brochureVisibility\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': PropertyByPathQueryResult;
     '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && location.community->slug.current == $communitySlug\n  && slug.current == $slug\n\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{ \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n }\n': PropertyCanonicalPathQueryResult;
-    '\n  *[\n    _type == "propertyListing"\n    && ghiListingId == $ghiId\n    && listingKind in ["property", "unit"]\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription\n},\n  addressDisplay,\n  mapPrivacyLevel,\n  mapDisplayApproved,\n  coordinates\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  content{\n  shortDescription,\n  heroHeadline,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  media{\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  brochureVisibility\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n  \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n\n}\n': PropertyByGhiIdQueryResult;
+    '\n  *[\n    _type == "propertyListing"\n    && ghiListingId == $ghiId\n    && listingKind in ["property", "unit"]\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  coordinates\n},\n  addressDisplay\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  content{\n  shortDescription,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  media{\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  brochureVisibility\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled,\n  whatsAppEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n  \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n\n}\n': PropertyByGhiIdQueryResult;
     '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && slug.current == $slug\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ]{ \n  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),\n  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),\n  "communitySlug": location.community->slug.current,\n  "slug": slug.current,\n  listingKind\n }\n': PropertyStalePathQueryResult;
-    '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n    && location.community->slug.current == $communitySlug\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ] | order(title asc)[$start...$end]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  }\n}\n': PropertyCardsByCommunityQueryResult;
-    '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ] | order(title asc)[$start...$end]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  }\n}\n': PropertyCardsByLocationQueryResult;
-    '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n\n    && _id != $excludeId\n    && propertyType == $propertyType\n    && location.country->slug.current == $countrySlug\n    && location.location->slug.current == $locationSlug\n    && location.community->slug.current == $communitySlug\n  ] | order(_createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  }\n}\n': AutomaticSimilarPropertiesQueryResult;
-    '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n\n    && _id != $excludeId\n    && count((related.similarityTags)[@ in $tags]) > 0\n  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  }\n}\n': TagsSimilarPropertiesQueryResult;
-    '\n  *[_id == $listingId][0]{\n    "items": related.manualSimilarProperties[]->[\n      \n  (_type == "propertyListing" && listingKind in ["property", "unit"] && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n)\n  || (_type == "development" && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n)\n\n    ]{\n  _type,\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  developmentDisplayMode,\n  developmentStatus,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption,\n  assetBrandingType,\n  imageRightsStatus,\n  publicUseApproved\n}\n  }\n}\n  }\n': ManualSimilarPropertiesQueryResult;
+    '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n    && location.community->slug.current == $communitySlug\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ] | order(title asc)[$start...$end]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  }\n}\n': PropertyCardsByCommunityQueryResult;
+    '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n  ] | order(title asc)[$start...$end]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  }\n}\n': PropertyCardsByLocationQueryResult;
+    '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n\n    && _id != $excludeId\n    && propertyType == $propertyType\n    && location.country->slug.current == $countrySlug\n    && location.location->slug.current == $locationSlug\n    && location.community->slug.current == $communitySlug\n  ] | order(_createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  }\n}\n': AutomaticSimilarPropertiesQueryResult;
+    '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n\n    && _id != $excludeId\n    && count((related.similarityTags)[@ in $tags]) > 0\n  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  }\n}\n': TagsSimilarPropertiesQueryResult;
+    '\n  *[_id == $listingId][0]{\n    "items": related.manualSimilarProperties[]->[\n      \n  (_type == "propertyListing" && listingKind in ["property", "unit"] && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n)\n  || (_type == "development" && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n)\n\n    ]{\n  _type,\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  developmentDisplayMode,\n  developmentStatus,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceSourceStatus,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText,\n  caption\n}\n  }\n}\n  }\n': ManualSimilarPropertiesQueryResult;
     '\n  *[_id == $listingId][0]{\n    "tags": coalesce(related.similarityTags, [])\n  }\n': SimilarTagsConfigQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && defined(slug.current)\n  ]{\n    type,\n    "slug": slug.current,\n    "countrySlug": select(\n      type == "country" => slug.current,\n      type == "location" => parent->slug.current,\n      type == "community" => parent->parent->slug.current\n    ),\n    "locationSlug": select(\n      type == "location" => slug.current,\n      type == "community" => parent->slug.current,\n      null\n    ),\n    "communitySlug": select(type == "community" => slug.current, null),\n    _updatedAt\n  }\n': SitemapTaxonomyQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && (_type != "propertyListing" || listingKind in ["property", "unit"])\n    && defined(slug.current)\n    && \n  \n  coalesce(workflow.publishReadiness, "") in $approvedReadiness\n\n  && \n  coalesce(pricing.publicVisibility, "visible") == "visible"\n\n  && \n  coalesce(pricing.availabilityStatus, "") != "reserved"\n\n\n    && coalesce(seo.noindex, false) != true\n  ]{\n    "countrySlug": location.country->slug.current,\n    "locationSlug": location.location->slug.current,\n    "communitySlug": location.community->slug.current,\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapListingsQueryResult;

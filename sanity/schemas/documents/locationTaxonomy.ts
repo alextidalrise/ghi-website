@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity';
-import { LOCATION_TAXONOMY_TYPES, MAP_PRIVACY_LEVELS } from '../constants/enums';
+import { LOCATION_TAXONOMY_TYPES } from '../constants/enums';
 
 export const locationTaxonomy = defineType({
 	name: 'locationTaxonomy',
@@ -118,11 +118,11 @@ export const locationTaxonomy = defineType({
 			description: 'A short editorial description shown on this location\'s landing page (e.g. "Marbella is renowned for...").'
 		}),
 		defineField({
-			name: 'mapPrivacyDefault',
-			title: 'Map privacy default',
-			type: 'string',
-			options: { list: [...MAP_PRIVACY_LEVELS], layout: 'dropdown' },
-			description: 'The default map privacy applied to all listings in this area, unless a listing sets its own privacy level.'
+			name: 'coordinates',
+			title: 'Coordinates',
+			type: 'geopoint',
+			description: 'Map pin for this community. Used on all listings in this community.',
+			hidden: ({ document }) => document?.type !== 'community'
 		}),
 		defineField({
 			name: 'featuredListings',

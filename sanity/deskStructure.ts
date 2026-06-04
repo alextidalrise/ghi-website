@@ -11,9 +11,6 @@ const REVIEW_BLOCKERS = [
 	'workflow.publishReadiness == "governance_hold"',
 	'sensitiveGovernance.sensitiveReviewStatus in ["pending", "in_review", "blocked"]',
 	'sensitiveGovernance.requiresHumanApproval == true',
-	'media.heroImage.publicUseApproved != true',
-	'count(media.gallery[publicUseApproved != true]) > 0',
-	'count(media.gallery[imageRightsStatus in ["needs_review", "needs_rights_review", "specific_concern"]]) > 0',
 	'count(sourceProvenance[publicSafeStatus == "needs_review"]) > 0',
 	'count(workflow.reviewItems[blocksPublish == true]) > 0 || count(workflow.factsNeedingConfirmation) > 0 || count(workflow.missingSourceFields) > 0',
 ];

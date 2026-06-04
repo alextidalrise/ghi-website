@@ -76,18 +76,6 @@ export const specsFields = defineType({
 			validation: (Rule) => Rule.min(0).integer()
 		}),
 		defineField({
-			name: 'parkingSpaces',
-			title: 'Parking spaces',
-			type: 'number',
-			validation: (Rule) => Rule.min(0).integer()
-		}),
-		defineField({
-			name: 'garageSpaces',
-			title: 'Garage spaces',
-			type: 'number',
-			validation: (Rule) => Rule.min(0).integer()
-		}),
-		defineField({
 			name: 'pool',
 			title: 'Pool',
 			type: 'string',

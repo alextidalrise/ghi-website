@@ -10,7 +10,7 @@ export const seoFields = defineType({
 			name: 'openGraph',
 			title: 'Social sharing',
 			description:
-				'Controls how this page appears when shared on WhatsApp, LinkedIn, and similar apps. Leave blank to fall back to SEO title, description, and hero image.',
+				'Controls how this page appears when shared on WhatsApp, LinkedIn, and similar apps. Leave blank to fall back to SEO title, description, and the first gallery image.',
 			options: { collapsible: true, collapsed: false }
 		}
 	],

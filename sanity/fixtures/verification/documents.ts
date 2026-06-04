@@ -31,47 +31,22 @@ function verificationLocation(countryId: string, locationId: string, communityId
 		country: { _type: 'reference' as const, _ref: countryId },
 		location: { _type: 'reference' as const, _ref: locationId },
 		community: { _type: 'reference' as const, _ref: communityId },
-		addressDisplay: 'Costa del Sol, Spain (verification fixture)',
-		mapPrivacyLevel: 'area_only',
-		mapDisplayApproved: false
+		addressDisplay: 'Costa del Sol, Spain (verification fixture)'
 	};
 }
 
-function approvedMediaAsset(
-	assetId: string,
-	altText: string,
-	rights: 'approved' | 'ghi_branded' = 'approved'
-) {
+function mediaAsset(assetId: string, altText: string) {
 	return {
 		_type: 'mediaAssetMetadata' as const,
 		asset: imageRef(assetId),
-		altText,
-		assetBrandingType: rights === 'ghi_branded' ? 'ghi_branded' : 'unbranded',
-		imageRightsStatus: 'approved',
-		publicUseApproved: true
-	};
-}
-
-function blockedMediaAsset(
-	assetId: string,
-	altText: string,
-	rights: 'rejected' | 'do_not_use' | 'restricted' = 'rejected'
-) {
-	return {
-		_type: 'mediaAssetMetadata' as const,
-		asset: imageRef(assetId),
-		altText,
-		assetBrandingType: 'third_party_branded',
-		imageRightsStatus: rights === 'rejected' ? 'rejected' : rights,
-		publicUseApproved: false
+		altText
 	};
 }
 
 function baseContent(title: string) {
 	return {
 		_type: 'contentFields' as const,
-		shortDescription: `${title} — verification fixture for privacy gate testing.`,
-		heroHeadline: title
+		shortDescription: `${title} — verification fixture for privacy gate testing.`
 	};
 }
 
@@ -105,7 +80,8 @@ export function buildLocationDocuments() {
 			type: 'community',
 			parent: { _type: 'reference', _ref: FIXTURE_IDS.location },
 			breadcrumbLabel: 'Verification Community',
-			publicDescription: 'Verification fixture community stub.'
+			publicDescription: 'Verification fixture community stub.',
+			coordinates: { _type: 'geopoint', lat: 36.484, lng: -4.952 }
 		}
 	];
 }
@@ -143,16 +119,14 @@ export function buildGoldenProperty(assets: UploadedAssets) {
 		content: baseContent('Verification Golden Villa'),
 		media: {
 			_type: 'mediaFields',
-			heroImage: approvedMediaAsset(
-				assets[FIXTURE_ASSET_TAGS.approvedHero],
-				'Approved hero — verification golden villa',
-				'ghi_branded'
-			),
 			gallery: [
-				approvedMediaAsset(
+				mediaAsset(
+					assets[FIXTURE_ASSET_TAGS.approvedHero],
+					'Approved hero — verification golden villa'
+				),
+				mediaAsset(
 					assets[FIXTURE_ASSET_TAGS.approvedGallery],
-					'Approved gallery image — verification golden villa',
-					'ghi_branded'
+					'Approved gallery image — verification golden villa'
 				)
 			]
 		},
@@ -184,11 +158,9 @@ export function buildPrivacyDevelopmentStub(assets: UploadedAssets) {
 		content: baseContent('Verification Privacy Units Development'),
 		media: {
 			_type: 'mediaFields',
-			heroImage: approvedMediaAsset(
-				assets[FIXTURE_ASSET_TAGS.approvedHero],
-				'Approved development hero',
-				'ghi_branded'
-			)
+			gallery: [
+				mediaAsset(assets[FIXTURE_ASSET_TAGS.approvedHero], 'Approved development hero')
+			]
 		},
 		units: [],
 		workflow: approvedWorkflow()
@@ -266,7 +238,7 @@ export function buildPrivacyDevelopmentDocuments(assets: UploadedAssets) {
 	return [...buildPrivacyDevelopmentUnits(), buildPrivacyDevelopmentWithUnits(assets)];
 }
 
-/** Fixture 3: property with blocked hero + restricted gallery item — only approved gallery survives. */
+/** Fixture 3: property with placeholder first in gallery — public output uses first item with a file. */
 export function buildMediaPrivacyProperty(assets: UploadedAssets) {
 	return {
 		_id: FIXTURE_IDS.mediaPrivacyProperty,
@@ -297,20 +269,14 @@ export function buildMediaPrivacyProperty(assets: UploadedAssets) {
 		content: baseContent('Verification Media Privacy Villa'),
 		media: {
 			_type: 'mediaFields',
-			heroImage: blockedMediaAsset(
-				assets[FIXTURE_ASSET_TAGS.doNotUseHero],
-				'Do-not-use hero — must not appear publicly'
-			),
 			gallery: [
-				blockedMediaAsset(
-					assets[FIXTURE_ASSET_TAGS.restrictedGallery],
-					'Restricted gallery item — must not appear publicly',
-					'restricted'
-				),
-				approvedMediaAsset(
+				{
+					_type: 'mediaAssetMetadata',
+					altText: 'Gallery placeholder without uploaded file'
+				},
+				mediaAsset(
 					assets[FIXTURE_ASSET_TAGS.approvedGallery],
-					'Approved gallery item — should appear publicly',
-					'ghi_branded'
+					'Gallery image — should appear publicly'
 				)
 			]
 		},

@@ -1,20 +1,5 @@
 /** Shared enum option lists for GHI Sanity schema objects. */
 
-export const MAP_PRIVACY_LEVELS = [
-	{ title: 'Exact', value: 'exact' },
-	{ title: 'Approximate', value: 'approximate' },
-	{ title: 'Area only', value: 'area_only' },
-	{ title: 'Hidden', value: 'hidden' }
-] as const;
-
-export const COORDINATE_SOURCES = [
-	{ title: 'Source brochure', value: 'source_brochure' },
-	{ title: 'Agent supplied', value: 'agent_supplied' },
-	{ title: 'Manually geocoded', value: 'manually_geocoded' },
-	{ title: 'Estimated', value: 'estimated' },
-	{ title: 'Unknown', value: 'unknown' }
-] as const;
-
 export const PRICE_QUALIFIERS = [
 	{ title: 'Exact', value: 'exact' },
 	{ title: 'From', value: 'from' },
@@ -147,23 +132,6 @@ export const ASSET_CATEGORIES = [
 	{ title: 'Location', value: 'location' },
 	{ title: 'Lifestyle', value: 'lifestyle' },
 	{ title: 'Source document', value: 'source_document' }
-] as const;
-
-export const ASSET_BRANDING_TYPES = [
-	{ title: 'GHI branded', value: 'ghi_branded' },
-	{ title: 'Developer branded', value: 'developer_branded' },
-	{ title: 'Agency branded', value: 'agency_branded' },
-	{ title: 'Third party branded', value: 'third_party_branded' },
-	{ title: 'Unbranded', value: 'unbranded' },
-	{ title: 'Unknown', value: 'unknown' }
-] as const;
-
-export const IMAGE_RIGHTS_STATUSES = [
-	{ title: 'Source pack provided', value: 'source_pack_provided' },
-	{ title: 'Specific concern', value: 'specific_concern' },
-	{ title: 'Needs rights review', value: 'needs_rights_review' },
-	{ title: 'Approved', value: 'approved' },
-	{ title: 'Rejected', value: 'rejected' }
 ] as const;
 
 export const REVIEW_SEVERITIES = [

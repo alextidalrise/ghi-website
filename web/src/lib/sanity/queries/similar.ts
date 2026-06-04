@@ -55,7 +55,7 @@ const MANUAL_SIMILAR_PROJECTION = /* groq */ `{
     builtAreaUnit
   },
   media{
-    heroImage${MEDIA_ASSET_PUBLIC},
+    gallery[0...1]${MEDIA_ASSET_PUBLIC},
     thumbnailOverride${MEDIA_ASSET_PUBLIC}
   }
 }`;

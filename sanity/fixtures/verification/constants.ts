@@ -27,9 +27,7 @@ export const FIXTURE_SLUGS = {
 
 export const FIXTURE_ASSET_TAGS = {
 	approvedHero: 'verification-approved-hero',
-	approvedGallery: 'verification-approved-gallery',
-	doNotUseHero: 'verification-do-not-use-hero',
-	restrictedGallery: 'verification-restricted-gallery'
+	approvedGallery: 'verification-approved-gallery'
 } as const;
 
 export const VERIFICATION_DATASET = 'development';
