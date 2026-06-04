@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
 	APPROVED_IMAGE_REF,
-	BLOCKED_IMAGE_REF,
 	goldenPropertyRaw,
 	mediaPrivacyPropertyRaw
 } from '../verification/fixture-payloads';
@@ -20,23 +19,10 @@ vi.mock('../image', () => ({
 	})
 }));
 
-function approvedAsset(ref: string, alt: string): MediaAssetInput {
+function mediaAsset(ref: string, alt: string): MediaAssetInput {
 	return {
 		asset: { _type: 'image', asset: { _type: 'reference', _ref: ref } },
-		altText: alt,
-		assetBrandingType: 'ghi_branded',
-		imageRightsStatus: 'approved',
-		publicUseApproved: true
-	};
-}
-
-function blockedAsset(ref: string, alt: string): MediaAssetInput {
-	return {
-		asset: { _type: 'image', asset: { _type: 'reference', _ref: ref } },
-		altText: alt,
-		assetBrandingType: 'third_party_branded',
-		imageRightsStatus: 'do_not_use',
-		publicUseApproved: false
+		altText: alt
 	};
 }
 
@@ -107,12 +93,12 @@ describe('toPublicPropertyCard', () => {
 		expect(card.pricing?.priceDisplay).toBe('POA');
 	});
 
-	it('falls back to thumbnailOverride when hero is blocked', () => {
+	it('falls back to thumbnailOverride when first gallery item has no file', () => {
 		const card = toPublicPropertyCard(
 			baseCard({
 				media: {
-					heroImage: blockedAsset(BLOCKED_IMAGE_REF, 'Blocked hero'),
-					thumbnailOverride: approvedAsset(APPROVED_IMAGE_REF, 'Approved thumbnail')
+					gallery: [{ altText: 'Gallery slot without file' }],
+					thumbnailOverride: mediaAsset(APPROVED_IMAGE_REF, 'Thumbnail with file')
 				} as RawPropertyCard['media']
 			})
 		);
@@ -120,34 +106,27 @@ describe('toPublicPropertyCard', () => {
 		expect(card.heroImageUrl).toBe(
 			`https://cdn.sanity.io/images/test/production/${APPROVED_IMAGE_REF}?w=600&h=400`
 		);
-		expect(card.heroImageAlt).toBe('Approved thumbnail');
+		expect(card.heroImageAlt).toBe('Thumbnail with file');
 	});
 
-	it('returns null hero URL when hero and thumbnail are blocked', () => {
+	it('returns null hero URL when gallery and thumbnail have no file', () => {
 		const card = toPublicPropertyCard(
 			baseCard({
-				_id: mediaPrivacyPropertyRaw._id!,
-				ghiListingId: mediaPrivacyPropertyRaw.ghiListingId!,
-				title: mediaPrivacyPropertyRaw.title!,
-				slug: mediaPrivacyPropertyRaw.slug!,
-				pricing: mediaPrivacyPropertyRaw.pricing as RawPropertyCard['pricing'],
-				specs: mediaPrivacyPropertyRaw.specs as RawPropertyCard['specs'],
-				media: mediaPrivacyPropertyRaw.media as RawPropertyCard['media']
+				media: {
+					gallery: [{ altText: 'Gallery slot without file' }]
+				} as RawPropertyCard['media']
 			})
 		);
 
 		expect(card.heroImageUrl).toBeNull();
-		expect(card.heroImageAlt).toBe('Verification Media Privacy Villa');
+		expect(card.heroImageAlt).toBe('Verification Golden Villa');
 	});
 
-	it('excludes governance fields and raw media from serialized output', () => {
+	it('excludes pricing governance and raw media from serialized output', () => {
 		const card = toPublicPropertyCard(baseCard());
 		const serialized = JSON.stringify(card);
 
 		expect(serialized).not.toContain('priceSourceStatus');
-		expect(serialized).not.toContain('imageRightsStatus');
-		expect(serialized).not.toContain('publicUseApproved');
-		expect(serialized).not.toContain('assetBrandingType');
 		expect(serialized).not.toContain('"media"');
 	});
 });

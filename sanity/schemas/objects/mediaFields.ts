@@ -36,16 +36,11 @@ export const mediaFields = defineType({
 	type: 'object',
 	fields: [
 		defineField({
-			name: 'heroImage',
-			title: 'Hero image',
-			type: 'mediaAssetMetadata',
-			description: 'The main image displayed at the top of the listing page. Must be approved before it appears publicly.'
-		}),
-		defineField({
 			name: 'gallery',
 			title: 'Gallery',
 			type: 'array',
-			of: [defineArrayMember({ type: 'mediaAssetMetadata' })]
+			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			description: 'The first image is used as the listing hero on the website.'
 		}),
 		defineField({
 			name: 'galleryGroups',
@@ -78,7 +73,7 @@ export const mediaFields = defineType({
 			name: 'brochure',
 			title: 'Brochure',
 			type: 'mediaAssetMetadata',
-			description: 'The downloadable property brochure. Hidden by default — must be approved before buyers can access it.'
+			description: 'The downloadable property brochure. Hidden by default until brochure visibility is set to allow downloads.'
 		}),
 		defineField({
 			name: 'brochureVisibility',
@@ -92,14 +87,14 @@ export const mediaFields = defineType({
 	],
 	preview: {
 		select: {
-			heroAlt: 'heroImage.altText',
+			firstAlt: 'gallery.0.altText',
 			brochureVisibility: 'brochureVisibility',
 			galleryCount: 'gallery'
 		},
-		prepare({ heroAlt, brochureVisibility, galleryCount }) {
+		prepare({ firstAlt, brochureVisibility, galleryCount }) {
 			const count = Array.isArray(galleryCount) ? galleryCount.length : 0;
 			return {
-				title: heroAlt || 'Media',
+				title: firstAlt || 'Media',
 				subtitle: [count ? `${count} gallery item(s)` : null, brochureVisibility]
 					.filter(Boolean)
 					.join(' · ')

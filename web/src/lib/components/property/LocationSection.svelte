@@ -16,7 +16,7 @@
 
 	const embedUrl = $derived.by(() => {
 		if (!coords) return null;
-		const delta = map?.level === 'area_only' ? 0.04 : 0.012;
+		const delta = 0.04;
 		const left = coords.lng - delta;
 		const right = coords.lng + delta;
 		const top = coords.lat + delta;
@@ -47,13 +47,13 @@
 		{#if embedUrl}
 			<div class="location__map">
 				<iframe
-					title="Approximate property location"
+					title="Community area map"
 					src={embedUrl}
 					loading="lazy"
 					referrerpolicy="no-referrer-when-downgrade"
 				></iframe>
-				{#if map?.level === 'approximate' || map?.level === 'area_only'}
-					<p class="location__map-note">Map shows an approximate location for privacy.</p>
+				{#if map?.level === 'area_only'}
+					<p class="location__map-note">Map shows the community area, not the exact property location.</p>
 				{/if}
 			</div>
 		{/if}

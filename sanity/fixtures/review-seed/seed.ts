@@ -5,7 +5,7 @@
  * while real properties are still being approved.
  *
  * Every document is gated to PASS the public filter (approved_for_publish +
- * visible pricing + approved hero rights) and is tagged with a `reviewSeed-`
+ * visible pricing + hero image) and is tagged with a `reviewSeed-`
  * id prefix so it can be removed in one command.
  *
  * Usage (from sanity/):
@@ -159,9 +159,7 @@ function buildListing(listing: Listing, index: number, assetId: string) {
 			country: { _type: 'reference', _ref: COUNTRY },
 			location: { _type: 'reference', _ref: LOCATION },
 			community: { _type: 'reference', _ref: listing.community },
-			addressDisplay: COMMUNITY_ADDRESS[listing.community],
-			mapPrivacyLevel: 'area_only',
-			mapDisplayApproved: false
+			addressDisplay: COMMUNITY_ADDRESS[listing.community]
 		},
 		pricing: {
 			_type: 'pricingFields',
@@ -182,19 +180,17 @@ function buildListing(listing: Listing, index: number, assetId: string) {
 		},
 		content: {
 			_type: 'contentFields',
-			heroHeadline: listing.title,
 			shortDescription: `${listing.title} — sample listing seeded for design review of the property grid.`
 		},
 		media: {
 			_type: 'mediaFields',
-			heroImage: {
-				_type: 'mediaAssetMetadata',
-				asset: { _type: 'image', asset: { _type: 'reference', _ref: assetId } },
-				altText: `${listing.title} — exterior`,
-				assetBrandingType: 'unbranded',
-				imageRightsStatus: 'approved',
-				publicUseApproved: true
-			}
+			gallery: [
+				{
+					_type: 'mediaAssetMetadata',
+					asset: { _type: 'image', asset: { _type: 'reference', _ref: assetId } },
+					altText: `${listing.title} — exterior`
+				}
+			]
 		},
 		workflow: {
 			_type: 'workflowFields',

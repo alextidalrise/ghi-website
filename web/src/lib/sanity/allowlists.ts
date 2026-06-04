@@ -12,25 +12,16 @@ export const LOCATION_TAXONOMY_PUBLIC = /* groq */ `{
   breadcrumbLabel,
   seoTitle,
   metaDescription,
-  publicDescription
-}`;
-
-/** Server-only location fields required for map transform (coordinates stripped before response). */
-export const LOCATION_MAP_INTERNAL = /* groq */ `{
-  mapPrivacyLevel,
-  mapDisplayApproved,
+  publicDescription,
   coordinates
 }`;
 
-/** Public location projection — includes internal map fields for server-side transform only. */
+/** Public location projection — map pin comes from community->coordinates. */
 export const LOCATION_PUBLIC = /* groq */ `{
   country->${LOCATION_TAXONOMY_PUBLIC},
   location->${LOCATION_TAXONOMY_PUBLIC},
   community->${LOCATION_TAXONOMY_PUBLIC},
-  addressDisplay,
-  mapPrivacyLevel,
-  mapDisplayApproved,
-  coordinates
+  addressDisplay
 }`;
 
 /** Public pricing fields — governance fields excluded. */
@@ -48,22 +39,18 @@ export const PRICING_PUBLIC = /* groq */ `{
   buildStatus
 }`;
 
-/** Public media asset metadata — private governance fields excluded at query time. */
+/** Public media asset metadata — source provenance fields excluded at query time. */
 export const MEDIA_ASSET_PUBLIC = /* groq */ `{
   asset,
   fileAsset,
   assetCategory,
   order,
   altText,
-  caption,
-  assetBrandingType,
-  imageRightsStatus,
-  publicUseApproved
+  caption
 }`;
 
 /** Public media bundle for property/development pages. */
 export const MEDIA_PUBLIC = /* groq */ `{
-  heroImage${MEDIA_ASSET_PUBLIC},
   gallery[]${MEDIA_ASSET_PUBLIC},
   galleryGroups[]{
     title,
@@ -80,7 +67,6 @@ export const MEDIA_PUBLIC = /* groq */ `{
 /** Public website content fields — marketing source and editorial workflow excluded. */
 export const CONTENT_PUBLIC = /* groq */ `{
   shortDescription,
-  heroHeadline,
   aboutDescription,
   locationDescription,
   golfDescription,
@@ -168,7 +154,7 @@ export const DEVELOPMENT_CARD_PUBLIC = /* groq */ `{
   },
   pricing${PRICING_PUBLIC},
   media{
-    heroImage${MEDIA_ASSET_PUBLIC},
+    gallery[0...1]${MEDIA_ASSET_PUBLIC},
     thumbnailOverride${MEDIA_ASSET_PUBLIC}
   }
 }`;
@@ -196,7 +182,7 @@ export const PROPERTY_CARD_PUBLIC = /* groq */ `{
     builtAreaUnit
   },
   media{
-    heroImage${MEDIA_ASSET_PUBLIC},
+    gallery[0...1]${MEDIA_ASSET_PUBLIC},
     thumbnailOverride${MEDIA_ASSET_PUBLIC}
   }
 }`;

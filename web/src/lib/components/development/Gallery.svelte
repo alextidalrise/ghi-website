@@ -18,8 +18,7 @@
 		}
 
 		return {
-			heroImage: base?.heroImage ?? shared[0] ?? null,
-			gallery: [...(base?.gallery ?? []), ...shared],
+			gallery: [...shared, ...(base?.gallery ?? [])],
 			galleryGroups: base?.galleryGroups ?? [],
 			thumbnailOverride: base?.thumbnailOverride ?? null,
 			floorplans: base?.floorplans ?? [],

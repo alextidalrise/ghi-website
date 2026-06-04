@@ -1,5 +1,9 @@
 import { buildPublicImageUrl } from '$lib/sanity/image';
 import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
+import {
+	resolveDevelopmentHeroImage,
+	resolveListingHeroImage
+} from '$lib/sanity/transforms/mediaFilter';
 import type { PublicPricing } from '$lib/sanity/transforms/pricingFilter';
 
 /** SEO payload built only from allowlisted seo fields on the public listing. */
@@ -27,7 +31,9 @@ export function buildPropertySeo(
 		description: seo?.metaDescription ?? fallbackDescription,
 		openGraphTitle: seo?.openGraphTitle ?? seo?.seoTitle ?? fallbackTitle,
 		openGraphDescription: seo?.openGraphDescription ?? seo?.metaDescription ?? fallbackDescription,
-		openGraphImageUrl: buildPublicImageUrl(seo?.openGraphImage ?? listing.media?.heroImage, {
+		openGraphImageUrl: buildPublicImageUrl(
+			seo?.openGraphImage ?? resolveListingHeroImage(listing.media),
+			{
 			width: 1200,
 			height: 630,
 			fit: 'crop'
@@ -161,7 +167,9 @@ function buildFloorSize(specs: Record<string, unknown> | null | undefined): Reco
 }
 
 function buildListingImage(listing: PublicPropertyListing): string | null {
-	return buildPublicImageUrl(listing.seo?.openGraphImage ?? listing.media?.heroImage, {
+	return buildPublicImageUrl(
+		listing.seo?.openGraphImage ?? resolveListingHeroImage(listing.media),
+		{
 		width: 1200,
 		height: 630,
 		fit: 'crop'
@@ -235,7 +243,10 @@ export function buildDevelopmentSeo(
 		description: seo?.metaDescription ?? fallbackDescription,
 		openGraphTitle: seo?.openGraphTitle ?? seo?.seoTitle ?? fallbackTitle,
 		openGraphDescription: seo?.openGraphDescription ?? seo?.metaDescription ?? fallbackDescription,
-		openGraphImageUrl: buildPublicImageUrl(seo?.openGraphImage ?? development.media?.heroImage, {
+		openGraphImageUrl: buildPublicImageUrl(
+			seo?.openGraphImage ??
+				resolveDevelopmentHeroImage(development.media, development.sharedGallery),
+			{
 			width: 1200,
 			height: 630,
 			fit: 'crop'

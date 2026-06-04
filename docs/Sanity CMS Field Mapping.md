@@ -37,12 +37,11 @@ This is still an implementation-planning document, not a live Sanity migration. 
 - **Development template:** needed from day 1.
 - **Development modelling:** support `development`, `unit`, and `unitType`; development display can be flat, unit-type led, unit-led, price-from summary, or enquiry-led.
 - **Payment schedules:** deferred for v1.
-- **Branded asset model:** approved with explicit branding classes: `ghi_branded`, `developer_branded`, `agency_branded`, `third_party_branded`, `unbranded`, `unknown`.
-- **Image rights:** default `source_pack_provided` for pack images; explicit statuses for concern, rights review, approved, or rejected.
+- **Media assets:** public output requires an uploaded file only; editorial checks (hero, gallery order, alt text) use optional `workflow.reviewItems` — not per-asset rights, public-use, or aerial-privacy gates.
 - **Reserved units/items:** hidden from public output entirely.
 - **Brochures:** request-only or disabled by default until explicitly approved.
 - **Golf:** manual enrichment, supported by lightweight `golfCourse` references.
-- **Map privacy:** manual ingestion decision with coordinate privacy value; exact coordinates optional and governed by `mapPrivacyLevel`.
+- **Map display:** community-level coordinates on `locationTaxonomy` (type `community`); listings show the community area pin, not per-property coordinates.
 - **Community fees / IBI / garbage tax:** private/internal for v1.
 - **Commission:** private/internal, useful for reporting, never public.
 - **Legal/cadastral/collaboration/source-sensitive details:** stay in Drive/KB/intake; Sanity may store only safe internal summary flags.
@@ -69,7 +68,7 @@ Every field or field group in this document is classified as one of:
 - `unitType` — representative typologies within a development.
 - `golfCourse` — lightweight reference docs for manual golf enrichment and future golf SEO clusters.
 - `locationTaxonomy` — country, region, municipality, area, sub-area, micro-location hierarchy for breadcrumbs, filters, SEO, and map privacy.
-- `mediaAssetMetadata` — asset-level governance for public use, brand status, rights, approval, grouping, alt text, captions, and source references.
+- `mediaAssetMetadata` — asset metadata for category, display order, alt text, captions, and internal source references (no per-asset rights or public-use approval fields).
 - `sourceProvenance` — structured provenance summary for publish-critical facts and internal reporting.
 - `readinessStatus` / workflow field group — content status, publish readiness, channel readiness, and blockers.
 - `reviewApprovalWorkflow` — human review and approval metadata.
@@ -147,13 +146,13 @@ Every field or field group in this document is classified as one of:
 - Raw folder names containing commission, internal shorthand, or unreviewed price hints
   - Classification: **rejected** for public modelling; **source/intake-only** as evidence.
 
-### 2. Location and map privacy
+### 2. Location and map display
 
-- `country`, `region`, `municipality`, `area`, `subArea`, `microLocation`
-  - Classification: **public**.
-  - Type: references to `locationTaxonomy` or controlled strings during early migration.
+- `country`, `location`, `community` (on `locationFields`)
+  - Classification: **public** (country/location auto-derived from community; hidden in Studio).
+  - Type: references to `locationTaxonomy`.
   - Purpose: breadcrumbs, filters, SEO landing pages, public display.
-  - Validation: required to the level needed for the public page and breadcrumb.
+  - Validation: `community` required on listings.
 
 - `addressDisplay`
   - Classification: **public**.
@@ -163,28 +162,12 @@ Every field or field group in this document is classified as one of:
 - `exactAddressInternal`
   - Classification: **private/internal**.
   - Type: string.
-  - Public rule: never expose unless manually approved through map/privacy workflow.
+  - Public rule: never expose on the website.
 
-- `coordinates`
-  - Classification: **private/internal** by default; **public** only through a derived safe map payload governed by `mapPrivacyLevel`.
+- `coordinates` on `locationTaxonomy` when `type = community`
+  - Classification: **public** via server transform as a community-area map pin (not exact property location).
   - Type: geopoint.
-  - Purpose: internal mapping, approximate/exact public display where approved.
-
-- `coordinateSource`
-  - Classification: **private/internal**.
-  - Type: enum/string.
-  - Examples: source brochure, agent supplied, manually geocoded, estimated, unknown.
-
-- `mapPrivacyLevel`
-  - Classification: **private/internal governance** controlling public map output.
-  - Type: enum.
-  - Values: `exact`, `approximate`, `area_only`, `hidden`.
-  - Validation: required before public publish if any map/location module appears.
-  - Public rule: frontend must use this value to transform or suppress coordinates.
-
-- `mapDisplayApproved`, `mapDisplayApprovedBy`, `mapDisplayApprovedAt`, `publicMapNotes`
-  - Classification: **private/internal**.
-  - Purpose: approval workflow for coordinate/map use.
+  - Purpose: shared map pin for all listings in that community.
 
 - Cadastral/legal-plan location detail
   - Classification: **source/intake-only** and **rejected** for public output.
@@ -242,7 +225,7 @@ Every field or field group in this document is classified as one of:
 
 ### 4. Specifications
 
-- `bedrooms`, `bathrooms`, `builtArea`, `builtAreaUnit`, `plotSize`, `plotSizeUnit`, `terraceSize`, `interiorArea`, `exteriorArea`, `gardenArea`, `levels`, `parkingSpaces`, `garageSpaces`, `pool`, `garden`, `orientation`, `views`
+- `bedrooms`, `bathrooms`, `builtArea`, `builtAreaUnit`, `plotSize`, `plotSizeUnit`, `terraceSize`, `interiorArea`, `exteriorArea`, `gardenArea`, `levels`, `pool`, `garden`, `orientation`, `views`
   - Classification: **public** when source-supported and relevant.
   - Types: number/string/enum/array.
   - Validation: required fields vary by listing type. Villas generally need bedrooms, bathrooms, built area, and plot size for public publish. Apartments may use terrace/garden/exterior fields instead of plot size when more accurate.
@@ -302,10 +285,12 @@ Public website copy only. Campaign and extended marketing copy lives in **§7b M
   - Types: text / rich text.
   - Roles: card teaser (`shortDescription`); canonical listing body (`aboutDescription`).
 
-- `heroHeadline`, `locationDescription`, `golfDescription`, `featureHighlights`, `amenities`
+- `locationDescription`, `golfDescription`, `featureHighlights`, `amenities`
   - Classification: **public** after human review when populated.
-  - Types: string / rich text / array.
+  - Types: rich text / array.
   - `locationDescription` and `golfDescription` are optional section copy only — not alternate main descriptions.
+
+- Page headline: Identity `title` (not a separate content field).
 
 - `humanReviewed`, `reviewer`, `reviewDate`
   - Classification: **private/internal** workflow fields on `contentFields`.
@@ -356,8 +341,8 @@ Initial controlled feature vocabulary may include: frontline golf, golf views, p
 
 ### 9. Media and asset governance
 
-- `heroImage`, `gallery`, `galleryGroups`, `thumbnailOverride`, `floorplans`, `videoUrl`, `virtualTourUrl`
-  - Classification: **public** only when selected and approved for public use.
+- `gallery`, `galleryGroups`, `thumbnailOverride`, `floorplans`, `videoUrl`, `virtualTourUrl`
+  - Classification: **public** when the asset has an uploaded file and the listing is publish-ready. The first gallery image is the listing hero on the website. Editorial review (gallery order, alt text) is optional via `workflow.reviewItems`; do not use rights, public-use, or aerial-privacy checklist items.
 
 - `brochure`
   - Classification: **private/internal** by default; public/request-only only after approval.
@@ -367,22 +352,8 @@ Initial controlled feature vocabulary may include: frontline golf, golf views, p
   - Values: `disabled`, `request_only`, `public_approved`, `internal_source_only`.
   - Default: `request_only` or `disabled` until approved.
 
-- `imageRightsStatus`
-  - Classification: **private/internal governance** controlling public media use.
-  - Values: `source_pack_provided`, `specific_concern`, `needs_rights_review`, `approved`, `rejected`.
-  - Default: `source_pack_provided` for property-pack sourced images unless evidence says otherwise.
-  - Desk alarm: only `needs_rights_review` and `specific_concern` (not `source_pack_provided`).
-
-- `publicMediaApproved`, `publicUseApproved`, `approvalStatus`, `approvedBy`, `approvedAt`
-  - Classification: **private/internal**.
-
-- `assetBrandingType`
-  - Classification: **private/internal governance**; may affect public output.
-  - Values: `ghi_branded`, `developer_branded`, `agency_branded`, `third_party_branded`, `unbranded`, `unknown`.
-  - Rule: GHI-branded assets can be public once final/approved. Non-GHI branded source assets are internal-only unless explicitly approved. Unbranded assets are preferred for public galleries, subject to usage approval.
-
-- `requiresRebrandOrCrop`, `brandingNotes`, `imageUsageNotes`, `sourceMediaFolderUrl`, `sourceDriveFileId`
-  - Classification: **private/internal**.
+- `sourceMediaFolderUrl`, `sourceDriveFileId`, `sourceFileName`
+  - Classification: **private/internal** (provenance tracking only; not queried for public pages).
 
 - `altText`, `caption`, `assetCategory`, `order`, `recommendedCrop`, `focalPoint`
   - Classification: **public** when attached to public assets.
@@ -522,6 +493,7 @@ Rejected for public modelling:
 - Unsupported investment/scarcity claims.
 - Reserved-unit rows/cards/statuses in public output.
 - Community fees, IBI, and garbage tax in public v1 output.
+- Parking spaces, garage spaces, and energy performance certificate (EPC) data as structured public fields.
 
 ## Minimum publish-ready field sets
 
@@ -532,12 +504,12 @@ Required before public publish:
 - `ghiListingId` in `GHIXXXXX` format.
 - `publicTitle`, `slug`, `listingKind = property`, `propertyType`.
 - Location taxonomy sufficient for breadcrumbs/public display.
-- `addressDisplay` and `mapPrivacyLevel` decision.
+- `addressDisplay` and `community` reference; community `coordinates` when the location map module is used.
 - `price` or approved POA/no-price strategy, `priceDisplay`, `currency`, `priceSourceStatus` not equal to unreviewed folder hint.
 - Confirmed `availabilityStatus` that is not hidden/reserved.
 - Core specs appropriate to the property type.
-- Approved `heroImage`; approved gallery if page UX includes gallery.
-- Public-safe media governance: no `rejected` hero; branding/use rules satisfied.
+- Approved first gallery image (listing hero); additional gallery images if page UX includes a gallery.
+- Public-safe media governance: branding/use rules satisfied for public gallery assets.
 - `shortDescription` and `aboutDescription` reviewed.
 - `featureHighlights` reviewed if displayed.
 - Golf enrichment reviewed: `golfRelevance`, plus `linkedGolfCourses` only when named course claims/cards are shown.
@@ -568,7 +540,7 @@ Required before public development publish:
 - `slug`.
 - `listingKind = development`.
 - `developmentDisplayMode` selected.
-- Location taxonomy and `mapPrivacyLevel`.
+- Location taxonomy (`community` required) and community `coordinates` when map is shown.
 - `developerName` if source-supported and approved, or blank/unknown.
 - `developmentComposition` and shared amenities/features.
 - `priceFrom` / `priceTo` or approved POA/range/enquiry-led strategy.
@@ -727,25 +699,15 @@ document locationTaxonomy {
   seoTitle: string
   metaDescription: string
   publicDescription: text
-  mapPrivacyDefault: 'exact' | 'approximate' | 'area_only' | 'hidden'
+  coordinates: geopoint // public on community docs — community-area map pin
 }
 
 object locationFields {
-  country: reference locationTaxonomy
-  region: reference locationTaxonomy
-  municipality: reference locationTaxonomy
-  area: reference locationTaxonomy
-  subArea: reference locationTaxonomy
-  microLocation: reference locationTaxonomy|string
+  country: reference locationTaxonomy // hidden, auto-derived
+  location: reference locationTaxonomy // hidden, auto-derived
+  community: reference locationTaxonomy // required
   addressDisplay: string // public
   exactAddressInternal: string // private_internal
-  coordinates: geopoint // private_internal raw coordinate
-  coordinateSource: string // private_internal
-  mapPrivacyLevel: 'exact' | 'approximate' | 'area_only' | 'hidden'
-  mapDisplayApproved: boolean
-  mapDisplayApprovedBy: string
-  mapDisplayApprovedAt: datetime
-  publicMapNotes: string
 }
 
 object pricingFields {
@@ -785,16 +747,9 @@ object mediaAssetMetadata {
   order: number
   altText: string
   caption: string
-  assetBrandingType: 'ghi_branded' | 'developer_branded' | 'agency_branded' | 'third_party_branded' | 'unbranded' | 'unknown'
-  imageRightsStatus: 'source_pack_provided' | 'specific_concern' | 'needs_rights_review' | 'approved' | 'rejected'
-  publicUseApproved: boolean
-  requiresRebrandOrCrop: boolean
-  brandingNotes: text // private_internal
-  imageUsageNotes: text // private_internal
   sourceDriveFileId: string // private_internal
   sourceMediaFolderUrl: url // private_internal
-  approvedBy: string
-  approvedAt: datetime
+  sourceFileName: string // private_internal
 }
 
 object reviewItem {
@@ -846,13 +801,12 @@ object sensitiveGovernanceFields {
 - Public price cannot be published when `priceSourceStatus = folder_hint_only`.
 - `availabilityStatus = reserved` must force `publicVisibility = hidden` or `internal_only`.
 - Reserved units/items must be excluded from public queries, unit tables, cards, schema markup, feeds, downloads, SEO metadata, and customer-facing copy.
-- `mapPrivacyLevel` must exist before a map module renders.
-- Raw `coordinates` must never be sent directly to public pages without transformation/filtering by `mapPrivacyLevel`.
+- Listing documents must not store per-property map coordinates or map privacy fields.
+- Community `coordinates` are returned via allowlisted GROQ and transformed to a community-area `map` payload on the public response.
 - `commissionVisibility` must be `private_internal` for v1.
 - `feesTaxVisibility` must be `private_internal` for v1.
 - Brochure downloads must be disabled or request-only unless `brochureVisibility = public_approved`.
-- Any asset with `imageRightsStatus = rejected` (or legacy `restricted` / `do_not_use`) must be excluded from public output.
-- Non-GHI branded assets must not be public unless `publicUseApproved = true`.
+- Public media output includes only assets with an uploaded `asset` or `fileAsset` (no rights/branding gate).
 - `legalPublicUseAllowed` defaults to false.
 - Public SEO fields must be generated only from public-safe fields.
 
@@ -862,11 +816,10 @@ A record can reach `approved_for_publish` only when:
 
 - Public identity is complete.
 - Location/breadcrumb fields are public-safe and reviewed.
-- Map privacy is manually set.
+- Community map coordinates are set on the community taxonomy when a map is required.
 - Price/status/specs are source-supported or intentionally blank/POA/enquiry-led.
 - Reserved/hidden child records are filtered.
-- Public media is selected and public-use safe.
-- Branded assets are approved or excluded.
+- Public media has uploaded files; hero/gallery order and alt text are editorially acceptable (optional `reviewItems` only — not rights/aerial gates).
 - Brochure behaviour is request-only/disabled/public-approved as configured.
 - Golf enrichment is reviewed enough for the claims shown.
 - Public copy and SEO metadata are human reviewed.
@@ -899,8 +852,8 @@ The following must never be returned to public pages, SEO metadata, structured d
 - commission fields and commission notes;
 - community fees, IBI, garbage tax, and fee/tax source notes for v1;
 - raw source folder IDs, Drive links, file paths, source provenance details, and extraction notes;
-- exact address/internal address unless explicitly approved through map privacy;
-- raw coordinates unless transformed by the map privacy layer;
+- exact address/internal address;
+- raw listing-level coordinates (removed from schema);
 - legal/cadastral/collaboration/source-sensitive notes;
 - sensitive governance details and internal-only notes;
 - `doNotPublishReason` and review notes;
@@ -917,12 +870,8 @@ Recommended developer pattern:
 1. Query only public allowlisted fields.
 2. Apply readiness filters: `publishReadiness in ['approved_for_publish', 'published']` and `publicVisibility = visible`.
 3. Filter child units/availability rows: exclude `reserved`, `hidden`, `internal_only`, and unapproved rows.
-4. Transform map data according to `mapPrivacyLevel`:
-   - `exact`: return exact coordinate only if approved.
-   - `approximate`: return intentionally fuzzed/area coordinate.
-   - `area_only`: return location taxonomy/area centroid or no marker.
-   - `hidden`: return no map coordinate.
-5. Filter media by `publicUseApproved`, `imageRightsStatus`, and `assetBrandingType` rules.
+4. Transform map data from `location.community.coordinates` into a community-area `map` payload (`area_only` when coords exist, otherwise none).
+5. Filter media to items with an uploaded file; apply `brochureVisibility` for brochure downloads.
 6. Build SEO metadata only from the same public-safe payload.
 7. Build schema.org structured data only from public-safe fields.
 8. Keep private/internal data available only to authenticated admin/reporting surfaces.
@@ -944,7 +893,7 @@ const PROPERTY_PUBLIC_FIELDS = [
   'location.subArea.name',
   'location.microLocation',
   'location.addressDisplay',
-  'location.mapPrivacyLevel', // only for map transform logic
+  'location.community.coordinates', // community-area map transform
   'pricing.priceDisplay',
   'pricing.currency',
   'pricing.priceQualifier',
@@ -954,12 +903,10 @@ const PROPERTY_PUBLIC_FIELDS = [
   'golf.primaryGolfCourse.name',
   'golf.linkedGolfCourses[].name',
   'content.shortDescription',
-  'content.heroHeadline',
   'content.aboutDescription',
   'content.locationDescription',
   'content.golfDescription',
   'content.featureHighlights',
-  'media.heroImage.publicFieldsOnly',
   'media.gallery.publicFieldsOnly',
   'ctas.publicFieldsOnly',
   'seo.seoTitle',

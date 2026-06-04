@@ -2,29 +2,15 @@ import type { RawDevelopment, RawPropertyListing } from '../transforms';
 import type { MediaAssetInput } from '../transforms/mediaFilter';
 
 const APPROVED_IMAGE_REF = 'image-verification-approved';
-const BLOCKED_IMAGE_REF = 'image-verification-blocked';
 
 function imageRef(ref: string) {
 	return { _type: 'image' as const, asset: { _type: 'reference' as const, _ref: ref } };
 }
 
-function approvedAsset(ref: string, alt: string): MediaAssetInput {
+function mediaAsset(ref: string, alt: string): MediaAssetInput {
 	return {
 		asset: imageRef(ref),
-		altText: alt,
-		assetBrandingType: 'ghi_branded',
-		imageRightsStatus: 'approved',
-		publicUseApproved: true
-	};
-}
-
-function blockedAsset(ref: string, alt: string, rights: 'rejected' | 'do_not_use' | 'restricted' = 'rejected'): MediaAssetInput {
-	return {
-		asset: imageRef(ref),
-		altText: alt,
-		assetBrandingType: 'third_party_branded',
-		imageRightsStatus: rights === 'rejected' ? 'rejected' : rights,
-		publicUseApproved: false
+		altText: alt
 	};
 }
 
@@ -35,11 +21,10 @@ const sharedLocation = {
 		_id: 'cm1',
 		name: 'Verification Community',
 		slug: 'verification-community',
-		type: 'community'
+		type: 'community',
+		coordinates: { lat: 36.484, lng: -4.952 }
 	},
-	addressDisplay: 'Costa del Sol, Spain',
-	mapPrivacyLevel: 'area_only' as const,
-	mapDisplayApproved: false
+	addressDisplay: 'Costa del Sol, Spain'
 };
 
 /** Raw query-shaped payload for fixture 1 — fully published property. */
@@ -64,12 +49,13 @@ export const goldenPropertyRaw: RawPropertyListing = {
 	},
 	specs: { bedrooms: 4, bathrooms: 3, builtArea: 280, builtAreaUnit: 'sqm' },
 	content: {
-		shortDescription: 'Verification golden villa fixture.',
-		heroHeadline: 'Verification Golden Villa'
+		shortDescription: 'Verification golden villa fixture.'
 	},
 	media: {
-		heroImage: approvedAsset(APPROVED_IMAGE_REF, 'Approved hero'),
-		gallery: [approvedAsset(APPROVED_IMAGE_REF, 'Approved gallery')]
+		gallery: [
+			mediaAsset(APPROVED_IMAGE_REF, 'Approved hero'),
+			mediaAsset(APPROVED_IMAGE_REF, 'Approved gallery')
+		]
 	}
 };
 
@@ -93,11 +79,10 @@ export const privacyDevelopmentRaw: RawDevelopment = {
 		publicVisibility: 'visible'
 	},
 	content: {
-		shortDescription: 'Verification privacy units fixture.',
-		heroHeadline: 'Verification Privacy Units Development'
+		shortDescription: 'Verification privacy units fixture.'
 	},
 	media: {
-		heroImage: approvedAsset(APPROVED_IMAGE_REF, 'Approved development hero')
+		gallery: [mediaAsset(APPROVED_IMAGE_REF, 'Approved development hero')]
 	},
 	units: [
 		{
@@ -127,7 +112,7 @@ export const privacyDevelopmentRaw: RawDevelopment = {
 	]
 };
 
-/** Raw query-shaped payload for fixture 3 — blocked hero + restricted gallery. */
+/** Raw query-shaped payload for fixture 3 — first gallery slot has no file; later item is public. */
 export const mediaPrivacyPropertyRaw: RawPropertyListing = {
 	_id: 'verificationFixture.property.media-privacy',
 	_type: 'propertyListing',
@@ -148,14 +133,12 @@ export const mediaPrivacyPropertyRaw: RawPropertyListing = {
 	},
 	specs: { bedrooms: 3, bathrooms: 2, builtArea: 200, builtAreaUnit: 'sqm' },
 	content: {
-		shortDescription: 'Verification media privacy fixture.',
-		heroHeadline: 'Verification Media Privacy Villa'
+		shortDescription: 'Verification media privacy fixture.'
 	},
 	media: {
-		heroImage: blockedAsset(BLOCKED_IMAGE_REF, 'Do-not-use hero', 'do_not_use'),
 		gallery: [
-			blockedAsset(BLOCKED_IMAGE_REF, 'Restricted gallery', 'restricted'),
-			approvedAsset(APPROVED_IMAGE_REF, 'Approved gallery')
+			{ altText: 'Gallery placeholder without uploaded file' },
+			mediaAsset(APPROVED_IMAGE_REF, 'Gallery image')
 		]
 	}
 };
@@ -175,11 +158,6 @@ export const schemaViolationExamples = {
 		priceSourceStatus: 'source_confirmed',
 		availabilityStatus: 'reserved',
 		publicVisibility: 'visible'
-	},
-	restrictedApproved: {
-		assetBrandingType: 'third_party_branded',
-		imageRightsStatus: 'rejected',
-		publicUseApproved: true
 	}
 } as const;
 
@@ -199,4 +177,4 @@ export const queryGateFailures = {
 	}
 } as const;
 
-export { APPROVED_IMAGE_REF, BLOCKED_IMAGE_REF };
+export { APPROVED_IMAGE_REF };

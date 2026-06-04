@@ -67,12 +67,6 @@ export const contentFields = defineType({
 				'Required. Brief summary for search results and listing cards. Must be reviewed before going live. Do not include investment or urgency claims unless confirmed from a source.',
 			validation: (Rule) => Rule.required()
 		}),
-		defineField({
-			name: 'heroHeadline',
-			title: 'Hero headline',
-			type: 'string',
-			description: 'A bold headline displayed prominently at the top of the listing page, above the main description.'
-		}),
 		portableTextField(
 			'aboutDescription',
 			'About description',
