@@ -4,7 +4,6 @@
 	import EnquiryCta from '$lib/components/property/EnquiryCta.svelte';
 	import Gallery from '$lib/components/property/Gallery.svelte';
 	import GolfInfo from '$lib/components/property/GolfInfo.svelte';
-	import Hero from '$lib/components/property/Hero.svelte';
 	import KeyFacts from '$lib/components/property/KeyFacts.svelte';
 	import LocationSection from '$lib/components/property/LocationSection.svelte';
 	import DevelopmentEnquiryCta from '$lib/components/development/EnquiryCta.svelte';
@@ -101,9 +100,8 @@
 </svelte:head>
 
 {#if property}
-	<article class="listing-page">
+	<article class="listing-page listing-page--property">
 		<Breadcrumbs items={data.breadcrumbs} />
-		<Hero listing={property} />
 		<Gallery media={property.media} title={property.title ?? 'Property'} />
 		<KeyFacts listing={property} />
 
@@ -164,6 +162,19 @@
 <style>
 	.listing-page {
 		padding-bottom: 0;
+	}
+
+	/* Mobile: gallery becomes a full-bleed hero flush under the nav, breadcrumbs
+	   drop below it (photo-first). Property pages only. Mirrors +page.svelte. */
+	@media (max-width: 760px) {
+		.listing-page--property {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.listing-page--property > :global(.gallery) {
+			order: -1;
+		}
 	}
 
 	.amenities {

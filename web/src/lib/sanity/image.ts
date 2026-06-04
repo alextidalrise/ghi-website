@@ -28,7 +28,9 @@ export function buildPublicImageUrl(
 		return null;
 	}
 
-	let imageBuilder = builder.image(asset.asset as SanityImageSource);
+	// auto('format') lets the Sanity CDN negotiate AVIF/WebP per request,
+	// so every consumer of this helper ships modern formats without opting in.
+	let imageBuilder = builder.image(asset.asset as SanityImageSource).auto('format');
 
 	if (options.width) {
 		imageBuilder = imageBuilder.width(options.width);

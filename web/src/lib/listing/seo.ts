@@ -112,20 +112,6 @@ function buildPostalAddress(location: ListingLocation | null): Record<string, un
 	};
 }
 
-function buildGeoCoordinates(
-	location: ListingLocation | null
-): Record<string, unknown> | undefined {
-	const map = location?.map;
-	if (map?.level !== 'exact' || !map.coordinates) {
-		return undefined;
-	}
-
-	return {
-		'@type': 'GeoCoordinates',
-		latitude: map.coordinates.lat,
-		longitude: map.coordinates.lng
-	};
-}
 
 function buildOffers(pricing: PublicPricing | null | undefined): Record<string, unknown> | undefined {
 	if (!pricing) {
@@ -185,7 +171,6 @@ export function buildRealEstateListingJsonLd(
 	const specs = listing.specs;
 	const bedrooms = typeof specs?.bedrooms === 'number' ? specs.bedrooms : undefined;
 	const address = buildPostalAddress(listing.location);
-	const geo = buildGeoCoordinates(listing.location);
 	const offers = buildOffers(listing.pricing);
 	const floorSize = buildFloorSize(specs);
 	const image = buildListingImage(listing);
@@ -208,10 +193,6 @@ export function buildRealEstateListingJsonLd(
 
 	if (address) {
 		jsonLd.address = address;
-	}
-
-	if (geo) {
-		jsonLd.geo = geo;
 	}
 
 	if (offers) {
