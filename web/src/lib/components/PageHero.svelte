@@ -1,17 +1,34 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
+	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 
 	type Props = {
 		image: string;
 		alt: string;
 		lead?: string;
+		/** Breadcrumbs laid over the top of the hero photograph. */
+		breadcrumbs?: BreadcrumbItem[];
+		/** In-page CTA. Both must be set for the button to render. */
+		ctaHref?: string;
+		ctaLabel?: string;
 		/** Less bottom padding when nothing bridges below the hero (e.g. no discovery bar). */
 		compact?: boolean;
 		fetchpriority?: 'high' | 'low' | 'auto';
 		title: Snippet;
 	};
 
-	let { image, alt, lead, compact = false, fetchpriority = 'auto', title }: Props = $props();
+	let {
+		image,
+		alt,
+		lead,
+		breadcrumbs,
+		ctaHref,
+		ctaLabel,
+		compact = false,
+		fetchpriority = 'auto',
+		title
+	}: Props = $props();
 </script>
 
 <section class="page-hero on-dark" class:page-hero--compact={compact}>
@@ -20,12 +37,21 @@
 	</div>
 	<div class="page-hero__overlay" aria-hidden="true"></div>
 
+	{#if breadcrumbs && breadcrumbs.length > 0}
+		<div class="page-hero__top">
+			<Breadcrumbs items={breadcrumbs} onDark />
+		</div>
+	{/if}
+
 	<div class="page-hero__content content-wrap">
 		<h1 class="page-hero__title">
 			{@render title()}
 		</h1>
 		{#if lead}
 			<p class="page-hero__lead">{lead}</p>
+		{/if}
+		{#if ctaHref && ctaLabel}
+			<a class="page-hero__cta" href={ctaHref}>{ctaLabel}</a>
 		{/if}
 	</div>
 </section>
@@ -35,7 +61,7 @@
 		position: relative;
 		min-height: min(calc(100dvh - var(--nav-height)), 44rem);
 		display: flex;
-		align-items: flex-end;
+		flex-direction: column;
 		overflow: hidden;
 	}
 
@@ -66,10 +92,18 @@
 		z-index: 1;
 	}
 
+	.page-hero__top {
+		position: relative;
+		z-index: 2;
+		width: 100%;
+	}
+
 	.page-hero__content {
 		position: relative;
 		z-index: 2;
 		width: 100%;
+		/* Push the headline block to the foot of the hero; breadcrumbs hold the top. */
+		margin-top: auto;
 		padding-top: var(--hero-padding-y);
 		padding-bottom: clamp(8rem, 15vh, 12rem);
 	}
@@ -96,6 +130,34 @@
 		max-width: 34rem;
 		line-height: 1.7;
 		letter-spacing: 0.01em;
+	}
+
+	.page-hero__cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: var(--space-lg);
+		padding: 0.9rem 1.85rem;
+		background: var(--gold);
+		color: var(--green);
+		border: 1px solid var(--gold);
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		font-weight: 500;
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		text-decoration: none;
+		transition:
+			background var(--duration-hover) var(--ease),
+			color var(--duration-hover) var(--ease),
+			border-color var(--duration-hover) var(--ease);
+	}
+
+	.page-hero__cta:hover,
+	.page-hero__cta:focus-visible {
+		background: transparent;
+		color: var(--on-green);
+		border-color: rgba(245, 241, 232, 0.65);
 	}
 
 	@media (max-width: 600px) {

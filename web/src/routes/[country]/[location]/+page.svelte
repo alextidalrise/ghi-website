@@ -1,7 +1,9 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
+	import PageHero from '$lib/components/PageHero.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import ListingResults from '$lib/components/listing/ListingResults.svelte';
+	import { locationFeatureByPath, locationHeadline } from '$lib/home/curated';
 	import { buildListingSearchHref } from '$lib/listing/searchParams';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
@@ -9,6 +11,23 @@
 
 	const placeholderBody = $derived(
 		`Property listings and editorial content for ${data.location.name} coming soon.`
+	);
+
+	// Curated hero photograph + positioning line for this location, when one exists.
+	const locationFeature = $derived(locationFeatureByPath(data.canonicalPath));
+
+	// The hero stays location-level; an active community filter refines the results
+	// below, so it surfaces in the hero title/lead to keep the page in context.
+	const heroTitle = $derived(
+		data.activeCommunity?.name
+			? `${data.activeCommunity.name} — ${data.location.name}`
+			: locationHeadline(data.location.name)
+	);
+
+	const heroLead = $derived(
+		data.activeCommunity?.publicDescription ??
+			data.location.publicDescription ??
+			locationFeature?.tagline
 	);
 
 	// Only direct communities (sub-areas whose listings live under this location) can
@@ -19,12 +38,6 @@
 				Boolean(community.slug && community.name)
 			)
 			.map((community) => ({ label: community.name, value: community.slug }))
-	);
-
-	const pageHeading = $derived(
-		data.activeCommunity?.name
-			? `${data.activeCommunity.name} — ${data.location.name}`
-			: data.location.name
 	);
 
 	const introText = $derived(
@@ -65,12 +78,33 @@
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
 
-<article class="location-page">
-	<Breadcrumbs items={data.breadcrumbs} />
+{#if locationFeature}
+	<PageHero
+		image={locationFeature.image}
+		alt={locationFeature.alt}
+		breadcrumbs={data.breadcrumbs}
+		lead={heroLead}
+		ctaHref="#properties"
+		ctaLabel="Browse properties"
+		compact
+		fetchpriority="high"
+	>
+		{#snippet title()}
+			{heroTitle}
+		{/snippet}
+	</PageHero>
+{/if}
+
+<article class="location-page" class:location-page--has-hero={locationFeature}>
+	{#if !locationFeature}
+		<Breadcrumbs items={data.breadcrumbs} />
+	{/if}
 
 	<div class="location-page__top content-wrap">
-		<h1>{pageHeading}</h1>
-		<p class="location-page__intro">{introText}</p>
+		{#if !locationFeature}
+			<h1>{heroTitle}</h1>
+			<p class="location-page__intro">{introText}</p>
+		{/if}
 
 		{#if data.relatedAreaLinks.length > 0}
 			<section class="location-page__list" aria-labelledby="related-areas-heading">
@@ -96,15 +130,17 @@
 		/>
 	</div>
 
-	<ListingResults
-		basePath={data.canonicalPath}
-		searchParams={data.searchParams}
-		cards={data.listingResults.cards}
-		total={data.listingResults.total}
-		pagination={data.listingResults.pagination}
-		heading={`All properties in ${data.location.name}`}
-		{communityOptions}
-	/>
+	<div id="properties" class="location-page__results">
+		<ListingResults
+			basePath={data.canonicalPath}
+			searchParams={data.searchParams}
+			cards={data.listingResults.cards}
+			total={data.listingResults.total}
+			pagination={data.listingResults.pagination}
+			heading={`All properties in ${data.location.name}`}
+			{communityOptions}
+		/>
+	</div>
 
 	{#if data.directCommunities.length > 0 || data.associatedCommunities.length > 0}
 		<div class="location-page__after content-wrap">
@@ -148,6 +184,17 @@
 
 	.location-page__top {
 		padding-top: var(--space-xl);
+	}
+
+	/* The hero already carries generous breathing room above the rail/links;
+	   don't stack another --space-xl on top of it. */
+	.location-page--has-hero .location-page__top:empty {
+		display: none;
+	}
+
+	/* Offset the smooth-scroll target so the listings heading clears the sticky nav. */
+	.location-page__results {
+		scroll-margin-top: calc(var(--nav-height) + var(--space-md));
 	}
 
 	.location-page__intro {

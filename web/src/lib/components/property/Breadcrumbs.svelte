@@ -3,12 +3,14 @@
 
 	type Props = {
 		items: BreadcrumbItem[];
+		/** Light treatment for breadcrumbs laid over a dark hero image. */
+		onDark?: boolean;
 	};
 
-	let { items }: Props = $props();
+	let { items, onDark = false }: Props = $props();
 </script>
 
-<nav class="breadcrumbs content-wrap" aria-label="Breadcrumb">
+<nav class="breadcrumbs content-wrap" class:breadcrumbs--on-dark={onDark} aria-label="Breadcrumb">
 	<ol class="breadcrumbs__list">
 		{#each items as item, index (item.label + (item.href ?? index))}
 			<li class="breadcrumbs__item">
@@ -54,5 +56,25 @@
 
 	.breadcrumbs__item span {
 		color: var(--charcoal);
+	}
+
+	/* On-dark variant: breadcrumbs laid over a hero photograph. */
+	.breadcrumbs--on-dark .breadcrumbs__item::after {
+		color: rgba(245, 241, 232, 0.45);
+	}
+
+	.breadcrumbs--on-dark .breadcrumbs__item a {
+		color: rgba(245, 241, 232, 0.85);
+		transition: color var(--duration-hover) var(--ease);
+	}
+
+	.breadcrumbs--on-dark .breadcrumbs__item a:hover,
+	.breadcrumbs--on-dark .breadcrumbs__item a:focus-visible {
+		color: var(--gold);
+		text-decoration: none;
+	}
+
+	.breadcrumbs--on-dark .breadcrumbs__item span {
+		color: var(--on-green);
 	}
 </style>

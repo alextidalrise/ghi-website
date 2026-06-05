@@ -58,6 +58,16 @@ export function locationFeaturesForCountry(countryName: string): LocationFeature
 	return LOCATION_FEATURES.filter((location) => location.countryLabel === countryName);
 }
 
+/** Location hero headline — mirrors `countryHeadline`, aligned with the keyword map. */
+export function locationHeadline(name: string): string {
+	return `Golf property for sale in ${name}`;
+}
+
+/** Look up a curated location feature (hero image + tagline) by its canonical path. */
+export function locationFeatureByPath(path: string): LocationFeature | undefined {
+	return LOCATION_FEATURES.find((location) => location.href === path);
+}
+
 export const LOCATION_FEATURES: LocationFeature[] = [
 	{
 		name: 'Marbella',
