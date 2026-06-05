@@ -89,7 +89,7 @@ Color is used sparingly and with intent. The system is **white by default, deep 
 | On Green | `#F5F1E8` | `--on-green` | Light ink for text and icons on green surfaces only. Never a page or panel surface. |
 | Charcoal | `#2B2B2B` | `--charcoal` | Body text, secondary headings. |
 | Stone Border | `#E2DED5` | `--border` | 1px structural borders, dividers, input underlines. |
-| Muted | `#7A7A7A` | `--muted` | Secondary text, descriptions, metadata. |
+| Muted | `#6B6B6B` | `--muted` | Secondary text, descriptions, metadata. ~5.3:1 on white (AA). |
 
 ### Semantic Colors (to be defined as needed)
 - **Success:** TBD -- should align with the green family, distinct from primary
@@ -107,7 +107,7 @@ The palette inverts with care, not mechanically.
 | `--charcoal` | `#2B2B2B` | `#E8E5DF` |
 | `--white` | `#FFFFFF` | `#1C231E` |
 | `--border` | `#E2DED5` | `#2A332C` |
-| `--muted` | `#7A7A7A` | `#8A8A8A` |
+| `--muted` | `#6B6B6B` | `#8A8A8A` |
 | `--gold` | `#D6C3A3` | `#D6C3A3` (unchanged) |
 
 Dark background for hero/mockup sections: `#0E1410`
@@ -215,7 +215,7 @@ Underline on hover (not at rest). Arrow (`→`) slides right 3px on hover. Color
     --charcoal: #2B2B2B;
     --white: #FFFFFF;
     --border: #E2DED5;
-    --muted: #7A7A7A;
+    --muted: #6B6B6B;
 
     --serif: 'Playfair Display', 'Georgia', serif;
     --sans: 'Libre Franklin', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -262,3 +262,4 @@ been retired in favour of this page.
 |------|----------|-----------|
 | 2026-06-01 | Consolidated two clashing design-system showcases into one | A frozen hand-built HTML page (`web/static/design-system/design-system/index.html`) and a live Svelte page (`/internal/design-system`) both showed the system and had drifted. The static page hardcoded its own `:root` tokens, so it could not stay in sync. Retired the static page; kept the live Svelte page as the single source-of-truth showcase. Load-bearing brand assets under `web/static/design-system/assets/` (logo, hero image, referenced by `SiteNav` and the homepage) were preserved. |
 | 2026-06-01 | Removed the cream surface (`--linen`); moved to white-default + green-punctuation | Partner no longer liked the warm cream tint on feature panels. Tested the data-heavy sections (key facts, amenities) on white and confirmed they hold: key facts now sits in a 1px hairline frame, amenities became outline chips, image-led sections (gallery, location) go straight to white. Cream had no remaining job. `--linen` deleted; its only other role (light ink on green) renamed to `--on-green`. Rhythm now carried by whitespace, hairlines, photography, and the deep-green emphasis bands. |
+| 2026-06-05 | Darkened `--muted` `#7A7A7A` → `#6B6B6B` (light mode) | `#7A7A7A` measured ~4.3:1 on white, below the AA 4.5 floor PRODUCT.md sets for the older, affluent audience. Every muted-on-white instance (metadata, labels, the property location line) was technically failing. `#6B6B6B` is ~5.3:1 and still reads as soft secondary gray. Dark-mode `--muted` (`#8A8A8A`, on a dark surface) unchanged. |

@@ -1,11 +1,9 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import ContentSection from '$lib/components/property/ContentSection.svelte';
-	import EnquiryCta from '$lib/components/property/EnquiryCta.svelte';
-	import Gallery from '$lib/components/property/Gallery.svelte';
 	import GolfInfo from '$lib/components/property/GolfInfo.svelte';
-	import KeyFacts from '$lib/components/property/KeyFacts.svelte';
 	import LocationSection from '$lib/components/property/LocationSection.svelte';
+	import PropertyDetail from '$lib/components/property/PropertyDetail.svelte';
 	import DevelopmentEnquiryCta from '$lib/components/development/EnquiryCta.svelte';
 	import DevelopmentGallery from '$lib/components/development/Gallery.svelte';
 	import DevelopmentHero from '$lib/components/development/Hero.svelte';
@@ -100,34 +98,7 @@
 </svelte:head>
 
 {#if property}
-	<article class="listing-page listing-page--property">
-		<Breadcrumbs items={data.breadcrumbs} />
-		<Gallery media={property.media} title={property.title ?? 'Property'} />
-		<KeyFacts listing={property} />
-
-		<ContentSection title="About" body={property.content?.aboutDescription} />
-
-		<LocationSection
-			description={property.content?.locationDescription}
-			address={property.location?.addressDisplay}
-			map={property.location?.map}
-		/>
-
-		<GolfInfo golf={property.golf} description={property.content?.golfDescription} />
-
-		{#if property.content?.amenities && property.content.amenities.length > 0}
-			<section class="amenities content-wrap" aria-labelledby="amenities-heading">
-				<h2 id="amenities-heading">Amenities</h2>
-				<ul class="amenities__list">
-					{#each property.content.amenities as amenity (amenity)}
-						<li>{amenity}</li>
-					{/each}
-				</ul>
-			</section>
-		{/if}
-
-		<EnquiryCta listing={property} />
-	</article>
+	<PropertyDetail {property} breadcrumbs={data.breadcrumbs} />
 {:else if development}
 	<article class="listing-page">
 		<Breadcrumbs items={data.breadcrumbs} />
@@ -160,42 +131,8 @@
 {/if}
 
 <style>
+	/* Development article only; the property page is wholly owned by PropertyDetail. */
 	.listing-page {
 		padding-bottom: 0;
-	}
-
-	/* Mobile: gallery becomes a full-bleed hero flush under the nav, breadcrumbs
-	   drop below it (photo-first). Property pages only. Mirrors +page.svelte. */
-	@media (max-width: 760px) {
-		.listing-page--property {
-			display: flex;
-			flex-direction: column;
-		}
-
-		.listing-page--property > :global(.gallery) {
-			order: -1;
-		}
-	}
-
-	.amenities {
-		padding-block: var(--space-xl);
-	}
-
-	.amenities h2 {
-		margin-bottom: var(--space-md);
-	}
-
-	.amenities__list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.65rem;
-		list-style: none;
-	}
-
-	.amenities__list li {
-		font-size: var(--text-ui);
-		padding: 0.45rem 0.85rem;
-		border: 1px solid var(--border);
-		color: var(--green);
 	}
 </style>

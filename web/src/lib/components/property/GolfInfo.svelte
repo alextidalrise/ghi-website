@@ -9,9 +9,12 @@
 				? D
 				: null
 			: null;
+		/** Property pages surface the course in a dedicated card beside the map, so
+		    they hide this list to avoid repeating it. Developments keep it. */
+		showCourses?: boolean;
 	};
 
-	let { golf, description }: Props = $props();
+	let { golf, description, showCourses = true }: Props = $props();
 
 	const isRelevant = $derived(
 		golf?.golfRelevance &&
@@ -35,7 +38,7 @@
 
 			<PortableTextBlock value={description} />
 
-			{#if courses.length > 0}
+			{#if showCourses && courses.length > 0}
 				<ul class="golf__courses">
 					{#each courses as course (course._id)}
 						<li>

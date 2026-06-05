@@ -13,7 +13,9 @@
 	--charcoal: #2b2b2b;
 	--white: #ffffff;
 	--border: #e2ded5;
-	--muted: #7a7a7a;
+	/* Secondary text on white. #7a7a7a was ~4.3:1 (below AA); #6b6b6b is ~5.3:1,
+	   clearing the 4.5 floor PRODUCT.md sets for the older, affluent audience. */
+	--muted: #6b6b6b;
 	--hero-dark: #0e1410;
 
 	/* Typography families */

@@ -20,6 +20,14 @@ function formatAmount(amount: number, currency: string): string {
 	return formatter(currency).format(amount);
 }
 
+/** Only qualifiers that read naturally in front of a price get a prefix. "exact"
+    is the default (the price IS the price) and must not render; "reduced",
+    "poa" and "enquiry_led" are handled elsewhere or carry no useful prefix. */
+const QUALIFIER_PREFIX: Record<string, string> = {
+	from: 'From',
+	guide: 'Guide'
+};
+
 /** Format public-safe pricing for display. Returns null when no price may be shown. */
 export function formatListingPrice(pricing: PublicPricing | null | undefined): string | null {
 	if (!pricing) {
@@ -33,8 +41,9 @@ export function formatListingPrice(pricing: PublicPricing | null | undefined): s
 	const currency = pricing.currency ?? 'EUR';
 
 	if (pricing.price != null) {
-		const qualifier = pricing.priceQualifier ? `${pricing.priceQualifier} ` : '';
-		return `${qualifier}${formatAmount(pricing.price, currency)}`.trim();
+		const prefix = pricing.priceQualifier ? (QUALIFIER_PREFIX[pricing.priceQualifier] ?? '') : '';
+		const amount = formatAmount(pricing.price, currency);
+		return prefix ? `${prefix} ${amount}` : amount;
 	}
 
 	if (pricing.priceFrom != null && pricing.priceTo != null) {
