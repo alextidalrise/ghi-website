@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "sanity dev",
 		"build": "sanity build",
+		"check": "tsc -p tsconfig.json --noEmit",
 		"deploy": "sanity deploy",
 		"start": "sanity start",
 		"datasets:list": "sanity dataset list",

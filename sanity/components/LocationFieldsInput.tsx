@@ -29,10 +29,10 @@ export function LocationFieldsInput(props: ObjectInputProps) {
 		if (!communityRef) {
 			if (value.location || value.country) {
 				onChange(
-					PatchEvent.from(
+					PatchEvent.from([
 						...(value.location ? [unset(['location'])] : []),
 						...(value.country ? [unset(['country'])] : [])
-					)
+					])
 				);
 			}
 			return;
@@ -62,7 +62,7 @@ export function LocationFieldsInput(props: ObjectInputProps) {
 
 			if (patches.length > 0) {
 				syncingRef.current = true;
-				onChange(PatchEvent.from(...patches));
+				onChange(PatchEvent.from(patches));
 				syncingRef.current = false;
 			}
 		}

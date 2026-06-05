@@ -89,7 +89,7 @@ function ref(value: string): Reference {
 function inferTaxonomyFromId(
 	id: string,
 	role: 'country' | 'location' | 'community' | 'region' | 'municipality' | 'area' | 'subArea'
-): Pick<TaxonomyDoc, 'name' | 'slug' | 'type'> | null {
+): (Pick<TaxonomyDoc, 'name' | 'slug'> & { type: string }) | null {
 	if (OBSOLETE_TAXONOMY_TYPES.has(role) || id.startsWith('location.region.')) {
 		return null;
 	}

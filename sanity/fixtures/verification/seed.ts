@@ -9,7 +9,7 @@
  *   SANITY_API_TOKEN=... pnpm --filter sanity fixtures:seed
  *   SANITY_API_TOKEN=... pnpm --filter sanity fixtures:seed -- --dry-run
  */
-import { createClient } from '@sanity/client';
+import { createClient, type IdentifiedSanityDocumentStub } from '@sanity/client';
 import { readFileSync, existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -27,7 +27,8 @@ import {
 	buildMediaPrivacyProperty,
 	buildPrivacyDevelopmentStub,
 	buildPrivacyDevelopmentUnits,
-	buildPrivacyDevelopmentWithUnits
+	buildPrivacyDevelopmentWithUnits,
+	type UploadedAssets
 } from './documents';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -118,7 +119,7 @@ async function main() {
 	console.log('Uploading fixture image assets…');
 	const assets = await uploadTaggedAssets(client);
 
-	const documents = [
+	const documents: IdentifiedSanityDocumentStub[] = [
 		...buildLocationDocuments(),
 		buildGoldenProperty(assets),
 		buildPrivacyDevelopmentStub(assets),
