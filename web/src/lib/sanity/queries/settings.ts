@@ -1,5 +1,10 @@
 import { defineQuery } from 'groq';
-import { LOCATION_TAXONOMY_PUBLIC, MEDIA_ASSET_PUBLIC } from '../allowlists';
+import {
+	FEATURED_LOCATION_PROJECTION,
+	FEATURED_LOCATION_REF_FILTER,
+	LOCATION_TAXONOMY_PUBLIC,
+	MEDIA_ASSET_PUBLIC
+} from '../allowlists';
 import { fetchPublic } from './fetch';
 import {
 	toCountryCards,
@@ -9,25 +14,6 @@ import {
 	type HomepageHero,
 	type TaxonomyWithHero
 } from '../transforms/taxonomyHero';
-
-const FEATURED_LOCATION_REF_FILTER = /* groq */ `
-  @->_type == "locationTaxonomy"
-  && @->type == "location"
-  && defined(@->slug.current)
-  && defined(@->parent->slug.current)
-`;
-
-const FEATURED_LOCATION_PROJECTION = /* groq */ `{
-  _id,
-  name,
-  "slug": slug.current,
-  type,
-  breadcrumbLabel,
-  tagline,
-  heroImage${MEDIA_ASSET_PUBLIC},
-  "countrySlug": parent->slug.current,
-  "countryName": parent->name
-}`;
 
 export const siteSettingsHeroQuery = defineQuery(`
   *[_type == "siteSettings" && _id == "siteSettings"][0]{
@@ -61,7 +47,7 @@ export async function fetchSiteSettingsHero(): Promise<HomepageHero | null> {
 }
 
 export async function fetchHomepageFeaturedLocations(): Promise<FeaturedLocationCard[]> {
-	const result = await fetchPublic<{ locations?: FeaturedLocationCard[] | null }>(
+	const result = await fetchPublic<{ locations?: Array<TaxonomyWithHero | null> | null }>(
 		homepageFeaturedLocationsQuery
 	);
 	return toLocationCards(result?.locations);

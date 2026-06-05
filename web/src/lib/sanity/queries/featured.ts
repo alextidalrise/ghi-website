@@ -1,5 +1,9 @@
 import { defineQuery } from 'groq';
-import { PROPERTY_CARD_PUBLIC } from '../allowlists';
+import {
+	FEATURED_LOCATION_PROJECTION,
+	FEATURED_LOCATION_REF_FILTER,
+	PROPERTY_CARD_PUBLIC
+} from '../allowlists';
 import { toPublicPropertyCard, type PublicPropertyCard, type RawPropertyCard } from '../transforms/propertyCard';
 import {
 	toLocationCards,
@@ -51,32 +55,6 @@ export const homepageFeaturedListingsQuery = defineQuery(`
     ]->${PROPERTY_CARD_PUBLIC}
   }
 `);
-
-const FEATURED_LOCATION_REF_FILTER = /* groq */ `
-  @->_type == "locationTaxonomy"
-  && @->type == "location"
-  && defined(@->slug.current)
-  && defined(@->parent->slug.current)
-`;
-
-const FEATURED_LOCATION_PROJECTION = /* groq */ `{
-  _id,
-  name,
-  "slug": slug.current,
-  type,
-  breadcrumbLabel,
-  tagline,
-  heroImage{
-    asset,
-    fileAsset,
-    assetCategory,
-    order,
-    altText,
-    caption
-  },
-  "countrySlug": parent->slug.current,
-  "countryName": parent->name
-}`;
 
 /** Ordered featured locations for a country taxonomy doc — editor order preserved. */
 export const countryFeaturedLocationsQuery = defineQuery(`

@@ -92,6 +92,9 @@
 		display: flex;
 		align-items: flex-end;
 		overflow: hidden;
+		/* Dark base so the light-on-dark title stays readable even if the hero image
+		   is absent. The photo (z0) and overlay (z1) layer over this when present. */
+		background-color: var(--hero-dark);
 	}
 
 	.home-hero__bg {

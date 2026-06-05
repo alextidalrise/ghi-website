@@ -42,7 +42,9 @@
 							<span class="location-tile__country">{location.countryLabel}</span>
 							<span class="location-tile__name">{location.name}</span>
 							<span class="location-tile__cue">
-								<span class="location-tile__tagline">{location.tagline}</span>
+								{#if location.tagline}
+									<span class="location-tile__tagline">{location.tagline}</span>
+								{/if}
 								<svg
 									class="location-tile__arrow"
 									width="18"

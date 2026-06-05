@@ -28,6 +28,31 @@ export const LOCATION_TAXONOMY_PUBLIC = /* groq */ `{
   coordinates
 }`;
 
+/**
+ * Filter applied to a hand-picked `locationTaxonomy` reference (e.g.
+ * siteSettings.homepageFeaturedLocations, locationTaxonomy.featuredLocations) so only
+ * resolvable location docs with a country parent survive into the featured grid.
+ */
+export const FEATURED_LOCATION_REF_FILTER = /* groq */ `
+  @->_type == "locationTaxonomy"
+  && @->type == "location"
+  && defined(@->slug.current)
+  && defined(@->parent->slug.current)
+`;
+
+/** Projection for a featured-location card — hero image, tagline, and country context. */
+export const FEATURED_LOCATION_PROJECTION = /* groq */ `{
+  _id,
+  name,
+  "slug": slug.current,
+  type,
+  breadcrumbLabel,
+  tagline,
+  heroImage${MEDIA_ASSET_PUBLIC},
+  "countrySlug": parent->slug.current,
+  "countryName": parent->name
+}`;
+
 /** Public location projection — map pin comes from community->coordinates. */
 export const LOCATION_PUBLIC = /* groq */ `{
   country->${LOCATION_TAXONOMY_PUBLIC},

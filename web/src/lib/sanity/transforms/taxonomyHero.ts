@@ -5,7 +5,6 @@ const HERO_WIDTHS = [960, 1280, 1600, 1920, 2400];
 const COUNTRY_CARD = { width: 800, height: 600, fit: 'crop' as const, quality: 85 };
 const LOCATION_CARD = { width: 600, height: 800, fit: 'crop' as const, quality: 85 };
 const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 85 };
-const HOMEPAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 85 };
 
 export type TaxonomyHero = {
 	url: string;
@@ -19,7 +18,7 @@ export type CountryFeatureCard = {
 	href: string;
 	image: string;
 	alt: string;
-	tagline: string;
+	tagline: string | null;
 };
 
 export type FeaturedLocationCard = {
@@ -28,7 +27,7 @@ export type FeaturedLocationCard = {
 	href: string;
 	image: string;
 	alt: string;
-	tagline: string;
+	tagline: string | null;
 };
 
 export type HomepageHero = {
@@ -95,15 +94,17 @@ function resolveCardImage(
 export function toCountryCard(doc: TaxonomyWithHero | null | undefined): CountryFeatureCard | null {
 	if (!doc?.slug || !doc.name) return null;
 
+	// A card needs a picture; the tagline is optional and simply omitted when absent
+	// (don't silently drop the whole card because an editor skipped the tagline).
 	const cardImage = resolveCardImage(doc.heroImage, COUNTRY_CARD, doc.name);
-	if (!cardImage || !doc.tagline?.trim()) return null;
+	if (!cardImage) return null;
 
 	return {
 		name: doc.name,
 		href: `/${doc.slug}`,
 		image: cardImage.image,
 		alt: cardImage.alt,
-		tagline: doc.tagline.trim()
+		tagline: doc.tagline?.trim() || null
 	};
 }
 
@@ -111,7 +112,7 @@ export function toLocationCard(doc: TaxonomyWithHero | null | undefined): Featur
 	if (!doc?.slug || !doc.name || !doc.countrySlug || !doc.countryName) return null;
 
 	const cardImage = resolveCardImage(doc.heroImage, LOCATION_CARD, doc.name);
-	if (!cardImage || !doc.tagline?.trim()) return null;
+	if (!cardImage) return null;
 
 	return {
 		name: doc.name,
@@ -119,7 +120,7 @@ export function toLocationCard(doc: TaxonomyWithHero | null | undefined): Featur
 		href: `/${doc.countrySlug}/${doc.slug}`,
 		image: cardImage.image,
 		alt: cardImage.alt,
-		tagline: doc.tagline.trim()
+		tagline: doc.tagline?.trim() || null
 	};
 }
 

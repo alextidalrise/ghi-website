@@ -189,14 +189,52 @@ function locationRef(refId: string) {
 	return { _type: 'reference' as const, _ref: refId, _key: refId };
 }
 
+/** Strip the `drafts.` prefix so we always store/reference the published id. */
+function publishedId(id: string): string {
+	return id.startsWith('drafts.') ? id.slice('drafts.'.length) : id;
+}
+
+/**
+ * Which of a doc's revisions actually exist — published id plus its `drafts.` twin.
+ * We patch every revision that exists so the hero shows whether the read path resolves
+ * published (production) or draft (dev preview-all). We never create a draft that isn't
+ * already there.
+ */
+async function existingTargets(client: SanityClient, baseId: string): Promise<string[]> {
+	const pub = publishedId(baseId);
+	const ids = [pub, `drafts.${pub}`];
+	return client.fetch<string[]>(`*[_id in $ids]._id`, { ids });
+}
+
+/** Apply the same patch to every existing revision of a document. */
+async function patchAllTargets(
+	client: SanityClient,
+	baseId: string,
+	patch: Record<string, unknown>,
+	commitOptions?: Parameters<ReturnType<SanityClient['patch']>['commit']>[0]
+): Promise<void> {
+	const targets = await existingTargets(client, baseId);
+	if (targets.length === 0) {
+		console.warn(`  no existing revision to patch for ${publishedId(baseId)}`);
+		return;
+	}
+	for (const id of targets) {
+		console.log(`  patch ${id}`);
+		if (!dryRun) {
+			await client.patch(id).set(patch).commit(commitOptions);
+		}
+	}
+}
+
 async function fetchCountryId(
 	client: SanityClient,
 	slug: string
 ): Promise<string | null> {
-	return client.fetch<string | null>(
+	const id = await client.fetch<string | null>(
 		`*[_type == "locationTaxonomy" && type == "country" && slug.current == $slug][0]._id`,
 		{ slug }
 	);
+	return id ? publishedId(id) : null;
 }
 
 async function fetchLocationId(
@@ -204,7 +242,7 @@ async function fetchLocationId(
 	countrySlug: string,
 	locationSlug: string
 ): Promise<string | null> {
-	return client.fetch<string | null>(
+	const id = await client.fetch<string | null>(
 		`*[
 			_type == "locationTaxonomy"
 			&& type == "location"
@@ -213,6 +251,7 @@ async function fetchLocationId(
 		][0]._id`,
 		{ countrySlug, locationSlug }
 	);
+	return id ? publishedId(id) : null;
 }
 
 async function resolveLocationPath(client: SanityClient, path: string): Promise<string | null> {
@@ -258,9 +297,7 @@ async function main() {
 		};
 
 		console.log(`patch country ${country.slug} (${countryId})`);
-		if (!dryRun) {
-			await client.patch(countryId).set(patch).commit();
-		}
+		await patchAllTargets(client, countryId, patch);
 	}
 
 	for (const location of LOCATION_HEROES) {
@@ -286,51 +323,46 @@ async function main() {
 		};
 
 		console.log(`patch location ${location.countrySlug}/${location.slug} (${locationId})`);
-		if (!dryRun) {
-			await client.patch(locationId).set(patch).commit();
-		}
+		await patchAllTargets(client, locationId, patch);
 	}
+
+	// Homepage hero image needs the source PNG; the featured-locations list does not.
+	// Keep them independent so a missing PNG can't silently drop the featured locations.
+	const settingsPatch: Record<string, unknown> = {};
 
 	if (existsSync(HOMEPAGE_HERO_FILE)) {
 		const homepageAssetId = await uploadImage(client, HOMEPAGE_HERO_FILE, 'andalucia-golf-villa.png');
-
-		for (const path of HOMEPAGE_FEATURED_LOCATIONS) {
-			if (!locationIds.has(path)) {
-				const id = await resolveLocationPath(client, path);
-				if (id) locationIds.set(path, id);
-			}
-		}
-
-		const homepageFeaturedRefsResolved = HOMEPAGE_FEATURED_LOCATIONS.flatMap((path) => {
-			const id = locationIds.get(path);
-			if (!id) {
-				console.warn(`skip homepage featured location ${path} — taxonomy doc not found`);
-				return [];
-			}
-			return [locationRef(id)];
-		});
-
-		console.log('patch siteSettings homepageHero + homepageFeaturedLocations');
-		if (!dryRun) {
-			await ensureSiteSettings(client);
-			await client
-				.patch('siteSettings')
-				.set({
-					homepageHero: {
-						image: {
-							_type: 'mediaAssetMetadata',
-							asset: { _type: 'reference', _ref: homepageAssetId },
-							altText: ''
-						},
-						tagline: HOMEPAGE_TAGLINE
-					},
-					homepageFeaturedLocations: homepageFeaturedRefsResolved
-				})
-				.commit({ autoGenerateArrayKeys: true });
-		}
+		settingsPatch.homepageHero = {
+			image: {
+				_type: 'mediaAssetMetadata',
+				asset: { _type: 'reference', _ref: homepageAssetId },
+				altText: ''
+			},
+			tagline: HOMEPAGE_TAGLINE
+		};
 	} else {
-		console.warn(`skip homepage hero — missing asset ${HOMEPAGE_HERO_FILE}`);
+		console.warn(`skip homepage hero image — missing asset ${HOMEPAGE_HERO_FILE}`);
 	}
+
+	for (const path of HOMEPAGE_FEATURED_LOCATIONS) {
+		if (!locationIds.has(path)) {
+			const id = await resolveLocationPath(client, path);
+			if (id) locationIds.set(path, id);
+		}
+	}
+
+	settingsPatch.homepageFeaturedLocations = HOMEPAGE_FEATURED_LOCATIONS.flatMap((path) => {
+		const id = locationIds.get(path);
+		if (!id) {
+			console.warn(`skip homepage featured location ${path} — taxonomy doc not found`);
+			return [];
+		}
+		return [locationRef(id)];
+	});
+
+	console.log('patch siteSettings homepageHero + homepageFeaturedLocations');
+	await ensureSiteSettings(client);
+	await patchAllTargets(client, 'siteSettings', settingsPatch, { autoGenerateArrayKeys: true });
 
 	for (const [countrySlug, paths] of Object.entries(COUNTRY_FEATURED_LOCATIONS)) {
 		const countryId = await fetchCountryId(client, countrySlug);
@@ -356,12 +388,9 @@ async function main() {
 		if (refs.length === 0) continue;
 
 		console.log(`patch country featuredLocations ${countrySlug}`);
-		if (!dryRun) {
-			await client
-				.patch(countryId)
-				.set({ featuredLocations: refs })
-				.commit({ autoGenerateArrayKeys: true });
-		}
+		await patchAllTargets(client, countryId, { featuredLocations: refs }, {
+			autoGenerateArrayKeys: true
+		});
 	}
 
 	console.log('Done.');

@@ -27,7 +27,9 @@
 					<span class="country-card__scrim" aria-hidden="true"></span>
 					<span class="country-card__body">
 						<span class="country-card__name">{country.name}</span>
-						<span class="country-card__tagline">{country.tagline}</span>
+						{#if country.tagline}
+							<span class="country-card__tagline">{country.tagline}</span>
+						{/if}
 						<span class="country-card__cue">
 							Explore {country.name}
 							<svg
