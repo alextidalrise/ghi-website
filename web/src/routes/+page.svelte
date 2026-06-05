@@ -69,7 +69,7 @@
 		viewAllHref={frontlineViewAllHref}
 	/>
 
-	{#if data.featuredCards.length === 0}
+	{#if data.featuredCards.length === 0 && data.frontlineCards.length === 0}
 		<div class="home-intro">
 			<p class="text-overline">Coming soon</p>
 			<h2 class="text-h2 home-intro__heading">Property listings are on their way</h2>

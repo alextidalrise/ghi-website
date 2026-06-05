@@ -1,21 +1,26 @@
 /**
  * Reusable GROQ filter fragments for the public query layer.
  * Defence in depth: every public listing query must include these gates.
+ *
+ * Each gate carries a `|| $previewAll` escape hatch. In production `$previewAll` is
+ * false (see PUBLIC_QUERY_PARAMS) so the gates apply normally. The env-gated dev
+ * preview mode in ./fetch.ts sets it true to surface draft/hidden/held listings
+ * locally. Never true in production.
  */
 
 /** Document-level publish readiness gate. */
 export const PUBLISH_READINESS_FILTER = /* groq */ `
-  coalesce(workflow.publishReadiness, "") in $approvedReadiness
+  (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)
 `;
 
 /** Pricing visibility gate — reserved/hidden/internal items never surface publicly. */
 export const PUBLIC_VISIBILITY_FILTER = /* groq */ `
-  coalesce(pricing.publicVisibility, "visible") == "visible"
+  (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)
 `;
 
 /** Reserved availability gate at document level. */
 export const NOT_RESERVED_FILTER = /* groq */ `
-  coalesce(pricing.availabilityStatus, "") != "reserved"
+  (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll)
 `;
 
 /** Country slug for listing URLs — from stored ref or community taxonomy parent chain. */
@@ -50,7 +55,7 @@ export const PUBLIC_LISTING_FILTER = /* groq */ `
 
 /** Child unit / unit-type gate (same pricing + readiness rules). */
 export const PUBLIC_CHILD_UNIT_FILTER = /* groq */ `
-  coalesce(workflow.publishReadiness, "") in $approvedReadiness
-  && coalesce(pricing.publicVisibility, "visible") == "visible"
-  && coalesce(pricing.availabilityStatus, "") != "reserved"
+  ${PUBLISH_READINESS_FILTER}
+  && ${PUBLIC_VISIBILITY_FILTER}
+  && ${NOT_RESERVED_FILTER}
 `;

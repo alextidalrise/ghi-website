@@ -38,3 +38,22 @@ export const publicClient = createClient(publicClientConfig);
 export function getPublicClientConfig(): Readonly<ClientConfig> {
 	return { ...publicClientConfig };
 }
+
+/**
+ * Drafts-reading client for the env-gated dev preview mode (see queries/fetch.ts).
+ * Reads the `drafts` perspective with the read token so unpublished listings render
+ * in local dev. Server-only and null when no token is configured — the public site
+ * never depends on it. The same allowlists still strip sensitive fields.
+ */
+function resolveReadToken(): string | undefined {
+	return privateEnv.SANITY_API_READ_TOKEN ?? privateEnv.SANITY_API_TOKEN ?? undefined;
+}
+
+export const previewClient = resolveReadToken()
+	? createClient({
+			...publicClientConfig,
+			useCdn: false,
+			perspective: 'drafts',
+			token: resolveReadToken()
+		})
+	: null;

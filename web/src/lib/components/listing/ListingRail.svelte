@@ -19,7 +19,9 @@
 </script>
 
 <ul class="rail" class:rail--bleed={bleed} aria-labelledby={labelledby}>
-	{#each cards as card, index (card._id)}
+	<!-- Keyed by id + index: an editor can pick the same listing twice in a featured
+	     array, and duplicate keys would break the keyed each on hydration. -->
+	{#each cards as card, index (`${card._id}-${index}`)}
 		<li class="rail__item" style="--reveal-delay: {index * 70}ms">
 			<SpotlightCard {card} {surface} />
 		</li>
