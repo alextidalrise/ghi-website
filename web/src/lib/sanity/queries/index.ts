@@ -60,11 +60,24 @@ export {
 	FRONTLINE_LISTING_LIMIT,
 	HOMEPAGE_FEATURED_LIMIT,
 	COUNTRY_FEATURED_LIMIT,
+	HOMEPAGE_FEATURED_LOCATIONS_LIMIT,
+	COUNTRY_FEATURED_LOCATIONS_LIMIT,
 	fetchFrontlineListingCards,
 	fetchHomepageFrontlineListingCards,
 	fetchHomepageFeaturedListingCards,
-	fetchCountryFeaturedListingCards
+	fetchCountryFeaturedListingCards,
+	fetchCountryFeaturedLocations,
+	countryFeaturedLocationsQuery
 } from './featured';
+
+export {
+	siteSettingsHeroQuery,
+	homepageFeaturedLocationsQuery,
+	countriesWithHeroQuery,
+	fetchSiteSettingsHero,
+	fetchHomepageFeaturedLocations,
+	fetchCountriesWithHero
+} from './settings';
 
 export {
 	fetchNavTaxonomy,

@@ -1,22 +1,34 @@
 import type { PageServerLoad } from './$types';
 import {
+	fetchCountriesWithHero,
 	fetchHomepageFeaturedListingCards,
-	fetchHomepageFrontlineListingCards
+	fetchHomepageFeaturedLocations,
+	fetchHomepageFrontlineListingCards,
+	fetchSiteSettingsHero
 } from '$lib/sanity/queries';
+import { resolveHomepageHeroImage } from '$lib/sanity/transforms/taxonomyHero';
 
 export const load: PageServerLoad = async ({ parent }) => {
 	const { nav } = await parent();
 
-	const [featuredCards, frontlineCards] = await Promise.all([
-		fetchHomepageFeaturedListingCards(),
-		fetchHomepageFrontlineListingCards()
-	]);
+	const [featuredCards, frontlineCards, homepageHero, featuredCountries, featuredLocations] =
+		await Promise.all([
+			fetchHomepageFeaturedListingCards(),
+			fetchHomepageFrontlineListingCards(),
+			fetchSiteSettingsHero(),
+			fetchCountriesWithHero(),
+			fetchHomepageFeaturedLocations()
+		]);
 
 	return {
 		countries: nav.countries,
 		locations: nav.locations,
 		communities: nav.communities,
 		featuredCards,
-		frontlineCards
+		frontlineCards,
+		homepageHero: resolveHomepageHeroImage(homepageHero),
+		homepageHeroTagline: homepageHero?.tagline ?? null,
+		featuredCountries,
+		featuredLocations
 	};
 };

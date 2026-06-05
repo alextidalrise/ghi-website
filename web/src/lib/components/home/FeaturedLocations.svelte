@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { LocationFeature } from '$lib/home/curated';
+	import type { FeaturedLocationCard } from '$lib/sanity/transforms/taxonomyHero';
 
 	type Props = {
-		locations: LocationFeature[];
+		locations: FeaturedLocationCard[];
 		heading?: string;
 		summary?: string;
 	};

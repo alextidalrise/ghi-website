@@ -3,7 +3,7 @@
 	import PageHero from '$lib/components/PageHero.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import ListingResults from '$lib/components/listing/ListingResults.svelte';
-	import { locationFeatureByPath, locationHeadline } from '$lib/home/curated';
+	import { locationHeadline } from '$lib/home/headlines';
 	import { buildListingSearchHref } from '$lib/listing/searchParams';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
@@ -13,8 +13,7 @@
 		`Property listings and editorial content for ${data.location.name} coming soon.`
 	);
 
-	// Curated hero photograph + positioning line for this location, when one exists.
-	const locationFeature = $derived(locationFeatureByPath(data.canonicalPath));
+	const locationHero = $derived(data.locationHero);
 
 	// The hero stays location-level; an active community filter refines the results
 	// below, so it surfaces in the hero title/lead to keep the page in context.
@@ -27,7 +26,7 @@
 	const heroLead = $derived(
 		data.activeCommunity?.publicDescription ??
 			data.location.publicDescription ??
-			locationFeature?.tagline
+			locationHero?.tagline
 	);
 
 	// Only direct communities (sub-areas whose listings live under this location) can
@@ -78,12 +77,13 @@
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
 
-{#if locationFeature}
+{#if locationHero}
 	<PageHero
-		image={locationFeature.image}
-		alt={locationFeature.alt}
+		image={locationHero.url}
+		srcset={locationHero.srcset}
+		alt={locationHero.alt}
 		breadcrumbs={data.breadcrumbs}
-		lead={heroLead}
+		lead={heroLead ?? undefined}
 		ctaHref="#properties"
 		ctaLabel="Browse properties"
 		compact
@@ -95,13 +95,13 @@
 	</PageHero>
 {/if}
 
-<article class="location-page" class:location-page--has-hero={locationFeature}>
-	{#if !locationFeature}
+<article class="location-page" class:location-page--has-hero={locationHero}>
+	{#if !locationHero}
 		<Breadcrumbs items={data.breadcrumbs} />
 	{/if}
 
 	<div class="location-page__top content-wrap">
-		{#if !locationFeature}
+		{#if !locationHero}
 			<h1>{heroTitle}</h1>
 			<p class="location-page__intro">{introText}</p>
 		{/if}

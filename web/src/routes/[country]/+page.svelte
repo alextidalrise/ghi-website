@@ -4,17 +4,13 @@
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
-	import {
-		countryFeatureBySlug,
-		countryHeadline,
-		locationFeaturesForCountry
-	} from '$lib/home/curated';
+	import { countryHeadline } from '$lib/home/headlines';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
 
-	const countryFeature = $derived(countryFeatureBySlug(data.location.slug ?? ''));
-	const countryLocations = $derived(locationFeaturesForCountry(data.location.name));
+	const countryHero = $derived(data.countryHero);
+	const countryLocations = $derived(data.featuredLocations);
 
 	const placeholderBody = $derived(
 		`Property listings and editorial content for ${data.location.name} coming soon.`
@@ -46,11 +42,12 @@
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
 
-{#if countryFeature}
+{#if countryHero}
 	<PageHero
-		image={countryFeature.image}
-		alt={countryFeature.alt}
-		lead={countryFeature.tagline}
+		image={countryHero.url}
+		srcset={countryHero.srcset}
+		alt={countryHero.alt}
+		lead={countryHero.tagline ?? undefined}
 		compact
 		fetchpriority="high"
 	>
@@ -64,7 +61,7 @@
 	<div class="country-page__intro content-wrap">
 		<Breadcrumbs items={data.breadcrumbs} />
 
-		{#if !countryFeature}
+		{#if !countryHero}
 			<h1 class="country-page__title">{countryHeadline(data.location.name)}</h1>
 		{/if}
 

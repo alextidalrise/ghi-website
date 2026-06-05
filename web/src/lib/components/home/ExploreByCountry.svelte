@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { CountryFeature } from '$lib/home/curated';
+	import type { CountryFeatureCard } from '$lib/sanity/transforms/taxonomyHero';
 
 	type Props = {
-		countries: CountryFeature[];
+		countries: CountryFeatureCard[];
 	};
 
 	let { countries }: Props = $props();

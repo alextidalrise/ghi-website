@@ -3,6 +3,16 @@
  * Wildcard projections are forbidden — compose queries only from these fragments.
  */
 
+/** Public media asset metadata — source provenance fields excluded at query time. */
+export const MEDIA_ASSET_PUBLIC = /* groq */ `{
+  asset,
+  fileAsset,
+  assetCategory,
+  order,
+  altText,
+  caption
+}`;
+
 /** Public fields on locationTaxonomy references used in breadcrumbs and stubs. */
 export const LOCATION_TAXONOMY_PUBLIC = /* groq */ `{
   _id,
@@ -13,6 +23,8 @@ export const LOCATION_TAXONOMY_PUBLIC = /* groq */ `{
   seoTitle,
   metaDescription,
   publicDescription,
+  heroImage${MEDIA_ASSET_PUBLIC},
+  tagline,
   coordinates
 }`;
 
@@ -37,16 +49,6 @@ export const PRICING_PUBLIC = /* groq */ `{
   completionStatus,
   completionDate,
   buildStatus
-}`;
-
-/** Public media asset metadata — source provenance fields excluded at query time. */
-export const MEDIA_ASSET_PUBLIC = /* groq */ `{
-  asset,
-  fileAsset,
-  assetCategory,
-  order,
-  altText,
-  caption
 }`;
 
 /** Public media bundle for property/development pages. */

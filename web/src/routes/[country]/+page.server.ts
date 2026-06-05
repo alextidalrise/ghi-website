@@ -11,11 +11,13 @@ import { buildLocationSeo } from '$lib/listing/seo';
 import {
 	countryBySlugQuery,
 	fetchCountryFeaturedListingCards,
+	fetchCountryFeaturedLocations,
 	fetchFrontlineListingCards,
 	fetchMaybePreview,
 	fetchPublic,
 	locationsByCountryQuery
 } from '$lib/sanity/queries';
+import { resolveTaxonomyHero } from '$lib/sanity/transforms/taxonomyHero';
 import type { CountryBySlugQueryResult } from '$lib/sanity/types';
 
 type LocationTaxonomyPage = LocationTaxonomyRef & {
@@ -38,14 +40,15 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 
 	const canonicalPath = `/${country.slug}`;
 
-	const [locations, featuredCards, frontlineCards] = await Promise.all([
+	const [locations, featuredCards, frontlineCards, featuredLocations] = await Promise.all([
 		fetchPublic<LocationTaxonomyPage[]>(locationsByCountryQuery, {
 			params: { countrySlug: params.country }
 		}),
 		fetchCountryFeaturedListingCards({ countrySlug: params.country }),
 		fetchFrontlineListingCards({
 			scope: { type: 'country', countrySlug: params.country }
-		})
+		}),
+		fetchCountryFeaturedLocations({ countrySlug: params.country })
 	]);
 
 	const frontlineViewAllHref = buildListingSearchHref(
@@ -65,6 +68,8 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		pageType: 'country' as const,
 		location: country,
 		locations: locations ?? [],
+		countryHero: resolveTaxonomyHero(country),
+		featuredLocations,
 		featuredCards,
 		frontlineCards,
 		frontlineViewAllHref,

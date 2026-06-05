@@ -1,5 +1,5 @@
 import { defineQuery } from 'groq';
-import { LOCATION_TAXONOMY_PUBLIC } from '../allowlists';
+import { LOCATION_TAXONOMY_PUBLIC, MEDIA_ASSET_PUBLIC } from '../allowlists';
 
 /** Country stub page — minimal public taxonomy fields for v1. */
 export const countryBySlugQuery = defineQuery(`
@@ -36,6 +36,8 @@ export const locationPageContextQuery = defineQuery(`
     seoTitle,
     metaDescription,
     publicDescription,
+    heroImage${MEDIA_ASSET_PUBLIC},
+    tagline,
     linkedLocations[]{
       includeInGrid,
       showLink,

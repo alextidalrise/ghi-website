@@ -4,8 +4,6 @@
 	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
-	import { COUNTRY_FEATURES, LOCATION_FEATURES } from '$lib/home/curated';
-
 	let { data } = $props();
 
 	// No global "all frontline" results page exists (frontline search is location-scoped),
@@ -17,26 +15,29 @@
 </script>
 
 <section class="home-hero on-dark">
-	<div class="home-hero__bg" aria-hidden="true">
-		<img
-			src="/design-system/assets/andalucia-golf-villa.png"
-			alt=""
-			width="1920"
-			height="1080"
-			fetchpriority="high"
-		/>
-	</div>
-	<div class="home-hero__overlay" aria-hidden="true"></div>
+	{#if data.homepageHero}
+		<div class="home-hero__bg" aria-hidden="true">
+			<img
+				src={data.homepageHero.url}
+				srcset={data.homepageHero.srcset}
+				sizes="100vw"
+				alt={data.homepageHero.alt}
+				width="1920"
+				height="1080"
+				fetchpriority="high"
+			/>
+		</div>
+		<div class="home-hero__overlay" aria-hidden="true"></div>
+	{/if}
 
 	<div class="home-hero__content content-wrap">
 		<h1 class="home-hero__title">
 			Homes beside<br />
 			<em>the fairway</em>
 		</h1>
-		<p class="home-hero__lead">
-			A curated portfolio of residential properties on and near premier golf courses across
-			southern Europe.
-		</p>
+		{#if data.homepageHeroTagline}
+			<p class="home-hero__lead">{data.homepageHeroTagline}</p>
+		{/if}
 	</div>
 </section>
 
@@ -52,9 +53,9 @@
 </div>
 
 <section class="home-content content-wrap">
-	<ExploreByCountry countries={COUNTRY_FEATURES} />
+	<ExploreByCountry countries={data.featuredCountries} />
 
-	<FeaturedLocations locations={LOCATION_FEATURES} />
+	<FeaturedLocations locations={data.featuredLocations} />
 
 	<FeaturedListings
 		cards={data.featuredCards}

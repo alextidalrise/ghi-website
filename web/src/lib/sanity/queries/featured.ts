@@ -1,6 +1,11 @@
 import { defineQuery } from 'groq';
 import { PROPERTY_CARD_PUBLIC } from '../allowlists';
 import { toPublicPropertyCard, type PublicPropertyCard, type RawPropertyCard } from '../transforms/propertyCard';
+import {
+	toLocationCards,
+	type FeaturedLocationCard,
+	type TaxonomyWithHero
+} from '../transforms/taxonomyHero';
 import { fetchPublic } from './fetch';
 import {
 	buildPaginatedListingCardsQuery,
@@ -11,6 +16,8 @@ import {
 export const FRONTLINE_LISTING_LIMIT = 8;
 export const HOMEPAGE_FEATURED_LIMIT = 8;
 export const COUNTRY_FEATURED_LIMIT = 6;
+export const HOMEPAGE_FEATURED_LOCATIONS_LIMIT = 6;
+export const COUNTRY_FEATURED_LOCATIONS_LIMIT = 6;
 
 export type { ListingSearchScope };
 
@@ -42,6 +49,45 @@ export const homepageFeaturedListingsQuery = defineQuery(`
     "cards": homepageFeaturedListings[
       ${FEATURED_LISTING_REF_FILTER}
     ]->${PROPERTY_CARD_PUBLIC}
+  }
+`);
+
+const FEATURED_LOCATION_REF_FILTER = /* groq */ `
+  @->_type == "locationTaxonomy"
+  && @->type == "location"
+  && defined(@->slug.current)
+  && defined(@->parent->slug.current)
+`;
+
+const FEATURED_LOCATION_PROJECTION = /* groq */ `{
+  _id,
+  name,
+  "slug": slug.current,
+  type,
+  breadcrumbLabel,
+  tagline,
+  heroImage{
+    asset,
+    fileAsset,
+    assetCategory,
+    order,
+    altText,
+    caption
+  },
+  "countrySlug": parent->slug.current,
+  "countryName": parent->name
+}`;
+
+/** Ordered featured locations for a country taxonomy doc — editor order preserved. */
+export const countryFeaturedLocationsQuery = defineQuery(`
+  *[
+    _type == "locationTaxonomy"
+    && type == "country"
+    && slug.current == $countrySlug
+  ][0]{
+    "locations": featuredLocations[
+      ${FEATURED_LOCATION_REF_FILTER}
+    ]->${FEATURED_LOCATION_PROJECTION}
   }
 `);
 
@@ -111,4 +157,17 @@ export async function fetchCountryFeaturedListingCards({
 		{ params: { countrySlug } }
 	);
 	return toFeaturedCards(result?.cards, COUNTRY_FEATURED_LIMIT);
+}
+
+/** Hand-picked country featured locations from locationTaxonomy.featuredLocations. */
+export async function fetchCountryFeaturedLocations({
+	countrySlug
+}: {
+	countrySlug: string;
+}): Promise<FeaturedLocationCard[]> {
+	const result = await fetchPublic<{ locations?: Array<TaxonomyWithHero | null> | null }>(
+		countryFeaturedLocationsQuery,
+		{ params: { countrySlug } }
+	);
+	return toLocationCards(result?.locations).slice(0, COUNTRY_FEATURED_LOCATIONS_LIMIT);
 }

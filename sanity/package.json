@@ -56,6 +56,8 @@
 		"seed:location-taxonomy:dry-run": "tsx migrations/seed-location-taxonomy.ts --dry-run",
 		"wipe:location-taxonomy": "tsx migrations/wipe-location-taxonomy.ts",
 		"wipe:location-taxonomy:dry-run": "tsx migrations/wipe-location-taxonomy.ts --dry-run",
+		"migrate:curated-heroes": "tsx migrations/curated-heroes-migrate.ts",
+		"migrate:curated-heroes:dry-run": "tsx migrations/curated-heroes-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

@@ -1,6 +1,7 @@
 import { defineField, defineType } from 'sanity';
 import { LOCATION_TAXONOMY_TYPES } from '../constants/enums';
 import { featuredListingMember, noDuplicateListings } from '../objects/featuredListings';
+import { featuredLocationMember, noDuplicateLocations } from '../objects/featuredLocations';
 
 export const locationTaxonomy = defineType({
 	name: 'locationTaxonomy',
@@ -119,6 +120,22 @@ export const locationTaxonomy = defineType({
 			description: 'A short editorial description shown on this location\'s landing page (e.g. "Marbella is renowned for...").'
 		}),
 		defineField({
+			name: 'heroImage',
+			title: 'Hero image',
+			type: 'mediaAssetMetadata',
+			description: 'Full-bleed photograph for the country or location landing page hero.',
+			hidden: ({ document }) => document?.type === 'community'
+		}),
+		defineField({
+			name: 'tagline',
+			title: 'Tagline',
+			type: 'string',
+			description:
+				'Short positioning line under the hero headline and on location cards, e.g. "Polo, Valderrama, exclusive".',
+			hidden: ({ document }) => document?.type === 'community',
+			validation: (Rule) => Rule.max(60)
+		}),
+		defineField({
 			name: 'coordinates',
 			title: 'Coordinates',
 			type: 'geopoint',
@@ -134,6 +151,16 @@ export const locationTaxonomy = defineType({
 				'Hand-picked listings for this country landing page (4–6). Order here is preserved on the site.',
 			hidden: ({ document }) => document?.type !== 'country',
 			validation: (Rule) => Rule.max(6).custom(noDuplicateListings)
+		}),
+		defineField({
+			name: 'featuredLocations',
+			title: 'Featured locations',
+			type: 'array',
+			of: [featuredLocationMember],
+			description:
+				'Hand-picked locations for this country landing page (3–6). Order here is preserved on the site.',
+			hidden: ({ document }) => document?.type !== 'country',
+			validation: (Rule) => Rule.max(6).custom(noDuplicateLocations)
 		})
 	],
 	preview: {

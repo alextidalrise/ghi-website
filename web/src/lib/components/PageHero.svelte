@@ -6,6 +6,8 @@
 	type Props = {
 		image: string;
 		alt: string;
+		srcset?: string;
+		sizes?: string;
 		lead?: string;
 		/** Breadcrumbs laid over the top of the hero photograph. */
 		breadcrumbs?: BreadcrumbItem[];
@@ -21,6 +23,8 @@
 	let {
 		image,
 		alt,
+		srcset,
+		sizes = '100vw',
 		lead,
 		breadcrumbs,
 		ctaHref,
@@ -33,7 +37,15 @@
 
 <section class="page-hero on-dark" class:page-hero--compact={compact}>
 	<div class="page-hero__bg" aria-hidden="true">
-		<img src={image} {alt} width="1920" height="1080" {fetchpriority} />
+		<img
+			src={image}
+			srcset={srcset || undefined}
+			sizes={srcset ? sizes : undefined}
+			{alt}
+			width="1920"
+			height="1080"
+			{fetchpriority}
+		/>
 	</div>
 	<div class="page-hero__overlay" aria-hidden="true"></div>
 

@@ -48,4 +48,31 @@ export function buildPublicImageUrl(
 	return imageBuilder.url();
 }
 
+/** Build a responsive srcset string from a public media asset. */
+export function buildImageSrcset(
+	asset: MediaAssetInput | null | undefined,
+	widths: number[],
+	options: ImageBuilderOptions = {}
+): string {
+	if (!isPublicMediaAsset(asset) || !asset?.asset) {
+		return '';
+	}
+
+	const parts: string[] = [];
+	for (const width of widths) {
+		const height =
+			options.height && options.width
+				? Math.round((width / options.width) * options.height)
+				: options.height;
+		const url = buildPublicImageUrl(asset, {
+			...options,
+			width,
+			height
+		});
+		if (url) parts.push(`${url} ${width}w`);
+	}
+
+	return parts.join(', ');
+}
+
 export { builder as publicImageBuilder };

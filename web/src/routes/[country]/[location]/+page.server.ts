@@ -18,6 +18,8 @@ import {
 	locationPageContextQuery
 } from '$lib/sanity/queries';
 import { buildLocationGridIds } from '$lib/sanity/queries/listingSearch';
+import { resolveTaxonomyHero } from '$lib/sanity/transforms/taxonomyHero';
+import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
 import type { CountryBySlugQueryResult } from '$lib/sanity/types';
 
 type LinkedLocationEntry = {
@@ -38,6 +40,8 @@ type LocationPageContext = {
 	seoTitle?: string | null;
 	metaDescription?: string | null;
 	publicDescription?: string | null;
+	heroImage?: MediaAssetInput | null;
+	tagline?: string | null;
 	linkedLocations?: LinkedLocationEntry[] | null;
 };
 
@@ -135,6 +139,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 	return {
 		pageType: 'location' as const,
 		location: locationPage,
+		locationHero: resolveTaxonomyHero(locationPage),
 		country,
 		activeCommunity,
 		directCommunities,
