@@ -25,17 +25,17 @@
 </script>
 
 <article class="listing-page listing-page--property">
-	<Breadcrumbs items={breadcrumbs} />
-
-	<!-- Split hero: a large gallery beside the headline facts, both in one viewport
-	     on desktop. Full immersion stays one click away in the gallery lightbox.
-	     On mobile this collapses to a photo-first stack (the gallery jumps above
-	     the breadcrumbs). -->
+	<!-- Split hero: a full-bleed gallery (flush to the left edge and the nav on
+	     desktop) beside the headline facts, both in one viewport. Full immersion
+	     stays one click away in the gallery lightbox. The breadcrumb trail rides at
+	     the top of the info column, above the title. On mobile this collapses to a
+	     photo-first stack: the gallery jumps above the breadcrumbs + summary. -->
 	<section class="hero">
 		<div class="hero__gallery">
 			<Gallery media={property.media} title={property.title ?? 'Property'} />
 		</div>
 		<div class="hero__summary">
+			<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 			<PropertySummary listing={property} />
 			<KeyFacts listing={property} />
 			<a class="hero__cta" href="#enquire-form">{enquireLabel}</a>
@@ -108,32 +108,37 @@
 		border-color: var(--green);
 	}
 
-	/* Desktop: gallery left, summary right, both within one viewport. */
+	/* Desktop: a full-bleed gallery flush to the left edge and the nav, beside the
+	   info column. The grid keeps only a right gutter; the gallery column runs to
+	   x=0 so photography commands the viewport. */
 	@media (min-width: 1024px) {
 		.hero {
 			display: grid;
-			grid-template-columns: minmax(0, 1.55fr) minmax(20rem, 1fr);
-			gap: clamp(2rem, 3.5vw, 4rem);
-			align-items: center;
-			max-width: 1800px;
-			margin-inline: auto;
-			padding: var(--space-md) clamp(1rem, 2.5vw, 2rem) 0;
+			grid-template-columns: minmax(0, 1.62fr) minmax(21rem, 1fr);
+			gap: clamp(2rem, 3vw, 3.5rem);
+			align-items: start;
+			padding: 0 clamp(1.5rem, 3vw, 3rem) 0 0;
 		}
 
 		.hero__summary {
 			padding: 0;
+			/* Hold the column off the very top so the title baseline reads against
+			   the upper third of the photo, not its top edge. */
+			padding-block-start: clamp(0.5rem, 1.5vw, 1.5rem);
 		}
 
-		/* Let the gallery fill its column, and cap the stage so the hero stays
-		   close to one viewport (nav + breadcrumbs + stage + filmstrip). */
+		/* Let the gallery fill its column edge-to-edge; its own gutter/cap are
+		   removed so the stage bleeds to x=0 and up to the nav. */
 		:global(.hero__gallery .gallery) {
 			max-width: none;
 			margin: 0;
 			padding: 0;
 		}
 
+		/* Cap the stage so the hero stays close to one viewport (nav + stage +
+		   filmstrip). The reclaimed breadcrumb row buys a taller frame. */
 		:global(.hero__gallery .gallery__stage) {
-			max-height: 66vh;
+			max-height: 74vh;
 		}
 
 		/* The headline is in a narrower column now; ease the display ceiling so a

@@ -5,16 +5,33 @@
 		items: BreadcrumbItem[];
 		/** Light treatment for breadcrumbs laid over a dark hero image. */
 		onDark?: boolean;
+		/** Drop the centered content-wrap gutter so the trail sits flush inside a column. */
+		inline?: boolean;
+		/**
+		 * Hide the trailing current-page crumb. On property pages the title already
+		 * headlines the column, so repeating it in the trail is redundant. The full
+		 * trail (including the current page) still ships in the JSON-LD that the
+		 * server builds separately, so search engines are unaffected.
+		 */
+		hideCurrent?: boolean;
 	};
 
-	let { items, onDark = false }: Props = $props();
+	let { items, onDark = false, inline = false, hideCurrent = false }: Props = $props();
+
+	const visibleItems = $derived(hideCurrent && items.length > 1 ? items.slice(0, -1) : items);
 </script>
 
-<nav class="breadcrumbs content-wrap" class:breadcrumbs--on-dark={onDark} aria-label="Breadcrumb">
+<nav
+	class="breadcrumbs"
+	class:content-wrap={!inline}
+	class:breadcrumbs--inline={inline}
+	class:breadcrumbs--on-dark={onDark}
+	aria-label="Breadcrumb"
+>
 	<ol class="breadcrumbs__list">
-		{#each items as item, index (item.label + (item.href ?? index))}
+		{#each visibleItems as item, index (item.label + (item.href ?? index))}
 			<li class="breadcrumbs__item">
-				{#if item.href && index < items.length - 1}
+				{#if item.href && (hideCurrent || index < visibleItems.length - 1)}
 					<a href={item.href}>{item.label}</a>
 				{:else}
 					<span aria-current="page">{item.label}</span>
@@ -27,6 +44,12 @@
 <style>
 	.breadcrumbs {
 		padding-block: var(--space-md);
+	}
+
+	/* Sits at the top of the property hero's info column: no top padding (it meets
+	   the gallery's top edge), a small gap before the title below. */
+	.breadcrumbs--inline {
+		padding-block: 0 var(--space-sm);
 	}
 
 	.breadcrumbs__list {
