@@ -1,29 +1,30 @@
-<script lang="ts">
-	import SpotlightCard from './SpotlightCard.svelte';
-	import type { PublicPropertyCard } from '$lib/sanity/transforms/propertyCard';
+<script lang="ts" generics="Item">
+	import type { Snippet } from 'svelte';
 
 	type Props = {
-		cards: PublicPropertyCard[];
-		surface?: 'light' | 'green';
+		items: Item[];
+		/** Stable key per item. Index is included because an editor can pick the same
+		    listing twice in a featured array, and duplicate keys break the keyed each. */
+		getKey: (item: Item, index: number) => string;
+		/** Renders one card from an item; the rail owns only the scroll container. */
+		card: Snippet<[Item]>;
 		/** id of the section heading this rail belongs to, for the list's accessible name. */
 		labelledby?: string;
 		/**
-		 * `false` (default): contained rail that scrolls within its column (Featured).
+		 * `false` (default): contained rail that scrolls within its column (Featured, Similar).
 		 * `true`: the first card aligns to the page content column and the rail runs off
 		 * the right screen edge. Must sit inside a full-bleed (100vw) parent (Frontline).
 		 */
 		bleed?: boolean;
 	};
 
-	let { cards, surface = 'light', labelledby, bleed = false }: Props = $props();
+	let { items, getKey, card, labelledby, bleed = false }: Props = $props();
 </script>
 
 <ul class="rail" class:rail--bleed={bleed} aria-labelledby={labelledby}>
-	<!-- Keyed by id + index: an editor can pick the same listing twice in a featured
-	     array, and duplicate keys would break the keyed each on hydration. -->
-	{#each cards as card, index (`${card._id}-${index}`)}
+	{#each items as item, index (getKey(item, index))}
 		<li class="rail__item" style="--reveal-delay: {index * 70}ms">
-			<SpotlightCard {card} {surface} />
+			{@render card(item)}
 		</li>
 	{/each}
 </ul>
@@ -57,8 +58,8 @@
 		scroll-snap-align: start;
 	}
 
-	/* Contained rail (Featured): bleed to the viewport edges on phones so a full card
-	   width is usable and the next card peeks. Mirrors the Featured Locations rail. */
+	/* Contained rail (Featured, Similar): bleed to the viewport edges on phones so a full
+	   card width is usable and the next card peeks. Mirrors the Featured Locations rail. */
 	@media (max-width: 767px) {
 		.rail:not(.rail--bleed) {
 			grid-auto-columns: clamp(14rem, 72vw, 18.5rem);

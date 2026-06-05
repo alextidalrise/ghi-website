@@ -1,25 +1,44 @@
 <script lang="ts">
 	import { buildListingHref } from '$lib/listing/canonicalPath';
+	import { formatEnumLabel, shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
 	import { formatListingPrice, formatPropertyType } from '$lib/listing/formatPrice';
 	import {
 		CARD_HERO_IMAGE,
 		type PublicPropertyCard,
 		type PublicPropertyCardSpecs
 	} from '$lib/sanity/transforms/propertyCard';
+	import type { PublicDevelopmentCard } from '$lib/sanity/transforms/similarListingCard';
 
+	/** The rail card renders both a single property and a development. The two share the
+	    same media + body skeleton; only the top spec line and pricing rule differ. */
 	type Props = {
-		card: PublicPropertyCard;
-		/** 'light' for the white Featured rail, 'green' for the Frontline premier band. */
+		/** 'light' for the white Featured/Similar rail, 'green' for the Frontline band. */
 		surface?: 'light' | 'green';
-	};
+	} & (
+		| { kind?: 'property'; card: PublicPropertyCard }
+		| { kind: 'development'; card: PublicDevelopmentCard }
+	);
 
-	let { card, surface = 'light' }: Props = $props();
+	let { card, kind = 'property', surface = 'light' }: Props = $props();
 
 	const href = $derived(buildListingHref({ slug: card.slug, location: card.location }));
-	const price = $derived(formatListingPrice(card.pricing));
 	const locationLine = $derived(card.location?.addressDisplay ?? null);
-	const specs = $derived(buildSpecs(card.propertyType, card.specs));
-	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Property listing');
+	const fallbackName = $derived(kind === 'development' ? 'Development listing' : 'Property listing');
+	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? fallbackName);
+	const linkLabel = $derived(card.title ?? `View ${fallbackName.toLowerCase()}`);
+
+	const specs = $derived(
+		kind === 'development'
+			? buildDevelopmentSpecs(card as PublicDevelopmentCard)
+			: buildSpecs((card as PublicPropertyCard).propertyType, (card as PublicPropertyCard).specs)
+	);
+
+	const price = $derived(
+		kind === 'development' &&
+			!shouldShowDevelopmentPricing((card as PublicDevelopmentCard).developmentDisplayMode)
+			? null
+			: formatListingPrice(card.pricing)
+	);
 
 	function buildSpecs(
 		propertyType: PublicPropertyCard['propertyType'],
@@ -30,6 +49,13 @@
 		if (type) parts.push(type);
 		if (cardSpecs?.bedrooms != null) parts.push(`${cardSpecs.bedrooms} bed`);
 		if (cardSpecs?.bathrooms != null) parts.push(`${cardSpecs.bathrooms} bath`);
+		return parts;
+	}
+
+	function buildDevelopmentSpecs(dev: PublicDevelopmentCard): string[] {
+		const parts: string[] = ['Development'];
+		const status = formatEnumLabel(dev.developmentStatus);
+		if (status) parts.push(status);
 		return parts;
 	}
 </script>
@@ -71,11 +97,7 @@
 {/snippet}
 
 {#if href}
-	<a
-		class="spotlight-card spotlight-card--{surface}"
-		{href}
-		aria-label={card.title ?? 'View property listing'}
-	>
+	<a class="spotlight-card spotlight-card--{surface}" {href} aria-label={linkLabel}>
 		{@render cardBody()}
 	</a>
 {:else}

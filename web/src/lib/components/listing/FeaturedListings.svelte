@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ListingRail from './ListingRail.svelte';
+	import SpotlightCard from './SpotlightCard.svelte';
 	import type { PublicPropertyCard } from '$lib/sanity/transforms/propertyCard';
 
 	type Props = {
@@ -28,7 +29,15 @@
 			{/if}
 		</div>
 
-		<ListingRail {cards} surface="light" labelledby="featured-heading" />
+		<ListingRail
+			items={cards}
+			getKey={(c, i) => `${c._id}-${i}`}
+			labelledby="featured-heading"
+		>
+			{#snippet card(c)}
+				<SpotlightCard card={c} surface="light" />
+			{/snippet}
+		</ListingRail>
 	</section>
 {/if}
 

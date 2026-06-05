@@ -1,5 +1,6 @@
 <script lang="ts">
-	import SimilarListingGrid from './SimilarListingGrid.svelte';
+	import ListingRail from './ListingRail.svelte';
+	import SpotlightCard from './SpotlightCard.svelte';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 	type Props = {
@@ -8,35 +9,71 @@
 	};
 
 	let { cards, heading = 'Similar properties' }: Props = $props();
+
+	const summaryLine = $derived(cards.length === 1 ? '1 listing' : `${cards.length} listings`);
 </script>
 
 {#if cards.length > 0}
-	<section class="similar-properties" aria-labelledby="similar-properties-heading">
-		<div class="similar-properties__head">
-			<h2 id="similar-properties-heading">{heading}</h2>
-			<p class="similar-properties__summary">
-				{cards.length === 1 ? '1 listing' : `${cards.length} listings`}
-			</p>
+	<section class="similar content-wrap" aria-labelledby="similar-properties-heading">
+		<div class="similar__head">
+			<div class="similar__heading">
+				<h2 id="similar-properties-heading">{heading}</h2>
+				<p class="similar__summary">{summaryLine}</p>
+			</div>
+			{#if cards.length > 1}
+				<span class="similar__cue" aria-hidden="true">‹ scroll ›</span>
+			{/if}
 		</div>
 
-		<SimilarListingGrid {cards} />
+		<ListingRail
+			items={cards}
+			getKey={(item, i) => `${item.card._id}-${i}`}
+			labelledby="similar-properties-heading"
+		>
+			{#snippet card(item)}
+				{#if item.kind === 'development'}
+					<SpotlightCard card={item.card} kind="development" surface="light" />
+				{:else}
+					<SpotlightCard card={item.card} surface="light" />
+				{/if}
+			{/snippet}
+		</ListingRail>
 	</section>
 {/if}
 
 <style>
-	.similar-properties {
-		margin-top: var(--space-xl);
+	.similar {
+		margin-top: var(--space-2xl);
+		padding-bottom: var(--space-2xl);
 	}
 
-	.similar-properties__head {
-		display: grid;
-		gap: var(--space-xs);
-		margin-bottom: var(--space-md);
+	.similar__head {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: var(--space-md);
+		margin-bottom: var(--space-lg);
 	}
 
-	.similar-properties__summary {
+	.similar__summary {
+		margin-top: var(--space-xs);
 		color: var(--muted);
 		font-family: var(--sans);
 		font-size: var(--text-ui);
+	}
+
+	.similar__cue {
+		flex-shrink: 0;
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		letter-spacing: 0.04em;
+		color: var(--muted);
+		white-space: nowrap;
+	}
+
+	@media (max-width: 600px) {
+		.similar__cue {
+			display: none;
+		}
 	}
 </style>
