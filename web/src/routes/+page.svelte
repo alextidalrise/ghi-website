@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DiscoveryBar from '$lib/components/listing/DiscoveryBar.svelte';
+	import BuyerGuides from '$lib/components/home/BuyerGuides.svelte';
 	import ExploreByCountry from '$lib/components/home/ExploreByCountry.svelte';
 	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
@@ -54,6 +55,8 @@
 </div>
 
 <section class="home-content content-wrap">
+	<BuyerGuides />
+
 	<ExploreByCountry countries={data.featuredCountries} />
 
 	<FeaturedLocations locations={data.featuredLocations} />
