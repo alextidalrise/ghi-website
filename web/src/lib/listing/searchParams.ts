@@ -18,6 +18,8 @@ export type ListingSearchParams = {
 	minBeds: number | null;
 	community: string | null;
 	golfRelevance: GolfRelevanceValue[];
+	/** Golf course/club slugs the listing must sit on (primary or linked). */
+	golfCourse: string[];
 };
 
 export const DEFAULT_LISTING_SEARCH_PARAMS: ListingSearchParams = {
@@ -28,7 +30,8 @@ export const DEFAULT_LISTING_SEARCH_PARAMS: ListingSearchParams = {
 	maxPrice: null,
 	minBeds: null,
 	community: null,
-	golfRelevance: []
+	golfRelevance: [],
+	golfCourse: []
 };
 
 export type PaginationMeta = {
@@ -65,13 +68,23 @@ function parseMinBeds(value: string | null): number | null {
 	return parsed != null && parsed >= 1 ? parsed : null;
 }
 
-/** Validate a community slug from the URL — lowercase, hyphen-separated alphanumerics only. */
-const COMMUNITY_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** Validate a slug from the URL — lowercase, hyphen-separated alphanumerics only. */
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function parseCommunity(value: string | null): string | null {
 	if (!value) return null;
 	const trimmed = value.trim().toLowerCase();
-	return COMMUNITY_SLUG_PATTERN.test(trimmed) ? trimmed : null;
+	return SLUG_PATTERN.test(trimmed) ? trimmed : null;
+}
+
+/** Parse repeated golfCourse slug params — validated, de-duplicated, deterministically ordered. */
+function parseGolfCourse(values: string[]): string[] {
+	const seen = new Set<string>();
+	for (const value of values) {
+		const trimmed = value.trim().toLowerCase();
+		if (SLUG_PATTERN.test(trimmed)) seen.add(trimmed);
+	}
+	return [...seen].sort();
 }
 
 function parseGolfRelevance(values: string[]): GolfRelevanceValue[] {
@@ -100,7 +113,8 @@ export function parseListingSearchParams(url: URL): ListingSearchParams {
 		maxPrice: parsePositiveInt(url.searchParams.get('maxPrice')),
 		minBeds: parseMinBeds(url.searchParams.get('minBeds')),
 		community: parseCommunity(url.searchParams.get('community')),
-		golfRelevance: parseGolfRelevance(url.searchParams.getAll('golfRelevance'))
+		golfRelevance: parseGolfRelevance(url.searchParams.getAll('golfRelevance')),
+		golfCourse: parseGolfCourse(url.searchParams.getAll('golfCourse'))
 	};
 }
 
@@ -129,6 +143,10 @@ export function serializeListingSearchParams(params: ListingSearchParams): URLSe
 
 	for (const value of params.golfRelevance) {
 		searchParams.append('golfRelevance', value);
+	}
+
+	for (const value of params.golfCourse) {
+		searchParams.append('golfCourse', value);
 	}
 
 	return searchParams;

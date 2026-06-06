@@ -323,6 +323,13 @@ export function toPublicDevelopment(raw: RawDevelopment | null): PublicDevelopme
 }
 
 export { filterMediaAsset, filterMediaAssetList, filterMediaBundle } from './mediaFilter';
+export {
+	FRONTLINE_HERO_DEFAULTS,
+	resolveFrontlineHero,
+	type FrontlineHeroContent,
+	type FrontlineHeroImage,
+	type FrontlineHeroInput
+} from './frontlineHero';
 export { transformMapPrivacy, stripInternalLocationFields } from './mapPrivacy';
 export { filterPublicPricing } from './pricingFilter';
 export {

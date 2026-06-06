@@ -39,6 +39,7 @@ export async function fetchListingCards({
 		maxPrice: params.maxPrice,
 		minBeds: params.minBeds,
 		golfRelevance: params.golfRelevance,
+		golfCourse: params.golfCourse,
 		start,
 		end
 	});

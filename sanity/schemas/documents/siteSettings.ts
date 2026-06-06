@@ -37,6 +37,43 @@ export const siteSettings = defineType({
 			]
 		}),
 		defineField({
+			name: 'frontlineHero',
+			title: 'Front Line Collection hero',
+			type: 'object',
+			description:
+				'Hero band for the /front-line-collection page. Each field has a sensible default on the site if left empty.',
+			fields: [
+				defineField({
+					name: 'image',
+					title: 'Hero image',
+					type: 'mediaAssetMetadata',
+					description: 'Photograph shown beside the headline (right side on desktop).'
+				}),
+				defineField({
+					name: 'eyebrow',
+					title: 'Eyebrow',
+					type: 'string',
+					description: 'Short label in the gold marker. Defaults to "Frontline Golf".',
+					validation: (Rule) => Rule.max(40)
+				}),
+				defineField({
+					name: 'headline',
+					title: 'Headline',
+					type: 'string',
+					description: 'Display headline. Wrap a phrase in *asterisks* to render it in italic.',
+					validation: (Rule) => Rule.max(80)
+				}),
+				defineField({
+					name: 'lead',
+					title: 'Lead',
+					type: 'text',
+					rows: 3,
+					description: 'Supporting sentence under the headline.',
+					validation: (Rule) => Rule.max(280)
+				})
+			]
+		}),
+		defineField({
 			name: 'homepageFeaturedLocations',
 			title: 'Homepage featured locations',
 			type: 'array',

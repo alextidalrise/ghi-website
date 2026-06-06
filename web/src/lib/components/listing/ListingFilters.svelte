@@ -15,14 +15,25 @@
 	} from '$lib/listing/filterOptions';
 
 	type CommunityOption = { label: string; value: string };
+	type CourseOption = { label: string; value: string };
 
 	type Props = {
 		basePath: string;
 		searchParams: ListingSearchParams;
 		communityOptions?: CommunityOption[];
+		/** Golf course/club options. When non-empty, renders the Course filter pill. */
+		courseOptions?: CourseOption[];
+		/** Whether to show the generic golf-relevance pill (hidden on the frontline page). */
+		showGolfRelevance?: boolean;
 	};
 
-	let { basePath, searchParams, communityOptions = [] }: Props = $props();
+	let {
+		basePath,
+		searchParams,
+		communityOptions = [],
+		courseOptions = [],
+		showGolfRelevance = true
+	}: Props = $props();
 
 	let form: HTMLFormElement | undefined;
 	// Starts false to match SSR; flips true after mount so per-menu Apply buttons
@@ -41,6 +52,7 @@
 	const bedsLabel = $derived(searchParams.minBeds ? `${searchParams.minBeds}+ beds` : null);
 	const priceLabel = $derived(formatPriceRange(searchParams.minPrice, searchParams.maxPrice));
 	const golfLabel = $derived(formatGolfLabel(searchParams.golfRelevance));
+	const courseLabel = $derived(formatCourseLabel(searchParams.golfCourse));
 	const sortLabel = $derived(
 		SORT_OPTIONS.find((option) => option.value === searchParams.sort)?.label ?? 'Newest'
 	);
@@ -51,7 +63,8 @@
 			searchParams.minBeds != null ||
 			searchParams.minPrice != null ||
 			searchParams.maxPrice != null ||
-			searchParams.golfRelevance.length > 0
+			searchParams.golfRelevance.length > 0 ||
+			searchParams.golfCourse.length > 0
 	);
 
 	function formatPriceShort(value: number): string {
@@ -77,6 +90,14 @@
 			return GOLF_RELEVANCE.find((option) => option.value === values[0])?.label ?? null;
 		}
 		return `Golf (${values.length})`;
+	}
+
+	function formatCourseLabel(values: string[]): string | null {
+		if (values.length === 0) return null;
+		if (values.length === 1) {
+			return courseOptions.find((option) => option.value === values[0])?.label ?? '1 course';
+		}
+		return `Courses (${values.length})`;
 	}
 
 	/** Progressive enhancement: derive clean params from the live form and SPA-navigate. */
@@ -270,28 +291,55 @@
 			</details>
 		{/if}
 
-		<details class="pill" class:pill--active={golfLabel} ontoggle={onToggle}>
-			<summary class="pill__trigger">
-				<span class="pill__label">Golf</span>
-				{#if golfLabel}<span class="pill__value">{golfLabel}</span>{/if}
-				<span class="pill__chevron" aria-hidden="true"></span>
-			</summary>
-			<fieldset class="pill__menu option-list">
-				<legend class="sr-only">Golf relevance</legend>
-				{#each GOLF_RELEVANCE as option (option.value)}
-					<label class="option">
-						<input
-							type="checkbox"
-							name="golfRelevance"
-							value={option.value}
-							checked={searchParams.golfRelevance.includes(option.value)}
-						/>
-						<span>{option.label}</span>
-					</label>
-				{/each}
-				<button class="pill__apply" type="submit">Apply</button>
-			</fieldset>
-		</details>
+		{#if courseOptions.length > 0}
+			<details class="pill" class:pill--active={courseLabel} ontoggle={onToggle}>
+				<summary class="pill__trigger">
+					<span class="pill__label">Golf course</span>
+					{#if courseLabel}<span class="pill__value">{courseLabel}</span>{/if}
+					<span class="pill__chevron" aria-hidden="true"></span>
+				</summary>
+				<fieldset class="pill__menu option-list option-list--scroll">
+					<legend class="sr-only">Golf course or club</legend>
+					{#each courseOptions as option (option.value)}
+						<label class="option">
+							<input
+								type="checkbox"
+								name="golfCourse"
+								value={option.value}
+								checked={searchParams.golfCourse.includes(option.value)}
+							/>
+							<span>{option.label}</span>
+						</label>
+					{/each}
+					<button class="pill__apply" type="submit">Apply</button>
+				</fieldset>
+			</details>
+		{/if}
+
+		{#if showGolfRelevance}
+			<details class="pill" class:pill--active={golfLabel} ontoggle={onToggle}>
+				<summary class="pill__trigger">
+					<span class="pill__label">Golf</span>
+					{#if golfLabel}<span class="pill__value">{golfLabel}</span>{/if}
+					<span class="pill__chevron" aria-hidden="true"></span>
+				</summary>
+				<fieldset class="pill__menu option-list">
+					<legend class="sr-only">Golf relevance</legend>
+					{#each GOLF_RELEVANCE as option (option.value)}
+						<label class="option">
+							<input
+								type="checkbox"
+								name="golfRelevance"
+								value={option.value}
+								checked={searchParams.golfRelevance.includes(option.value)}
+							/>
+							<span>{option.label}</span>
+						</label>
+					{/each}
+					<button class="pill__apply" type="submit">Apply</button>
+				</fieldset>
+			</details>
+		{/if}
 	</div>
 
 	<div class="filter-bar__sort">

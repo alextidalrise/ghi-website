@@ -101,6 +101,13 @@ export {
 	sitemapGolfCoursesQuery
 } from './golf';
 
+export {
+	fetchFrontlineCourseOptions,
+	fetchFrontlineHero,
+	frontlineHeroQuery,
+	type CourseFilterOption
+} from './frontline';
+
 export { sitemapListingsQuery, sitemapTaxonomyQuery } from './sitemap';
 
 export {

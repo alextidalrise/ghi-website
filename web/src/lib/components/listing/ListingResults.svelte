@@ -10,6 +10,7 @@
 	import type { PublicPropertyCard } from '$lib/sanity/transforms/propertyCard';
 
 	type CommunityOption = { label: string; value: string };
+	type CourseOption = { label: string; value: string };
 
 	type Props = {
 		basePath: string;
@@ -19,6 +20,8 @@
 		pagination: PaginationMeta;
 		heading?: string;
 		communityOptions?: CommunityOption[];
+		courseOptions?: CourseOption[];
+		showGolfRelevance?: boolean;
 	};
 
 	let {
@@ -28,7 +31,9 @@
 		total,
 		pagination,
 		heading = 'Properties',
-		communityOptions = []
+		communityOptions = [],
+		courseOptions = [],
+		showGolfRelevance = true
 	}: Props = $props();
 
 	const summary = $derived(formatSummary(total, pagination));
@@ -39,6 +44,7 @@
 			searchParams.maxPrice != null ||
 			searchParams.minBeds != null ||
 			searchParams.golfRelevance.length > 0 ||
+			searchParams.golfCourse.length > 0 ||
 			searchParams.sort !== DEFAULT_LISTING_SEARCH_PARAMS.sort
 	);
 
@@ -57,7 +63,13 @@
 			<p class="listing-results__summary">{summary}</p>
 		</div>
 
-		<ListingFilters {basePath} {searchParams} {communityOptions} />
+		<ListingFilters
+			{basePath}
+			{searchParams}
+			{communityOptions}
+			{courseOptions}
+			{showGolfRelevance}
+		/>
 
 		{#if cards.length > 0}
 			<div class="listing-results__grid">
