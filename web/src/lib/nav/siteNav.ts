@@ -1,3 +1,5 @@
+import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
+
 export type SiteNavItem = {
 	label: string;
 	href: string;
@@ -10,7 +12,7 @@ export type SiteNavItem = {
 export const SITE_NAV_ITEMS: SiteNavItem[] = [
 	{ label: 'Spain', href: '/spain' },
 	{ label: 'Portugal', href: '/portugal' },
-	{ label: 'Front Line Collection', href: '/front-line-collection' },
+	{ label: 'Front Line Collection', href: FRONTLINE_COLLECTION_PATH },
 	// Buying Guide page is not built yet; the nav links ahead of the page.
 	{ label: 'Buying Guide', href: '/buying-guide' },
 	{ label: 'About Us', href: '/about' }

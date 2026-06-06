@@ -6,14 +6,8 @@
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import TrustedPartners from '$lib/components/home/TrustedPartners.svelte';
+	import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 	let { data } = $props();
-
-	// No global "all frontline" results page exists (frontline search is location-scoped),
-	// so the homepage CTA points at the primary country's landing page for now.
-	// TODO: revisit destination — see if a dedicated frontline index is wanted.
-	const frontlineViewAllHref = $derived(
-		data.countries[0]?.slug ? `/${data.countries[0].slug}` : undefined
-	);
 </script>
 
 <section class="home-hero on-dark">
@@ -71,7 +65,7 @@
 		cards={data.frontlineCards}
 		heading="Frontline Golf Properties"
 		summary="Homes directly on the fairway, in Spain and Portugal."
-		viewAllHref={frontlineViewAllHref}
+		viewAllHref={FRONTLINE_COLLECTION_PATH}
 	/>
 
 	<TrustedPartners />

@@ -1,13 +1,14 @@
 import type { PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
 import { parseListingSearchParams } from '$lib/listing/searchParams';
+import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 import {
 	fetchFrontlineCourseOptions,
 	fetchFrontlineHero,
 	fetchListingCards
 } from '$lib/sanity/queries';
 
-const BASE_PATH = '/front-line-collection';
+const BASE_PATH = FRONTLINE_COLLECTION_PATH;
 
 export const load: PageServerLoad = async ({ url }) => {
 	const searchParams = parseListingSearchParams(url);

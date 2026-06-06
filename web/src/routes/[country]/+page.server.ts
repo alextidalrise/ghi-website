@@ -3,10 +3,7 @@ import type { PageServerLoad } from './$types';
 import { buildCountryBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
 import { withPreviewLocationSeo } from '$lib/listing/detailPage';
-import {
-	DEFAULT_LISTING_SEARCH_PARAMS,
-	buildListingSearchHref
-} from '$lib/listing/searchParams';
+import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 import { buildLocationSeo } from '$lib/listing/seo';
 import {
 	countryBySlugQuery,
@@ -51,11 +48,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		fetchCountryFeaturedLocations({ countrySlug: params.country })
 	]);
 
-	const frontlineViewAllHref = buildListingSearchHref(
-		canonicalPath,
-		DEFAULT_LISTING_SEARCH_PARAMS,
-		{ golfRelevance: ['frontline_golf'] }
-	);
+	const frontlineViewAllHref = FRONTLINE_COLLECTION_PATH;
 
 	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const breadcrumbs = buildCountryBreadcrumbs(country, canonicalPath);

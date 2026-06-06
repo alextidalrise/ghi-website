@@ -2,11 +2,8 @@ import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { buildLocationBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import { withPreviewLocationSeo } from '$lib/listing/detailPage';
-import {
-	DEFAULT_LISTING_SEARCH_PARAMS,
-	buildListingSearchHref,
-	parseListingSearchParams
-} from '$lib/listing/searchParams';
+import { parseListingSearchParams } from '$lib/listing/searchParams';
+import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 import { buildFilteredLocationSeo, buildLocationSeo } from '$lib/listing/seo';
 import {
 	communitiesByLocationQuery,
@@ -118,11 +115,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		fetchFrontlineListingCards({ scope: listingScope })
 	]);
 
-	const frontlineViewAllHref = buildListingSearchHref(
-		canonicalPath,
-		DEFAULT_LISTING_SEARCH_PARAMS,
-		{ golfRelevance: ['frontline_golf'] }
-	);
+	const frontlineViewAllHref = FRONTLINE_COLLECTION_PATH;
 
 	const directCommunities = allowedCommunities.filter((community) => !community.isAssociated);
 	const associatedCommunities = allowedCommunities.filter((community) => community.isAssociated);
