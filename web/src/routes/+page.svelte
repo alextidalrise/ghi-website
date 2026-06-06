@@ -4,6 +4,7 @@
 	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
+	import TrustedPartners from '$lib/components/home/TrustedPartners.svelte';
 	let { data } = $props();
 
 	// No global "all frontline" results page exists (frontline search is location-scoped),
@@ -69,6 +70,8 @@
 		summary="Homes directly on the fairway, in Spain and Portugal."
 		viewAllHref={frontlineViewAllHref}
 	/>
+
+	<TrustedPartners />
 
 	{#if data.featuredCards.length === 0 && data.frontlineCards.length === 0}
 		<div class="home-intro">
