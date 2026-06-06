@@ -1,3 +1,9 @@
+import {
+	LISTING_COMMUNITY_SLUG,
+	LISTING_COUNTRY_SLUG,
+	LISTING_LOCATION_SLUG
+} from './queries/filters';
+
 /**
  * Explicit public field allowlists per template.
  * Wildcard projections are forbidden — compose queries only from these fragments.
@@ -200,10 +206,13 @@ export const PROPERTY_CARD_PUBLIC = /* groq */ `{
   listingKind,
   propertyType,
   transactionType,
+  "countrySlug": ${LISTING_COUNTRY_SLUG},
+  "locationSlug": ${LISTING_LOCATION_SLUG},
+  "communitySlug": ${LISTING_COMMUNITY_SLUG},
   location{
     country->{ name, "slug": slug.current },
     location->{ name, "slug": slug.current },
-    community->{ name, "slug": slug.current },
+    community->{ _id, name, "slug": slug.current },
     addressDisplay
   },
   pricing${PRICING_PUBLIC},
@@ -304,9 +313,9 @@ export const DEVELOPMENT_PUBLIC = /* groq */ `{
 
 /** Canonical path fields for slug resolution and 301 redirects. */
 export const CANONICAL_PATH_FIELDS = /* groq */ `
-  "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),
-  "locationSlug": coalesce(location.location->slug.current, location.community->parent->slug.current),
-  "communitySlug": location.community->slug.current,
+  "countrySlug": ${LISTING_COUNTRY_SLUG},
+  "locationSlug": ${LISTING_LOCATION_SLUG},
+  "communitySlug": ${LISTING_COMMUNITY_SLUG},
   "slug": slug.current,
   listingKind
 `;

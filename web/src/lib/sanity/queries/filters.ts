@@ -35,8 +35,17 @@ export const LISTING_LOCATION_SLUG = /* groq */ `coalesce(
   location.community->parent->slug.current
 )`;
 
-/** Community slug for listing URLs. */
-export const LISTING_COMMUNITY_SLUG = /* groq */ `location.community->slug.current`;
+/** Community slug for listing URLs — falls back to stable taxonomy _id prefixes when
+    slug.current is not yet set in the CMS (e.g. places-community-la-quinta). */
+export const LISTING_COMMUNITY_SLUG = /* groq */ `coalesce(
+  location.community->slug.current,
+  select(
+    location.community->_id match "places-community-*" =>
+      string::split(location.community->_id, "places-community-")[1],
+    location.community->_id match "location.community.*" =>
+      string::split(location.community->_id, "location.community.")[1]
+  )
+)`;
 
 /** Match a listing document to its hierarchical URL segments. */
 export const LISTING_PATH_FILTER = /* groq */ `

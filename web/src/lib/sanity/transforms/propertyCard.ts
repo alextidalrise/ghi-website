@@ -17,6 +17,9 @@ export type PublicPropertyCard = {
 	ghiListingId: RawPropertyCard['ghiListingId'];
 	title: RawPropertyCard['title'];
 	slug: RawPropertyCard['slug'];
+	countrySlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
 	listingKind: RawPropertyCard['listingKind'];
 	propertyType: RawPropertyCard['propertyType'];
 	transactionType: RawPropertyCard['transactionType'];
@@ -37,6 +40,9 @@ export function toPublicPropertyCard(raw: RawPropertyCard): PublicPropertyCard {
 		ghiListingId: raw.ghiListingId,
 		title: raw.title,
 		slug: raw.slug,
+		countrySlug: raw.countrySlug,
+		locationSlug: raw.locationSlug,
+		communitySlug: raw.communitySlug,
 		listingKind: raw.listingKind,
 		propertyType: raw.propertyType,
 		transactionType: raw.transactionType,

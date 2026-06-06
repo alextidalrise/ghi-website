@@ -19,18 +19,46 @@ export function buildCanonicalPath({
 
 export type ListingHrefInput = {
 	slug?: string | null;
+	/** Pre-resolved segments from card/canonical queries (preferred when present). */
+	countrySlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
 	location?: {
 		country?: { slug?: string | null } | null;
 		location?: { slug?: string | null } | null;
-		community?: { slug?: string | null } | null;
+		community?: { _id?: string | null; slug?: string | null } | null;
 	} | null;
 };
 
-export function buildListingHref({ slug, location }: ListingHrefInput): string | null {
+/** Derive a community slug from CMS slug or stable taxonomy _id prefixes. */
+export function resolveCommunitySlug(
+	community: { _id?: string | null; slug?: string | null } | null | undefined
+): string | null {
+	if (!community) return null;
+	if (community.slug) return community.slug;
+
+	const id = community._id;
+	if (!id) return null;
+	if (id.startsWith('places-community-')) {
+		return id.slice('places-community-'.length);
+	}
+	if (id.startsWith('location.community.')) {
+		return id.slice('location.community.'.length);
+	}
+	return null;
+}
+
+export function buildListingHref({
+	slug,
+	countrySlug,
+	locationSlug,
+	communitySlug,
+	location
+}: ListingHrefInput): string | null {
 	return buildCanonicalPath({
-		countrySlug: location?.country?.slug,
-		locationSlug: location?.location?.slug,
-		communitySlug: location?.community?.slug,
+		countrySlug: countrySlug ?? location?.country?.slug,
+		locationSlug: locationSlug ?? location?.location?.slug,
+		communitySlug: communitySlug ?? resolveCommunitySlug(location?.community),
 		slug
 	});
 }

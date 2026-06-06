@@ -21,7 +21,15 @@
 
 	let { card, kind = 'property', surface = 'light' }: Props = $props();
 
-	const href = $derived(buildListingHref({ slug: card.slug, location: card.location }));
+	const href = $derived(
+		buildListingHref({
+			slug: card.slug,
+			countrySlug: card.countrySlug,
+			locationSlug: card.locationSlug,
+			communitySlug: card.communitySlug,
+			location: card.location
+		})
+	);
 	const locationLine = $derived(card.location?.addressDisplay ?? null);
 	const fallbackName = $derived(kind === 'development' ? 'Development listing' : 'Property listing');
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? fallbackName);

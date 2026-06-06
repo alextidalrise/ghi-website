@@ -13,7 +13,15 @@
 
 	let { card }: Props = $props();
 
-	const href = $derived(buildListingHref({ slug: card.slug, location: card.location }));
+	const href = $derived(
+		buildListingHref({
+			slug: card.slug,
+			countrySlug: card.countrySlug,
+			locationSlug: card.locationSlug,
+			communitySlug: card.communitySlug,
+			location: card.location
+		})
+	);
 	const price = $derived(formatListingPrice(card.pricing));
 	const locationLine = $derived(card.location?.addressDisplay ?? null);
 	const specsLine = $derived(formatSpecs(card.specs));
