@@ -1,21 +1,28 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-// Stubbed newsletter signup. The footer form posts here and renders real
+// Stubbed newsletter + buyer-guide signup. The footer newsletter form and the
+// homepage buyer-guide cards both post here and render real
 // idle/submitting/success/error states against it. When the HubSpot list is
 // ready, replace the body of the `try` block with the HubSpot Forms API call
 // (POST to https://api.hsforms.com/submissions/v3/integration/submit/{portalId}/{formGuid})
-// and keep the same JSON success/error contract so the client needs no changes.
+// and keep the same JSON success/error contract so the clients need no changes.
 
 // Deliberately forgiving: catches the obvious typos without rejecting the long
 // tail of valid addresses a stricter regex would.
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Which buyer guide an email is requesting, when posted from the homepage cards.
+// Absent for a plain newsletter signup. Anything else is ignored as untrusted.
+const GUIDES = ['spain', 'portugal'] as const;
+type Guide = (typeof GUIDES)[number];
+
 export const POST: RequestHandler = async ({ request }) => {
 	let email: unknown;
+	let guide: unknown;
 
 	try {
-		({ email } = await request.json());
+		({ email, guide } = await request.json());
 	} catch {
 		return json({ error: 'Could not read your request. Please try again.' }, { status: 400 });
 	}
@@ -24,8 +31,15 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ error: 'Please enter a valid email address.' }, { status: 422 });
 	}
 
+	const requestedGuide: Guide | undefined = GUIDES.includes(guide as Guide)
+		? (guide as Guide)
+		: undefined;
+
 	try {
 		// TODO: forward `email.trim()` to HubSpot once the list ID is provisioned.
+		// When `requestedGuide` is set, trigger the matching guide-delivery workflow
+		// (HubSpot emails the PDF) instead of a plain list subscription.
+		void requestedGuide;
 		return json({ ok: true });
 	} catch {
 		return json(
