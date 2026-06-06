@@ -197,6 +197,8 @@
 	}
 
 	.location-page__top {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		padding-top: var(--space-xl);
 	}
 

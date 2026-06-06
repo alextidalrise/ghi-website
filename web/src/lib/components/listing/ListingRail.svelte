@@ -40,10 +40,16 @@
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		/* Grid min-content width is the sum of all cards; cap it so overflow-x scrolls
+		   inside the rail instead of widening the page. */
+		min-width: 0;
+		max-width: 100%;
 		overflow-x: auto;
 		overflow-y: hidden;
 		scroll-snap-type: x mandatory;
 		-webkit-overflow-scrolling: touch;
+		overscroll-behavior-x: contain;
+		touch-action: pan-x pan-y pinch-zoom;
 		scrollbar-width: none;
 		/* Breathing room so the focus ring and hover lift aren't clipped by overflow. */
 		padding-block: 0.5rem;

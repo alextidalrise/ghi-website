@@ -205,11 +205,15 @@
 			gap: var(--space-md);
 			margin-inline: calc(-1 * var(--content-padding));
 			padding-inline: var(--content-padding);
+			min-width: 0;
+			max-width: 100%;
 			overflow-x: auto;
 			overflow-y: hidden;
 			scroll-snap-type: x mandatory;
 			scroll-padding-inline-start: var(--content-padding);
 			-webkit-overflow-scrolling: touch;
+			overscroll-behavior-x: contain;
+			touch-action: pan-x pan-y pinch-zoom;
 			scrollbar-width: none;
 			/* Breathing room so the focus ring isn't clipped by overflow. */
 			padding-block: 0.375rem;

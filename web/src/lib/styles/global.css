@@ -10,9 +10,19 @@
 
 html {
 	scroll-behavior: smooth;
+	/* Lock the document horizontally. Full-bleed bands and the off-screen nav drawer
+	   live outside .site-main; clipping only main leaves the page swipeable on iOS. */
+	overflow-x: hidden;
+	overflow-x: clip;
 }
 
 body {
+	width: 100%;
+	overflow-x: hidden;
+	overflow-x: clip;
+	overscroll-behavior-x: none;
+	/* Vertical page scroll only; horizontal carousels opt back in with pan-x. */
+	touch-action: pan-y pinch-zoom;
 	font-family: var(--sans);
 	font-weight: 300;
 	font-size: var(--text-body);

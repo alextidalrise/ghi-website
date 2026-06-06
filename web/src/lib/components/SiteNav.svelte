@@ -126,6 +126,7 @@
 	class:is-open={open}
 	aria-label="Main"
 	aria-hidden={!open}
+	inert={open ? undefined : true}
 	bind:this={drawer}
 >
 	<ul class="site-nav__drawer-menu">
@@ -330,10 +331,16 @@
 		z-index: 95;
 		overflow-y: auto;
 		overscroll-behavior: contain;
+		pointer-events: none;
+		/* Off-screen drawer still paints past the viewport edge; clip it closed so
+		   iOS cannot rubber-band the page sideways to reveal it. */
+		clip-path: inset(0 0 0 100%);
 	}
 
 	.site-nav__drawer.is-open {
 		transform: translateX(0);
+		pointer-events: auto;
+		clip-path: none;
 	}
 
 	.site-nav__drawer-menu {
