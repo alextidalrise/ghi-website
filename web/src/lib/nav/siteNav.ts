@@ -10,7 +10,6 @@ export type SiteNavItem = {
 export const SITE_NAV_ITEMS: SiteNavItem[] = [
 	{ label: 'Spain', href: '/spain' },
 	{ label: 'Portugal', href: '/portugal' },
-	// Front Line Collection will become its own page; placeholder route until then.
 	{ label: 'Front Line Collection', href: '/front-line-collection' },
 	// Buying Guide page is not built yet; the nav links ahead of the page.
 	{ label: 'Buying Guide', href: '/buying-guide' },

@@ -37,3 +37,20 @@ describe('golfCourse listing scope', () => {
 		).toMatchObject({ golfCourseId: 'gc-1' });
 	});
 });
+
+describe('golfCourse facet filter', () => {
+	it('matches on primary and linked course slugs', () => {
+		const query = buildListingCardsCountQuery({ type: 'global' });
+		expect(query).toContain('golf.primaryGolfCourse->slug.current in $golfCourse');
+		expect(query).toContain('count(golf.linkedGolfCourses[@->slug.current in $golfCourse]) > 0');
+	});
+
+	it('serializes a populated golfCourse facet, nulls an empty one', () => {
+		expect(
+			listingSearchQueryParams({ type: 'global' }, { golfCourse: ['valderrama'] })
+		).toMatchObject({ golfCourse: ['valderrama'] });
+		expect(
+			listingSearchQueryParams({ type: 'global' }, { golfCourse: [] })
+		).toMatchObject({ golfCourse: null });
+	});
+});

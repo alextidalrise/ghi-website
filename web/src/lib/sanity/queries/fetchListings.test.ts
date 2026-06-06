@@ -91,7 +91,8 @@ describe('fetchListingCards', () => {
 				maxPrice: null,
 				minBeds: null,
 				community: null,
-				golfRelevance: []
+				golfRelevance: [],
+				golfCourse: []
 			}
 		});
 
