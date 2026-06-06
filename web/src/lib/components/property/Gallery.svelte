@@ -207,6 +207,13 @@
 		else prev();
 	}
 
+	// On a real device a horizontal drag can be aborted by the browser's
+	// gesture detector (firing pointercancel, never pointerup). Reset state so
+	// the gallery doesn't get wedged and the next tap behaves normally.
+	function onPointerCancel() {
+		pointerActive = false;
+	}
+
 	// A swipe on the stage navigates; it must not also tap through to the lightbox.
 	function onStageClick() {
 		if (swipedAway) {
@@ -255,6 +262,7 @@
 				onclick={onStageClick}
 				onpointerdown={onPointerDown}
 				onpointerup={onPointerUp}
+				onpointercancel={onPointerCancel}
 				aria-label={total > 1
 					? `View photo ${activeIndex + 1} of ${total} fullscreen`
 					: 'View photo fullscreen'}
@@ -318,7 +326,12 @@
 					<span aria-hidden="true">×</span>
 				</button>
 
-				<figure class="lightbox__figure" onpointerdown={onPointerDown} onpointerup={onPointerUp}>
+				<figure
+					class="lightbox__figure"
+					onpointerdown={onPointerDown}
+					onpointerup={onPointerUp}
+					onpointercancel={onPointerCancel}
+				>
 					{#key activeIndex}
 						<img
 							class="lightbox__img"
@@ -377,6 +390,10 @@
 		border: 0;
 		background: none;
 		cursor: zoom-in;
+		/* Reserve vertical panning for page scroll, but let horizontal drags
+		   reach the swipe handlers instead of being eaten by the browser's
+		   gesture detector (which otherwise fires pointercancel on real phones). */
+		touch-action: pan-y;
 	}
 
 	.gallery__stage-img {
@@ -566,6 +583,9 @@
 		max-height: calc(100vh - 7rem);
 		object-fit: contain;
 		pointer-events: auto;
+		/* The img is the touch target (the figure is pointer-events:none), so the
+		   swipe gesture must be claimed here. Background scroll is already locked. */
+		touch-action: pan-y;
 	}
 
 
