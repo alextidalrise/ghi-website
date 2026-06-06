@@ -3,6 +3,7 @@ export type ListingPreviewSegments = {
 	locationSlug?: string | null;
 	communitySlug?: string | null;
 	slug?: string | null;
+	isCatchAll?: boolean | null;
 };
 
 export type TaxonomyPreviewInput = {
@@ -17,11 +18,21 @@ export function buildListingPreviewPath({
 	countrySlug,
 	locationSlug,
 	communitySlug,
-	slug
+	slug,
+	isCatchAll
 }: ListingPreviewSegments): string | null {
-	if (!countrySlug || !locationSlug || !communitySlug || !slug) {
+	if (!countrySlug || !locationSlug || !slug) {
 		return null;
 	}
+
+	if (isCatchAll === true) {
+		return `/${countrySlug}/${locationSlug}/${slug}`;
+	}
+
+	if (!communitySlug) {
+		return null;
+	}
+
 	return `/${countrySlug}/${locationSlug}/${communitySlug}/${slug}`;
 }
 

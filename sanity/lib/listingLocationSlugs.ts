@@ -11,8 +11,11 @@ export const LISTING_LOCATION_SLUG = /* groq */ `coalesce(
 
 export const LISTING_COMMUNITY_SLUG = /* groq */ `location.community->slug.current`;
 
+export const LISTING_IS_CATCH_ALL = /* groq */ `coalesce(location.community->isCatchAll, false)`;
+
 export const LISTING_LOCATION_SLUGS_PROJECTION = /* groq */ `{
   "countrySlug": ${LISTING_COUNTRY_SLUG},
   "locationSlug": ${LISTING_LOCATION_SLUG},
-  "communitySlug": ${LISTING_COMMUNITY_SLUG}
+  "communitySlug": ${LISTING_COMMUNITY_SLUG},
+  "isCatchAll": ${LISTING_IS_CATCH_ALL}
 }`;

@@ -6,6 +6,7 @@ export type LocationTaxonomyRef = {
 	slug?: string | null;
 	type?: string | null;
 	breadcrumbLabel?: string | null;
+	isCatchAll?: boolean | null;
 };
 
 export type BreadcrumbItem = {
@@ -56,7 +57,13 @@ export function buildPropertyBreadcrumbs(
 		items.push({ label: labelFor(loc)!, href: `/${country.slug}/${loc.slug}` });
 	}
 
-	if (community?.slug && loc?.slug && country?.slug && labelFor(community)) {
+	if (
+		community?.slug &&
+		!community.isCatchAll &&
+		loc?.slug &&
+		country?.slug &&
+		labelFor(community)
+	) {
 		items.push({
 			label: labelFor(community)!,
 			href: communityFilterHref(country.slug, loc.slug, community.slug)
@@ -157,7 +164,13 @@ export function buildDevelopmentBreadcrumbs(
 		items.push({ label: labelFor(loc)!, href: `/${country.slug}/${loc.slug}` });
 	}
 
-	if (community?.slug && loc?.slug && country?.slug && labelFor(community)) {
+	if (
+		community?.slug &&
+		!community.isCatchAll &&
+		loc?.slug &&
+		country?.slug &&
+		labelFor(community)
+	) {
 		items.push({
 			label: labelFor(community)!,
 			href: communityFilterHref(country.slug, loc.slug, community.slug)

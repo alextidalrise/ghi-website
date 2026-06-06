@@ -19,6 +19,7 @@
 			countrySlug: card.countrySlug,
 			locationSlug: card.locationSlug,
 			communitySlug: card.communitySlug,
+			isCatchAll: card.isCatchAll,
 			location: card.location
 		})
 	);

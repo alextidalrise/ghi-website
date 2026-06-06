@@ -42,8 +42,10 @@ function cardLocationFromFixture() {
 		country: { name: location.country!.name!, slug: location.country!.slug! },
 		location: { name: location.location!.name!, slug: location.location!.slug! },
 		community: {
+			_id: location.community!._id ?? 'places-community-test',
 			name: location.community!.name!,
-			slug: location.community!.slug!
+			slug: location.community!.slug!,
+			isCatchAll: location.community!.isCatchAll ?? null
 		},
 		addressDisplay: location.addressDisplay!
 	};
@@ -58,6 +60,10 @@ function basePropertyCard(overrides: Partial<RawPropertyCard> = {}): RawProperty
 		listingKind: 'property',
 		propertyType: 'villa',
 		transactionType: 'sale',
+		countrySlug: goldenPropertyRaw.location?.country?.slug ?? null,
+		locationSlug: goldenPropertyRaw.location?.location?.slug ?? null,
+		communitySlug: goldenPropertyRaw.location?.community?.slug ?? null,
+		isCatchAll: goldenPropertyRaw.location?.community?.isCatchAll ?? false,
 		location: cardLocationFromFixture(),
 		pricing: goldenPropertyRaw.pricing as RawPropertyCard['pricing'],
 		specs: goldenPropertyRaw.specs as RawPropertyCard['specs'],

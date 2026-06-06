@@ -27,6 +27,18 @@ describe('buildListingPreviewPath', () => {
 			})
 		).toBeNull();
 	});
+
+	it('returns a 3-segment path when community is catch-all', () => {
+		expect(
+			buildListingPreviewPath({
+				countrySlug: 'spain',
+				locationSlug: 'nueva-andalucia',
+				communitySlug: 'nueva-andalucia',
+				slug: 'villa-example',
+				isCatchAll: true
+			})
+		).toBe('/spain/nueva-andalucia/villa-example');
+	});
 });
 
 describe('buildGolfCoursePreviewPath', () => {

@@ -1,30 +1,54 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import {
+	buildDevelopmentDetailPageData,
+	buildPropertyDetailPageData,
+	type ListingPathParams
+} from '$lib/listing/detailPage';
 import { buildCanonicalPath } from '$lib/listing/canonicalPath';
 import {
+	catchAllCommunityInLocationQuery,
 	communitiesByLocationQuery,
+	developmentByCatchAllPathPreviewQuery,
+	developmentByCatchAllPathQuery,
 	fetchPublic,
+	fetchPublicDevelopment,
+	fetchPublicProperty,
+	fetchSimilarListingCards,
 	listingLegacyThreeSegmentPathQuery,
-	locationBySlugQuery
+	locationBySlugQuery,
+	propertyByCatchAllPathPreviewQuery,
+	propertyByCatchAllPathQuery
 } from '$lib/sanity/queries';
+import {
+	toPublicDevelopment,
+	toPublicPropertyListing,
+	type RawDevelopment,
+	type RawPropertyListing
+} from '$lib/sanity/transforms';
 
 type LegacyPathRow = {
 	countrySlug?: string | null;
 	locationSlug?: string | null;
 	communitySlug?: string | null;
 	slug?: string | null;
+	isCatchAll?: boolean | null;
 };
 
 type CommunityRow = {
 	slug?: string | null;
 };
 
-/** Redirect legacy community-page URLs to filtered location pages; preserve listing slug fallback. */
-export const load: PageServerLoad = async ({ params, url, locals: { preview } }) => {
-	if (preview) {
-		error(404, 'Community pages are no longer available in preview for this path.');
-	}
+function catchAllPathParams(
+	countrySlug: string,
+	locationSlug: string,
+	listingSlug: string
+): ListingPathParams {
+	return { countrySlug, locationSlug, slug: listingSlug };
+}
 
+/** Resolve community redirects, catch-all listings, and legacy listing fallbacks at 3 segments. */
+export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
 	const location = await fetchPublic<{ _id?: string; slug?: string | null } | null>(
 		locationBySlugQuery,
 		{
@@ -50,6 +74,68 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview } })
 		redirect(301, `${target.pathname}${target.search}`);
 	}
 
+	if (preview) {
+		return loadCatchAllPreview(
+			{
+				countrySlug: params.country,
+				locationSlug: params.location,
+				slug: params.community
+			},
+			url.origin,
+			loadQuery
+		);
+	}
+
+	const pathParams = catchAllPathParams(params.country, params.location, params.community);
+
+	const property = await fetchPublicProperty(propertyByCatchAllPathQuery, {
+		params: {
+			countrySlug: params.country,
+			locationSlug: params.location,
+			slug: params.community
+		}
+	});
+
+	if (property) {
+		const similarCards = await fetchSimilarListingCards({
+			listingId: property._id!,
+			mode: property.related?.similarPropertiesMode,
+			propertyType: property.propertyType,
+			location: property.location
+		});
+
+		return {
+			preview: false as const,
+			...buildPropertyDetailPageData(property, url.origin, pathParams, { similarCards })
+		};
+	}
+
+	const development = await fetchPublicDevelopment(developmentByCatchAllPathQuery, {
+		params: {
+			countrySlug: params.country,
+			locationSlug: params.location,
+			slug: params.community
+		}
+	});
+
+	if (development) {
+		return {
+			preview: false as const,
+			...buildDevelopmentDetailPageData(development, url.origin, pathParams)
+		};
+	}
+
+	const catchAllCommunity = await fetchPublic<{ slug?: string | null } | null>(
+		catchAllCommunityInLocationQuery,
+		{
+			params: { locationId: location._id, communitySlug: params.community }
+		}
+	);
+
+	if (catchAllCommunity?.slug) {
+		redirect(301, `/${params.country}/${params.location}`);
+	}
+
 	const legacyMatches = await fetchPublic<LegacyPathRow[]>(listingLegacyThreeSegmentPathQuery, {
 		params: {
 			countrySlug: params.country,
@@ -67,3 +153,70 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview } })
 
 	error(404, 'Not found.');
 };
+
+async function loadCatchAllPreview(
+	pathParams: ListingPathParams,
+	siteOrigin: string,
+	loadQuery: App.Locals['loadQuery']
+) {
+	const propertyInitial = await loadQuery<RawPropertyListing | null>(
+		propertyByCatchAllPathPreviewQuery,
+		{
+			countrySlug: pathParams.countrySlug,
+			locationSlug: pathParams.locationSlug,
+			slug: pathParams.slug
+		}
+	);
+
+	const property = toPublicPropertyListing(propertyInitial.data);
+	if (property) {
+		const detail = buildPropertyDetailPageData(property, siteOrigin, pathParams, {
+			preview: true,
+			skipRedirect: true,
+			similarCards: []
+		});
+
+		return {
+			preview: true as const,
+			previewQuery: propertyByCatchAllPathPreviewQuery,
+			queryParams: {
+				countrySlug: pathParams.countrySlug,
+				locationSlug: pathParams.locationSlug,
+				slug: pathParams.slug
+			},
+			listingInitial: propertyInitial,
+			...detail
+		};
+	}
+
+	const developmentInitial = await loadQuery<RawDevelopment | null>(
+		developmentByCatchAllPathPreviewQuery,
+		{
+			countrySlug: pathParams.countrySlug,
+			locationSlug: pathParams.locationSlug,
+			slug: pathParams.slug
+		}
+	);
+
+	const development = toPublicDevelopment(developmentInitial.data);
+	if (development) {
+		const detail = buildDevelopmentDetailPageData(development, siteOrigin, pathParams, {
+			preview: true,
+			skipRedirect: true
+		});
+
+		return {
+			preview: true as const,
+			previewQuery: developmentByCatchAllPathPreviewQuery,
+			queryParams: {
+				countrySlug: pathParams.countrySlug,
+				locationSlug: pathParams.locationSlug,
+				slug: pathParams.slug
+			},
+			listingInitial: developmentInitial,
+			...detail
+		};
+	}
+
+	error(404, 'Listing not found.');
+}

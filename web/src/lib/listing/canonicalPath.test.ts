@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildCanonicalPath, buildListingHref, resolveCommunitySlug } from './canonicalPath';
+import {
+	buildCanonicalPath,
+	buildListingHref,
+	pathsMatch,
+	resolveCommunitySlug
+} from './canonicalPath';
 
 describe('buildCanonicalPath', () => {
 	it('returns a 4-segment path when all segments are present', () => {
@@ -11,6 +16,18 @@ describe('buildCanonicalPath', () => {
 				slug: 'villa-example'
 			})
 		).toBe('/spain/costa-del-sol/marbella/villa-example');
+	});
+
+	it('returns a 3-segment path when community is catch-all', () => {
+		expect(
+			buildCanonicalPath({
+				countrySlug: 'spain',
+				locationSlug: 'nueva-andalucia',
+				communitySlug: 'nueva-andalucia',
+				slug: 'villa-example',
+				isCatchAll: true
+			})
+		).toBe('/spain/nueva-andalucia/villa-example');
 	});
 });
 
@@ -90,6 +107,56 @@ describe('buildListingHref', () => {
 				}
 			})
 		).toBe('/spain/benahavis/la-quinta/villa-example');
+	});
+
+	it('returns a 3-segment path when community is catch-all', () => {
+		expect(
+			buildListingHref({
+				slug: 'villa-example',
+				location: {
+					country: { slug: 'spain' },
+					location: { slug: 'nueva-andalucia' },
+					community: { slug: 'nueva-andalucia', isCatchAll: true }
+				}
+			})
+		).toBe('/spain/nueva-andalucia/villa-example');
+	});
+});
+
+describe('pathsMatch', () => {
+	it('matches catch-all listings on 3-segment request URLs', () => {
+		expect(
+			pathsMatch(
+				{ countrySlug: 'spain', locationSlug: 'nueva-andalucia', slug: 'villa-example' },
+				{
+					countrySlug: 'spain',
+					locationSlug: 'nueva-andalucia',
+					communitySlug: 'nueva-andalucia',
+					slug: 'villa-example',
+					isCatchAll: true
+				}
+			)
+		).toBe(true);
+	});
+
+	it('rejects stale 4-segment URLs for catch-all listings', () => {
+		expect(
+			pathsMatch(
+				{
+					countrySlug: 'spain',
+					locationSlug: 'nueva-andalucia',
+					communitySlug: 'nueva-andalucia',
+					slug: 'villa-example'
+				},
+				{
+					countrySlug: 'spain',
+					locationSlug: 'nueva-andalucia',
+					communitySlug: 'nueva-andalucia',
+					slug: 'villa-example',
+					isCatchAll: true
+				}
+			)
+		).toBe(false);
 	});
 });
 

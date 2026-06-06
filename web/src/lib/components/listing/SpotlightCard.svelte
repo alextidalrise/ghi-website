@@ -21,15 +21,24 @@
 
 	let { card, kind = 'property', surface = 'light' }: Props = $props();
 
-	const href = $derived(
-		buildListingHref({
+	const href = $derived.by(() => {
+		if (kind === 'property') {
+			const propertyCard = card as PublicPropertyCard;
+			return buildListingHref({
+				slug: propertyCard.slug,
+				countrySlug: propertyCard.countrySlug,
+				locationSlug: propertyCard.locationSlug,
+				communitySlug: propertyCard.communitySlug,
+				isCatchAll: propertyCard.isCatchAll,
+				location: propertyCard.location
+			});
+		}
+
+		return buildListingHref({
 			slug: card.slug,
-			countrySlug: card.countrySlug,
-			locationSlug: card.locationSlug,
-			communitySlug: card.communitySlug,
 			location: card.location
-		})
-	);
+		});
+	});
 	const locationLine = $derived(card.location?.addressDisplay ?? null);
 	const fallbackName = $derived(kind === 'development' ? 'Development listing' : 'Property listing');
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? fallbackName);

@@ -9,6 +9,8 @@ export {
 export {
 	propertyByPathQuery,
 	propertyByPathPreviewQuery,
+	propertyByCatchAllPathQuery,
+	propertyByCatchAllPathPreviewQuery,
 	propertyByGhiIdQuery,
 	propertyCanonicalPathQuery,
 	propertyStalePathQuery,
@@ -19,6 +21,8 @@ export {
 export {
 	developmentByPathQuery,
 	developmentByPathPreviewQuery,
+	developmentByCatchAllPathQuery,
+	developmentByCatchAllPathPreviewQuery,
 	developmentByGhiIdQuery,
 	developmentCanonicalPathQuery,
 	developmentStalePathQuery
@@ -29,13 +33,18 @@ export {
 	locationBySlugQuery,
 	locationPageContextQuery,
 	communityInLocationContextQuery,
+	catchAllCommunityInLocationQuery,
 	countriesForNavQuery,
 	locationsByCountryQuery,
 	communitiesByLocationQuery,
 	locationBreadcrumbQuery
 } from './location';
 
-export { listingByPathQuery, listingLegacyThreeSegmentPathQuery } from './listingResolver';
+export {
+	listingByPathQuery,
+	listingByCatchAllPathQuery,
+	listingLegacyThreeSegmentPathQuery
+} from './listingResolver';
 
 export {
 	fetchPublic,

@@ -1,6 +1,7 @@
 import {
 	LISTING_COMMUNITY_SLUG,
 	LISTING_COUNTRY_SLUG,
+	LISTING_IS_CATCH_ALL,
 	LISTING_LOCATION_SLUG
 } from './queries/filters';
 
@@ -25,6 +26,7 @@ export const LOCATION_TAXONOMY_PUBLIC = /* groq */ `{
   "slug": slug.current,
   type,
   breadcrumbLabel,
+  isCatchAll,
   seoTitle,
   metaDescription,
   publicDescription,
@@ -209,10 +211,11 @@ export const PROPERTY_CARD_PUBLIC = /* groq */ `{
   "countrySlug": ${LISTING_COUNTRY_SLUG},
   "locationSlug": ${LISTING_LOCATION_SLUG},
   "communitySlug": ${LISTING_COMMUNITY_SLUG},
+  "isCatchAll": ${LISTING_IS_CATCH_ALL},
   location{
     country->{ name, "slug": slug.current },
     location->{ name, "slug": slug.current },
-    community->{ _id, name, "slug": slug.current },
+    community->{ _id, name, "slug": slug.current, isCatchAll },
     addressDisplay
   },
   pricing${PRICING_PUBLIC},
@@ -316,6 +319,7 @@ export const CANONICAL_PATH_FIELDS = /* groq */ `
   "countrySlug": ${LISTING_COUNTRY_SLUG},
   "locationSlug": ${LISTING_LOCATION_SLUG},
   "communitySlug": ${LISTING_COMMUNITY_SLUG},
+  "isCatchAll": ${LISTING_IS_CATCH_ALL},
   "slug": slug.current,
   listingKind
 `;

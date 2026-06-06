@@ -47,6 +47,17 @@ export const LISTING_COMMUNITY_SLUG = /* groq */ `coalesce(
   )
 )`;
 
+/** Whether the listing's community is a catch-all bucket (URL omits community segment). */
+export const LISTING_IS_CATCH_ALL = /* groq */ `coalesce(location.community->isCatchAll, false)`;
+
+/** Match a listing at /{country}/{location}/{slug} when community is catch-all. */
+export const LISTING_CATCH_ALL_PATH_FILTER = /* groq */ `
+  ${LISTING_COUNTRY_SLUG} == $countrySlug
+  && ${LISTING_LOCATION_SLUG} == $locationSlug
+  && slug.current == $slug
+  && ${LISTING_IS_CATCH_ALL} == true
+`;
+
 /** Match a listing document to its hierarchical URL segments. */
 export const LISTING_PATH_FILTER = /* groq */ `
   ${LISTING_COUNTRY_SLUG} == $countrySlug

@@ -24,8 +24,10 @@ function cardLocationFromFixture(raw: RawPropertyListing): RawPropertyCard['loca
 		country: { name: location.country!.name!, slug: location.country!.slug! },
 		location: { name: location.location!.name!, slug: location.location!.slug! },
 		community: {
+			_id: location.community!._id ?? 'places-community-test',
 			name: location.community!.name!,
-			slug: location.community!.slug!
+			slug: location.community!.slug!,
+			isCatchAll: location.community!.isCatchAll ?? null
 		},
 		addressDisplay: location.addressDisplay!
 	};
@@ -43,6 +45,10 @@ function rawCardFromFixture(
 		listingKind: raw.listingKind as RawPropertyCard['listingKind'],
 		propertyType: raw.propertyType as RawPropertyCard['propertyType'],
 		transactionType: raw.transactionType as RawPropertyCard['transactionType'],
+		countrySlug: raw.location?.country?.slug ?? null,
+		locationSlug: raw.location?.location?.slug ?? null,
+		communitySlug: raw.location?.community?.slug ?? null,
+		isCatchAll: raw.location?.community?.isCatchAll ?? false,
 		location: cardLocationFromFixture(raw),
 		pricing: raw.pricing as RawPropertyCard['pricing'],
 		specs: raw.specs as RawPropertyCard['specs'],

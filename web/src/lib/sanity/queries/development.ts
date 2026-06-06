@@ -1,6 +1,7 @@
 import { defineQuery } from 'groq';
 import { CANONICAL_PATH, DEVELOPMENT_PUBLIC, DEVELOPMENT_WITH_CANONICAL } from '../allowlists';
 import {
+	LISTING_CATCH_ALL_PATH_FILTER,
 	LISTING_COUNTRY_SLUG,
 	LISTING_PATH_FILTER,
 	PUBLIC_LISTING_FILTER
@@ -20,6 +21,23 @@ export const developmentByPathQuery = defineQuery(`
     _type == "development"
     && ${LISTING_PATH_FILTER}
     && ${PUBLIC_LISTING_FILTER}
+  ][0]${DEVELOPMENT_PUBLIC}
+`);
+
+/** Resolve a development at /{country}/{location}/{slug} when community is catch-all. */
+export const developmentByCatchAllPathQuery = defineQuery(`
+  *[
+    _type == "development"
+    && ${LISTING_CATCH_ALL_PATH_FILTER}
+    && ${PUBLIC_LISTING_FILTER}
+  ][0]${DEVELOPMENT_PUBLIC}
+`);
+
+/** Resolve a catch-all development (preview — no publish gates). */
+export const developmentByCatchAllPathPreviewQuery = defineQuery(`
+  *[
+    _type == "development"
+    && ${LISTING_CATCH_ALL_PATH_FILTER}
   ][0]${DEVELOPMENT_PUBLIC}
 `);
 

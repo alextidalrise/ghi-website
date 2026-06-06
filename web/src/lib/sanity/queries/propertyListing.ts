@@ -6,6 +6,7 @@ import {
 	PROPERTY_LISTING_WITH_CANONICAL
 } from '../allowlists';
 import {
+	LISTING_CATCH_ALL_PATH_FILTER,
 	LISTING_COMMUNITY_SLUG,
 	LISTING_COUNTRY_SLUG,
 	LISTING_LOCATION_SLUG,
@@ -29,6 +30,25 @@ export const propertyByPathQuery = defineQuery(`
     && listingKind in ["property", "unit"]
     && ${LISTING_PATH_FILTER}
     && ${PUBLIC_LISTING_FILTER}
+  ][0]${PROPERTY_LISTING_PUBLIC}
+`);
+
+/** Resolve a property listing at /{country}/{location}/{slug} when community is catch-all. */
+export const propertyByCatchAllPathQuery = defineQuery(`
+  *[
+    _type == "propertyListing"
+    && listingKind in ["property", "unit"]
+    && ${LISTING_CATCH_ALL_PATH_FILTER}
+    && ${PUBLIC_LISTING_FILTER}
+  ][0]${PROPERTY_LISTING_PUBLIC}
+`);
+
+/** Resolve a catch-all property listing (preview — no publish gates). */
+export const propertyByCatchAllPathPreviewQuery = defineQuery(`
+  *[
+    _type == "propertyListing"
+    && listingKind in ["property", "unit"]
+    && ${LISTING_CATCH_ALL_PATH_FILTER}
   ][0]${PROPERTY_LISTING_PUBLIC}
 `);
 

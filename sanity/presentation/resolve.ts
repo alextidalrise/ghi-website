@@ -8,6 +8,7 @@ import { map } from 'rxjs';
 import {
 	LISTING_COMMUNITY_SLUG,
 	LISTING_COUNTRY_SLUG,
+	LISTING_IS_CATCH_ALL,
 	LISTING_LOCATION_SLUG
 } from '../lib/listingLocationSlugs';
 import {
@@ -22,7 +23,8 @@ const LISTING_LOCATION_QUERY = {
 		"slug": slug.current,
 		"countrySlug": ${LISTING_COUNTRY_SLUG},
 		"locationSlug": ${LISTING_LOCATION_SLUG},
-		"communitySlug": ${LISTING_COMMUNITY_SLUG}
+		"communitySlug": ${LISTING_COMMUNITY_SLUG},
+		"isCatchAll": ${LISTING_IS_CATCH_ALL}
 	}`,
 	listen: `*[_id in [$id, $draftId]]`
 } as const;
@@ -55,12 +57,14 @@ export function resolveListingLocation(doc: {
 	countrySlug?: string | null;
 	locationSlug?: string | null;
 	communitySlug?: string | null;
+	isCatchAll?: boolean | null;
 } | null) {
 	const href = buildListingPreviewPath({
 		countrySlug: doc?.countrySlug,
 		locationSlug: doc?.locationSlug,
 		communitySlug: doc?.communitySlug,
-		slug: doc?.slug
+		slug: doc?.slug,
+		isCatchAll: doc?.isCatchAll
 	});
 
 	if (!href) {

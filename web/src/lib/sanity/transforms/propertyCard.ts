@@ -20,6 +20,7 @@ export type PublicPropertyCard = {
 	countrySlug?: string | null;
 	locationSlug?: string | null;
 	communitySlug?: string | null;
+	isCatchAll?: boolean | null;
 	listingKind: RawPropertyCard['listingKind'];
 	propertyType: RawPropertyCard['propertyType'];
 	transactionType: RawPropertyCard['transactionType'];
@@ -43,6 +44,7 @@ export function toPublicPropertyCard(raw: RawPropertyCard): PublicPropertyCard {
 		countrySlug: raw.countrySlug,
 		locationSlug: raw.locationSlug,
 		communitySlug: raw.communitySlug,
+		isCatchAll: raw.isCatchAll,
 		listingKind: raw.listingKind,
 		propertyType: raw.propertyType,
 		transactionType: raw.transactionType,

@@ -152,6 +152,48 @@ export const locationTaxonomy = defineType({
 			hidden: ({ document }) => document?.type !== 'community'
 		}),
 		defineField({
+			name: 'isCatchAll',
+			title: 'Catch-all community',
+			type: 'boolean',
+			initialValue: false,
+			description:
+				'Default bucket for listings without a specific micro-location. Public URLs omit this community segment.',
+			hidden: ({ document }) => document?.type !== 'community',
+			validation: (Rule) =>
+				Rule.custom(async (value, context) => {
+					if (!value) return true;
+
+					const doc = context.document as
+						| { type?: string; parent?: { _ref?: string }; _id?: string }
+						| undefined;
+					if (doc?.type !== 'community') return true;
+
+					const parentRef = doc.parent?._ref;
+					if (!parentRef) {
+						return 'A catch-all community must have a parent location.';
+					}
+
+					const docId = doc._id?.replace(/^drafts\./, '') ?? '';
+					const client = context.getClient({ apiVersion: '2024-01-01' });
+					const existing = await client.fetch<string | null>(
+						`*[
+							_type == "locationTaxonomy"
+							&& type == "community"
+							&& isCatchAll == true
+							&& parent._ref == $parentId
+							&& !(_id in [$id, "drafts." + $id])
+						][0]._id`,
+						{ parentId: parentRef, id: docId }
+					);
+
+					if (existing) {
+						return 'This location already has a catch-all community.';
+					}
+
+					return true;
+				})
+		}),
+		defineField({
 			name: 'featuredListings',
 			title: 'Featured listings',
 			type: 'array',

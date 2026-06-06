@@ -134,4 +134,16 @@ describe('buildListingPath', () => {
 			})
 		).toBeNull();
 	});
+
+	it('returns a 3-segment path for catch-all listings', () => {
+		expect(
+			buildListingPath({
+				countrySlug: 'spain',
+				locationSlug: 'nueva-andalucia',
+				communitySlug: 'nueva-andalucia',
+				slug: 'villa-example',
+				isCatchAll: true
+			})
+		).toBe('/spain/nueva-andalucia/villa-example');
+	});
 });

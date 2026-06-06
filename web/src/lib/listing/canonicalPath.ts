@@ -3,17 +3,28 @@ export type CanonicalSegments = {
 	locationSlug?: string | null;
 	communitySlug?: string | null;
 	slug?: string | null;
+	isCatchAll?: boolean | null;
 };
 
 export function buildCanonicalPath({
 	countrySlug,
 	locationSlug,
 	communitySlug,
-	slug
+	slug,
+	isCatchAll
 }: CanonicalSegments): string | null {
-	if (!countrySlug || !locationSlug || !communitySlug || !slug) {
+	if (!countrySlug || !locationSlug || !slug) {
 		return null;
 	}
+
+	if (isCatchAll === true) {
+		return `/${countrySlug}/${locationSlug}/${slug}`;
+	}
+
+	if (!communitySlug) {
+		return null;
+	}
+
 	return `/${countrySlug}/${locationSlug}/${communitySlug}/${slug}`;
 }
 
@@ -23,10 +34,15 @@ export type ListingHrefInput = {
 	countrySlug?: string | null;
 	locationSlug?: string | null;
 	communitySlug?: string | null;
+	isCatchAll?: boolean | null;
 	location?: {
 		country?: { slug?: string | null } | null;
 		location?: { slug?: string | null } | null;
-		community?: { _id?: string | null; slug?: string | null } | null;
+		community?: {
+			_id?: string | null;
+			slug?: string | null;
+			isCatchAll?: boolean | null;
+		} | null;
 	} | null;
 };
 
@@ -53,20 +69,37 @@ export function buildListingHref({
 	countrySlug,
 	locationSlug,
 	communitySlug,
+	isCatchAll,
 	location
 }: ListingHrefInput): string | null {
+	const resolvedIsCatchAll = isCatchAll ?? location?.community?.isCatchAll ?? false;
+
 	return buildCanonicalPath({
 		countrySlug: countrySlug ?? location?.country?.slug,
 		locationSlug: locationSlug ?? location?.location?.slug,
 		communitySlug: communitySlug ?? resolveCommunitySlug(location?.community),
-		slug
+		slug,
+		isCatchAll: resolvedIsCatchAll
 	});
 }
 
-export function pathsMatch(
-	request: { countrySlug: string; locationSlug: string; communitySlug: string; slug: string },
-	canonical: CanonicalSegments
-): boolean {
+export type PathMatchRequest = {
+	countrySlug: string;
+	locationSlug: string;
+	communitySlug?: string;
+	slug: string;
+};
+
+export function pathsMatch(request: PathMatchRequest, canonical: CanonicalSegments): boolean {
+	if (canonical.isCatchAll === true) {
+		return (
+			request.countrySlug === canonical.countrySlug &&
+			request.locationSlug === canonical.locationSlug &&
+			request.slug === canonical.slug &&
+			!request.communitySlug
+		);
+	}
+
 	return (
 		request.countrySlug === canonical.countrySlug &&
 		request.locationSlug === canonical.locationSlug &&

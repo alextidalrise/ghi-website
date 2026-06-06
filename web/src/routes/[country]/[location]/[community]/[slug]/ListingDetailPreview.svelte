@@ -11,7 +11,7 @@
 	import SharedAmenities from '$lib/components/development/SharedAmenities.svelte';
 	import UnitTypesList from '$lib/components/development/UnitTypesList.svelte';
 	import UnitsList from '$lib/components/development/UnitsList.svelte';
-	import { withPreviewLocationSeo } from '$lib/listing/detailPage';
+	import { withPreviewLocationSeo, type DevelopmentDetailPageData, type PropertyDetailPageData } from '$lib/listing/detailPage';
 	import {
 		shouldShowDevelopmentPricing,
 		showsUnitTypes,
@@ -26,9 +26,13 @@
 	} from '$lib/sanity/transforms';
 	import type { QueryResponseInitial } from '@sanity/svelte-loader';
 	import { useQuery } from '@sanity/svelte-loader';
-	import type { PageData } from './$types';
 
-	type PreviewPageData = Extract<PageData, { preview: true }>;
+	type PreviewPageData = {
+		preview: true;
+		previewQuery: string;
+		queryParams: Record<string, unknown>;
+		listingInitial: QueryResponseInitial<RawPropertyListing | RawDevelopment | null>;
+	} & (PropertyDetailPageData | DevelopmentDetailPageData);
 
 	let {
 		data

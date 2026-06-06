@@ -11,6 +11,7 @@ export type LocationTaxonomyRef = {
 	slug?: string | null;
 	type?: string | null;
 	breadcrumbLabel?: string | null;
+	isCatchAll?: boolean | null;
 	coordinates?: GeoPoint | null;
 };
 

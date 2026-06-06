@@ -52,6 +52,20 @@ export const locationPageContextQuery = defineQuery(`
   }
 `);
 
+/** Catch-all community slug under a location — for 3-segment URL resolution. */
+export const catchAllCommunityInLocationQuery = defineQuery(`
+  *[
+    _type == "locationTaxonomy"
+    && type == "community"
+    && isCatchAll == true
+    && slug.current == $communitySlug
+    && parent._ref == $locationId
+  ][0]{
+    _id,
+    "slug": slug.current
+  }
+`);
+
 /** Community within a location context — direct parent or associated location. */
 export const communityInLocationContextQuery = defineQuery(`
   *[
@@ -92,6 +106,7 @@ export const communitiesByLocationQuery = defineQuery(`
   *[
     _type == "locationTaxonomy"
     && type == "community"
+    && isCatchAll != true
     && (
       parent._ref == $locationId
       || $locationId in associatedLocations[]._ref
@@ -115,6 +130,7 @@ export const communitiesForNavQuery = defineQuery(`
   *[
     _type == "locationTaxonomy"
     && type == "community"
+    && isCatchAll != true
     && defined(slug.current)
     && defined(parent->slug.current)
     && defined(parent->parent->slug.current)

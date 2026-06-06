@@ -18,7 +18,8 @@ import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCa
 export type ListingPathParams = {
 	countrySlug: string;
 	locationSlug: string;
-	communitySlug: string;
+	/** Omitted for catch-all listings served at /{country}/{location}/{slug}. */
+	communitySlug?: string;
 	slug: string;
 };
 
@@ -59,11 +60,13 @@ export function buildPropertyDetailPageData(
 	} = {}
 ): PropertyDetailPageData {
 	const { countrySlug, locationSlug, communitySlug, slug } = params;
+	const isCatchAll = property.location?.community?.isCatchAll === true;
 	const canonicalPath = buildCanonicalPath({
 		countrySlug: property.location?.country?.slug ?? countrySlug,
 		locationSlug: property.location?.location?.slug ?? locationSlug,
 		communitySlug: property.location?.community?.slug ?? communitySlug,
-		slug: property.slug ?? slug
+		slug: property.slug ?? slug,
+		isCatchAll
 	});
 
 	if (!canonicalPath) {
@@ -76,7 +79,8 @@ export function buildPropertyDetailPageData(
 			countrySlug: property.location?.country?.slug,
 			locationSlug: property.location?.location?.slug,
 			communitySlug: property.location?.community?.slug,
-			slug: property.slug
+			slug: property.slug,
+			isCatchAll
 		})
 	) {
 		redirect(301, canonicalPath);
@@ -116,11 +120,13 @@ export function buildDevelopmentDetailPageData(
 	options: { preview?: boolean; skipRedirect?: boolean } = {}
 ): DevelopmentDetailPageData {
 	const { countrySlug, locationSlug, communitySlug, slug } = params;
+	const isCatchAll = development.location?.community?.isCatchAll === true;
 	const canonicalPath = buildCanonicalPath({
 		countrySlug: development.location?.country?.slug ?? countrySlug,
 		locationSlug: development.location?.location?.slug ?? locationSlug,
 		communitySlug: development.location?.community?.slug ?? communitySlug,
-		slug: development.slug ?? slug
+		slug: development.slug ?? slug,
+		isCatchAll
 	});
 
 	if (!canonicalPath) {
@@ -133,7 +139,8 @@ export function buildDevelopmentDetailPageData(
 			countrySlug: development.location?.country?.slug,
 			locationSlug: development.location?.location?.slug,
 			communitySlug: development.location?.community?.slug,
-			slug: development.slug
+			slug: development.slug,
+			isCatchAll
 		})
 	) {
 		redirect(301, canonicalPath);
