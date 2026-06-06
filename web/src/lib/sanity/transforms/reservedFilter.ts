@@ -41,3 +41,20 @@ export function filterReservedUnits<T extends UnitLike>(units: T[] | null | unde
 export function filterReservedUnitTypes<T extends UnitLike>(unitTypes: T[] | null | undefined): T[] {
 	return filterReservedUnits(unitTypes);
 }
+
+/**
+ * Units shown in the development inventory table. Hidden/internal/preview units are
+ * dropped, but reserved and sold units are KEPT so the table can list them in a
+ * locked, non-clickable row (matching the agreed inventory design). Availability
+ * gating for clickability happens in the UI, not here.
+ */
+export function filterDisplayableUnits<T extends UnitLike>(units: T[] | null | undefined): T[] {
+	if (!Array.isArray(units)) {
+		return [];
+	}
+
+	return units.filter((unit) => {
+		const visibility = unit.pricing?.publicVisibility ?? 'visible';
+		return visibility === 'visible';
+	});
+}

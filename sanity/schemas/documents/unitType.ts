@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { PROPERTY_TYPES } from '../constants/enums';
 import { validatePricingFields } from '../validators/rules';
 
 export const unitType = defineType({
@@ -15,7 +16,17 @@ export const unitType = defineType({
 			title: 'Unit type name',
 			type: 'string',
 			group: 'details',
+			description: 'The typology name shown to buyers (e.g. "2-bed apartment", "Penthouse").',
 			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'propertyType',
+			title: 'Property type',
+			type: 'string',
+			group: 'details',
+			options: { list: [...PROPERTY_TYPES], layout: 'dropdown' },
+			description:
+				'The kind of home this typology is (Apartment, Villa, Penthouse…). Shown in the development inventory table\'s "Type" column and inherited by every unit of this type.'
 		}),
 		defineField({
 			name: 'parentDevelopment',

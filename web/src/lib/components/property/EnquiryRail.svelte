@@ -1,12 +1,23 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { PublicPropertyListing } from '$lib/sanity/transforms';
 
-	type Props = {
-		listing: PublicPropertyListing;
+	/** Minimal structural shape — satisfied by both property listings and developments,
+	    so the rail can serve either without coupling to a specific document type. */
+	type Enquirable = {
+		ghiListingId?: string | null;
+		ctas?: {
+			primaryCtaLabel?: string | null;
+			formIntroText?: string | null;
+			responseTimeText?: string | null;
+		} | null;
 	};
 
-	let { listing }: Props = $props();
+	type Props = {
+		listing: Enquirable;
+		heading?: string;
+	};
+
+	let { listing, heading = 'Enquire about this property' }: Props = $props();
 
 	// The mobile sticky bar is fixed, so the page must reserve room for it or it
 	// covers the footer's last row. Flag the body only while this rail is mounted
@@ -63,7 +74,7 @@
 </script>
 
 <section class="rail on-dark" aria-labelledby="enquire-heading" id="enquire">
-	<h2 id="enquire-heading" class="rail__heading">Enquire about this property</h2>
+	<h2 id="enquire-heading" class="rail__heading">{heading}</h2>
 	{#if intro}
 		<p class="rail__intro">{intro}</p>
 	{/if}

@@ -185,6 +185,28 @@ export function buildDevelopmentBreadcrumbs(
 	return items;
 }
 
+/**
+ * Build a unit breadcrumb trail. Same location chain as a property, then the
+ * parent development, then the unit itself: Home → … → Development → Unit.
+ */
+export function buildUnitBreadcrumbs(
+	listing: PublicPropertyListing,
+	developmentTitle: string,
+	developmentCanonicalPath: string,
+	unitCanonicalPath: string
+): BreadcrumbItem[] {
+	// Reuse the property trail for the location chain, then swap its final (unit)
+	// crumb for a Development crumb followed by the Unit crumb.
+	const trail = buildPropertyBreadcrumbs(listing, unitCanonicalPath);
+	const locationChain = trail.slice(0, -1);
+
+	return [
+		...locationChain,
+		{ label: developmentTitle, href: developmentCanonicalPath },
+		{ label: listing.title ?? 'Unit', href: unitCanonicalPath }
+	];
+}
+
 export function breadcrumbListJsonLd(items: BreadcrumbItem[], siteOrigin: string) {
 	const itemListElement = items.map((item, index) => ({
 		'@type': 'ListItem',

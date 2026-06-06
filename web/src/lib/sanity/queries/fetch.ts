@@ -7,10 +7,13 @@ import { PUBLIC_QUERY_PARAMS } from '../constants';
 import {
 	toPublicDevelopment,
 	toPublicPropertyListing,
+	toPublicUnitListing,
 	type PublicDevelopment,
 	type PublicPropertyListing,
 	type RawDevelopment,
-	type RawPropertyListing
+	type RawPropertyListing,
+	type RawUnitListing,
+	type UnitCanonicalContext
 } from '../transforms';
 
 export type PublicFetchOptions = {
@@ -87,6 +90,14 @@ export async function fetchPublicDevelopment(
 ): Promise<PublicDevelopment | null> {
 	const raw = await fetchPublic<RawDevelopment>(query, options);
 	return toPublicDevelopment(raw);
+}
+
+export async function fetchPublicUnit(
+	query: string,
+	options: PublicFetchOptions = {}
+): Promise<{ listing: PublicPropertyListing; context: UnitCanonicalContext } | null> {
+	const raw = await fetchPublic<RawUnitListing>(query, options);
+	return toPublicUnitListing(raw);
 }
 
 export { withPublicParams };
