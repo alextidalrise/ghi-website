@@ -42,6 +42,7 @@ type LocationPageContext = {
 	seoTitle?: string | null;
 	metaDescription?: string | null;
 	publicDescription?: string | null;
+	overviewHeading?: string | null;
 	heroImage?: MediaAssetInput | null;
 	tagline?: string | null;
 	linkedLocations?: LinkedLocationEntry[] | null;

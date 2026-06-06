@@ -113,11 +113,20 @@ export const locationTaxonomy = defineType({
 			rows: 3
 		}),
 		defineField({
+			name: 'overviewHeading',
+			title: 'Overview heading',
+			type: 'string',
+			description:
+				'Optional heading for the overview section below the hero. Leave blank to use the default ("The {Country} Golf Property Market" / "About {Location} Golf Property").',
+			hidden: ({ document }) => document?.type === 'community'
+		}),
+		defineField({
 			name: 'publicDescription',
-			title: 'Public description',
+			title: 'Overview / public description',
 			type: 'text',
-			rows: 4,
-			description: 'A short editorial description shown on this location\'s landing page (e.g. "Marbella is renowned for...").'
+			rows: 10,
+			description:
+				'The editorial overview shown in the reveal section below the hero (country: ~150–200 words; location: ~300–400 words). Separate blank lines into paragraphs. Not used for the hero line (that is the Tagline) or the search snippet (that is the Meta description).'
 		}),
 		defineField({
 			name: 'heroImage',

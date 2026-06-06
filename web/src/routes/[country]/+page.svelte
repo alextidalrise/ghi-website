@@ -1,16 +1,22 @@
 <script lang="ts">
 	import PageHero from '$lib/components/PageHero.svelte';
+	import AreaOverview from '$lib/components/AreaOverview.svelte';
 	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
-	import { countryHeadline } from '$lib/home/headlines';
+	import { countryHeadline, countryOverviewHeading } from '$lib/home/headlines';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
 
 	const countryHero = $derived(data.countryHero);
 	const countryLocations = $derived(data.featuredLocations);
+
+	const overviewBody = $derived(data.location.publicDescription?.trim() || undefined);
+	const overviewHeading = $derived(
+		data.location.overviewHeading?.trim() || countryOverviewHeading(data.location.name)
+	);
 
 	const placeholderBody = $derived(
 		`Property listings and editorial content for ${data.location.name} coming soon.`
@@ -65,9 +71,11 @@
 			<h1 class="country-page__title">{countryHeadline(data.location.name)}</h1>
 		{/if}
 
-		<p class="country-page__lead">
-			{data.location.publicDescription ?? placeholderBody}
-		</p>
+		{#if overviewBody}
+			<AreaOverview heading={overviewHeading} body={overviewBody} />
+		{:else}
+			<p class="country-page__lead">{placeholderBody}</p>
+		{/if}
 	</div>
 
 	<section class="country-page__content content-wrap">

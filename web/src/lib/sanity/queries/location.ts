@@ -36,6 +36,7 @@ export const locationPageContextQuery = defineQuery(`
     seoTitle,
     metaDescription,
     publicDescription,
+    overviewHeading,
     heroImage${MEDIA_ASSET_PUBLIC},
     tagline,
     linkedLocations[]{

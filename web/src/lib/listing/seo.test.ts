@@ -32,7 +32,7 @@ function baseListing(overrides: Partial<PublicPropertyListing> = {}): PublicProp
 describe('buildFilteredLocationSeo', () => {
 	it('uses community-aware title and noindex while canonical stays on the location page', () => {
 		const seo = buildFilteredLocationSeo(
-			{ name: 'Marbella', seoTitle: null, metaDescription: null, publicDescription: null },
+			{ name: 'Marbella', seoTitle: null, metaDescription: null, tagline: null },
 			{ name: 'La Quinta', seoTitle: null, metaDescription: null, publicDescription: null },
 			'https://example.com/spain/marbella'
 		);
@@ -44,11 +44,21 @@ describe('buildFilteredLocationSeo', () => {
 
 	it('buildLocationSeo leaves location pages indexable', () => {
 		const seo = buildLocationSeo(
-			{ name: 'Marbella', seoTitle: null, metaDescription: null, publicDescription: null },
+			{ name: 'Marbella', seoTitle: null, metaDescription: null, tagline: null },
 			'https://example.com/spain/marbella'
 		);
 
 		expect(seo.noindex).toBe(false);
+	});
+
+	it('falls back to the short tagline (not the long overview) for the SEO description', () => {
+		const seo = buildLocationSeo(
+			{ name: 'Marbella', seoTitle: null, metaDescription: null, tagline: 'Golf Valley flagship' },
+			'https://example.com/spain/marbella'
+		);
+
+		expect(seo.description).toBe('Golf Valley flagship');
+		expect(seo.openGraphDescription).toBe('Golf Valley flagship');
 	});
 });
 

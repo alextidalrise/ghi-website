@@ -56,6 +56,8 @@
 		"migrate:taxonomy-dotted-ids:dry-run": "tsx migrations/taxonomy-dotted-ids-migrate.ts --dry-run",
 		"seed:location-taxonomy": "tsx migrations/seed-location-taxonomy.ts",
 		"seed:location-taxonomy:dry-run": "tsx migrations/seed-location-taxonomy.ts --dry-run",
+		"seed:overview-lorem": "tsx migrations/seed-overview-lorem.ts",
+		"seed:overview-lorem:dry-run": "tsx migrations/seed-overview-lorem.ts --dry-run",
 		"wipe:location-taxonomy": "tsx migrations/wipe-location-taxonomy.ts",
 		"wipe:location-taxonomy:dry-run": "tsx migrations/wipe-location-taxonomy.ts --dry-run",
 		"migrate:curated-heroes": "tsx migrations/curated-heroes-migrate.ts",

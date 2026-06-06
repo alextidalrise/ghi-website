@@ -2,9 +2,10 @@
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import PageHero from '$lib/components/PageHero.svelte';
 	import GolfCoursesSection from '$lib/components/golf/GolfCoursesSection.svelte';
+	import AreaOverview from '$lib/components/AreaOverview.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import ListingResults from '$lib/components/listing/ListingResults.svelte';
-	import { locationHeadline } from '$lib/home/headlines';
+	import { locationHeadline, locationOverviewHeading } from '$lib/home/headlines';
 	import { buildListingSearchHref } from '$lib/listing/searchParams';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
@@ -17,18 +18,16 @@
 	const locationHero = $derived(data.locationHero);
 
 	// The hero stays location-level; an active community filter refines the results
-	// below, so it surfaces in the hero title/lead to keep the page in context.
+	// below, so it surfaces in the hero title to keep the page in context.
 	const heroTitle = $derived(
 		data.activeCommunity?.name
 			? `${data.activeCommunity.name} — ${data.location.name}`
 			: locationHeadline(data.location.name)
 	);
 
-	const heroLead = $derived(
-		data.activeCommunity?.publicDescription ??
-			data.location.publicDescription ??
-			locationHero?.tagline
-	);
+	// Hero lead is the short positioning tagline, consistent with the country page.
+	// The long editorial copy lives in the overview section below the hero.
+	const heroLead = $derived(locationHero?.tagline ?? undefined);
 
 	// Only direct communities (sub-areas whose listings live under this location) can
 	// filter this location's results; associated communities resolve elsewhere.
@@ -40,10 +39,14 @@
 			.map((community) => ({ label: community.name, value: community.slug }))
 	);
 
-	const introText = $derived(
-		data.activeCommunity?.publicDescription ??
-			data.location.publicDescription ??
-			placeholderBody
+	// An active community refines the page, so its description leads the overview;
+	// otherwise the location's own editorial copy carries it.
+	const overviewBody = $derived(
+		(data.activeCommunity?.publicDescription ?? data.location.publicDescription)?.trim() ||
+			undefined
+	);
+	const overviewHeading = $derived(
+		data.location.overviewHeading?.trim() || locationOverviewHeading(data.location.name)
 	);
 
 	function communityFilterHref(communitySlug: string) {
@@ -104,7 +107,12 @@
 	<div class="location-page__top content-wrap">
 		{#if !locationHero}
 			<h1>{heroTitle}</h1>
-			<p class="location-page__intro">{introText}</p>
+		{/if}
+
+		{#if overviewBody}
+			<AreaOverview heading={overviewHeading} body={overviewBody} />
+		{:else if !locationHero}
+			<p class="location-page__intro">{placeholderBody}</p>
 		{/if}
 
 		{#if data.relatedAreaLinks.length > 0}
@@ -190,6 +198,21 @@
 
 	.location-page__top {
 		padding-top: var(--space-xl);
+	}
+
+	/* Section rhythm between the overview, related-area links, and the green
+	   frontline band — mirrors the country page's --section-gap cadence so the
+	   green band never hugs the overview's "Read more". The siblings are
+	   child-component roots (own Svelte scope), so the gap part is :global while
+	   staying anchored to this component's scoped __top. */
+	.location-page__top > :global(* + *) {
+		margin-top: var(--section-gap);
+	}
+
+	/* The page title (no-hero pages only) leads straight into its first block;
+	   keep that pairing tight rather than a full section apart. */
+	.location-page__top > :global(h1 + *) {
+		margin-top: var(--space-md);
 	}
 
 	/* The hero already carries generous breathing room above the rail/links;

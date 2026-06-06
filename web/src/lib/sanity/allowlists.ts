@@ -22,6 +22,7 @@ export const LOCATION_TAXONOMY_PUBLIC = /* groq */ `{
   seoTitle,
   metaDescription,
   publicDescription,
+  overviewHeading,
   heroImage${MEDIA_ASSET_PUBLIC},
   tagline,
   coordinates

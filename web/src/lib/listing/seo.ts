@@ -47,14 +47,16 @@ type LocationSeoFields = {
 	name: string;
 	seoTitle?: string | null;
 	metaDescription?: string | null;
-	publicDescription?: string | null;
+	// Short positioning line. Used as the SEO/OG fallback because publicDescription
+	// is now long-form overview copy that would overflow a search snippet.
+	tagline?: string | null;
 };
 
 export function buildLocationSeo(
 	location: LocationSeoFields,
 	canonicalUrl: string
 ): PropertySeoMeta & { canonicalUrl: string } {
-	const fallbackDescription = location.publicDescription ?? null;
+	const fallbackDescription = location.tagline ?? null;
 
 	return {
 		canonicalUrl,
@@ -97,7 +99,9 @@ export function buildGolfCourseSeo(
 /** SEO for a location page with an active community filter — canonical stays on the unfiltered location URL. */
 export function buildFilteredLocationSeo(
 	location: LocationSeoFields,
-	community: LocationSeoFields,
+	// Communities keep a short publicDescription (no overview reveal), so it stays a
+	// valid SEO fallback here. These pages are noindex regardless.
+	community: { name: string; seoTitle?: string | null; metaDescription?: string | null; publicDescription?: string | null },
 	unfilteredCanonicalUrl: string
 ): PropertySeoMeta & { canonicalUrl: string } {
 	const base = buildLocationSeo(location, unfilteredCanonicalUrl);
