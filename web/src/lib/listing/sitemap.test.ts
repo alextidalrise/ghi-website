@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	buildGolfCoursePath,
 	buildListingPath,
 	buildTaxonomyPath,
 	collectSitemapEntries,
@@ -83,6 +84,42 @@ describe('renderSitemapXml', () => {
 			'<loc>https://example.com/spain/costa-del-sol/marbella/villa-example</loc>'
 		);
 		expect(xml).toContain('<lastmod>2026-05-01T00:00:00.000Z</lastmod>');
+	});
+});
+
+describe('buildGolfCoursePath', () => {
+	it('builds a golf course canonical path', () => {
+		expect(
+			buildGolfCoursePath({
+				countrySlug: 'spain',
+				locationSlug: 'marbella',
+				communitySlug: 'nueva-andalucia',
+				slug: 'aloha-golf'
+			})
+		).toBe('/spain/marbella/nueva-andalucia/golf/aloha-golf');
+	});
+});
+
+describe('collectSitemapEntries golf courses', () => {
+	it('includes approved golf course pages', () => {
+		const entries = collectSitemapEntries(
+			[],
+			[],
+			[
+				{
+					countrySlug: 'spain',
+					locationSlug: 'marbella',
+					communitySlug: 'nueva-andalucia',
+					slug: 'aloha-golf',
+					_updatedAt: '2026-06-01T00:00:00.000Z'
+				}
+			]
+		);
+
+		expect(entries.map((entry) => entry.path)).toEqual([
+			'/',
+			'/spain/marbella/nueva-andalucia/golf/aloha-golf'
+		]);
 	});
 });
 

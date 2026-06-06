@@ -1,4 +1,4 @@
-import type { PublicPropertyListing, PublicDevelopment } from '$lib/sanity/transforms';
+import type { PublicPropertyListing, PublicDevelopment, PublicGolfCourse } from '$lib/sanity/transforms';
 
 export type LocationTaxonomyRef = {
 	_id?: string;
@@ -99,6 +99,40 @@ export function buildLocationBreadcrumbs(
 	if (locationLabel) {
 		items.push({ label: locationLabel, href: canonicalPath });
 	}
+
+	return items;
+}
+
+/** Build breadcrumb trail for a golf course page. */
+export function buildGolfCourseBreadcrumbs(
+	course: PublicGolfCourse,
+	canonicalPath: string
+): BreadcrumbItem[] {
+	const items: BreadcrumbItem[] = [{ label: 'Home', href: '/' }];
+
+	const country = course.community?.country;
+	const location = course.community?.parent;
+	const community = course.community;
+
+	if (country?.slug && labelFor(country)) {
+		items.push({ label: labelFor(country)!, href: `/${country.slug}` });
+	}
+
+	if (location?.slug && country?.slug && labelFor(location)) {
+		items.push({ label: labelFor(location)!, href: `/${country.slug}/${location.slug}` });
+	}
+
+	if (community?.slug && location?.slug && country?.slug && labelFor(community)) {
+		items.push({
+			label: labelFor(community)!,
+			href: communityFilterHref(country.slug, location.slug, community.slug)
+		});
+	}
+
+	items.push({
+		label: course.name,
+		href: canonicalPath
+	});
 
 	return items;
 }

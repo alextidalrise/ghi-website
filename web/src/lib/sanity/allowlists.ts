@@ -116,13 +116,19 @@ export const GOLF_PUBLIC = /* groq */ `{
     _id,
     name,
     "slug": slug.current,
-    shortDescription
+    shortDescription,
+    "communitySlug": community->slug.current,
+    "locationSlug": community->parent->slug.current,
+    "countrySlug": community->parent->parent->slug.current
   },
   linkedGolfCourses[]->{
     _id,
     name,
     "slug": slug.current,
-    shortDescription
+    shortDescription,
+    "communitySlug": community->slug.current,
+    "locationSlug": community->parent->slug.current,
+    "countrySlug": community->parent->parent->slug.current
   },
   distanceToPrimaryGolfCourse,
   golfView,

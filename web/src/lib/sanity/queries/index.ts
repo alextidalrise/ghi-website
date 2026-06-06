@@ -86,6 +86,12 @@ export {
 	type NavTaxonomy
 } from './nav';
 
+export {
+	golfCourseByPathQuery,
+	golfCoursesByLocationQuery,
+	sitemapGolfCoursesQuery
+} from './golf';
+
 export { sitemapListingsQuery, sitemapTaxonomyQuery } from './sitemap';
 
 export {

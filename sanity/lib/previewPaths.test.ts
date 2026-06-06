@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { buildListingPreviewPath, buildTaxonomyPreviewPath } from './previewPaths';
+import {
+	buildGolfCoursePreviewPath,
+	buildListingPreviewPath,
+	buildTaxonomyPreviewPath
+} from './previewPaths';
 
 describe('buildListingPreviewPath', () => {
 	it('returns a 4-segment path when all segments are present', () => {
@@ -22,6 +26,19 @@ describe('buildListingPreviewPath', () => {
 				slug: 'villa-example'
 			})
 		).toBeNull();
+	});
+});
+
+describe('buildGolfCoursePreviewPath', () => {
+	it('builds a golf course preview path', () => {
+		expect(
+			buildGolfCoursePreviewPath({
+				countrySlug: 'spain',
+				locationSlug: 'marbella',
+				communitySlug: 'nueva-andalucia',
+				slug: 'aloha-golf'
+			})
+		).toBe('/spain/marbella/nueva-andalucia/golf/aloha-golf');
 	});
 });
 

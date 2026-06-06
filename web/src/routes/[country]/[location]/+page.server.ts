@@ -15,8 +15,10 @@ import {
 	fetchListingCards,
 	fetchMaybePreview,
 	fetchPublic,
+	golfCoursesByLocationQuery,
 	locationPageContextQuery
 } from '$lib/sanity/queries';
+import { toGolfCourseCards, type RawGolfCourse } from '$lib/sanity/transforms';
 import { buildLocationGridIds } from '$lib/sanity/queries/listingSearch';
 import { resolveTaxonomyHero } from '$lib/sanity/transforms/taxonomyHero';
 import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
@@ -77,11 +79,14 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 	const canonicalPath = `/${country.slug}/${locationPage.slug}`;
 	const unfilteredCanonicalUrl = `${url.origin}${canonicalPath}`;
 
-	const [communities, linkedLocations] = await Promise.all([
+	const [communities, linkedLocations, golfCoursesRaw] = await Promise.all([
 		fetchPublic<CommunityTaxonomyRow[]>(communitiesByLocationQuery, {
 			params: { locationId: locationPage._id }
 		}),
-		Promise.resolve(locationPage.linkedLocations ?? [])
+		Promise.resolve(locationPage.linkedLocations ?? []),
+		fetchPublic<RawGolfCourse[]>(golfCoursesByLocationQuery, {
+			params: { locationId: locationPage._id }
+		})
 	]);
 
 	const allowedCommunities = communities ?? [];
@@ -123,6 +128,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 	const relatedAreaLinks = linkedLocations.filter(
 		(entry) => entry.showLink && entry.location?.slug && entry.location?.name
 	);
+	const golfCourseCards = toGolfCourseCards(golfCoursesRaw);
 
 	const breadcrumbs = buildLocationBreadcrumbs(country, locationPage, canonicalPath);
 	const seoBase =
@@ -150,6 +156,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		listingResults,
 		frontlineCards,
 		frontlineViewAllHref,
+		golfCourseCards,
 		canonicalUrl: seo.canonicalUrl,
 		breadcrumbs,
 		seo,

@@ -26,12 +26,16 @@ export const golfCourse = defineType({
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
-			name: 'location',
-			title: 'Location',
+			name: 'community',
+			title: 'Community',
 			type: 'reference',
 			to: [{ type: 'locationTaxonomy' }],
 			group: 'details',
-			description: 'Primary area or municipality for this course.'
+			description: 'The community this golf course belongs to.',
+			options: {
+				filter: 'type == "community"'
+			},
+			validation: (Rule) => Rule.required()
 		}),
 		defineField({
 			name: 'shortDescription',
@@ -40,6 +44,27 @@ export const golfCourse = defineType({
 			group: 'details',
 			rows: 3,
 			description: 'A brief description of this golf course shown publicly after review.'
+		}),
+		defineField({
+			name: 'tagline',
+			title: 'Tagline',
+			type: 'string',
+			group: 'details',
+			description: 'Short positioning line under the hero headline.',
+			validation: (Rule) => Rule.max(60)
+		}),
+		defineField({
+			name: 'seoTitle',
+			title: 'SEO title',
+			type: 'string',
+			group: 'details'
+		}),
+		defineField({
+			name: 'metaDescription',
+			title: 'Meta description',
+			type: 'text',
+			group: 'details',
+			rows: 3
 		}),
 		defineField({
 			name: 'holes',
@@ -98,11 +123,11 @@ export const golfCourse = defineType({
 	preview: {
 		select: {
 			title: 'name',
-			location: 'location.name',
+			community: 'community.name',
 			holes: 'holes'
 		},
-		prepare({ title, location, holes }) {
-			const subtitle = [location, holes != null ? `${holes} holes` : null].filter(Boolean).join(' · ');
+		prepare({ title, community, holes }) {
+			const subtitle = [community, holes != null ? `${holes} holes` : null].filter(Boolean).join(' · ');
 			return { title: title || 'Golf course', subtitle: subtitle || undefined };
 		}
 	}

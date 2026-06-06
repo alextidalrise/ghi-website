@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PublicPropertyListing } from '$lib/sanity/transforms';
+	import { buildGolfCourseRefHref, type PublicPropertyListing } from '$lib/sanity/transforms';
 	import PortableTextBlock from './PortableTextBlock.svelte';
 
 	type Props = {
@@ -41,8 +41,13 @@
 			{#if showCourses && courses.length > 0}
 				<ul class="golf__courses">
 					{#each courses as course (course._id)}
+						{@const href = buildGolfCourseRefHref(course)}
 						<li>
-							<strong>{course.name}</strong>
+							{#if href}
+								<strong><a {href}>{course.name}</a></strong>
+							{:else}
+								<strong>{course.name}</strong>
+							{/if}
 							{#if course.shortDescription}
 								<p>{course.shortDescription}</p>
 							{/if}
@@ -102,6 +107,12 @@
 		color: var(--green);
 		display: block;
 		margin-bottom: 0.35rem;
+	}
+
+	.golf__courses a {
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 0.15em;
 	}
 
 	.golf__courses p {

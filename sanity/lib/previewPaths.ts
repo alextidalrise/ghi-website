@@ -25,6 +25,25 @@ export function buildListingPreviewPath({
 	return `/${countrySlug}/${locationSlug}/${communitySlug}/${slug}`;
 }
 
+export type GolfCoursePreviewSegments = {
+	countrySlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
+	slug?: string | null;
+};
+
+export function buildGolfCoursePreviewPath({
+	countrySlug,
+	locationSlug,
+	communitySlug,
+	slug
+}: GolfCoursePreviewSegments): string | null {
+	if (!countrySlug || !locationSlug || !communitySlug || !slug) {
+		return null;
+	}
+	return `/${countrySlug}/${locationSlug}/${communitySlug}/golf/${slug}`;
+}
+
 export function buildTaxonomyPreviewPath({
 	type,
 	slug,

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PublicGolf } from '$lib/sanity/transforms';
+	import { buildGolfCourseRefHref, type PublicGolf } from '$lib/sanity/transforms';
 
 	type Props = {
 		golf: PublicGolf | null | undefined;
@@ -9,12 +9,19 @@
 
 	const course = $derived(golf?.primaryGolfCourse ?? null);
 	const distance = $derived(golf?.distanceToPrimaryGolfCourse ?? null);
+	const href = $derived(buildGolfCourseRefHref(course));
 </script>
 
 {#if course?.name}
 	<aside class="course-card" aria-label="Linked golf course">
 		<p class="course-card__eyebrow text-overline">Linked golf course</p>
-		<h3 class="course-card__name">{course.name}</h3>
+		{#if href}
+			<h3 class="course-card__name">
+				<a {href}>{course.name}</a>
+			</h3>
+		{:else}
+			<h3 class="course-card__name">{course.name}</h3>
+		{/if}
 		{#if distance}
 			<p class="course-card__distance">{distance} from the property</p>
 		{/if}
@@ -37,6 +44,12 @@
 
 	.course-card__name {
 		color: var(--green);
+	}
+
+	.course-card__name a {
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 0.15em;
 	}
 
 	.course-card__distance {

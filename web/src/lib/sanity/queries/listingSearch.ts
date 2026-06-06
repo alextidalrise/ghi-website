@@ -32,7 +32,8 @@ export type ListingSearchScope =
 			locationIds: string[];
 			communityId?: string | null;
 	  }
-	| { type: 'country'; countrySlug: string };
+	| { type: 'country'; countrySlug: string }
+	| { type: 'golfCourse'; golfCourseId: string };
 
 function scopeFilter(scope: ListingSearchScope): string {
 	switch (scope.type) {
@@ -57,6 +58,13 @@ function scopeFilter(scope: ListingSearchScope): string {
       `;
 		case 'country':
 			return /* groq */ `location.country->slug.current == $countrySlug`;
+		case 'golfCourse':
+			return /* groq */ `
+        (
+          golf.primaryGolfCourse._ref == $golfCourseId
+          || $golfCourseId in golf.linkedGolfCourses[]._ref
+        )
+      `;
 	}
 }
 
@@ -131,13 +139,18 @@ export function listingSearchQueryParams(
 ) {
 	// Sanity requires every $param referenced in GROQ to be supplied — use null for inactive facets.
 	return {
-		...(scope.type !== 'global' ? { countrySlug: scope.countrySlug } : {}),
+		...(scope.type === 'country' ||
+		scope.type === 'location' ||
+		scope.type === 'community'
+			? { countrySlug: scope.countrySlug }
+			: {}),
 		...(scope.type === 'location' || scope.type === 'community'
 			? { locationSlug: scope.locationSlug }
 			: {}),
 		...(scope.type === 'location' ? { locationIds: scope.locationIds } : {}),
 		...(scope.type === 'location' && scope.communityId ? { communityId: scope.communityId } : {}),
 		...(scope.type === 'community' ? { communitySlug: scope.communitySlug } : {}),
+		...(scope.type === 'golfCourse' ? { golfCourseId: scope.golfCourseId } : {}),
 		propertyType: params.propertyType ?? null,
 		community: params.community ?? null,
 		minPrice: params.minPrice ?? null,

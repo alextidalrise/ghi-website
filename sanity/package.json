@@ -62,6 +62,8 @@
 		"migrate:curated-heroes:dry-run": "tsx migrations/curated-heroes-migrate.ts --dry-run",
 		"migrate:set-nueva-andalucia-hero": "tsx migrations/set-nueva-andalucia-hero-migrate.ts",
 		"migrate:set-nueva-andalucia-hero:dry-run": "tsx migrations/set-nueva-andalucia-hero-migrate.ts --dry-run",
+		"migrate:golf-course-community": "tsx migrations/golf-course-community-migrate.ts",
+		"migrate:golf-course-community:dry-run": "tsx migrations/golf-course-community-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

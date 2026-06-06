@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import PageHero from '$lib/components/PageHero.svelte';
+	import GolfCoursesSection from '$lib/components/golf/GolfCoursesSection.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import ListingResults from '$lib/components/listing/ListingResults.svelte';
 	import { locationHeadline } from '$lib/home/headlines';
@@ -127,6 +128,11 @@
 			cards={data.frontlineCards}
 			heading={`Frontline golf in ${data.location.name}`}
 			viewAllHref={data.frontlineViewAllHref}
+		/>
+
+		<GolfCoursesSection
+			courses={data.golfCourseCards}
+			heading={`Golf courses in ${data.location.name}`}
 		/>
 	</div>
 

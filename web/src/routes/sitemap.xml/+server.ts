@@ -1,14 +1,24 @@
 import type { RequestHandler } from './$types';
 import { collectSitemapEntries, renderSitemapXml } from '$lib/listing/sitemap';
-import { fetchPublic, sitemapListingsQuery, sitemapTaxonomyQuery } from '$lib/sanity/queries';
+import {
+	fetchPublic,
+	sitemapGolfCoursesQuery,
+	sitemapListingsQuery,
+	sitemapTaxonomyQuery
+} from '$lib/sanity/queries';
 
 export const GET: RequestHandler = async ({ url }) => {
-	const [taxonomyRows, listingRows] = await Promise.all([
+	const [taxonomyRows, listingRows, golfCourseRows] = await Promise.all([
 		fetchPublic<Parameters<typeof collectSitemapEntries>[0]>(sitemapTaxonomyQuery),
-		fetchPublic<Parameters<typeof collectSitemapEntries>[1]>(sitemapListingsQuery)
+		fetchPublic<Parameters<typeof collectSitemapEntries>[1]>(sitemapListingsQuery),
+		fetchPublic<Parameters<typeof collectSitemapEntries>[2]>(sitemapGolfCoursesQuery)
 	]);
 
-	const entries = collectSitemapEntries(taxonomyRows ?? [], listingRows ?? []);
+	const entries = collectSitemapEntries(
+		taxonomyRows ?? [],
+		listingRows ?? [],
+		golfCourseRows ?? []
+	);
 	const body = renderSitemapXml(url.origin, entries);
 
 	return new Response(body, {

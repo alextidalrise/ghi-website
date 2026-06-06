@@ -68,6 +68,32 @@ export function buildLocationSeo(
 	};
 }
 
+type GolfCourseSeoFields = {
+	name: string;
+	seoTitle?: string | null;
+	metaDescription?: string | null;
+	shortDescription?: string | null;
+	tagline?: string | null;
+};
+
+export function buildGolfCourseSeo(
+	course: GolfCourseSeoFields,
+	canonicalUrl: string
+): PropertySeoMeta & { canonicalUrl: string } {
+	const fallbackDescription = course.shortDescription ?? course.tagline ?? null;
+
+	return {
+		canonicalUrl,
+		title: course.seoTitle ?? course.name,
+		description: course.metaDescription ?? fallbackDescription,
+		openGraphTitle: course.seoTitle ?? course.name,
+		openGraphDescription: course.metaDescription ?? fallbackDescription,
+		openGraphImageUrl: null,
+		noindex: false,
+		schemaType: null
+	};
+}
+
 /** SEO for a location page with an active community filter — canonical stays on the unfiltered location URL. */
 export function buildFilteredLocationSeo(
 	location: LocationSeoFields,

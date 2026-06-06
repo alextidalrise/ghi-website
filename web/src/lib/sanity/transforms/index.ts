@@ -48,6 +48,9 @@ type GolfCourseRef = {
 	name?: string | null;
 	slug?: string | null;
 	shortDescription?: string | null;
+	countrySlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
 };
 
 type GolfInput = {
@@ -331,3 +334,15 @@ export {
 	type RawPropertyCard
 } from './propertyCard';
 export { filterReservedUnits, filterReservedUnitTypes } from './reservedFilter';
+export {
+	buildGolfCourseHref,
+	buildGolfCourseRefHref,
+	resolveGolfCourseHero,
+	toGolfCourseCard,
+	toGolfCourseCards,
+	toPublicGolfCourse,
+	type GolfCourseCardData,
+	type GolfCourseHrefSegments,
+	type PublicGolfCourse,
+	type RawGolfCourse
+} from './golfCourse';
