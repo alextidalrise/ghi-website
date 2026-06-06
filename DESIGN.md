@@ -77,7 +77,22 @@ Color is used sparingly and with intent. The system is **white by default, deep 
 
 **The White-Default Rule.** Feature sections, panels, and data blocks sit on white, not on a tinted surface. Where a data block (key facts) needs anchoring, it gets a 1px hairline frame, never a fill. The warm cream that once tinted these panels (`--linen`) was removed on 2026-06-01; warmth now comes from gold, photography, and typography, not from the background.
 
-**The Green-Punctuation Rule.** Deep green is the only full-bleed surface colour, used for one or two emphasis moments per page (hero, enquiry CTA). If a page feels flat, the fix is more imagery or a green moment, never a return to beige.
+**The Green-Punctuation Rule.** Deep green is the only full-bleed surface colour. It is the heaviest tool in the kit, so it is rationed: **one green band per page, hard cap** (the hero is usually that one). Two green bands stacked read as one heavy slab and burn the page's only landing point; that is the failure the Emphasis Ladder exists to prevent. If a page feels flat, reach down the ladder (rules, photography, whitespace) before reaching for a second green.
+
+### The Emphasis Ladder
+
+When a section needs to feel distinct from the white editorial default, pick the **lowest tier that does the job**. Weight is reserved for importance; spending tier 4 on a supporting section leaves nothing for the real moment.
+
+| Tier | Device | Use for | Budget / page |
+|------|--------|---------|----------------|
+| 1 — lightest | Whitespace + width + type scale (larger Playfair heading, Playfair italic for a select moment) | Most sections | unlimited |
+| 2 | Hairline rules or a 1px frame on white (full-bleed `--border` rules bracketing the band; the rail may still bleed off the right edge). Gold reserved as accent marks (spec dots, focus), not as the rule colour. | "This is its own thing" — supporting sections that still need separation | generous |
+| 3 | Full-bleed **photography** band (single image + scrim + overlaid heading) | "This is a moment" / a destination | ~1–2 |
+| 4 — heaviest | Full-bleed **green** band (`--green`, gold hairline `border-block`, on-green type) | The single most important emphasis on the page | **1, hard cap** |
+
+The levers that compose these tiers: **width** (full-bleed / contained / deliberately narrowed), **whitespace**, **hairline rules and frames**, **photography as surface**, **layout-mode change** (prose → grid → rail), **typographic scale and italic**, and **gold as accent marks** (never a fill). Tier 3 does not apply when the section's own content is already photographic (e.g. a listing rail); image-on-image competes, so use tier 2 instead.
+
+**Stacking bands.** Two full-bleed bands sit **flush**, never with a section-gap between them: each band's own `padding-block` is the breathing room, so an external gap just reads as dead space. When a ruled tier-2 band runs straight into a tier-3/4 band, the lower band's edge is the divider, so the upper band drops its now-redundant bottom rule (on the location page the white golf rail flows directly into the green frontline band). A band keeps its closing rule only when plain white content follows it.
 
 ### Palette
 
@@ -263,3 +278,4 @@ been retired in favour of this page.
 | 2026-06-01 | Consolidated two clashing design-system showcases into one | A frozen hand-built HTML page (`web/static/design-system/design-system/index.html`) and a live Svelte page (`/internal/design-system`) both showed the system and had drifted. The static page hardcoded its own `:root` tokens, so it could not stay in sync. Retired the static page; kept the live Svelte page as the single source-of-truth showcase. Load-bearing brand assets under `web/static/design-system/assets/` (logo, hero image, referenced by `SiteNav` and the homepage) were preserved. |
 | 2026-06-01 | Removed the cream surface (`--linen`); moved to white-default + green-punctuation | Partner no longer liked the warm cream tint on feature panels. Tested the data-heavy sections (key facts, amenities) on white and confirmed they hold: key facts now sits in a 1px hairline frame, amenities became outline chips, image-led sections (gallery, location) go straight to white. Cream had no remaining job. `--linen` deleted; its only other role (light ink on green) renamed to `--on-green`. Rhythm now carried by whitespace, hairlines, photography, and the deep-green emphasis bands. |
 | 2026-06-05 | Darkened `--muted` `#7A7A7A` → `#6B6B6B` (light mode) | `#7A7A7A` measured ~4.3:1 on white, below the AA 4.5 floor PRODUCT.md sets for the older, affluent audience. Every muted-on-white instance (metadata, labels, the property location line) was technically failing. `#6B6B6B` is ~5.3:1 and still reads as soft secondary gray. Dark-mode `--muted` (`#8A8A8A`, on a dark surface) unchanged. |
+| 2026-06-06 | Introduced the Emphasis Ladder; capped green at one band per page | Distinguishing a section kept defaulting to a green band, and two greens stacked (golf courses + frontline listings on the location page) read as one heavy slab. Codified a four-tier ladder (whitespace/type → hairline rules → photography → green) so sections take the lowest tier that works and green stays the page's single landing point. Tier 3 (photography) is void when the section is itself photographic (a listing rail), so the golf-courses section moved to tier 2: full-bleed white bracketed by `--border` hairline rules, elevated cards (factual spec line, framed images, no arrow). |

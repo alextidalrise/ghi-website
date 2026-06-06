@@ -7,11 +7,11 @@
 		title: string;
 		/** Three short lines of what the guide covers. */
 		points: string[];
-		/** Cover-panel surface. 'green' = light ink on green; 'gold' = green ink on gold. */
-		tone: 'green' | 'gold';
+		/** Staggered reveal offset, in ms, set by the parent. */
+		revealDelay?: number;
 	};
 
-	let { guide, country, title, points, tone }: Props = $props();
+	let { guide, country, title, points, revealDelay = 0 }: Props = $props();
 
 	type Status = 'idle' | 'submitting' | 'success' | 'error';
 	let email = $state('');
@@ -27,7 +27,6 @@
 
 	function reveal() {
 		expanded = true;
-		// Wait for the collapsible to open, then drop focus into the field.
 		requestAnimationFrame(() => inputEl?.focus());
 	}
 
@@ -61,25 +60,36 @@
 	}
 </script>
 
-<article class="card" class:is-expanded={expanded}>
-	<div class="card__cover card__cover--{tone}">
-		<span class="card__wordmark">Golf Homes International</span>
-		<span class="card__cover-title">{country} Buyer's Guide</span>
-		<span class="card__tag">PDF · Free</span>
-	</div>
-
-	<div class="card__body">
+<article class="card" class:is-expanded={expanded} style="--reveal-delay: {revealDelay}ms">
+	<header class="card__head">
+		<span class="card__flag" aria-hidden="true">
+			{#if guide === 'spain'}
+				<svg viewBox="0 0 30 20" width="30" height="20">
+					<rect width="30" height="20" fill="#AA151B" />
+					<rect y="5" width="30" height="10" fill="#F1BF00" />
+				</svg>
+			{:else}
+				<svg viewBox="0 0 30 20" width="30" height="20">
+					<rect width="30" height="20" fill="#DA291C" />
+					<rect width="12" height="20" fill="#046A38" />
+					<circle cx="12" cy="10" r="3.1" fill="#FFE12C" stroke="#046A38" stroke-width="0.7" />
+				</svg>
+			{/if}
+		</span>
 		<h3 class="card__title">{title}</h3>
-		<ul class="card__points">
-			{#each points as point (point)}
-				<li>{point}</li>
-			{/each}
-		</ul>
+	</header>
 
+	<ul class="card__points">
+		{#each points as point (point)}
+			<li>{point}</li>
+		{/each}
+	</ul>
+
+	<div class="card__action">
 		{#if status === 'success'}
 			<p class="card__success" role="status">
 				<svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-					<path d="M3.5 9.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="1.5" />
+					<path d="M3.5 9.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="1.6" />
 				</svg>
 				{message}
 			</p>
@@ -118,8 +128,8 @@
 							{status === 'submitting' ? 'Sending…' : 'Send the guide'}
 						</button>
 					</div>
-					<p class="card__message" class:is-error={status === 'error'} role="alert">
-						{#if status === 'error'}{message}{/if}
+					<p class="card__note" class:is-error={status === 'error'} role="alert">
+						{#if status === 'error'}{message}{:else}Sent to your inbox as a PDF.{/if}
 					</p>
 				</form>
 			</div>
@@ -129,67 +139,49 @@
 
 <style>
 	.card {
-		display: grid;
-		grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-		border: 1px solid var(--border);
+		display: flex;
+		flex-direction: column;
+		padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
 		background: var(--white);
-		/* No shadow at rest — brand rule. */
+		/* White-default: a 1px frame defines the card, no shadow at rest. */
+		border: 1px solid var(--border);
+		transition:
+			box-shadow var(--duration-lift) var(--ease),
+			border-color var(--duration-hover) var(--ease),
+			transform var(--duration-lift) var(--ease);
 	}
 
-	/* Cover panel: typographic stand-in for the real guide cover. */
-	.card__cover {
+	/* The card being filled warms up: gold frame and a faint lift, so the active
+	   guide reads as the focus. Gold here is an accent mark, not a fill. */
+	.card:focus-within {
+		transform: translateY(-2px);
+		border-color: var(--gold);
+		box-shadow: 0 18px 40px -24px oklch(0.2 0.03 165 / 0.28);
+	}
+
+	.card__head {
 		display: flex;
-		flex-direction: column;
-		gap: var(--space-md);
-		padding: var(--space-lg);
+		align-items: center;
+		gap: var(--space-sm);
+		padding-bottom: var(--space-md);
+		margin-bottom: var(--space-md);
+		border-bottom: 1px solid var(--border);
 	}
 
-	.card__cover--green {
-		background: var(--green);
-		color: var(--on-green);
+	/* Flag as a small framed stamp — passport/luggage-tag cue for relocation. */
+	.card__flag {
+		flex: 0 0 auto;
+		display: inline-flex;
+		width: 32px;
+		height: 22px;
+		border: 1px solid var(--border);
+		overflow: hidden;
 	}
 
-	.card__cover--gold {
-		background: var(--gold);
-		color: var(--green);
-	}
-
-	.card__wordmark {
-		font-family: var(--sans);
-		font-size: var(--text-overline);
-		font-weight: 500;
-		letter-spacing: var(--tracking-overline);
-		text-transform: uppercase;
-		/* Slightly recede the wordmark against the cover title. */
-		opacity: 0.82;
-	}
-
-	.card__cover-title {
-		font-family: var(--serif);
-		font-weight: 600;
-		font-size: var(--text-h3);
-		line-height: 1.08;
-		letter-spacing: var(--tracking-tight);
-		margin-top: auto;
-	}
-
-	.card__tag {
-		font-family: var(--sans);
-		font-size: var(--text-small);
-		font-weight: 400;
-		letter-spacing: var(--tracking-wide);
-		text-transform: uppercase;
-		padding-top: var(--space-sm);
-		border-top: 1px solid currentColor;
-		/* Hairline reads as a faint rule, not a hard line, on either cover tone. */
-		opacity: 0.85;
-	}
-
-	.card__body {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-md);
-		padding: var(--space-lg);
+	.card__flag svg {
+		width: 100%;
+		height: 100%;
+		display: block;
 	}
 
 	.card__title {
@@ -197,13 +189,13 @@
 		font-weight: 400;
 		font-size: var(--text-h3);
 		color: var(--green);
-		line-height: 1.15;
+		line-height: 1.1;
 	}
 
 	.card__points {
 		list-style: none;
 		display: grid;
-		gap: 0.6rem;
+		gap: 0.65rem;
 		font-family: var(--sans);
 		font-size: var(--text-ui);
 		color: var(--charcoal);
@@ -211,28 +203,32 @@
 
 	.card__points li {
 		position: relative;
-		padding-left: 1.1rem;
-		line-height: 1.4;
+		padding-left: 1.15rem;
+		line-height: 1.45;
 	}
 
 	.card__points li::before {
 		content: '';
 		position: absolute;
 		left: 0;
-		top: 0.5em;
-		width: 4px;
-		height: 4px;
+		top: 0.52em;
+		width: 5px;
+		height: 5px;
 		background: var(--gold);
-		/* Square dot — keeps the zero-radius brand signal even at 4px. */
+		/* Square marker keeps the zero-radius brand signal. */
 	}
 
-	/* Reveal trigger — mobile shows it; desktop hides it (form is always open). */
+	/* Form / reveal pinned to the card base so both cards' CTAs line up. */
+	.card__action {
+		margin-top: auto;
+		padding-top: var(--space-lg);
+	}
+
 	.card__reveal {
 		display: none;
 		align-items: center;
 		gap: var(--space-sm);
 		align-self: flex-start;
-		margin-top: auto;
 		padding: 0.85rem 1.5rem;
 		font-family: var(--sans);
 		font-size: var(--text-ui);
@@ -263,10 +259,8 @@
 		transform: translateX(4px);
 	}
 
-	/* Collapsible wrapper. The grid-rows 0fr→1fr technique animates the reveal
-	   without a hard-coded max-height. Desktop pins it open. */
 	.card__collapsible {
-		margin-top: auto;
+		display: grid;
 	}
 
 	.card__form {
@@ -275,7 +269,6 @@
 	}
 
 	.card__label {
-		/* Visually hidden; the placeholder + submit label carry the meaning. */
 		position: absolute;
 		width: 1px;
 		height: 1px;
@@ -294,7 +287,6 @@
 		align-items: end;
 	}
 
-	/* Bottom-border input — the brand's form idiom. */
 	.card__input {
 		flex: 1 1 12rem;
 		min-width: 0;
@@ -310,7 +302,6 @@
 	}
 
 	.card__input::placeholder {
-		/* Placeholder must clear the same 4.5:1 floor as body text. */
 		color: var(--muted);
 	}
 
@@ -323,7 +314,6 @@
 		opacity: 0.6;
 	}
 
-	/* Gold submit — brand's gold button tier. */
 	.card__submit {
 		flex: 0 0 auto;
 		max-width: 100%;
@@ -354,15 +344,14 @@
 		opacity: 0.7;
 	}
 
-	.card__message {
+	.card__note {
 		font-family: var(--sans);
 		font-size: var(--text-small);
 		min-height: 1.2em;
 		color: var(--muted);
 	}
 
-	.card__message.is-error {
-		/* Muted brick red — distinct without alarming, ~6.4:1 on white. */
+	.card__note.is-error {
 		color: #9a3b2e;
 	}
 
@@ -370,7 +359,6 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-sm);
-		margin-top: auto;
 		font-family: var(--sans);
 		font-size: var(--text-ui);
 		color: var(--green);
@@ -382,33 +370,16 @@
 	}
 
 	@media (max-width: 720px) {
-		.card {
-			grid-template-columns: 1fr;
+		.card__action {
+			margin-top: var(--space-md);
+			padding-top: var(--space-md);
 		}
 
-		/* Top band rather than a tall side panel: compact, stacked, tight gap. */
-		.card__cover {
-			gap: var(--space-xs);
-			padding: var(--space-md);
-		}
-
-		.card__cover-title {
-			margin-top: 0;
-			font-size: var(--text-h4);
-		}
-
-		.card__tag {
-			border-top: 0;
-			padding-top: 0;
-		}
-
-		/* Collapse the form until the reveal button is tapped. */
 		.card__reveal {
 			display: inline-flex;
 		}
 
 		.card__collapsible {
-			display: grid;
 			grid-template-rows: 0fr;
 			overflow: hidden;
 		}
@@ -430,6 +401,36 @@
 	@media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
 		.card__collapsible {
 			transition: grid-template-rows var(--duration-lift) var(--ease);
+		}
+	}
+
+	/* Reduced motion: keep colour/shadow feedback, drop the positional movement. */
+	@media (prefers-reduced-motion: reduce) {
+		.card:focus-within {
+			transform: none;
+		}
+
+		.card__reveal:hover svg,
+		.card__reveal:focus-visible svg {
+			transform: none;
+		}
+	}
+
+	/* Staggered entrance, matching the country-card reveal used elsewhere on the
+	   homepage. Enhances an always-visible default; reduced-motion skips it. */
+	@media (prefers-reduced-motion: no-preference) {
+		.card {
+			opacity: 0;
+			transform: translateY(20px);
+			animation: card-reveal 0.7s var(--ease) forwards;
+			animation-delay: var(--reveal-delay, 0ms);
+		}
+
+		@keyframes card-reveal {
+			to {
+				opacity: 1;
+				transform: none;
+			}
 		}
 	}
 </style>

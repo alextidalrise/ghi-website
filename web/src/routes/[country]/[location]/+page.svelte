@@ -115,32 +115,15 @@
 			<p class="location-page__intro">{placeholderBody}</p>
 		{/if}
 
-		{#if data.relatedAreaLinks.length > 0}
-			<section class="location-page__list" aria-labelledby="related-areas-heading">
-				<h2 id="related-areas-heading">Related areas</h2>
-				<ul>
-					{#each data.relatedAreaLinks as entry (entry.location?._id)}
-						{@const slug = entry.location?.slug}
-						{@const name = entry.location?.breadcrumbLabel ?? entry.location?.name}
-						{#if slug && name}
-							<li>
-								<a href={relatedAreaHref(slug)}>{name}</a>
-							</li>
-						{/if}
-					{/each}
-				</ul>
-			</section>
-		{/if}
+		<GolfCoursesSection
+			courses={data.golfCourseCards}
+			heading={`Golf courses in ${data.location.name}`}
+		/>
 
 		<FrontlineListings
 			cards={data.frontlineCards}
 			heading={`Frontline golf in ${data.location.name}`}
 			viewAllHref={data.frontlineViewAllHref}
-		/>
-
-		<GolfCoursesSection
-			courses={data.golfCourseCards}
-			heading={`Golf courses in ${data.location.name}`}
 		/>
 	</div>
 
@@ -156,7 +139,7 @@
 		/>
 	</div>
 
-	{#if data.directCommunities.length > 0 || data.associatedCommunities.length > 0}
+	{#if data.directCommunities.length > 0 || data.associatedCommunities.length > 0 || data.relatedAreaLinks.length > 0}
 		<div class="location-page__after content-wrap">
 			{#if data.directCommunities.length > 0}
 				<section class="location-page__list" aria-labelledby="communities-heading">
@@ -187,6 +170,23 @@
 					</ul>
 				</section>
 			{/if}
+
+			{#if data.relatedAreaLinks.length > 0}
+				<section class="location-page__list" aria-labelledby="related-areas-heading">
+					<h2 id="related-areas-heading">Related areas</h2>
+					<ul>
+						{#each data.relatedAreaLinks as entry (entry.location?._id)}
+							{@const slug = entry.location?.slug}
+							{@const name = entry.location?.breadcrumbLabel ?? entry.location?.name}
+							{#if slug && name}
+								<li>
+									<a href={relatedAreaHref(slug)}>{name}</a>
+								</li>
+							{/if}
+						{/each}
+					</ul>
+				</section>
+			{/if}
 		</div>
 	{/if}
 </article>
@@ -207,6 +207,18 @@
 	   staying anchored to this component's scoped __top. */
 	.location-page__top > :global(* + *) {
 		margin-top: var(--section-gap);
+	}
+
+	/* Two full-bleed bands stack flush. Each carries its own internal padding for
+	   breathing, so the section-gap between them is dead space; and the green band's
+	   own edge is the divider, so the ruled white band above drops its now-redundant
+	   bottom rule and runs straight into the green. (Only matches when both bands
+	   render: an empty golf or frontline section emits no element.) */
+	.location-page__top > :global(.golf + .frontline) {
+		margin-top: 0;
+	}
+	.location-page__top > :global(.golf:has(+ .frontline)) {
+		border-bottom-color: transparent;
 	}
 
 	/* The page title (no-hero pages only) leads straight into its first block;

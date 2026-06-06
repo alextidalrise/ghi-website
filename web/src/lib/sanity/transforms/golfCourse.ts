@@ -5,7 +5,7 @@ import { resolveTaxonomyHero, type TaxonomyHero } from './taxonomyHero';
 
 const HERO_WIDTHS = [960, 1280, 1600, 1920, 2400];
 const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 85 };
-const COURSE_CARD = { width: 600, height: 800, fit: 'crop' as const, quality: 85 };
+const COURSE_CARD = { width: 600, height: 400, fit: 'crop' as const, quality: 82 };
 
 export type GolfCourseCommunityRef = {
 	_id?: string;
@@ -67,6 +67,8 @@ export type GolfCourseCardData = {
 	tagline: string | null;
 	communityLabel: string | null;
 	holes: number | null;
+	par: number | null;
+	designStyle: string | null;
 };
 
 export type GolfCourseHrefSegments = {
@@ -167,7 +169,9 @@ export function toGolfCourseCard(course: RawGolfCourse | null | undefined): Golf
 		alt: asset?.altText?.trim() || course.name,
 		tagline: course.tagline?.trim() || course.shortDescription?.trim() || null,
 		communityLabel: community?.name ?? null,
-		holes: course.holes ?? null
+		holes: course.holes ?? null,
+		par: course.par ?? null,
+		designStyle: course.designStyle?.trim() || null
 	};
 }
 

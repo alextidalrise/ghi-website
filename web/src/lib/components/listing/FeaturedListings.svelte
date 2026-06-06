@@ -18,20 +18,27 @@
 </script>
 
 {#if cards.length > 0}
+	<!-- Full-bleed: the section breaks out of the content column to the viewport edges.
+	     The head sits in an inner wrapper aligned to the content gutter; the rail bleeds
+	     off the right edge, so the carousel fills the width instead of sitting in the
+	     narrower page column. Stays on white — Frontline owns the page's one green band. -->
 	<section class="featured" aria-labelledby="featured-heading">
-		<div class="featured__head">
-			<div class="featured__heading">
-				<h2 id="featured-heading">{heading}</h2>
-				<p class="featured__summary">{summaryLine}</p>
+		<div class="featured__inner">
+			<div class="featured__head">
+				<div class="featured__heading">
+					<h2 id="featured-heading">{heading}</h2>
+					<p class="featured__summary">{summaryLine}</p>
+				</div>
+				{#if cards.length > 1}
+					<span class="featured__cue" aria-hidden="true">‹ scroll ›</span>
+				{/if}
 			</div>
-			{#if cards.length > 1}
-				<span class="featured__cue" aria-hidden="true">‹ scroll ›</span>
-			{/if}
 		</div>
 
 		<ListingRail
 			items={cards}
 			getKey={(c, i) => `${c._id}-${i}`}
+			bleed
 			labelledby="featured-heading"
 		>
 			{#snippet card(c)}
@@ -42,6 +49,19 @@
 {/if}
 
 <style>
+	.featured {
+		/* Escape the surrounding content column to the viewport edges. The page-level
+		   `overflow-x: clip` on .site-main absorbs the scrollbar gutter. */
+		width: 100vw;
+		margin-inline: calc(50% - 50vw);
+	}
+
+	/* Re-establish the content gutter for the head so it aligns to the same edge as the
+	   bleeding rail's first card. */
+	.featured__inner {
+		padding-inline: var(--content-padding);
+	}
+
 	.featured__head {
 		display: flex;
 		align-items: flex-end;
