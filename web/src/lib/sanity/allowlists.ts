@@ -9,8 +9,7 @@ export const MEDIA_ASSET_PUBLIC = /* groq */ `{
   fileAsset,
   assetCategory,
   order,
-  altText,
-  caption
+  altText
 }`;
 
 /** Public fields on locationTaxonomy references used in breadcrumbs and stubs. */
@@ -138,8 +137,7 @@ export const CTA_PUBLIC = /* groq */ `{
   formIntroText,
   responseTimeText,
   brochureCtaText,
-  brochureCtaEnabled,
-  whatsAppEnabled
+  brochureCtaEnabled
 }`;
 
 /** Public SEO fields — workflow keywords and internal clustering excluded. */

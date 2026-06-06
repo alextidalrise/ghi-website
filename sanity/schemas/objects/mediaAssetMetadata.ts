@@ -46,11 +46,6 @@ export const mediaAssetMetadata = defineType({
 				'Descriptive text for screen readers and search engines (e.g. "Living room with sea view").'
 		}),
 		defineField({
-			name: 'caption',
-			title: 'Caption',
-			type: 'string'
-		}),
-		defineField({
 			name: 'sourceDriveFileId',
 			title: 'Source Drive file ID',
 			type: 'string',
@@ -72,13 +67,12 @@ export const mediaAssetMetadata = defineType({
 	preview: {
 		select: {
 			title: 'altText',
-			caption: 'caption',
 			category: 'assetCategory',
 			media: 'asset'
 		},
-		prepare({ title, caption, category, media }) {
+		prepare({ title, category, media }) {
 			return {
-				title: title || caption || 'Media asset',
+				title: title || 'Media asset',
 				subtitle: category,
 				media
 			};

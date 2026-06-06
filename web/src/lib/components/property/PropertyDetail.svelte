@@ -38,7 +38,7 @@
 			<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 			<PropertySummary listing={property} />
 			<KeyFacts listing={property} />
-			<a class="hero__cta" href="#enquire-form">{enquireLabel}</a>
+			<a class="hero__cta" href="#enquire">{enquireLabel}</a>
 		</div>
 	</section>
 

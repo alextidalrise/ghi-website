@@ -40,8 +40,6 @@ type CtaInput = {
 	responseTimeText?: string | null;
 	brochureCtaText?: string | null;
 	brochureCtaEnabled?: boolean | null;
-	whatsAppEnabled?: boolean | null;
-	whatsAppMessageTemplate?: string | null;
 	enquiryRouting?: unknown;
 };
 
@@ -114,7 +112,7 @@ export type PublicRelated = {
 	similarPropertiesMode?: string | null;
 };
 
-export type PublicCta = Omit<CtaInput, 'whatsAppMessageTemplate' | 'enquiryRouting'>;
+export type PublicCta = Omit<CtaInput, 'enquiryRouting'>;
 
 export type PublicGolf = Omit<
 	GolfInput,
@@ -227,7 +225,7 @@ function filterCtaFields(ctas: CtaInput | null | undefined): PublicCta | null {
 		return null;
 	}
 
-	const { whatsAppMessageTemplate: _wa, enquiryRouting: _er, ...publicCtas } = ctas;
+	const { enquiryRouting: _er, ...publicCtas } = ctas;
 	return publicCtas;
 }
 

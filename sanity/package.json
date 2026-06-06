@@ -26,6 +26,8 @@
 		"migrate:source-provenance-keys:dry-run": "tsx migrations/source-provenance-keys-migrate.ts --dry-run",
 		"migrate:unset-media-rights": "tsx migrations/unset-media-rights-migrate.ts",
 		"migrate:unset-media-rights:dry-run": "tsx migrations/unset-media-rights-migrate.ts --dry-run",
+		"migrate:unset-caption": "tsx migrations/unset-caption-migrate.ts",
+		"migrate:unset-caption:dry-run": "tsx migrations/unset-caption-migrate.ts --dry-run",
 		"migrate:prune-media-privacy-review-items": "tsx migrations/prune-media-privacy-review-items-migrate.ts",
 		"migrate:prune-media-privacy-review-items:dry-run": "tsx migrations/prune-media-privacy-review-items-migrate.ts --dry-run",
 		"migrate:related-content": "tsx migrations/related-content-migrate.ts",
@@ -58,6 +60,8 @@
 		"wipe:location-taxonomy:dry-run": "tsx migrations/wipe-location-taxonomy.ts --dry-run",
 		"migrate:curated-heroes": "tsx migrations/curated-heroes-migrate.ts",
 		"migrate:curated-heroes:dry-run": "tsx migrations/curated-heroes-migrate.ts --dry-run",
+		"migrate:set-nueva-andalucia-hero": "tsx migrations/set-nueva-andalucia-hero-migrate.ts",
+		"migrate:set-nueva-andalucia-hero:dry-run": "tsx migrations/set-nueva-andalucia-hero-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

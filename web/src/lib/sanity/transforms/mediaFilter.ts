@@ -4,7 +4,6 @@ export type MediaAssetInput = {
 	assetCategory?: string | null;
 	order?: number | null;
 	altText?: string | null;
-	caption?: string | null;
 };
 
 /** Whether an asset may be used in public output (has an uploaded file). */

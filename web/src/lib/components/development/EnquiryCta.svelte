@@ -52,9 +52,6 @@
 			{:else if showBrochureRequest}
 				<p class="enquiry__brochure">{ctas?.brochureCtaText}</p>
 			{/if}
-			{#if ctas?.whatsAppEnabled}
-				<p class="enquiry__whatsapp">WhatsApp enquiries available — contact us to connect.</p>
-			{/if}
 		</div>
 
 		<form class="enquiry__form" id="enquire-form" action="#" method="post">
@@ -113,8 +110,7 @@
 
 	.enquiry__intro,
 	.enquiry__response,
-	.enquiry__brochure,
-	.enquiry__whatsapp {
+	.enquiry__brochure {
 		font-size: var(--text-ui);
 		color: rgba(255, 255, 255, 0.82);
 		margin-top: 0.5rem;

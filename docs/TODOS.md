@@ -181,6 +181,19 @@ Out of scope for initial restructure; do not block ship.
 
 ---
 
+## N. Property features — move grouping into Sanity
+
+The property **Features** section (`web/src/lib/components/property/Features.svelte`) renders a ranked "signature" lead over a grouped "also includes" index. Both the signature ranking and the group assignment are **keyword heuristics in component code** today, because `content.amenities` is a flat, untagged list of strings. This works across the current dataset but is brittle: a new amenity vocabulary can land an item in the wrong group or "Additional", and the score/keyword tables have to be hand-maintained.
+
+- [ ] **N-01** Tag amenities with a category + signature flag in Sanity
+  - CMS: replace (or augment) the flat `content.amenities: string[]` with structured entries carrying a `category` (reuse/extend `FEATURE_CATEGORIES` in `sanity/schemas/constants/enums.ts`: golf, outdoor, interior, community, location, energy, security, wellness, investment) and an optional `isSignature` / highlight flag for editor-curated standouts. Decide whether to extend the existing `featureHighlight` object (already has `category` + `isHighlighted`) or give `amenities` its own typed array.
+  - Web: once categories are authored, `Features.svelte` reads `category` directly for grouping and uses `isSignature` (with the keyword score as fallback) for the lead, retiring the in-component `GROUPS` keyword map and `SCORE_TIERS`. Keep the `matchWord` ranker only as a fallback for un-tagged legacy data.
+  - Also fold in the data-cleanup the component currently patches at runtime: strip the leaked `" per source" / " per source text"` provenance suffix at the source, and keep spec-restatement / location-proximity strings out of `amenities` (they belong to KeyFacts / location, not features).
+  - Context: see memory `listing-data-quirks` (amenities-field quirks) and the June 2026 Features redesign. Group display order + labels currently live in `GROUPS`; map enum values to those display titles.
+  - Done when: amenities (or highlights) carry categories in the schema + GROQ allowlist + transforms + typegen; `Features.svelte` groups by authored category with the keyword heuristic as fallback only; signature respects an editor flag; existing docs migrated or back-filled; tests pass.
+
+---
+
 ## Completed
 
 _Move items here with completion date when done._

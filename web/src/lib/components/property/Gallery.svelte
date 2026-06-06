@@ -7,7 +7,6 @@
 	type GalleryItem = {
 		asset: MediaAssetInput;
 		alt: string;
-		caption: string | null;
 		key: string;
 		thumbSrc: string;
 		thumbSrcset: string;
@@ -70,7 +69,6 @@
 			collected.push({
 				asset,
 				alt: asset.altText ?? title,
-				caption: asset.caption ?? null,
 				key,
 				thumbSrc: probe,
 				thumbSrcset: buildSrcset(asset, THUMB_WIDTHS, STAGE_RATIO, 'crop', 80)
@@ -304,10 +302,6 @@
 				{/each}
 			</div>
 		{/if}
-
-		{#if active?.caption}
-			<p class="gallery__caption">{active.caption}</p>
-		{/if}
 	</section>
 
 	<dialog
@@ -336,9 +330,6 @@
 							in:fade={{ duration: fadeDuration }}
 						/>
 					{/key}
-					{#if active.caption}
-						<figcaption class="lightbox__caption">{active.caption}</figcaption>
-					{/if}
 				</figure>
 
 				{#if total > 1}
@@ -510,15 +501,8 @@
 		opacity: 1;
 	}
 
-	.gallery__caption {
-		margin-top: var(--space-sm);
-		font-size: var(--text-small);
-		line-height: 1.5;
-		color: var(--charcoal);
-	}
-
 	/* On phones the stage becomes a true edge-to-edge hero, flush under the fixed
-	   nav. Only the stage bleeds; the filmstrip and caption keep their gutter.
+	   nav. Only the stage bleeds; the filmstrip keeps its gutter.
 	   100vw breakout matches the FrontlineListings convention; .site-main's
 	   overflow-x: clip absorbs it without a horizontal scrollbar. */
 	@media (max-width: 760px) {
@@ -584,13 +568,6 @@
 		pointer-events: auto;
 	}
 
-	.lightbox__caption {
-		font-size: var(--text-small);
-		line-height: 1.5;
-		color: rgba(245, 241, 232, 0.78);
-		text-align: center;
-		max-width: 60ch;
-	}
 
 	.lightbox__close {
 		position: absolute;

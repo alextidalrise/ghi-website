@@ -77,19 +77,6 @@ export const ctaFields = defineType({
 			description: "Shows the 'Download brochure' button on the listing. Only enable if the brochure visibility is also set to allow downloads."
 		}),
 		defineField({
-			name: 'whatsAppEnabled',
-			title: 'WhatsApp enabled',
-			type: 'boolean',
-			initialValue: true
-		}),
-		defineField({
-			name: 'whatsAppMessageTemplate',
-			title: 'WhatsApp message template',
-			type: 'text',
-			rows: 3,
-			description: 'The pre-filled message sent when a buyer taps the WhatsApp button. Internal only — buyers only see the button itself, not this template.'
-		}),
-		defineField({
 			name: 'enquiryRouting',
 			title: 'Enquiry routing',
 			type: 'enquiryRouting'
@@ -97,13 +84,11 @@ export const ctaFields = defineType({
 	],
 	preview: {
 		select: {
-			primaryCtaLabel: 'primaryCtaLabel',
-			whatsAppEnabled: 'whatsAppEnabled'
+			primaryCtaLabel: 'primaryCtaLabel'
 		},
-		prepare({ primaryCtaLabel, whatsAppEnabled }) {
+		prepare({ primaryCtaLabel }) {
 			return {
-				title: primaryCtaLabel || 'CTAs',
-				subtitle: whatsAppEnabled ? 'WhatsApp enabled' : 'WhatsApp disabled'
+				title: primaryCtaLabel || 'CTAs'
 			};
 		}
 	}
