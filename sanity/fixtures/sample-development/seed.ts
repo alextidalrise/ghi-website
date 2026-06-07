@@ -7,13 +7,15 @@
  * It creates its own throwaway location taxonomy (slugs prefixed `sample-…`) so it
  * never collides with production locations. Safe to delete with `--delete`.
  *
- * Requires a write token. Point --dataset at whatever your web dev server reads
- * (PUBLIC_SANITY_DATASET in web/.env.local).
+ * Requires a write token. Defaults to the `development` dataset (what the web dev
+ * server reads — PUBLIC_SANITY_DATASET in web/.env.local). Pass --dataset to target
+ * another dataset explicitly; only do so deliberately for `production`.
  *
  * Usage:
- *   SANITY_API_TOKEN=… pnpm --filter sanity sample:seed -- --dataset production
- *   SANITY_API_TOKEN=… pnpm --filter sanity sample:seed:dry-run -- --dataset production
- *   SANITY_API_TOKEN=… pnpm --filter sanity sample:delete -- --dataset production
+ *   SANITY_API_TOKEN=… pnpm --filter sanity sample:seed
+ *   SANITY_API_TOKEN=… pnpm --filter sanity sample:seed:dry-run
+ *   SANITY_API_TOKEN=… pnpm --filter sanity sample:delete
+ *   SANITY_API_TOKEN=… pnpm --filter sanity sample:seed -- --dataset production   # explicit opt-in
  */
 import { createClient, type IdentifiedSanityDocumentStub } from '@sanity/client';
 import { readFileSync, existsSync } from 'node:fs';
@@ -30,7 +32,7 @@ const dryRun = args.includes('--dry-run');
 const deleteMode = args.includes('--delete');
 const datasetIndex = args.indexOf('--dataset');
 const dataset =
-	datasetIndex >= 0 ? args[datasetIndex + 1] : (process.env.SANITY_STUDIO_DATASET ?? 'production');
+	datasetIndex >= 0 ? args[datasetIndex + 1] : (process.env.SANITY_STUDIO_DATASET ?? 'development');
 
 const IMAGE_SOURCE = join(
 	__dirname,
@@ -206,7 +208,7 @@ function buildLocation(): IdentifiedSanityDocumentStub[] {
 	];
 }
 
-function buildDevelopment(assetId: string): IdentifiedSanityDocumentStub {
+function buildDevelopment(assetId: string, includeChildren = true): IdentifiedSanityDocumentStub {
 	return {
 		_id: IDS.development,
 		_type: 'development',
@@ -259,8 +261,12 @@ function buildDevelopment(assetId: string): IdentifiedSanityDocumentStub {
 			_type: 'golfFields',
 			golfRelevance: 'frontline_golf'
 		},
-		unitTypes: [ref(IDS.type1, 'ut1'), ref(IDS.type2, 'ut2'), ref(IDS.type3, 'ut3')],
-		units: UNITS.map((u) => ref(`sample.unit.${u.key}`, u.key)),
+		...(includeChildren
+			? {
+					unitTypes: [ref(IDS.type1, 'ut1'), ref(IDS.type2, 'ut2'), ref(IDS.type3, 'ut3')],
+					units: UNITS.map((u) => ref(`sample.unit.${u.key}`, u.key))
+				}
+			: {}),
 		workflow: approvedWorkflow()
 	};
 }
@@ -318,13 +324,16 @@ async function main() {
 		console.log(`  uploaded → ${assetId}`);
 	}
 
+	// Circular refs: unit types and units point at the development; development lists them.
+	// Seed the development stub first, then children, then patch the parent refs.
 	const documents: IdentifiedSanityDocumentStub[] = [
 		...buildLocation(),
+		buildDevelopment(assetId, false),
 		buildUnitType(assetId, IDS.type1, '1-bed apartment', 'apartment', 1, 60),
 		buildUnitType(assetId, IDS.type2, '2-bed apartment', 'apartment', 2, 95),
 		buildUnitType(assetId, IDS.type3, '3-bed penthouse', 'penthouse', 3, 168),
-		buildDevelopment(assetId),
-		...UNITS.map((u) => buildUnit(assetId, u))
+		...UNITS.map((u) => buildUnit(assetId, u)),
+		buildDevelopment(assetId)
 	];
 
 	console.log(`Upserting ${documents.length} documents…`);
