@@ -2,7 +2,12 @@ import {
 	LISTING_COMMUNITY_SLUG,
 	LISTING_COUNTRY_SLUG,
 	LISTING_IS_CATCH_ALL,
-	LISTING_LOCATION_SLUG
+	LISTING_LOCATION_SLUG,
+	PUBLIC_CHILD_UNIT_FILTER,
+	UNIT_DEV_COMMUNITY_SLUG,
+	UNIT_DEV_COUNTRY_SLUG,
+	UNIT_DEV_IS_CATCH_ALL,
+	UNIT_DEV_LOCATION_SLUG
 } from './queries/filters';
 
 /**
@@ -176,7 +181,13 @@ export const RELATED_PUBLIC = /* groq */ `{
   similarPropertiesMode
 }`;
 
-/** Development card for grids (similar properties manual picks). */
+/**
+ * Development card for grids and rails. Carries href-parity slugs (so catch-all /
+ * id-prefix communities build correct URLs) plus aggregated inventory: count of
+ * publicly available units and the bedroom range across visible+available units and
+ * unit types. The aggregation reuses PUBLIC_CHILD_UNIT_FILTER so it never diverges
+ * from the unit-page visibility/availability gates.
+ */
 export const DEVELOPMENT_CARD_PUBLIC = /* groq */ `{
   _id,
   _type,
@@ -186,13 +197,26 @@ export const DEVELOPMENT_CARD_PUBLIC = /* groq */ `{
   listingKind,
   developmentDisplayMode,
   developmentStatus,
+  "countrySlug": ${LISTING_COUNTRY_SLUG},
+  "locationSlug": ${LISTING_LOCATION_SLUG},
+  "communitySlug": ${LISTING_COMMUNITY_SLUG},
+  "isCatchAll": ${LISTING_IS_CATCH_ALL},
   location{
     country->{ name, "slug": slug.current },
     location->{ name, "slug": slug.current },
-    community->{ name, "slug": slug.current },
+    community->{ _id, name, "slug": slug.current, isCatchAll },
     addressDisplay
   },
   pricing${PRICING_PUBLIC},
+  "unitsAvailable": count((units[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ]),
+  "bedroomsFrom": math::min(
+    (unitTypes[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ].specs.bedrooms
+    + (units[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ].specs.bedrooms
+  ),
+  "bedroomsTo": math::max(
+    (unitTypes[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ].specs.bedrooms
+    + (units[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ].specs.bedrooms
+  ),
   media{
     gallery[0...1]${MEDIA_ASSET_PUBLIC},
     thumbnailOverride${MEDIA_ASSET_PUBLIC}
@@ -231,6 +255,16 @@ export const PROPERTY_CARD_PUBLIC = /* groq */ `{
   }
 }`;
 
+/**
+ * Mixed card projection for surfaces that interleave properties/units and whole
+ * developments (location grid, featured rails). Each row gets exactly one branch's
+ * fields; downstream `toSimilarListingCard` discriminates on listingKind.
+ */
+export const LISTING_CARD_UNION = /* groq */ `{
+  _type == "development" => ${DEVELOPMENT_CARD_PUBLIC},
+  _type == "propertyListing" => ${PROPERTY_CARD_PUBLIC}
+}`;
+
 /** Full property listing page allowlist. */
 export const PROPERTY_LISTING_PUBLIC = /* groq */ `{
   _id,
@@ -252,12 +286,18 @@ export const PROPERTY_LISTING_PUBLIC = /* groq */ `{
   seo${SEO_PUBLIC}
 }`;
 
-/** Public unit projection for development pages. */
+/** Public unit projection for the development inventory table. */
 export const UNIT_PUBLIC = /* groq */ `{
   _id,
+  ghiListingId,
   unitName,
   unitNumber,
+  "slug": slug.current,
   listingKind,
+  floor,
+  phase,
+  "unitTypeName": parentUnitType->unitTypeName,
+  "propertyType": parentUnitType->propertyType,
   pricing${PRICING_PUBLIC},
   specs,
   floorplan${MEDIA_ASSET_PUBLIC},
@@ -312,6 +352,87 @@ export const DEVELOPMENT_PUBLIC = /* groq */ `{
   seo${SEO_PUBLIC},
   unitTypes[]->${UNIT_TYPE_PUBLIC},
   units[]->${UNIT_PUBLIC}
+}`;
+
+/**
+ * Inheritable development context projected onto a unit page. Mirrors the public
+ * development page minus its own units/unitTypes (no recursion) — the unit borrows
+ * the development's location, golf, editorial copy, amenities, CTAs and SEO base.
+ */
+export const DEVELOPMENT_CONTEXT_PUBLIC = /* groq */ `{
+  _id,
+  ghiListingId,
+  developmentName,
+  title,
+  "slug": slug.current,
+  developmentStatus,
+  completionStatus,
+  completionDate,
+  developerName,
+  location${LOCATION_PUBLIC},
+  pricing${PRICING_PUBLIC},
+  sharedAmenities[]{
+    label,
+    value,
+    category,
+    isFilterable,
+    isHighlighted
+  },
+  sharedGallery[]${MEDIA_ASSET_PUBLIC},
+  media${MEDIA_PUBLIC},
+  content${CONTENT_PUBLIC},
+  golf${GOLF_PUBLIC},
+  ctas${CTA_PUBLIC},
+  related${RELATED_PUBLIC},
+  seo${SEO_PUBLIC},
+  "countrySlug": ${LISTING_COUNTRY_SLUG},
+  "locationSlug": ${LISTING_LOCATION_SLUG},
+  "communitySlug": ${LISTING_COMMUNITY_SLUG},
+  "isCatchAll": ${LISTING_IS_CATCH_ALL}
+}`;
+
+/** Canonical path segments for a unit (its development's path + the unit slug). */
+export const UNIT_CANONICAL_PATH_FIELDS = /* groq */ `
+  "countrySlug": ${UNIT_DEV_COUNTRY_SLUG},
+  "locationSlug": ${UNIT_DEV_LOCATION_SLUG},
+  "communitySlug": ${UNIT_DEV_COMMUNITY_SLUG},
+  "isCatchAll": ${UNIT_DEV_IS_CATCH_ALL},
+  "developmentSlug": parentDevelopment->slug.current,
+  "unitSlug": slug.current
+`;
+
+/** Canonical path fragment for a unit — permalink + stale-URL 301 resolution. */
+export const UNIT_CANONICAL_PATH = /* groq */ `{ ${UNIT_CANONICAL_PATH_FIELDS} }`;
+
+/**
+ * Full unit-page projection. The page is synthesized from three sources: the unit
+ * (price, size, floor, number), its unit type (shared gallery + property type), and
+ * its parent development (location, golf, copy, CTAs, SEO base).
+ */
+export const UNIT_LISTING_PUBLIC = /* groq */ `{
+  _id,
+  _type,
+  ghiListingId,
+  unitName,
+  unitNumber,
+  "slug": slug.current,
+  listingKind,
+  floor,
+  phase,
+  pricing${PRICING_PUBLIC},
+  specs,
+  floorplan${MEDIA_ASSET_PUBLIC},
+  unitGallery[]${MEDIA_ASSET_PUBLIC},
+  "unitType": parentUnitType->{
+    _id,
+    unitTypeName,
+    propertyType,
+    specs,
+    gallery[]${MEDIA_ASSET_PUBLIC},
+    floorplans[]${MEDIA_ASSET_PUBLIC}
+  },
+  "development": parentDevelopment->${DEVELOPMENT_CONTEXT_PUBLIC},
+  ${UNIT_CANONICAL_PATH_FIELDS}
 }`;
 
 /** Canonical path fields for slug resolution and 301 redirects. */

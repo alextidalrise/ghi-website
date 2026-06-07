@@ -13,6 +13,9 @@
 		"datasets:ensure": "sanity dataset list | grep -q '^development$' || sanity dataset create development --visibility public",
 		"fixtures:seed": "tsx fixtures/verification/seed.ts",
 		"fixtures:seed:dry-run": "tsx fixtures/verification/seed.ts --dry-run",
+		"sample:seed": "tsx fixtures/sample-development/seed.ts",
+		"sample:seed:dry-run": "tsx fixtures/sample-development/seed.ts --dry-run",
+		"sample:delete": "tsx fixtures/sample-development/seed.ts --delete",
 		"reviewseed:seed": "tsx fixtures/review-seed/seed.ts",
 		"reviewseed:seed:dry-run": "tsx fixtures/review-seed/seed.ts --dry-run",
 		"reviewseed:delete": "tsx fixtures/review-seed/seed.ts --delete",
@@ -69,6 +72,8 @@
 		"migrate:set-nueva-andalucia-hero:dry-run": "tsx migrations/set-nueva-andalucia-hero-migrate.ts --dry-run",
 		"migrate:golf-course-community": "tsx migrations/golf-course-community-migrate.ts",
 		"migrate:golf-course-community:dry-run": "tsx migrations/golf-course-community-migrate.ts --dry-run",
+		"migrate:backfill-unit-slugs": "tsx migrations/backfill-unit-slugs-migrate.ts",
+		"migrate:backfill-unit-slugs:dry-run": "tsx migrations/backfill-unit-slugs-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

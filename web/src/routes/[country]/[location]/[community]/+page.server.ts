@@ -119,9 +119,15 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 	});
 
 	if (development) {
+		const similarCards = await fetchSimilarListingCards({
+			listingId: development._id!,
+			mode: development.related?.similarPropertiesMode,
+			location: development.location
+		});
+
 		return {
 			preview: false as const,
-			...buildDevelopmentDetailPageData(development, url.origin, pathParams)
+			...buildDevelopmentDetailPageData(development, url.origin, pathParams, { similarCards })
 		};
 	}
 

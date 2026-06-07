@@ -7,7 +7,7 @@
 		type ListingSearchParams,
 		type PaginationMeta
 	} from '$lib/listing/searchParams';
-	import type { PublicPropertyCard } from '$lib/sanity/transforms/propertyCard';
+	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 	type CommunityOption = { label: string; value: string };
 	type CourseOption = { label: string; value: string };
@@ -15,7 +15,7 @@
 	type Props = {
 		basePath: string;
 		searchParams: ListingSearchParams;
-		cards: PublicPropertyCard[];
+		cards: SimilarListingCard[];
 		total: number;
 		pagination: PaginationMeta;
 		heading?: string;

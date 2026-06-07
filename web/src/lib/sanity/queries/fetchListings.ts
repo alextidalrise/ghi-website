@@ -4,7 +4,11 @@ import {
 	type ListingSearchParams,
 	type PaginationMeta
 } from '../../listing/searchParams';
-import { toPublicPropertyCard, type PublicPropertyCard, type RawPropertyCard } from '../transforms/propertyCard';
+import {
+	toSimilarListingCard,
+	type RawSimilarListingItem,
+	type SimilarListingCard
+} from '../transforms/similarListingCard';
 import { fetchPublic } from './fetch';
 import {
 	buildListingCardsCountQuery,
@@ -14,7 +18,7 @@ import {
 } from './listingSearch';
 
 export type ListingSearchResult = {
-	cards: PublicPropertyCard[];
+	cards: SimilarListingCard[];
 	total: number;
 	pagination: PaginationMeta;
 };
@@ -48,11 +52,13 @@ export async function fetchListingCards({
 	const countQuery = buildListingCardsCountQuery(scope);
 
 	const [rawCards, total] = await Promise.all([
-		fetchPublic<RawPropertyCard[]>(cardsQuery, { params: queryParams }),
+		fetchPublic<RawSimilarListingItem[]>(cardsQuery, { params: queryParams }),
 		fetchPublic<number>(countQuery, { params: queryParams })
 	]);
 
-	const cards = (rawCards ?? []).map(toPublicPropertyCard);
+	const cards = (rawCards ?? [])
+		.map(toSimilarListingCard)
+		.filter((card): card is SimilarListingCard => card !== null);
 	const pagination = buildPaginationMeta({
 		total: total ?? 0,
 		page: params.page,

@@ -1,7 +1,18 @@
-import { filterMediaAsset, filterMediaAssetList, filterMediaBundle, type MediaBundleInput } from './mediaFilter';
+import {
+	filterMediaAsset,
+	filterMediaAssetList,
+	filterMediaBundle,
+	type MediaAssetInput,
+	type MediaBundleInput
+} from './mediaFilter';
 import { stripInternalLocationFields, type LocationMapInput } from './mapPrivacy';
 import { filterPublicPricing, type PricingInput, type PublicPricing } from './pricingFilter';
-import { filterReservedUnitTypes, filterReservedUnits, type UnitLike } from './reservedFilter';
+import {
+	filterDisplayableUnits,
+	filterReservedUnitTypes,
+	filterReservedUnits,
+	type UnitLike
+} from './reservedFilter';
 import type { PortableTextBlock } from '@portabletext/types';
 
 type FeatureHighlight = {
@@ -264,7 +275,9 @@ function filterContentFields(content: ContentInput | null | undefined): PublicCo
 }
 
 function transformDevelopmentUnits(units: UnitLike[] | null | undefined) {
-	return filterReservedUnits(units).map((unit) => ({
+	// Keep reserved/sold-but-visible units so the inventory table can list them in a
+	// locked row; only hidden/internal units are dropped here.
+	return filterDisplayableUnits(units).map((unit) => ({
 		...unit,
 		pricing: filterPublicPricing(unit.pricing),
 		floorplan: filterMediaAsset(unit.floorplan as Parameters<typeof filterMediaAsset>[0]),
@@ -320,6 +333,189 @@ export function toPublicDevelopment(raw: RawDevelopment | null): PublicDevelopme
 		unitTypes: transformDevelopmentUnitTypes(raw.unitTypes),
 		sharedGallery: filterMediaAssetList(raw.sharedGallery)
 	};
+}
+
+/** Raw inheritable development context projected onto a unit (see DEVELOPMENT_CONTEXT_PUBLIC). */
+type RawUnitDevelopmentContext = {
+	_id?: string;
+	ghiListingId?: string;
+	developmentName?: string | null;
+	title?: string | null;
+	slug?: string | null;
+	developmentStatus?: string | null;
+	completionStatus?: string | null;
+	completionDate?: string | null;
+	developerName?: string | null;
+	location?: LocationMapInput | null;
+	pricing?: PricingInput | null;
+	sharedAmenities?: FeatureHighlight[] | null;
+	sharedGallery?: MediaAssetInput[] | null;
+	media?: MediaBundleInput | null;
+	content?: ContentInput | null;
+	golf?: GolfInput | null;
+	ctas?: CtaInput | null;
+	related?: RelatedInput | null;
+	seo?: SeoInput | null;
+	countrySlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
+	isCatchAll?: boolean | null;
+};
+
+type RawUnitType = {
+	_id?: string;
+	unitTypeName?: string | null;
+	propertyType?: string | null;
+	specs?: Record<string, unknown> | null;
+	gallery?: MediaAssetInput[] | null;
+	floorplans?: MediaAssetInput[] | null;
+};
+
+export type RawUnitListing = {
+	_id?: string;
+	_type?: 'unit';
+	ghiListingId?: string;
+	unitName?: string | null;
+	unitNumber?: string | null;
+	slug?: string | null;
+	listingKind?: string;
+	floor?: number | null;
+	phase?: string | null;
+	pricing?: PricingInput | null;
+	specs?: Record<string, unknown> | null;
+	floorplan?: MediaAssetInput | null;
+	unitGallery?: MediaAssetInput[] | null;
+	unitType?: RawUnitType | null;
+	development?: RawUnitDevelopmentContext | null;
+	countrySlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
+	isCatchAll?: boolean | null;
+	developmentSlug?: string | null;
+	unitSlug?: string | null;
+};
+
+/** Canonical path segments needed to build a unit's nested URL and its dev breadcrumb. */
+export type UnitCanonicalContext = {
+	countrySlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
+	isCatchAll?: boolean | null;
+	developmentSlug?: string | null;
+	unitSlug?: string | null;
+	developmentTitle: string;
+};
+
+function titleCaseEnum(value: string | null | undefined): string {
+	if (!value) return '';
+	return value.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** Compose a unit-page h1: the unit's own name, qualified by its typology when distinct. */
+function composeUnitTitle(unit: RawUnitListing): string {
+	const baseName =
+		unit.unitName?.trim() ||
+		(unit.unitNumber ? `Unit ${unit.unitNumber}` : null) ||
+		'Unit';
+	const typeLabel = unit.unitType?.unitTypeName?.trim() || titleCaseEnum(unit.unitType?.propertyType);
+	if (typeLabel && !baseName.toLowerCase().includes(typeLabel.toLowerCase())) {
+		return `${baseName} · ${typeLabel}`;
+	}
+	return baseName;
+}
+
+/**
+ * Synthesize a public property-listing payload for a unit page from three sources:
+ * the unit (price, size, floor, number), its unit type (shared gallery + property
+ * type), and its parent development (location, golf, editorial copy, CTAs, SEO base).
+ * The result renders through the existing PropertyDetail template unchanged.
+ */
+export function toPublicUnitListing(
+	raw: RawUnitListing | null
+): { listing: PublicPropertyListing; context: UnitCanonicalContext } | null {
+	if (!raw || !raw.development) {
+		return null;
+	}
+
+	const dev = raw.development;
+	const unitType = raw.unitType;
+
+	// Image inheritance: a unit's own override gallery wins; otherwise the unit type's
+	// shared gallery; otherwise fall back to the development's own imagery.
+	const overrideGallery = filterMediaAssetList(raw.unitGallery);
+	const typeGallery = filterMediaAssetList(unitType?.gallery);
+	const devGallery = [
+		...filterMediaAssetList(dev.sharedGallery),
+		...filterMediaAssetList(dev.media?.gallery)
+	];
+	const gallery =
+		overrideGallery.length > 0 ? overrideGallery : typeGallery.length > 0 ? typeGallery : devGallery;
+
+	const floorplans = [
+		...filterMediaAssetList(unitType?.floorplans),
+		...(raw.floorplan ? filterMediaAssetList([raw.floorplan]) : [])
+	];
+
+	const mediaInput: MediaBundleInput = {
+		gallery,
+		floorplans,
+		thumbnailOverride: dev.media?.thumbnailOverride ?? null,
+		videoUrl: dev.media?.videoUrl ?? null,
+		virtualTourUrl: dev.media?.virtualTourUrl ?? null,
+		brochure: dev.media?.brochure ?? null,
+		brochureVisibility: dev.media?.brochureVisibility ?? null
+	};
+
+	const specs = { ...(unitType?.specs ?? {}), ...(raw.specs ?? {}) };
+	if (raw.floor != null) specs.floor = raw.floor;
+
+	const devSeo = filterSeoFields(dev.seo);
+	const locationLabel =
+		dev.location?.community?.name ?? dev.location?.location?.name ?? dev.developmentName ?? null;
+	const composedTitle = composeUnitTitle(raw);
+	const seoTitle = [composedTitle, dev.developmentName, locationLabel]
+		.filter((part): part is string => Boolean(part))
+		.join(', ');
+
+	const seo: PublicSeo = {
+		...(devSeo ?? { openGraphImage: null }),
+		seoTitle,
+		metaDescription:
+			dev.seo?.metaDescription ?? dev.content?.shortDescription ?? null,
+		noindex: dev.seo?.noindex ?? false
+	};
+
+	const listing: PublicPropertyListing = {
+		_id: raw._id,
+		_type: 'propertyListing',
+		ghiListingId: raw.ghiListingId,
+		title: composedTitle,
+		slug: raw.slug ?? undefined,
+		listingKind: 'unit',
+		propertyType: unitType?.propertyType ?? undefined,
+		transactionType: 'sale',
+		location: stripInternalLocationFields(dev.location),
+		pricing: filterPublicPricing(raw.pricing),
+		specs,
+		media: filterMediaBundle(mediaInput),
+		related: filterRelatedFields(dev.related),
+		seo,
+		ctas: filterCtaFields(dev.ctas),
+		golf: filterGolfFields(dev.golf),
+		content: filterContentFields(dev.content)
+	};
+
+	const context: UnitCanonicalContext = {
+		countrySlug: raw.countrySlug ?? dev.countrySlug,
+		locationSlug: raw.locationSlug ?? dev.locationSlug,
+		communitySlug: raw.communitySlug ?? dev.communitySlug,
+		isCatchAll: raw.isCatchAll ?? dev.isCatchAll,
+		developmentSlug: raw.developmentSlug ?? dev.slug,
+		unitSlug: raw.unitSlug ?? raw.slug,
+		developmentTitle: dev.title ?? dev.developmentName ?? 'Development'
+	};
+
+	return { listing, context };
 }
 
 export { filterMediaAsset, filterMediaAssetList, filterMediaBundle } from './mediaFilter';

@@ -3,7 +3,9 @@ import type { PageServerLoad } from './$types';
 import {
 	buildDevelopmentDetailPageData,
 	buildPropertyDetailPageData,
-	type ListingPathParams
+	buildUnitDetailPageData,
+	type ListingPathParams,
+	type UnitPathParams
 } from '$lib/listing/detailPage';
 import {
 	developmentByPathPreviewQuery,
@@ -12,10 +14,12 @@ import {
 	fetchPublic,
 	fetchPublicDevelopment,
 	fetchPublicProperty,
+	fetchPublicUnit,
 	fetchSimilarListingCards,
 	propertyByPathPreviewQuery,
 	propertyByPathQuery,
-	propertyStalePathQuery
+	propertyStalePathQuery,
+	unitByCatchAllDevPathQuery
 } from '$lib/sanity/queries';
 import { buildCanonicalPath, pathsMatch } from '$lib/listing/canonicalPath';
 import {
@@ -95,6 +99,9 @@ async function loadPreviewListing(
 		};
 	}
 
+	// Units under a catch-all development are synthesized from three documents and have
+	// no field-level overlay; they are not surfaced in Sanity Presentation preview. The
+	// published path below resolves them normally.
 	error(404, 'Listing not found.');
 }
 
@@ -138,9 +145,15 @@ async function loadPublishedListing(pathParams: ListingPathParams, siteOrigin: s
 	});
 
 	if (development) {
+		const similarCards = await fetchSimilarListingCards({
+			listingId: development._id!,
+			mode: development.related?.similarPropertiesMode,
+			location: development.location
+		});
+
 		return {
 			preview: false as const,
-			...buildDevelopmentDetailPageData(development, siteOrigin, pathParams)
+			...buildDevelopmentDetailPageData(development, siteOrigin, pathParams, { similarCards })
 		};
 	}
 
@@ -156,6 +169,41 @@ async function loadPublishedListing(pathParams: ListingPathParams, siteOrigin: s
 		) {
 			redirect(301, buildCanonicalPath(canonical)!);
 		}
+	}
+
+	// Last fallback: a unit under a CATCH-ALL development surfaces here at four
+	// segments (/{country}/{location}/{developmentSlug}/{unitSlug}), since the community
+	// segment is omitted. Units nested under a standard development resolve in the
+	// dedicated [slug]/[unit] route instead.
+	const unit = await fetchPublicUnit(unitByCatchAllDevPathQuery, {
+		params: {
+			countrySlug,
+			locationSlug,
+			developmentSlug: communitySlug,
+			unitSlug: slug
+		}
+	});
+
+	if (unit) {
+		const unitPathParams: UnitPathParams = {
+			countrySlug: countrySlug!,
+			locationSlug: locationSlug!,
+			developmentSlug: communitySlug!,
+			unitSlug: slug
+		};
+		const similarCards = await fetchSimilarListingCards({
+			listingId: unit.listing._id!,
+			mode: unit.listing.related?.similarPropertiesMode,
+			propertyType: unit.listing.propertyType,
+			location: unit.listing.location
+		});
+
+		return {
+			preview: false as const,
+			...buildUnitDetailPageData(unit.listing, unit.context, siteOrigin, unitPathParams, {
+				similarCards
+			})
+		};
 	}
 
 	error(404, 'Listing not found.');

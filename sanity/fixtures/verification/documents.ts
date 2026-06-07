@@ -173,6 +173,7 @@ export function buildPrivacyDevelopmentUnits() {
 		_type: 'unit',
 		unitName: 'Villa A (available)',
 		unitNumber: 'A',
+		slug: { _type: 'slug', current: 'villa-a' },
 		parentDevelopment: { _type: 'reference', _ref: FIXTURE_IDS.privacyDevelopment },
 		listingKind: 'unit',
 		pricing: {
@@ -199,6 +200,7 @@ export function buildPrivacyDevelopmentUnits() {
 		_type: 'unit',
 		unitName: 'Villa B (reserved — must not appear publicly)',
 		unitNumber: 'B',
+		slug: { _type: 'slug', current: 'villa-b' },
 		parentDevelopment: { _type: 'reference', _ref: FIXTURE_IDS.privacyDevelopment },
 		listingKind: 'unit',
 		pricing: {

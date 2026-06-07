@@ -79,3 +79,61 @@ export const PUBLIC_CHILD_UNIT_FILTER = /* groq */ `
   && ${PUBLIC_VISIBILITY_FILTER}
   && ${NOT_RESERVED_FILTER}
 `;
+
+/**
+ * Unit-page gate. A unit is publishable only when its own readiness + visibility
+ * pass AND its parent development is itself publishable. Availability is NOT gated
+ * here: a reserved/sold unit still has a reachable page (it renders with status),
+ * unlike hidden/internal units which must never resolve.
+ */
+export const UNIT_PARENT_PUBLISHABLE = /* groq */ `
+  (coalesce(parentDevelopment->workflow.publishReadiness, "") in $approvedReadiness || $previewAll)
+  && (coalesce(parentDevelopment->pricing.publicVisibility, "visible") == "visible" || $previewAll)
+`;
+
+export const UNIT_PUBLISHABLE_FILTER = /* groq */ `
+  ${PUBLISH_READINESS_FILTER}
+  && ${PUBLIC_VISIBILITY_FILTER}
+  && ${UNIT_PARENT_PUBLISHABLE}
+`;
+
+/** Parent-development URL segment slugs, resolved through the unit's parentDevelopment ref. */
+export const UNIT_DEV_COUNTRY_SLUG = /* groq */ `coalesce(
+  parentDevelopment->location.country->slug.current,
+  parentDevelopment->location.community->parent->parent->slug.current
+)`;
+
+export const UNIT_DEV_LOCATION_SLUG = /* groq */ `coalesce(
+  parentDevelopment->location.location->slug.current,
+  parentDevelopment->location.community->parent->slug.current
+)`;
+
+export const UNIT_DEV_COMMUNITY_SLUG = /* groq */ `coalesce(
+  parentDevelopment->location.community->slug.current,
+  select(
+    parentDevelopment->location.community->_id match "places-community-*" =>
+      string::split(parentDevelopment->location.community->_id, "places-community-")[1],
+    parentDevelopment->location.community->_id match "location.community.*" =>
+      string::split(parentDevelopment->location.community->_id, "location.community.")[1]
+  )
+)`;
+
+export const UNIT_DEV_IS_CATCH_ALL = /* groq */ `coalesce(parentDevelopment->location.community->isCatchAll, false)`;
+
+/** Match a unit at /{country}/{location}/{community}/{developmentSlug}/{unitSlug}. */
+export const UNIT_DEV_PATH_FILTER = /* groq */ `
+  ${UNIT_DEV_COUNTRY_SLUG} == $countrySlug
+  && ${UNIT_DEV_LOCATION_SLUG} == $locationSlug
+  && ${UNIT_DEV_COMMUNITY_SLUG} == $communitySlug
+  && parentDevelopment->slug.current == $developmentSlug
+  && slug.current == $unitSlug
+`;
+
+/** Match a unit under a catch-all development at /{country}/{location}/{developmentSlug}/{unitSlug}. */
+export const UNIT_DEV_CATCH_ALL_PATH_FILTER = /* groq */ `
+  ${UNIT_DEV_COUNTRY_SLUG} == $countrySlug
+  && ${UNIT_DEV_LOCATION_SLUG} == $locationSlug
+  && parentDevelopment->slug.current == $developmentSlug
+  && ${UNIT_DEV_IS_CATCH_ALL} == true
+  && slug.current == $unitSlug
+`;

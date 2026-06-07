@@ -2,6 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import {
 	buildDevelopmentBreadcrumbs,
 	buildPropertyBreadcrumbs,
+	buildUnitBreadcrumbs,
 	breadcrumbListJsonLd,
 	type BreadcrumbItem
 } from '$lib/listing/breadcrumbs';
@@ -12,7 +13,11 @@ import {
 	buildRealEstateListingJsonLd,
 	type PropertySeoMeta
 } from '$lib/listing/seo';
-import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
+import type {
+	PublicDevelopment,
+	PublicPropertyListing,
+	UnitCanonicalContext
+} from '$lib/sanity/transforms';
 import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 export type ListingPathParams = {
@@ -42,7 +47,7 @@ export type DevelopmentDetailPageData = {
 	seo: PropertySeoMeta & { canonicalUrl: string };
 	breadcrumbJsonLd: Record<string, unknown>;
 	listingJsonLd: null;
-	similarCards: [];
+	similarCards: SimilarListingCard[];
 };
 
 function applyPreviewSeo(seo: PropertySeoMeta & { canonicalUrl: string }) {
@@ -117,7 +122,11 @@ export function buildDevelopmentDetailPageData(
 	development: PublicDevelopment,
 	siteOrigin: string,
 	params: ListingPathParams,
-	options: { preview?: boolean; skipRedirect?: boolean } = {}
+	options: {
+		preview?: boolean;
+		skipRedirect?: boolean;
+		similarCards?: SimilarListingCard[];
+	} = {}
 ): DevelopmentDetailPageData {
 	const { countrySlug, locationSlug, communitySlug, slug } = params;
 	const isCatchAll = development.location?.community?.isCatchAll === true;
@@ -161,7 +170,92 @@ export function buildDevelopmentDetailPageData(
 		seo,
 		breadcrumbJsonLd,
 		listingJsonLd: null,
-		similarCards: []
+		similarCards: options.similarCards ?? []
+	};
+}
+
+export type UnitPathParams = {
+	countrySlug: string;
+	locationSlug: string;
+	/** Omitted when the parent development is catch-all (served without a community segment). */
+	communitySlug?: string;
+	developmentSlug: string;
+	unitSlug: string;
+};
+
+/** Build the nested canonical unit path: the development's path + the unit slug. */
+function buildUnitCanonicalPath(context: UnitCanonicalContext): string | null {
+	const developmentPath = buildCanonicalPath({
+		countrySlug: context.countrySlug,
+		locationSlug: context.locationSlug,
+		communitySlug: context.communitySlug,
+		slug: context.developmentSlug,
+		isCatchAll: context.isCatchAll
+	});
+	if (!developmentPath || !context.unitSlug) {
+		return null;
+	}
+	return `${developmentPath}/${context.unitSlug}`;
+}
+
+function requestedUnitPath(params: UnitPathParams): string {
+	const segments = [params.countrySlug, params.locationSlug];
+	if (params.communitySlug) segments.push(params.communitySlug);
+	segments.push(params.developmentSlug, params.unitSlug);
+	return `/${segments.join('/')}`;
+}
+
+export function buildUnitDetailPageData(
+	listing: PublicPropertyListing,
+	context: UnitCanonicalContext,
+	siteOrigin: string,
+	params: UnitPathParams,
+	options: {
+		preview?: boolean;
+		skipRedirect?: boolean;
+		similarCards?: PropertyDetailPageData['similarCards'];
+	} = {}
+): PropertyDetailPageData {
+	const developmentPath = buildCanonicalPath({
+		countrySlug: context.countrySlug,
+		locationSlug: context.locationSlug,
+		communitySlug: context.communitySlug,
+		slug: context.developmentSlug,
+		isCatchAll: context.isCatchAll
+	});
+	const canonicalPath = buildUnitCanonicalPath(context);
+
+	if (!developmentPath || !canonicalPath || !listing._id) {
+		error(404, 'Unit not found.');
+	}
+
+	if (!options.skipRedirect && requestedUnitPath(params) !== canonicalPath) {
+		redirect(301, canonicalPath);
+	}
+
+	const canonicalUrl = `${siteOrigin}${canonicalPath}`;
+	const breadcrumbs = buildUnitBreadcrumbs(
+		listing,
+		context.developmentTitle,
+		developmentPath,
+		canonicalPath
+	);
+	const seo = options.preview
+		? applyPreviewSeo(buildPropertySeo(listing, canonicalUrl))
+		: buildPropertySeo(listing, canonicalUrl);
+	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, siteOrigin);
+	const listingJsonLd =
+		options.preview || seo.noindex ? null : buildRealEstateListingJsonLd(listing, canonicalUrl);
+
+	return {
+		pageType: 'property',
+		property: listing,
+		canonicalUrl,
+		breadcrumbs,
+		seo,
+		breadcrumbJsonLd,
+		listingJsonLd,
+		similarCards: options.similarCards ?? []
 	};
 }
 

@@ -1,9 +1,10 @@
 <script lang="ts">
+	import DevelopmentCard from './DevelopmentCard.svelte';
 	import PropertyCard from './PropertyCard.svelte';
-	import type { PublicPropertyCard } from '$lib/sanity/transforms/propertyCard';
+	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 	type Props = {
-		cards: PublicPropertyCard[];
+		cards: SimilarListingCard[];
 	};
 
 	let { cards }: Props = $props();
@@ -11,8 +12,12 @@
 
 {#if cards.length > 0}
 	<div class="listing-grid">
-		{#each cards as card (card._id)}
-			<PropertyCard {card} />
+		{#each cards as item (item.card._id)}
+			{#if item.kind === 'development'}
+				<DevelopmentCard card={item.card} />
+			{:else}
+				<PropertyCard card={item.card} />
+			{/if}
 		{/each}
 	</div>
 {/if}

@@ -29,6 +29,15 @@ export {
 } from './development';
 
 export {
+	unitByDevPathQuery,
+	unitByDevPathPreviewQuery,
+	unitByCatchAllDevPathQuery,
+	unitByCatchAllDevPathPreviewQuery,
+	unitByGhiIdQuery,
+	unitStalePathQuery
+} from './unit';
+
+export {
 	countryBySlugQuery,
 	locationBySlugQuery,
 	locationPageContextQuery,
@@ -51,6 +60,7 @@ export {
 	fetchMaybePreview,
 	fetchPublicProperty,
 	fetchPublicDevelopment,
+	fetchPublicUnit,
 	type PublicFetchOptions
 } from './fetch';
 

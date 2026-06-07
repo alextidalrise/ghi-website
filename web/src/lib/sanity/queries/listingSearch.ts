@@ -1,11 +1,17 @@
-import { PROPERTY_CARD_PUBLIC } from '../allowlists';
+import { LISTING_CARD_UNION } from '../allowlists';
 import type { ListingSort } from '../../listing/filterOptions';
-import { PUBLIC_LISTING_FILTER } from './filters';
+import { PUBLIC_CHILD_UNIT_FILTER, PUBLIC_LISTING_FILTER } from './filters';
 
-/** Base document filter shared by cards and count queries. */
+/**
+ * Base document filter shared by cards and count queries. Surfaces individual
+ * properties/units AND whole developments — the latter render as rich cards
+ * interleaved with properties.
+ */
 const LISTING_BASE_FILTER = /* groq */ `
-  _type == "propertyListing"
-  && listingKind in ["property", "unit"]
+  (
+    (_type == "propertyListing" && listingKind in ["property", "unit"])
+    || _type == "development"
+  )
   && ${PUBLIC_LISTING_FILTER}
 `;
 
@@ -68,11 +74,36 @@ function scopeFilter(scope: ListingSearchScope): string {
 	}
 }
 
-/** Optional facet filters — omitted params disable each constraint. */
+/**
+ * Optional facet filters — omitted params disable each constraint.
+ *
+ * The property-type and bedroom facets are unit-aware for developments: a
+ * development matches if ANY of its visible+available unit types (for property
+ * type — units inherit type from their parent so unit types are authoritative) or
+ * units/unit types (for bedrooms) qualifies. Price, golf, community and location
+ * facets need no branching — developments carry the same fields as properties.
+ */
 const FACET_FILTERS = /* groq */ `
-  (!defined($propertyType) || propertyType == $propertyType)
+  (
+    !defined($propertyType)
+    || (_type == "propertyListing" && propertyType == $propertyType)
+    || (
+      _type == "development"
+      && count((unitTypes[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} && propertyType == $propertyType ]) > 0
+    )
+  )
   && (!defined($community) || location.community->slug.current == $community)
-  && (!defined($minBeds) || coalesce(specs.bedrooms, 0) >= $minBeds)
+  && (
+    !defined($minBeds)
+    || (_type == "propertyListing" && coalesce(specs.bedrooms, 0) >= $minBeds)
+    || (
+      _type == "development"
+      && (
+        count((unitTypes[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} && coalesce(specs.bedrooms, 0) >= $minBeds ]) > 0
+        || count((units[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} && coalesce(specs.bedrooms, 0) >= $minBeds ]) > 0
+      )
+    )
+  )
   && (
     !defined($minPrice)
     || (
@@ -116,7 +147,7 @@ export function buildPaginatedListingCardsQuery(
 	return /* groq */ `
     *[
       ${listingFilter(scope)}
-    ] | order(${SORT_ORDER_FRAGMENTS[sort]})[$start...$end]${PROPERTY_CARD_PUBLIC}
+    ] | order(${SORT_ORDER_FRAGMENTS[sort]})[$start...$end]${LISTING_CARD_UNION}
   `;
 }
 
