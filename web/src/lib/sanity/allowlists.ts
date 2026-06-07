@@ -3,6 +3,7 @@ import {
 	LISTING_COUNTRY_SLUG,
 	LISTING_IS_CATCH_ALL,
 	LISTING_LOCATION_SLUG,
+	PUBLIC_CHILD_UNIT_FILTER,
 	UNIT_DEV_COMMUNITY_SLUG,
 	UNIT_DEV_COUNTRY_SLUG,
 	UNIT_DEV_IS_CATCH_ALL,
@@ -180,7 +181,13 @@ export const RELATED_PUBLIC = /* groq */ `{
   similarPropertiesMode
 }`;
 
-/** Development card for grids (similar properties manual picks). */
+/**
+ * Development card for grids and rails. Carries href-parity slugs (so catch-all /
+ * id-prefix communities build correct URLs) plus aggregated inventory: count of
+ * publicly available units and the bedroom range across visible+available units and
+ * unit types. The aggregation reuses PUBLIC_CHILD_UNIT_FILTER so it never diverges
+ * from the unit-page visibility/availability gates.
+ */
 export const DEVELOPMENT_CARD_PUBLIC = /* groq */ `{
   _id,
   _type,
@@ -190,13 +197,26 @@ export const DEVELOPMENT_CARD_PUBLIC = /* groq */ `{
   listingKind,
   developmentDisplayMode,
   developmentStatus,
+  "countrySlug": ${LISTING_COUNTRY_SLUG},
+  "locationSlug": ${LISTING_LOCATION_SLUG},
+  "communitySlug": ${LISTING_COMMUNITY_SLUG},
+  "isCatchAll": ${LISTING_IS_CATCH_ALL},
   location{
     country->{ name, "slug": slug.current },
     location->{ name, "slug": slug.current },
-    community->{ name, "slug": slug.current },
+    community->{ _id, name, "slug": slug.current, isCatchAll },
     addressDisplay
   },
   pricing${PRICING_PUBLIC},
+  "unitsAvailable": count((units[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ]),
+  "bedroomsFrom": math::min(
+    (unitTypes[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ].specs.bedrooms
+    + (units[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ].specs.bedrooms
+  ),
+  "bedroomsTo": math::max(
+    (unitTypes[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ].specs.bedrooms
+    + (units[]->)[ ${PUBLIC_CHILD_UNIT_FILTER} ].specs.bedrooms
+  ),
   media{
     gallery[0...1]${MEDIA_ASSET_PUBLIC},
     thumbnailOverride${MEDIA_ASSET_PUBLIC}
@@ -233,6 +253,16 @@ export const PROPERTY_CARD_PUBLIC = /* groq */ `{
     gallery[0...1]${MEDIA_ASSET_PUBLIC},
     thumbnailOverride${MEDIA_ASSET_PUBLIC}
   }
+}`;
+
+/**
+ * Mixed card projection for surfaces that interleave properties/units and whole
+ * developments (location grid, featured rails). Each row gets exactly one branch's
+ * fields; downstream `toSimilarListingCard` discriminates on listingKind.
+ */
+export const LISTING_CARD_UNION = /* groq */ `{
+  _type == "development" => ${DEVELOPMENT_CARD_PUBLIC},
+  _type == "propertyListing" => ${PROPERTY_CARD_PUBLIC}
 }`;
 
 /** Full property listing page allowlist. */

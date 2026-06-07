@@ -1,10 +1,10 @@
 <script lang="ts">
 	import ListingRail from './ListingRail.svelte';
 	import SpotlightCard from './SpotlightCard.svelte';
-	import type { PublicPropertyCard } from '$lib/sanity/transforms/propertyCard';
+	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 	type Props = {
-		cards: PublicPropertyCard[];
+		cards: SimilarListingCard[];
 		heading: string;
 		/** Optional editorial subtitle; falls back to a plain count. */
 		summary?: string;
@@ -37,12 +37,16 @@
 
 		<ListingRail
 			items={cards}
-			getKey={(c, i) => `${c._id}-${i}`}
+			getKey={(c, i) => `${c.card._id}-${i}`}
 			bleed
 			labelledby="featured-heading"
 		>
 			{#snippet card(c)}
-				<SpotlightCard card={c} surface="light" />
+				{#if c.kind === 'development'}
+					<SpotlightCard card={c.card} kind="development" surface="light" />
+				{:else}
+					<SpotlightCard card={c.card} surface="light" />
+				{/if}
 			{/snippet}
 		</ListingRail>
 	</section>

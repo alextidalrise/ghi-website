@@ -2,9 +2,13 @@ import { defineQuery } from 'groq';
 import {
 	FEATURED_LOCATION_PROJECTION,
 	FEATURED_LOCATION_REF_FILTER,
-	PROPERTY_CARD_PUBLIC
+	LISTING_CARD_UNION
 } from '../allowlists';
-import { toPublicPropertyCard, type PublicPropertyCard, type RawPropertyCard } from '../transforms/propertyCard';
+import {
+	toSimilarListingCard,
+	type RawSimilarListingItem,
+	type SimilarListingCard
+} from '../transforms/similarListingCard';
 import {
 	toLocationCards,
 	type FeaturedLocationCard,
@@ -40,8 +44,10 @@ export type { ListingSearchScope };
  * Keep these clauses in sync with queries/filters.ts (here they are @-> prefixed).
  */
 const FEATURED_LISTING_REF_FILTER = /* groq */ `
-  @->_type == "propertyListing"
-  && @->listingKind in ["property", "unit"]
+  (
+    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])
+    || @->_type == "development"
+  )
   && (coalesce(@->workflow.publishReadiness, "") in $approvedReadiness || $previewAll)
   && (coalesce(@->pricing.publicVisibility, "visible") == "visible" || $previewAll)
   && (coalesce(@->pricing.availabilityStatus, "") != "reserved" || $previewAll)
@@ -52,7 +58,7 @@ export const homepageFeaturedListingsQuery = defineQuery(`
   *[_type == "siteSettings" && _id == "siteSettings"][0]{
     "cards": homepageFeaturedListings[
       ${FEATURED_LISTING_REF_FILTER}
-    ]->${PROPERTY_CARD_PUBLIC}
+    ]->${LISTING_CARD_UNION}
   }
 `);
 
@@ -78,18 +84,19 @@ export const countryFeaturedListingsQuery = defineQuery(`
   ][0]{
     "cards": featuredListings[
       ${FEATURED_LISTING_REF_FILTER}
-    ]->${PROPERTY_CARD_PUBLIC}
+    ]->${LISTING_CARD_UNION}
   }
 `);
 
 function toFeaturedCards(
-	raw: Array<RawPropertyCard | null | undefined> | null | undefined,
+	raw: Array<RawSimilarListingItem | null | undefined> | null | undefined,
 	limit: number
-): PublicPropertyCard[] {
+): SimilarListingCard[] {
 	return (raw ?? [])
-		.filter((card): card is RawPropertyCard => Boolean(card?._id))
+		.filter((card): card is RawSimilarListingItem => Boolean(card?._id))
 		.slice(0, limit)
-		.map(toPublicPropertyCard);
+		.map(toSimilarListingCard)
+		.filter((card): card is SimilarListingCard => card !== null);
 }
 
 /**
@@ -100,25 +107,27 @@ export async function fetchFrontlineListingCards({
 	scope
 }: {
 	scope: ListingSearchScope;
-}): Promise<PublicPropertyCard[]> {
+}): Promise<SimilarListingCard[]> {
 	const queryParams = listingSearchQueryParams(scope, {
 		golfRelevance: ['frontline_golf'],
 		start: 0,
 		end: FRONTLINE_LISTING_LIMIT
 	});
 	const query = buildPaginatedListingCardsQuery(scope, 'newest');
-	const raw = await fetchPublic<RawPropertyCard[]>(query, { params: queryParams });
-	return (raw ?? []).map(toPublicPropertyCard);
+	const raw = await fetchPublic<RawSimilarListingItem[]>(query, { params: queryParams });
+	return (raw ?? [])
+		.map(toSimilarListingCard)
+		.filter((card): card is SimilarListingCard => card !== null);
 }
 
 /** Site-wide frontline golf spotlight for the homepage. */
-export async function fetchHomepageFrontlineListingCards(): Promise<PublicPropertyCard[]> {
+export async function fetchHomepageFrontlineListingCards(): Promise<SimilarListingCard[]> {
 	return fetchFrontlineListingCards({ scope: { type: 'global' } });
 }
 
 /** Hand-picked homepage featured cards from siteSettings.homepageFeaturedListings. */
-export async function fetchHomepageFeaturedListingCards(): Promise<PublicPropertyCard[]> {
-	const result = await fetchPublic<{ cards?: Array<RawPropertyCard | null> | null }>(
+export async function fetchHomepageFeaturedListingCards(): Promise<SimilarListingCard[]> {
+	const result = await fetchPublic<{ cards?: Array<RawSimilarListingItem | null> | null }>(
 		homepageFeaturedListingsQuery
 	);
 	return toFeaturedCards(result?.cards, HOMEPAGE_FEATURED_LIMIT);
@@ -129,8 +138,8 @@ export async function fetchCountryFeaturedListingCards({
 	countrySlug
 }: {
 	countrySlug: string;
-}): Promise<PublicPropertyCard[]> {
-	const result = await fetchPublic<{ cards?: Array<RawPropertyCard | null> | null }>(
+}): Promise<SimilarListingCard[]> {
+	const result = await fetchPublic<{ cards?: Array<RawSimilarListingItem | null> | null }>(
 		countryFeaturedListingsQuery,
 		{ params: { countrySlug } }
 	);

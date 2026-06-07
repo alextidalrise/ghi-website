@@ -98,7 +98,65 @@ describe('fetchListingCards', () => {
 
 		expect(result.total).toBe(1);
 		expect(result.cards).toHaveLength(1);
-		expect(result.cards[0]).toEqual(toPublicPropertyCard(raw));
+		expect(result.cards[0]).toEqual({ kind: 'property', card: toPublicPropertyCard(raw) });
 		expect(JSON.stringify(result.cards[0])).not.toContain('priceSourceStatus');
+	});
+
+	it('discriminates a development row into a development card with aggregated inventory', async () => {
+		const devRow = {
+			_id: 'dev-1',
+			_type: 'development',
+			listingKind: 'development',
+			title: 'Epic Sample',
+			slug: 'epic-sample',
+			developmentDisplayMode: 'flat_listing',
+			countrySlug: 'spain',
+			locationSlug: 'costa-del-sol',
+			communitySlug: 'marbella',
+			isCatchAll: false,
+			location: cardLocationFromFixture(),
+			pricing: { priceFrom: 525000, priceTo: 1950000, currency: 'EUR' },
+			unitsAvailable: 5,
+			bedroomsFrom: 1,
+			bedroomsTo: 3,
+			media: null
+		};
+
+		mockedFetchPublic.mockImplementation(async (query) => {
+			if (typeof query === 'string' && query.includes('| order(')) {
+				return [devRow];
+			}
+			return 1;
+		});
+
+		const result = await fetchListingCards({
+			scope: {
+				type: 'community',
+				countrySlug: 'spain',
+				locationSlug: 'costa-del-sol',
+				communitySlug: 'marbella'
+			},
+			params: {
+				page: 1,
+				sort: 'title',
+				propertyType: null,
+				minPrice: null,
+				maxPrice: null,
+				minBeds: null,
+				community: null,
+				golfRelevance: [],
+				golfCourse: []
+			}
+		});
+
+		expect(result.cards).toHaveLength(1);
+		const entry = result.cards[0];
+		expect(entry.kind).toBe('development');
+		if (entry.kind === 'development') {
+			expect(entry.card.unitsAvailable).toBe(5);
+			expect(entry.card.bedroomsFrom).toBe(1);
+			expect(entry.card.bedroomsTo).toBe(3);
+			expect(entry.card.communitySlug).toBe('marbella');
+		}
 	});
 });

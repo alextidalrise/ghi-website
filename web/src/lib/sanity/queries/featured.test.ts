@@ -101,7 +101,7 @@ describe('fetchFrontlineListingCards', () => {
 		});
 
 		expect(cards).toHaveLength(1);
-		expect(cards[0]).toEqual(toPublicPropertyCard(raw));
+		expect(cards[0]).toEqual({ kind: 'property', card: toPublicPropertyCard(raw) });
 		expect(mockedFetchPublic).toHaveBeenCalledTimes(1);
 		const [query] = mockedFetchPublic.mock.calls[0];
 		expect(typeof query).toBe('string');
@@ -130,7 +130,7 @@ describe('fetchHomepageFrontlineListingCards', () => {
 		const cards = await fetchHomepageFrontlineListingCards();
 
 		expect(cards).toHaveLength(1);
-		expect(cards[0]).toEqual(toPublicPropertyCard(raw));
+		expect(cards[0]).toEqual({ kind: 'property', card: toPublicPropertyCard(raw) });
 	});
 });
 
@@ -149,8 +149,8 @@ describe('fetchHomepageFeaturedListingCards', () => {
 		const cards = await fetchHomepageFeaturedListingCards();
 
 		expect(cards).toHaveLength(2);
-		expect(cards[0]).toEqual(toPublicPropertyCard(first));
-		expect(cards[1]).toEqual(toPublicPropertyCard(second));
+		expect(cards[0]).toEqual({ kind: 'property', card: toPublicPropertyCard(first) });
+		expect(cards[1]).toEqual({ kind: 'property', card: toPublicPropertyCard(second) });
 		expect(mockedFetchPublic).toHaveBeenCalledTimes(1);
 	});
 
@@ -182,7 +182,7 @@ describe('fetchCountryFeaturedListingCards', () => {
 		const cards = await fetchCountryFeaturedListingCards({ countrySlug: 'spain' });
 
 		expect(cards).toHaveLength(1);
-		expect(cards[0]).toEqual(toPublicPropertyCard(raw));
+		expect(cards[0]).toEqual({ kind: 'property', card: toPublicPropertyCard(raw) });
 		expect(mockedFetchPublic).toHaveBeenCalledTimes(1);
 	});
 

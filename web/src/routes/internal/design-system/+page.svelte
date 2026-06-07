@@ -262,7 +262,7 @@
 				Wired <code>ListingGrid</code> and <code>PropertyCard</code> using verification fixtures and
 				public transforms.
 			</p>
-			<ListingGrid cards={data.demoCards} />
+			<ListingGrid cards={data.demoCards.map((card) => ({ kind: 'property' as const, card }))} />
 		</div>
 	</section>
 

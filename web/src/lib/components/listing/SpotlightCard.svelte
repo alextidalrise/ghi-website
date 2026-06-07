@@ -1,5 +1,9 @@
 <script lang="ts">
 	import { buildListingHref } from '$lib/listing/canonicalPath';
+	import {
+		buildDevelopmentMetaParts,
+		formatDevelopmentCardPrice
+	} from '$lib/listing/developmentCardDisplay';
 	import { formatEnumLabel, shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
 	import { formatListingPrice, formatPropertyType } from '$lib/listing/formatPrice';
 	import {
@@ -36,6 +40,10 @@
 
 		return buildListingHref({
 			slug: card.slug,
+			countrySlug: card.countrySlug,
+			locationSlug: card.locationSlug,
+			communitySlug: card.communitySlug,
+			isCatchAll: card.isCatchAll,
 			location: card.location
 		});
 	});
@@ -50,12 +58,15 @@
 			: buildSpecs((card as PublicPropertyCard).propertyType, (card as PublicPropertyCard).specs)
 	);
 
-	const price = $derived(
-		kind === 'development' &&
-			!shouldShowDevelopmentPricing((card as PublicDevelopmentCard).developmentDisplayMode)
-			? null
-			: formatListingPrice(card.pricing)
-	);
+	const price = $derived.by(() => {
+		if (kind === 'development') {
+			const dev = card as PublicDevelopmentCard;
+			return shouldShowDevelopmentPricing(dev.developmentDisplayMode)
+				? formatDevelopmentCardPrice(dev.pricing)
+				: null;
+		}
+		return formatListingPrice(card.pricing);
+	});
 
 	function buildSpecs(
 		propertyType: PublicPropertyCard['propertyType'],
@@ -70,10 +81,15 @@
 	}
 
 	function buildDevelopmentSpecs(dev: PublicDevelopmentCard): string[] {
-		const parts: string[] = ['Development'];
+		// Prefer the rich inventory line (beds range · units available) shared with the
+		// grid card; fall back to "Development · status" when no inventory is aggregated.
+		const parts = buildDevelopmentMetaParts(dev);
+		if (parts.length > 0) return parts;
+
+		const fallback: string[] = ['Development'];
 		const status = formatEnumLabel(dev.developmentStatus);
-		if (status) parts.push(status);
-		return parts;
+		if (status) fallback.push(status);
+		return fallback;
 	}
 </script>
 

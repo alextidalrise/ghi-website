@@ -17,8 +17,15 @@ export type RawDevelopmentCard = {
 		| 'enquiry_led'
 		| null;
 	developmentStatus?: string | null;
+	countrySlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
+	isCatchAll?: boolean | null;
 	location?: PublicPropertyCard['location'];
 	pricing?: Parameters<typeof filterPublicPricing>[0] | null;
+	unitsAvailable?: number | null;
+	bedroomsFrom?: number | null;
+	bedroomsTo?: number | null;
 	media?: RawPropertyCard['media'];
 };
 
@@ -30,8 +37,15 @@ export type PublicDevelopmentCard = {
 	listingKind?: string | null;
 	developmentDisplayMode: RawDevelopmentCard['developmentDisplayMode'];
 	developmentStatus?: string | null;
+	countrySlug?: string | null;
+	locationSlug?: string | null;
+	communitySlug?: string | null;
+	isCatchAll?: boolean | null;
 	location: PublicPropertyCard['location'];
 	pricing: PublicPricing | null;
+	unitsAvailable: number;
+	bedroomsFrom: number | null;
+	bedroomsTo: number | null;
 	heroImageUrl: string | null;
 	heroImageAlt: string | null;
 };
@@ -59,8 +73,15 @@ export function toPublicDevelopmentCard(raw: RawDevelopmentCard): PublicDevelopm
 		listingKind: raw.listingKind,
 		developmentDisplayMode: raw.developmentDisplayMode ?? 'flat_listing',
 		developmentStatus: raw.developmentStatus,
+		countrySlug: raw.countrySlug ?? null,
+		locationSlug: raw.locationSlug ?? null,
+		communitySlug: raw.communitySlug ?? null,
+		isCatchAll: raw.isCatchAll ?? null,
 		location: raw.location ?? null,
 		pricing: filterPublicPricing(raw.pricing),
+		unitsAvailable: raw.unitsAvailable ?? 0,
+		bedroomsFrom: raw.bedroomsFrom ?? null,
+		bedroomsTo: raw.bedroomsTo ?? null,
 		heroImageUrl,
 		heroImageAlt: heroAsset?.altText ?? raw.title ?? null
 	};
