@@ -23,7 +23,9 @@ export function filterReservedUnits<T extends UnitLike>(units: T[] | null | unde
 		return [];
 	}
 
-	return units.filter((unit) => {
+	return units.filter((unit): unit is T => {
+		if (!unit) return false;
+
 		const pricing = unit.pricing;
 		if (!pricing) {
 			return true;
@@ -53,7 +55,9 @@ export function filterDisplayableUnits<T extends UnitLike>(units: T[] | null | u
 		return [];
 	}
 
-	return units.filter((unit) => {
+	return units.filter((unit): unit is T => {
+		if (!unit) return false;
+
 		const visibility = unit.pricing?.publicVisibility ?? 'visible';
 		return visibility === 'visible';
 	});

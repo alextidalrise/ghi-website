@@ -74,6 +74,8 @@
 		"migrate:golf-course-community:dry-run": "tsx migrations/golf-course-community-migrate.ts --dry-run",
 		"migrate:backfill-unit-slugs": "tsx migrations/backfill-unit-slugs-migrate.ts",
 		"migrate:backfill-unit-slugs:dry-run": "tsx migrations/backfill-unit-slugs-migrate.ts --dry-run",
+		"migrate:fix-draft-ref-prefix": "tsx migrations/fix-draft-ref-prefix-migrate.ts",
+		"migrate:fix-draft-ref-prefix:dry-run": "tsx migrations/fix-draft-ref-prefix-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {
