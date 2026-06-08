@@ -1,86 +1,83 @@
-import { useEffect, useRef } from 'react';
-import { PatchEvent, set, unset, useClient, type ObjectInputProps } from 'sanity';
+import { useEffect } from 'react';
+import { PatchEvent, unset, useClient, type ObjectInputProps } from 'sanity';
+import {
+	buildParentRefPatches,
+	PARENT_CHAIN_QUERY,
+	type LocationFieldsValue,
+	type ParentChain
+} from '../lib/locationFieldsSync';
 
-type LocationFieldsValue = {
-	country?: { _type: 'reference'; _ref: string };
-	location?: { _type: 'reference'; _ref: string };
-	community?: { _type: 'reference'; _ref: string };
-};
-
-type ParentChain = {
-	locationRef?: string;
-	countryRef?: string;
-};
-
-const PARENT_CHAIN_QUERY = `*[_id == $id][0]{
-  "locationRef": parent._ref,
-  "countryRef": parent->parent._ref
-}`;
-
+/**
+ * Keeps the derived `location`/`country` references in sync with the selected
+ * community. Covers picking, swapping, and clearing the community, plus
+ * repair-on-open for documents saved with stale derived refs.
+ *
+ * Two things make this work where earlier attempts failed (see
+ * docs/sanity-location-fields-sync.md):
+ *
+ * 1. Sync happens here, at the object input, via `props.onChange`. Sanity scopes
+ *    `props.onChange` to this object and prefixes patches with the object's own
+ *    field name, so `set(ref, ['country'])` lands on `<object>.country`. Earlier
+ *    attempts used `useFormCallbacks().onChange` with absolute paths, but that
+ *    callback is also member-scoped and re-prefixes, so patches landed on garbage
+ *    paths (`location.location`) and were silently dropped.
+ *
+ * 2. This input is wired on the FIELD (`components.input`) in development.ts /
+ *    propertyListing.ts — not only on the `locationFields` type. The field also
+ *    sets `components.field` (HideFieldTitle), and a field-level `components`
+ *    object shadows the type-level one, so without a field-level `input` Sanity
+ *    fell back to the default object input and this component never mounted.
+ */
 export function LocationFieldsInput(props: ObjectInputProps) {
 	const client = useClient({ apiVersion: '2024-01-01' });
-	const { onChange, renderDefault, value: rawValue } = props;
-	const value = (rawValue ?? {}) as LocationFieldsValue;
-	const syncingRef = useRef(false);
+	const { onChange } = props;
+	const value = (props.value ?? {}) as LocationFieldsValue;
+	const communityRef = value.community?._ref;
+	const locationRef = value.location?._ref;
+	const countryRef = value.country?._ref;
 
 	useEffect(() => {
-		const communityRef = value.community?._ref;
-
+		// Community cleared → clear the derived refs.
 		if (!communityRef) {
-			if (value.location || value.country) {
-				onChange(
-					PatchEvent.from([
-						...(value.location ? [unset(['location'])] : []),
-						...(value.country ? [unset(['country'])] : [])
-					])
-				);
-			}
+			const patches = [];
+			if (locationRef) patches.push(unset(['location']));
+			if (countryRef) patches.push(unset(['country']));
+			if (patches.length > 0) onChange(PatchEvent.from(patches));
 			return;
 		}
 
 		let cancelled = false;
 
-		async function syncParentRefs() {
-			const chain = await client.fetch<ParentChain>(PARENT_CHAIN_QUERY, { id: communityRef });
-			if (cancelled || syncingRef.current) return;
-
-			const patches = [];
-			const nextLocationRef = chain?.locationRef;
-			const nextCountryRef = chain?.countryRef;
-
-			if (!nextLocationRef && value.location) {
-				patches.push(unset(['location']));
-			} else if (nextLocationRef && value.location?._ref !== nextLocationRef) {
-				patches.push(set({ _type: 'reference', _ref: nextLocationRef }, ['location']));
+		void (async () => {
+			let chain: ParentChain | null = null;
+			try {
+				chain = await client.fetch<ParentChain | null>(PARENT_CHAIN_QUERY, { id: communityRef });
+			} catch (err) {
+				// eslint-disable-next-line no-console
+				console.error('[locationFields] failed to resolve community parent chain', err);
+				return;
 			}
+			if (cancelled) return;
 
-			if (!nextCountryRef && value.country) {
-				patches.push(unset(['country']));
-			} else if (nextCountryRef && value.country?._ref !== nextCountryRef) {
-				patches.push(set({ _type: 'reference', _ref: nextCountryRef }, ['country']));
-			}
+			// A present community with no resolvable chain is anomalous (transient
+			// read / missing doc) — leave existing derived refs untouched rather
+			// than wiping them.
+			if (chain == null) return;
 
-			if (patches.length > 0) {
-				syncingRef.current = true;
-				onChange(PatchEvent.from(patches));
-				syncingRef.current = false;
-			}
-		}
-
-		void syncParentRefs();
+			const patches = buildParentRefPatches(
+				{
+					location: locationRef ? { _type: 'reference', _ref: locationRef } : undefined,
+					country: countryRef ? { _type: 'reference', _ref: countryRef } : undefined
+				},
+				chain
+			);
+			if (patches.length > 0) onChange(PatchEvent.from(patches));
+		})();
 
 		return () => {
 			cancelled = true;
 		};
-	}, [
-		client,
-		onChange,
-		value.community?._ref,
-		value.country,
-		value.country?._ref,
-		value.location,
-		value.location?._ref
-	]);
+	}, [client, onChange, communityRef, locationRef, countryRef]);
 
-	return renderDefault(props);
+	return props.renderDefault(props);
 }

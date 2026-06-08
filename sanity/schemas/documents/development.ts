@@ -1,5 +1,6 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { HideFieldTitle } from '../../components/HideFieldTitle';
+import { LocationFieldsInput } from '../../components/LocationFieldsInput';
 import {
 	BROCHURE_VISIBILITY,
 	BUILD_STATUSES,
@@ -83,7 +84,8 @@ export const development = defineType({
 			type: 'locationFields',
 			group: 'location',
 			components: {
-				field: HideFieldTitle
+				field: HideFieldTitle,
+				input: LocationFieldsInput
 			}
 		}),
 		defineField({
