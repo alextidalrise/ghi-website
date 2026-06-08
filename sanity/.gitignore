@@ -2,6 +2,7 @@ node_modules
 dist
 .sanity
 schema.json
+*.tsbuildinfo
 .env
 .env.*
 .env.local

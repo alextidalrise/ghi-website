@@ -1,5 +1,6 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { HideFieldTitle } from '../../components/HideFieldTitle';
+import { LocationFieldsInput } from '../../components/LocationFieldsInput';
 import { PROPERTY_LISTING_KINDS, PROPERTY_TYPES, TRANSACTION_TYPES } from '../constants/enums';
 import {
 	ghiListingIdRule,
@@ -95,7 +96,8 @@ export const propertyListing = defineType({
 			type: 'locationFields',
 			group: 'location',
 			components: {
-				field: HideFieldTitle
+				field: HideFieldTitle,
+				input: LocationFieldsInput
 			}
 		}),
 		defineField({
