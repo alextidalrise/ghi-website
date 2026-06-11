@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { LOCATION_TAXONOMY_TYPES } from '../constants/enums';
-import { featuredListingMember, noDuplicateListings } from '../objects/featuredListings';
+import { createFeaturedListingMember, noDuplicateListings } from '../objects/featuredListings';
 import { featuredLocationMember, noDuplicateLocations } from '../objects/featuredLocations';
 
 export const locationTaxonomy = defineType({
@@ -197,9 +197,9 @@ export const locationTaxonomy = defineType({
 			name: 'featuredListings',
 			title: 'Featured listings',
 			type: 'array',
-			of: [featuredListingMember],
+			of: [createFeaturedListingMember(['propertyListing', 'development'])],
 			description:
-				'Hand-picked listings for this country landing page (4–6). Order here is preserved on the site.',
+				'Hand-picked properties and developments for this country landing page (4–6). Order here is preserved on the site.',
 			hidden: ({ document }) => document?.type !== 'country',
 			validation: (Rule) => Rule.max(6).custom(noDuplicateListings)
 		}),
