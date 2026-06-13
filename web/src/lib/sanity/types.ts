@@ -473,9 +473,9 @@ export type LocationTaxonomyReference = {
 
 export type LocationFields = {
   _type: "locationFields";
-  country?: LocationTaxonomyReference;
-  location?: LocationTaxonomyReference;
   community: LocationTaxonomyReference;
+  location?: LocationTaxonomyReference;
+  country?: LocationTaxonomyReference;
   addressDisplay: string;
   exactAddressInternal?: string;
 };
