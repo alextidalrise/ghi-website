@@ -23,10 +23,28 @@ const BYPASS_COOKIE = 'launch_bypass';
 // and the site is fully open in development. Rotate the token (and redeploy) to revoke
 // every outstanding bypass at once.
 function hasLaunchBypass(url: URL, cookies: Cookies): boolean {
-	const token = env.LAUNCH_BYPASS_TOKEN;
+	// Trim both sides: env UIs (and shells) often leave stray quotes/whitespace/newlines
+	// on the value, which would silently break an otherwise-correct token.
+	const token = env.LAUNCH_BYPASS_TOKEN?.trim();
+	const provided = url.searchParams.get('preview')?.trim();
+	const cookieValue = cookies.get(BYPASS_COOKIE)?.trim();
+
+	// Temporary diagnostic: only logs when a ?preview attempt is made, and never prints
+	// the secret itself — just enough to see why a bypass did or didn't take. Remove once
+	// the gate is confirmed working.
+	if (env.LAUNCH_MODE === 'true' && url.searchParams.has('preview')) {
+		console.log('[launch-bypass]', {
+			tokenConfigured: Boolean(token),
+			tokenLength: token?.length ?? 0,
+			providedLength: provided?.length ?? 0,
+			providedMatches: Boolean(token) && provided === token,
+			cookieMatches: Boolean(token) && cookieValue === token
+		});
+	}
+
 	if (!token) return false;
 
-	if (url.searchParams.get('preview') === token) {
+	if (provided === token) {
 		cookies.set(BYPASS_COOKIE, token, {
 			path: '/',
 			httpOnly: true,
@@ -37,7 +55,7 @@ function hasLaunchBypass(url: URL, cookies: Cookies): boolean {
 		return true;
 	}
 
-	return cookies.get(BYPASS_COOKIE) === token;
+	return cookieValue === token;
 }
 
 export const load: LayoutServerLoad = async ({ locals: { preview }, url, route, cookies }) => {
