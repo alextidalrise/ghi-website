@@ -14,17 +14,6 @@ function imageRef(assetId: string) {
 	};
 }
 
-function approvedWorkflow() {
-	return {
-		_type: 'workflowFields' as const,
-		contentStatus: 'published',
-		publishReadiness: 'approved_for_publish',
-		approvedBy: 'verification-fixture',
-		approvedAt: '2026-05-22T12:00:00.000Z',
-		humanReviewed: true
-	};
-}
-
 function verificationLocation(countryId: string, locationId: string, communityId: string) {
 	return {
 		_type: 'locationFields' as const,
@@ -97,6 +86,7 @@ export function buildGoldenProperty(assets: UploadedAssets) {
 		listingKind: 'property',
 		propertyType: 'villa',
 		transactionType: 'sale',
+		status: 'published',
 		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.location, FIXTURE_IDS.community),
 		pricing: {
 			_type: 'pricingFields',
@@ -104,9 +94,8 @@ export function buildGoldenProperty(assets: UploadedAssets) {
 			priceDisplay: '895000',
 			currency: 'EUR',
 			priceQualifier: 'guide',
-			priceSourceStatus: 'source_confirmed',
-			availabilityStatus: 'available',
-			publicVisibility: 'visible'
+			priceConfirmed: true,
+			availabilityStatus: 'available'
 		},
 		specs: {
 			_type: 'specsFields',
@@ -129,12 +118,11 @@ export function buildGoldenProperty(assets: UploadedAssets) {
 					'Approved gallery image — verification golden villa'
 				)
 			]
-		},
-		workflow: approvedWorkflow()
+		}
 	};
 }
 
-/** Fixture 2: development with folder_hint_only pricing and a reserved child unit. */
+/** Fixture 2: published development with unconfirmed price (POA) and a reserved child unit (locked row). */
 export function buildPrivacyDevelopmentStub(assets: UploadedAssets) {
 	return {
 		_id: FIXTURE_IDS.privacyDevelopment,
@@ -145,16 +133,16 @@ export function buildPrivacyDevelopmentStub(assets: UploadedAssets) {
 		slug: { _type: 'slug', current: FIXTURE_SLUGS.privacyDevelopment },
 		listingKind: 'development',
 		developmentDisplayMode: 'units',
+		status: 'published',
 		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.location, FIXTURE_IDS.community),
 		pricing: {
 			_type: 'pricingFields',
 			priceDisplay: 'POA',
 			currency: 'EUR',
-			priceSourceStatus: 'folder_hint_only',
-			availabilityStatus: 'available',
-			publicVisibility: 'visible'
+			priceConfirmed: false,
+			availabilityStatus: 'available'
 		},
-		availabilitySummary: '1 unit available (1 reserved — hidden from public)',
+		availabilitySummary: '1 unit available, 1 reserved',
 		content: baseContent('Verification Privacy Units Development'),
 		media: {
 			_type: 'mediaFields',
@@ -162,8 +150,7 @@ export function buildPrivacyDevelopmentStub(assets: UploadedAssets) {
 				mediaAsset(assets[FIXTURE_ASSET_TAGS.approvedHero], 'Approved development hero')
 			]
 		},
-		units: [],
-		workflow: approvedWorkflow()
+		units: []
 	};
 }
 
@@ -176,14 +163,14 @@ export function buildPrivacyDevelopmentUnits() {
 		slug: { _type: 'slug', current: 'villa-a' },
 		parentDevelopment: { _type: 'reference', _ref: FIXTURE_IDS.privacyDevelopment },
 		listingKind: 'unit',
+		status: 'published',
 		pricing: {
 			_type: 'pricingFields',
 			price: 650_000,
 			priceDisplay: '650000',
 			currency: 'EUR',
-			priceSourceStatus: 'source_confirmed',
-			availabilityStatus: 'available',
-			publicVisibility: 'visible'
+			priceConfirmed: true,
+			availabilityStatus: 'available'
 		},
 		specs: {
 			_type: 'specsFields',
@@ -191,26 +178,25 @@ export function buildPrivacyDevelopmentUnits() {
 			bathrooms: 2,
 			builtArea: 180,
 			builtAreaUnit: 'sqm'
-		},
-		workflow: approvedWorkflow()
+		}
 	};
 
 	const unitReserved = {
 		_id: FIXTURE_IDS.unitReserved,
 		_type: 'unit',
-		unitName: 'Villa B (reserved — must not appear publicly)',
+		unitName: 'Villa B (reserved — locked row)',
 		unitNumber: 'B',
 		slug: { _type: 'slug', current: 'villa-b' },
 		parentDevelopment: { _type: 'reference', _ref: FIXTURE_IDS.privacyDevelopment },
 		listingKind: 'unit',
+		status: 'published',
 		pricing: {
 			_type: 'pricingFields',
 			price: 720_000,
 			priceDisplay: '720000',
 			currency: 'EUR',
-			priceSourceStatus: 'source_confirmed',
-			availabilityStatus: 'reserved',
-			publicVisibility: 'hidden'
+			priceConfirmed: true,
+			availabilityStatus: 'reserved'
 		},
 		specs: {
 			_type: 'specsFields',
@@ -218,8 +204,7 @@ export function buildPrivacyDevelopmentUnits() {
 			bathrooms: 3,
 			builtArea: 210,
 			builtAreaUnit: 'sqm'
-		},
-		workflow: approvedWorkflow()
+		}
 	};
 
 	return [unitAvailable, unitReserved];
@@ -251,15 +236,15 @@ export function buildMediaPrivacyProperty(assets: UploadedAssets) {
 		listingKind: 'property',
 		propertyType: 'villa',
 		transactionType: 'sale',
+		status: 'published',
 		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.location, FIXTURE_IDS.community),
 		pricing: {
 			_type: 'pricingFields',
 			price: 750_000,
 			priceDisplay: '750000',
 			currency: 'EUR',
-			priceSourceStatus: 'source_confirmed',
-			availabilityStatus: 'available',
-			publicVisibility: 'visible'
+			priceConfirmed: true,
+			availabilityStatus: 'available'
 		},
 		specs: {
 			_type: 'specsFields',
@@ -281,8 +266,7 @@ export function buildMediaPrivacyProperty(assets: UploadedAssets) {
 					'Gallery image — should appear publicly'
 				)
 			]
-		},
-		workflow: approvedWorkflow()
+		}
 	};
 }
 

@@ -2,13 +2,17 @@ import { defineArrayMember, defineField, defineType } from 'sanity';
 import { HideFieldTitle } from '../../components/HideFieldTitle';
 import { LocationFieldsInput } from '../../components/LocationFieldsInput';
 import {
-	BROCHURE_VISIBILITY,
 	BUILD_STATUSES,
 	COMPLETION_STATUSES,
 	DEVELOPMENT_DISPLAY_MODES,
 	DEVELOPMENT_STATUSES
 } from '../constants/enums';
-import { ghiListingIdRule, validatePricingFields } from '../validators/rules';
+import { reviewItemsField, statusField } from '../objects/workflowFields';
+import {
+	ghiListingIdRule,
+	validatePricingFields,
+	validatePublishGate
+} from '../validators/rules';
 
 export const development = defineType({
 	name: 'development',
@@ -25,7 +29,7 @@ export const development = defineType({
 		{ name: 'golf', title: 'Golf' },
 		{ name: 'related', title: 'Related listings' },
 		{ name: 'seo', title: 'SEO & CTAs' },
-		{ name: 'governance', title: 'Governance & workflow' }
+		{ name: 'internal', title: 'Internal' }
 	],
 	fields: [
 		defineField({
@@ -77,7 +81,7 @@ export const development = defineType({
 			options: { list: [...DEVELOPMENT_DISPLAY_MODES], layout: 'dropdown' },
 			validation: (Rule) => Rule.required(),
 			description:
-				'Controls how units and pricing are laid out on the development\'s public page.'
+				"Controls how units and pricing are laid out on the development's public page."
 		}),
 		defineField({
 			name: 'location',
@@ -120,14 +124,14 @@ export const development = defineType({
 			title: 'Developer name',
 			type: 'string',
 			group: 'development',
-			description: 'The developer\'s name. Shown publicly only when confirmed from a reliable source and approved.'
+			description: "The developer's name. Shown publicly only when confirmed from a reliable source."
 		}),
 		defineField({
 			name: 'architectureStudio',
 			title: 'Architecture studio',
 			type: 'string',
 			group: 'development',
-			description: 'The architecture studio name. Shown publicly only when confirmed from a reliable source and approved.'
+			description: 'The architecture studio name. Shown publicly only when confirmed from a reliable source.'
 		}),
 		defineField({
 			name: 'developmentComposition',
@@ -157,7 +161,8 @@ export const development = defineType({
 			type: 'array',
 			group: 'units',
 			of: [defineArrayMember({ type: 'reference', to: [{ type: 'unitType' }] })],
-			description: 'Unit types linked to this development (e.g. apartment, villa). Only those set to visible will appear on the website.'
+			description:
+				'Unit types linked to this development (e.g. apartment, villa). Only those whose status is published appear on the website.'
 		}),
 		defineField({
 			name: 'units',
@@ -165,7 +170,8 @@ export const development = defineType({
 			type: 'array',
 			group: 'units',
 			of: [defineArrayMember({ type: 'reference', to: [{ type: 'unit' }] })],
-			description: 'Individual units linked to this development. Reserved or hidden units are excluded from the website.'
+			description:
+				'Individual units linked to this development. Reserved/sold units render as locked rows; withdrawn units are dropped entirely.'
 		}),
 		defineField({
 			name: 'sharedAmenities',
@@ -187,15 +193,6 @@ export const development = defineType({
 			title: 'Media',
 			type: 'mediaFields',
 			group: 'content'
-		}),
-		defineField({
-			name: 'brochureVisibility',
-			title: 'Brochure visibility',
-			type: 'string',
-			group: 'content',
-			options: { list: [...BROCHURE_VISIBILITY], layout: 'dropdown' },
-			initialValue: 'request_only',
-			description: 'Controls whether buyers can download the brochure. Must be explicitly approved before it is set to publicly available.'
 		}),
 		defineField({
 			name: 'content',
@@ -233,32 +230,14 @@ export const development = defineType({
 			type: 'seoFields',
 			group: 'seo'
 		}),
+		statusField('internal'),
+		reviewItemsField('internal'),
 		defineField({
-			name: 'sourceFolderUrl',
-			title: 'Source folder URL',
-			type: 'url',
-			group: 'governance',
-			description: 'Internal link to the source files in Google Drive. Not shown on the website.'
-		}),
-		defineField({
-			name: 'sourceProvenance',
-			title: 'Source provenance',
-			type: 'array',
-			group: 'governance',
-			of: [defineArrayMember({ type: 'sourceProvenance' })],
-			description: 'Internal audit trail showing where this listing\'s data came from. Never shown on the website or in any public data.'
-		}),
-		defineField({
-			name: 'workflow',
-			title: 'Workflow & readiness',
-			type: 'workflowFields',
-			group: 'governance'
-		}),
-		defineField({
-			name: 'sensitiveGovernance',
-			title: 'Sensitive governance',
-			type: 'sensitiveGovernanceFields',
-			group: 'governance'
+			name: 'internal',
+			title: 'Internal',
+			type: 'internalFields',
+			group: 'internal',
+			description: 'Categorically private namespace — never projected by GROQ allowlists.'
 		})
 	],
 	validation: (Rule) =>
@@ -266,13 +245,18 @@ export const development = defineType({
 			const doc = document as {
 				listingKind?: string;
 				pricing?: Parameters<typeof validatePricingFields>[0];
+				status?: string;
+				reviewItems?: Array<{ blocksPublish?: boolean }>;
 			};
 
 			if (doc?.listingKind && doc.listingKind !== 'development') {
 				return 'Developments must have listing kind "development".';
 			}
 
-			return validatePricingFields(doc?.pricing);
+			const pricingResult = validatePricingFields(doc?.pricing);
+			if (pricingResult !== true) return pricingResult;
+
+			return validatePublishGate({ status: doc.status, reviewItems: doc.reviewItems });
 		}),
 	preview: {
 		select: {
@@ -280,10 +264,13 @@ export const development = defineType({
 			title: 'title',
 			ghiId: 'ghiListingId',
 			location: 'location.location.name',
-			displayMode: 'developmentDisplayMode'
+			displayMode: 'developmentDisplayMode',
+			status: 'status'
 		},
-		prepare({ developmentName, title, ghiId, location: locationName, displayMode }) {
-			const subtitle = [ghiId, locationName, displayMode?.replace(/_/g, ' ')].filter(Boolean).join(' · ');
+		prepare({ developmentName, title, ghiId, location: locationName, displayMode, status }) {
+			const subtitle = [status, ghiId, locationName, displayMode?.replace(/_/g, ' ')]
+				.filter(Boolean)
+				.join(' · ');
 			return {
 				title: developmentName || title || 'Development',
 				subtitle: subtitle || undefined

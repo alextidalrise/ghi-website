@@ -15,10 +15,11 @@ const LISTING_BASE_FILTER = /* groq */ `
   && ${PUBLIC_LISTING_FILTER}
 `;
 
-/** Exclude folder-hint prices from numeric price filters and sorts. */
+/** Numeric value used for price filters and sorts. */
 const PRICE_NUMERIC = /* groq */ `coalesce(pricing.price, pricing.priceFrom)`;
 
-const PRICE_FILTERABLE = /* groq */ `coalesce(pricing.priceSourceStatus, "") != "folder_hint_only"`;
+/** Only confirmed prices participate in numeric filters and sorts. */
+const PRICE_FILTERABLE = /* groq */ `pricing.priceConfirmed == true`;
 
 /** Allowlisted sort fragments — only composed from validated ListingSort values. */
 export const SORT_ORDER_FRAGMENTS = {

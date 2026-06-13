@@ -37,9 +37,7 @@ export type { ListingSearchScope };
  * rules, but it must filter in reference position. A filtered dereference
  * (`refs[]->[gate]`) resolves to null for any unpublished target, so editor-picked
  * draft listings never render in dev preview mode. Filtering the ref array first
- * (`refs[@->gate]->{...}`) resolves drafts correctly and keeps the gates in GROQ —
- * with $previewAll false the readiness/visibility/reserved gates still drop
- * hidden/held listings, so production behaviour is unchanged.
+ * (`refs[@->gate]->{...}`) resolves drafts correctly and keeps the gates in GROQ.
  *
  * Keep these clauses in sync with queries/filters.ts (here they are @-> prefixed).
  */
@@ -48,9 +46,7 @@ const FEATURED_LISTING_REF_FILTER = /* groq */ `
     (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])
     || @->_type == "development"
   )
-  && (coalesce(@->workflow.publishReadiness, "") in $approvedReadiness || $previewAll)
-  && (coalesce(@->pricing.publicVisibility, "visible") == "visible" || $previewAll)
-  && (coalesce(@->pricing.availabilityStatus, "") != "reserved" || $previewAll)
+  && (coalesce(@->status, "") == $publishedStatus || $previewAll)
 `;
 
 /** Ordered featured cards from site settings — editor order preserved. */

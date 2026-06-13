@@ -1,27 +1,20 @@
 /**
  * Reusable GROQ filter fragments for the public query layer.
- * Defence in depth: every public listing query must include these gates.
  *
- * Each gate carries a `|| $previewAll` escape hatch. In production `$previewAll` is
- * false (see PUBLIC_QUERY_PARAMS) so the gates apply normally. The env-gated dev
- * preview mode in ./fetch.ts sets it true to surface draft/hidden/held listings
+ * The single public-listing gate keys off the document's top-level `status`.
+ * In production `$previewAll` is false (see PUBLIC_QUERY_PARAMS) so only
+ * `status === 'published'` documents surface. The env-gated dev preview mode
+ * in ./fetch.ts sets `$previewAll = true` to surface non-published listings
  * locally. Never true in production.
  */
 
-/** Document-level publish readiness gate. */
-export const PUBLISH_READINESS_FILTER = /* groq */ `
-  (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)
+/** Whether a document is publicly visible (or preview-mode is on). */
+export const PUBLIC_LISTING_FILTER = /* groq */ `
+  (coalesce(status, "") == $publishedStatus || $previewAll)
 `;
 
-/** Pricing visibility gate — reserved/hidden/internal items never surface publicly. */
-export const PUBLIC_VISIBILITY_FILTER = /* groq */ `
-  (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)
-`;
-
-/** Reserved availability gate at document level. */
-export const NOT_RESERVED_FILTER = /* groq */ `
-  (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll)
-`;
+/** Same gate applies to child units / unit types. */
+export const PUBLIC_CHILD_UNIT_FILTER = PUBLIC_LISTING_FILTER;
 
 /** Country slug for listing URLs — from stored ref or community taxonomy parent chain. */
 export const LISTING_COUNTRY_SLUG = /* groq */ `coalesce(
@@ -66,34 +59,16 @@ export const LISTING_PATH_FILTER = /* groq */ `
   && slug.current == $slug
 `;
 
-/** Combined gate for publishable property listings and developments. */
-export const PUBLIC_LISTING_FILTER = /* groq */ `
-  ${PUBLISH_READINESS_FILTER}
-  && ${PUBLIC_VISIBILITY_FILTER}
-  && ${NOT_RESERVED_FILTER}
-`;
-
-/** Child unit / unit-type gate (same pricing + readiness rules). */
-export const PUBLIC_CHILD_UNIT_FILTER = /* groq */ `
-  ${PUBLISH_READINESS_FILTER}
-  && ${PUBLIC_VISIBILITY_FILTER}
-  && ${NOT_RESERVED_FILTER}
-`;
-
 /**
- * Unit-page gate. A unit is publishable only when its own readiness + visibility
- * pass AND its parent development is itself publishable. Availability is NOT gated
- * here: a reserved/sold unit still has a reachable page (it renders with status),
- * unlike hidden/internal units which must never resolve.
+ * Unit-page gate. A unit is publishable only when its own status is published
+ * AND its parent development is itself published.
  */
 export const UNIT_PARENT_PUBLISHABLE = /* groq */ `
-  (coalesce(parentDevelopment->workflow.publishReadiness, "") in $approvedReadiness || $previewAll)
-  && (coalesce(parentDevelopment->pricing.publicVisibility, "visible") == "visible" || $previewAll)
+  (coalesce(parentDevelopment->status, "") == $publishedStatus || $previewAll)
 `;
 
 export const UNIT_PUBLISHABLE_FILTER = /* groq */ `
-  ${PUBLISH_READINESS_FILTER}
-  && ${PUBLIC_VISIBILITY_FILTER}
+  ${PUBLIC_LISTING_FILTER}
   && ${UNIT_PARENT_PUBLISHABLE}
 `;
 

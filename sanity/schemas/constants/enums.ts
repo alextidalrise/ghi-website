@@ -9,15 +9,6 @@ export const PRICE_QUALIFIERS = [
 	{ title: 'Enquiry led', value: 'enquiry_led' }
 ] as const;
 
-export const PRICE_SOURCE_STATUSES = [
-	{ title: 'Source confirmed', value: 'source_confirmed' },
-	{ title: 'Folder hint only', value: 'folder_hint_only' },
-	{ title: 'Price list needs review', value: 'price_list_needs_review' },
-	{ title: 'Manual confirmed', value: 'manual_confirmed' },
-	{ title: 'Unknown', value: 'unknown' },
-	{ title: 'Stale — needs review', value: 'stale_needs_review' }
-] as const;
-
 export const AVAILABILITY_STATUSES = [
 	{ title: 'Available', value: 'available' },
 	{ title: 'Coming soon', value: 'coming_soon' },
@@ -26,13 +17,6 @@ export const AVAILABILITY_STATUSES = [
 	{ title: 'Under offer', value: 'under_offer' },
 	{ title: 'Unknown', value: 'unknown' },
 	{ title: 'Withdrawn', value: 'withdrawn' }
-] as const;
-
-export const PUBLIC_VISIBILITY = [
-	{ title: 'Visible', value: 'visible' },
-	{ title: 'Hidden', value: 'hidden' },
-	{ title: 'Preview only', value: 'preview_only' },
-	{ title: 'Internal only', value: 'internal_only' }
 ] as const;
 
 export const COMPLETION_STATUSES = [
@@ -134,20 +118,6 @@ export const ASSET_CATEGORIES = [
 	{ title: 'Source document', value: 'source_document' }
 ] as const;
 
-export const REVIEW_SEVERITIES = [
-	{ title: 'Must check', value: 'must_check' },
-	{ title: 'Nice to check', value: 'nice_to_check' },
-	{ title: 'Internal note', value: 'internal_note' }
-] as const;
-
-export const REVIEW_SOURCE_LEVELS = [
-	{ title: 'Window card', value: 'window_card' },
-	{ title: 'Brochure', value: 'brochure' },
-	{ title: 'Source folder', value: 'source_folder' },
-	{ title: 'Deep audit', value: 'deep_audit' },
-	{ title: 'Derived', value: 'derived' }
-] as const;
-
 export const REVIEW_CATEGORIES = [
 	{ title: 'Price', value: 'price' },
 	{ title: 'Facts', value: 'facts' },
@@ -157,13 +127,6 @@ export const REVIEW_CATEGORIES = [
 	{ title: 'SEO', value: 'seo' },
 	{ title: 'Legal', value: 'legal' },
 	{ title: 'Internal', value: 'internal' }
-] as const;
-
-export const BROCHURE_VISIBILITY = [
-	{ title: 'Disabled', value: 'disabled' },
-	{ title: 'Request only', value: 'request_only' },
-	{ title: 'Public approved', value: 'public_approved' },
-	{ title: 'Internal source only', value: 'internal_source_only' }
 ] as const;
 
 export const SIMILAR_PROPERTIES_MODES = [
@@ -181,90 +144,18 @@ export const SCHEMA_TYPES = [
 	{ title: 'Product', value: 'Product' }
 ] as const;
 
-export const CONTENT_STATUSES = [
+/**
+ * Single source of truth for the publishable lifecycle of a gateable document
+ * (propertyListing, development, unit, unitType). The public website renders
+ * ONLY documents whose `status === 'published'`. There is no second visibility
+ * flag — all other "is this live?" semantics collapse into this enum.
+ */
+export const LISTING_STATUSES = [
 	{ title: 'Draft', value: 'draft' },
-	{ title: 'Needs facts', value: 'needs_facts' },
-	{ title: 'Ready for editorial', value: 'ready_for_editorial' },
-	{ title: 'Ready for GHI review', value: 'ready_for_ghi_review' },
-	{ title: 'Approved', value: 'approved' },
-	{ title: 'Published', value: 'published' },
-	{ title: 'Archived', value: 'archived' }
-] as const;
-
-export const PUBLISH_READINESS = [
-	{ title: 'Metadata only', value: 'metadata_only' },
-	{ title: 'Structured extracted — needs review', value: 'structured_extracted_needs_review' },
-	{ title: 'Governance hold', value: 'governance_hold' },
-	{ title: 'Ready for editorial', value: 'ready_for_editorial' },
-	{ title: 'Ready for GHI review', value: 'ready_for_ghi_review' },
-	{ title: 'Approved for publish', value: 'approved_for_publish' },
-	{ title: 'Published', value: 'published' },
-	{ title: 'Archived', value: 'archived' }
-] as const;
-
-export const CHANNEL_KEYS = [
-	{ title: 'Website', value: 'website' },
-	{ title: 'Email', value: 'email' },
-	{ title: 'Social', value: 'social' },
-	{ title: 'CRM', value: 'crm' },
-	{ title: 'Paid ads', value: 'paid_ads' }
-] as const;
-
-export const CHANNEL_READINESS_STATUSES = [
-	{ title: 'Not ready', value: 'not_ready' },
-	{ title: 'In progress', value: 'in_progress' },
-	{ title: 'Ready', value: 'ready' },
-	{ title: 'Blocked', value: 'blocked' }
-] as const;
-
-export const SOURCE_CONFIDENCE = [
-	{ title: 'High', value: 'high' },
-	{ title: 'Medium', value: 'medium' },
-	{ title: 'Low', value: 'low' },
-	{ title: 'Unknown', value: 'unknown' }
-] as const;
-
-export const PUBLIC_SAFE_STATUSES = [
-	{ title: 'Public safe', value: 'public_safe' },
-	{ title: 'Needs review', value: 'needs_review' },
-	{ title: 'Not public safe', value: 'not_public_safe' },
-	{ title: 'Unknown', value: 'unknown' }
-] as const;
-
-export const SOURCE_EXTRACTION_METHODS = [
-	{ title: 'Manual entry', value: 'manual_entry' },
-	{ title: 'Brochure extraction', value: 'brochure_extraction' },
-	{ title: 'Price list extraction', value: 'price_list_extraction' },
-	{ title: 'Agent supplied', value: 'agent_supplied' },
-	{ title: 'Drive sync', value: 'drive_sync' },
-	{ title: 'Drive folder inventory', value: 'drive_folder_inventory' },
-	{ title: 'Unknown', value: 'unknown' }
-] as const;
-
-export const SENSITIVE_REVIEW_STATUSES = [
-	{ title: 'Not required', value: 'not_required' },
-	{ title: 'Pending', value: 'pending' },
 	{ title: 'In review', value: 'in_review' },
-	{ title: 'Approved', value: 'approved' },
-	{ title: 'Blocked', value: 'blocked' }
-] as const;
-
-export const SENSITIVE_ASSET_TYPES = [
-	{ title: 'Legal document', value: 'legal_document' },
-	{ title: 'Cadastral plan', value: 'cadastral_plan' },
-	{ title: 'Collaboration contract', value: 'collaboration_contract' },
-	{ title: 'Commission wording', value: 'commission_wording' },
-	{ title: 'Source price list', value: 'source_price_list' },
-	{ title: 'Unreviewed brochure', value: 'unreviewed_brochure' },
-	{ title: 'Other', value: 'other' }
-] as const;
-
-export const COMMISSION_VISIBILITY = [
-	{ title: 'Private / internal', value: 'private_internal' }
-] as const;
-
-export const FEES_TAX_VISIBILITY = [
-	{ title: 'Private / internal', value: 'private_internal' }
+	{ title: 'Published', value: 'published' },
+	{ title: 'Unpublished', value: 'unpublished' },
+	{ title: 'Archived', value: 'archived' }
 ] as const;
 
 export const LISTING_KINDS = [

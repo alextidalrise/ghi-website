@@ -3,18 +3,27 @@ import { filterDisplayableUnits, filterReservedUnits, type UnitLike } from './re
 
 const unit = (overrides: Partial<UnitLike>): UnitLike => ({
 	_id: 'ghi-unit-1',
-	pricing: { publicVisibility: 'visible', availabilityStatus: 'available' },
+	pricing: { availabilityStatus: 'available', priceConfirmed: true },
 	...overrides
 });
 
 describe('filterDisplayableUnits', () => {
-	it('drops null and non-visible units', () => {
+	it('drops withdrawn units and nulls', () => {
 		const units = [
 			unit({ _id: 'a' }),
 			null as unknown as UnitLike,
-			unit({ _id: 'b', pricing: { publicVisibility: 'hidden' } })
+			unit({ _id: 'b', pricing: { availabilityStatus: 'withdrawn' } })
 		];
 		expect(filterDisplayableUnits(units).map((u) => u._id)).toEqual(['a']);
+	});
+
+	it('keeps reserved and sold units (rendered as locked rows in the UI)', () => {
+		const units = [
+			unit({ _id: 'a', pricing: { availabilityStatus: 'reserved' } }),
+			unit({ _id: 'b', pricing: { availabilityStatus: 'sold' } }),
+			unit({ _id: 'c', pricing: { availabilityStatus: 'available' } })
+		];
+		expect(filterDisplayableUnits(units).map((u) => u._id)).toEqual(['a', 'b', 'c']);
 	});
 
 	// Regression: a development whose units[] references the same unit twice (duplicate
@@ -35,24 +44,25 @@ describe('filterDisplayableUnits', () => {
 
 		expect(ids).toEqual(['a', dupId, 'c']);
 		expect(new Set(ids).size).toBe(ids.length);
-		// keeps the first occurrence's payload
 		expect(result.find((u) => u._id === dupId)?.unitNumber).toBe('25');
 	});
 
 	it('leaves units without an _id untouched', () => {
-		const units = [unit({ _id: undefined, unitNumber: '1' }), unit({ _id: undefined, unitNumber: '2' })];
+		const units = [
+			unit({ _id: undefined, unitNumber: '1' }),
+			unit({ _id: undefined, unitNumber: '2' })
+		];
 		expect(filterDisplayableUnits(units)).toHaveLength(2);
 	});
 });
 
-describe('filterReservedUnits', () => {
-	it('dedupes by _id alongside reserved/visibility filtering', () => {
-		const dupId = 'dup';
+describe('filterReservedUnits (alias of filterDisplayableUnits)', () => {
+	it('matches the displayable policy (reserved kept, withdrawn dropped)', () => {
 		const units = [
-			unit({ _id: dupId }),
-			unit({ _id: dupId }),
-			unit({ _id: 'reserved', pricing: { publicVisibility: 'visible', availabilityStatus: 'reserved' } })
+			unit({ _id: 'a', pricing: { availabilityStatus: 'reserved' } }),
+			unit({ _id: 'b', pricing: { availabilityStatus: 'withdrawn' } }),
+			unit({ _id: 'c', pricing: { availabilityStatus: 'available' } })
 		];
-		expect(filterReservedUnits(units).map((u) => u._id)).toEqual([dupId]);
+		expect(filterReservedUnits(units).map((u) => u._id)).toEqual(['a', 'c']);
 	});
 });

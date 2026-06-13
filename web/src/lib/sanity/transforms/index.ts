@@ -99,6 +99,7 @@ export type RawPropertyListing = {
 	listingKind?: string;
 	propertyType?: string;
 	transactionType?: string;
+	status?: string;
 	location?: LocationMapInput | null;
 	pricing?: PricingInput | null;
 	specs?: Record<string, unknown> | null;
@@ -143,6 +144,7 @@ export type RawDevelopment = {
 	title?: string;
 	slug?: string;
 	listingKind?: string;
+	status?: string;
 	developmentDisplayMode?:
 		| 'flat_listing'
 		| 'unit_types'
@@ -158,7 +160,6 @@ export type RawDevelopment = {
 	architectureStudio?: string | null;
 	developmentComposition?: string[] | null;
 	availabilitySummary?: string | null;
-	brochureVisibility?: string | null;
 	sharedAmenities?: FeatureHighlight[] | null;
 	location?: LocationMapInput | null;
 	pricing?: PricingInput | null;
@@ -463,7 +464,7 @@ export function toPublicUnitListing(
 		videoUrl: dev.media?.videoUrl ?? null,
 		virtualTourUrl: dev.media?.virtualTourUrl ?? null,
 		brochure: dev.media?.brochure ?? null,
-		brochureVisibility: dev.media?.brochureVisibility ?? null
+		brochurePublic: dev.media?.brochurePublic ?? false
 	};
 
 	const specs = { ...(unitType?.specs ?? {}), ...(raw.specs ?? {}) };

@@ -3,12 +3,9 @@ import {
 	AVAILABILITY_STATUSES,
 	BUILD_STATUSES,
 	COMPLETION_STATUSES,
-	FEES_TAX_VISIBILITY,
-	PRICE_QUALIFIERS,
-	PRICE_SOURCE_STATUSES,
-	PUBLIC_VISIBILITY
+	PRICE_QUALIFIERS
 } from '../constants/enums';
-import { validateFeesTaxVisibility, validatePricingFields } from '../validators/rules';
+import { validatePricingFields } from '../validators/rules';
 
 export const pricingFields = defineType({
 	name: 'pricingFields',
@@ -38,7 +35,8 @@ export const pricingFields = defineType({
 			name: 'priceDisplay',
 			title: 'Price display',
 			type: 'string',
-			description: 'The price text shown to buyers on the website (e.g. "From €450,000", "POA", "Sold"). Must be approved before it goes live.'
+			description:
+				'Optional override text shown to buyers (e.g. "From €450,000", "POA"). When `priceConfirmed` is false, the website renders POA regardless of numeric price.'
 		}),
 		defineField({
 			name: 'currency',
@@ -54,23 +52,12 @@ export const pricingFields = defineType({
 			options: { list: [...PRICE_QUALIFIERS], layout: 'dropdown' }
 		}),
 		defineField({
-			name: 'priceSourceStatus',
-			title: 'Price source status',
-			type: 'string',
-			options: { list: [...PRICE_SOURCE_STATUSES], layout: 'dropdown' },
-			initialValue: 'unknown',
-			validation: (Rule) => Rule.required(),
-			description: 'Records where the price came from. A price based only on a folder hint cannot be displayed publicly.'
-		}),
-		defineField({
-			name: 'priceReviewedAt',
-			title: 'Price reviewed at',
-			type: 'datetime'
-		}),
-		defineField({
-			name: 'priceReviewedBy',
-			title: 'Price reviewed by',
-			type: 'string'
+			name: 'priceConfirmed',
+			title: 'Price confirmed',
+			type: 'boolean',
+			initialValue: false,
+			description:
+				'Tick once the numeric price has been confirmed against a reliable source. While unticked the website renders POA regardless of any numeric price entered above.'
 		}),
 		defineField({
 			name: 'availabilityStatus',
@@ -78,15 +65,9 @@ export const pricingFields = defineType({
 			type: 'string',
 			options: { list: [...AVAILABILITY_STATUSES], layout: 'dropdown' },
 			initialValue: 'unknown',
-			validation: (Rule) => Rule.required()
-		}),
-		defineField({
-			name: 'publicVisibility',
-			title: 'Public visibility',
-			type: 'string',
-			options: { list: [...PUBLIC_VISIBILITY], layout: 'dropdown' },
-			initialValue: 'visible',
-			description: 'Controls whether this listing appears on the website. Reserved listings must be set to hidden or internal — they will not appear publicly.'
+			validation: (Rule) => Rule.required(),
+			description:
+				'Whether this unit/listing is on the market. Reserved/sold units render as locked rows in the inventory; withdrawn units drop entirely. Use the document-level Status to take a listing offline.'
 		}),
 		defineField({
 			name: 'completionStatus',
@@ -104,48 +85,6 @@ export const pricingFields = defineType({
 			title: 'Build status',
 			type: 'string',
 			options: { list: [...BUILD_STATUSES], layout: 'dropdown' }
-		}),
-		defineField({
-			name: 'communityFeesAmount',
-			title: 'Community fees amount',
-			type: 'number',
-			description: 'Annual community fees for this property. Internal only — not shown on the website yet.',
-			validation: (Rule) => Rule.min(0)
-		}),
-		defineField({
-			name: 'communityFeesPeriod',
-			title: 'Community fees period',
-			type: 'string',
-			description: 'Whether community fees are charged monthly or annually. Internal only.'
-		}),
-		defineField({
-			name: 'ibiAmount',
-			title: 'IBI amount',
-			type: 'number',
-			description: 'Spanish property tax (IBI) annual amount. Internal only — not shown on the website yet.',
-			validation: (Rule) => Rule.min(0)
-		}),
-		defineField({
-			name: 'garbageTaxAmount',
-			title: 'Garbage tax amount',
-			type: 'number',
-			description: 'Annual garbage collection tax. Internal only — not shown on the website yet.',
-			validation: (Rule) => Rule.min(0)
-		}),
-		defineField({
-			name: 'feesTaxSource',
-			title: 'Fees / tax source',
-			type: 'string',
-			description: 'Where the fees and tax figures came from. Internal use only.'
-		}),
-		defineField({
-			name: 'feesTaxVisibility',
-			title: 'Fees / tax visibility',
-			type: 'string',
-			options: { list: [...FEES_TAX_VISIBILITY], layout: 'dropdown' },
-			initialValue: 'private_internal',
-			readOnly: true,
-			validation: (Rule) => Rule.custom((value) => validateFeesTaxVisibility(value))
 		})
 	],
 	validation: (Rule) =>

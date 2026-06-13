@@ -5,39 +5,37 @@ export type PricingInput = {
 	priceDisplay?: string | null;
 	currency?: string | null;
 	priceQualifier?: string | null;
-	priceSourceStatus?: string | null;
+	priceConfirmed?: boolean | null;
 	availabilityStatus?: string | null;
 	completionStatus?: string | null;
 	completionDate?: string | null;
 	buildStatus?: string | null;
-	publicVisibility?: string | null;
 };
 
-export type PublicPricing = Omit<PricingInput, 'priceSourceStatus' | 'publicVisibility'>;
+export type PublicPricing = Omit<PricingInput, 'priceConfirmed'>;
 
 /**
- * Strip price fields when source is folder_hint_only (defence in depth after GROQ allowlist).
- * Also removes governance fields from the public payload.
+ * Public-facing pricing projection.
+ *
+ * The document-level `status` gate decides whether ANY pricing renders at all,
+ * so this transform no longer cares about visibility or reserved availability.
+ * Its only job is to enforce POA fallback when `priceConfirmed` is false:
+ * numeric prices are stripped, `priceDisplay` collapses to "POA".
  */
 export function filterPublicPricing(pricing: PricingInput | null | undefined): PublicPricing | null {
 	if (!pricing) {
 		return null;
 	}
 
-	const visibility = pricing.publicVisibility ?? 'visible';
-	if (visibility !== 'visible' || pricing.availabilityStatus === 'reserved') {
-		return null;
-	}
+	const { priceConfirmed, ...rest } = pricing;
 
-	const { priceSourceStatus, publicVisibility: _visibility, ...rest } = pricing;
-
-	if (priceSourceStatus === 'folder_hint_only') {
+	if (priceConfirmed === false) {
 		return {
 			...rest,
 			price: undefined,
 			priceFrom: undefined,
 			priceTo: undefined,
-			priceDisplay: pricing.priceDisplay === 'POA' ? 'POA' : undefined
+			priceDisplay: 'POA'
 		};
 	}
 

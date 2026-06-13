@@ -37,15 +37,15 @@ export const goldenPropertyRaw: RawPropertyListing = {
 	listingKind: 'property',
 	propertyType: 'villa',
 	transactionType: 'sale',
+	status: 'published',
 	location: sharedLocation,
 	pricing: {
 		price: 895_000,
 		priceDisplay: '895000',
 		currency: 'EUR',
 		priceQualifier: 'guide',
-		priceSourceStatus: 'source_confirmed',
-		availabilityStatus: 'available',
-		publicVisibility: 'visible'
+		priceConfirmed: true,
+		availabilityStatus: 'available'
 	},
 	specs: { bedrooms: 4, bathrooms: 3, builtArea: 280, builtAreaUnit: 'sqm' },
 	content: {
@@ -59,7 +59,7 @@ export const goldenPropertyRaw: RawPropertyListing = {
 	}
 };
 
-/** Raw query-shaped payload for fixture 2 — development with folder_hint_only + reserved unit. */
+/** Raw query-shaped payload for fixture 2 — published development with unconfirmed price + reserved unit. */
 export const privacyDevelopmentRaw: RawDevelopment = {
 	_id: 'verificationFixture.development.privacy-units',
 	_type: 'development',
@@ -68,15 +68,15 @@ export const privacyDevelopmentRaw: RawDevelopment = {
 	slug: 'verification-privacy-units',
 	listingKind: 'development',
 	developmentDisplayMode: 'units',
+	status: 'published',
 	location: sharedLocation,
 	pricing: {
 		priceFrom: 650_000,
 		priceTo: 720_000,
 		priceDisplay: 'POA',
 		currency: 'EUR',
-		priceSourceStatus: 'folder_hint_only',
-		availabilityStatus: 'available',
-		publicVisibility: 'visible'
+		priceConfirmed: false,
+		availabilityStatus: 'available'
 	},
 	content: {
 		shortDescription: 'Verification privacy units fixture.'
@@ -92,21 +92,30 @@ export const privacyDevelopmentRaw: RawDevelopment = {
 				price: 650_000,
 				priceDisplay: '650000',
 				currency: 'EUR',
-				priceSourceStatus: 'source_confirmed',
-				availabilityStatus: 'available',
-				publicVisibility: 'visible'
+				priceConfirmed: true,
+				availabilityStatus: 'available'
 			}
 		},
 		{
 			_id: 'verificationFixture.unit.reserved-b',
-			unitName: 'Villa B (reserved)',
+			unitName: 'Villa B (reserved — locked row)',
 			pricing: {
 				price: 720_000,
 				priceDisplay: '720000',
 				currency: 'EUR',
-				priceSourceStatus: 'source_confirmed',
-				availabilityStatus: 'reserved',
-				publicVisibility: 'hidden'
+				priceConfirmed: true,
+				availabilityStatus: 'reserved'
+			}
+		},
+		{
+			_id: 'verificationFixture.unit.withdrawn-c',
+			unitName: 'Villa C (withdrawn — should drop)',
+			pricing: {
+				price: 800_000,
+				priceDisplay: '800000',
+				currency: 'EUR',
+				priceConfirmed: true,
+				availabilityStatus: 'withdrawn'
 			}
 		}
 	]
@@ -122,14 +131,14 @@ export const mediaPrivacyPropertyRaw: RawPropertyListing = {
 	listingKind: 'property',
 	propertyType: 'villa',
 	transactionType: 'sale',
+	status: 'published',
 	location: sharedLocation,
 	pricing: {
 		price: 750_000,
 		priceDisplay: '750000',
 		currency: 'EUR',
-		priceSourceStatus: 'source_confirmed',
-		availabilityStatus: 'available',
-		publicVisibility: 'visible'
+		priceConfirmed: true,
+		availabilityStatus: 'available'
 	},
 	specs: { bedrooms: 3, bathrooms: 2, builtArea: 200, builtAreaUnit: 'sqm' },
 	content: {
@@ -143,38 +152,41 @@ export const mediaPrivacyPropertyRaw: RawPropertyListing = {
 	}
 };
 
-/** Documents that must fail schema validation when saved through Studio. */
-export const schemaViolationExamples = {
-	folderHintWithPrice: {
-		price: 500_000,
-		priceDisplay: '500000',
-		priceSourceStatus: 'folder_hint_only',
-		availabilityStatus: 'available',
-		publicVisibility: 'visible'
+/** Documents that must fail the document-level publish gate. */
+type PublishGateFixture = {
+	status: string;
+	reviewItems: Array<{
+		_key: string;
+		label: string;
+		blocksPublish: boolean;
+		category: string;
+	}>;
+};
+
+export const publishGateFailures: {
+	publishedWithBlocker: PublishGateFixture;
+	publishedAllNotes: PublishGateFixture;
+} = {
+	publishedWithBlocker: {
+		status: 'published',
+		reviewItems: [
+			{ _key: 'r1', label: 'Confirm price source', blocksPublish: true, category: 'price' }
+		]
 	},
-	reservedVisible: {
-		price: 500_000,
-		priceDisplay: '500000',
-		priceSourceStatus: 'source_confirmed',
-		availabilityStatus: 'reserved',
-		publicVisibility: 'visible'
+	publishedAllNotes: {
+		status: 'published',
+		reviewItems: [
+			{ _key: 'r1', label: 'Internal aside', blocksPublish: false, category: 'internal' }
+		]
 	}
-} as const;
+};
 
 /** Documents that must fail the public listing GROQ gate. */
 export const queryGateFailures = {
-	notApproved: {
-		workflow: { publishReadiness: 'metadata_only' },
-		pricing: { publicVisibility: 'visible', availabilityStatus: 'available' }
-	},
-	hidden: {
-		workflow: { publishReadiness: 'approved_for_publish' },
-		pricing: { publicVisibility: 'hidden', availabilityStatus: 'available' }
-	},
-	reservedListing: {
-		workflow: { publishReadiness: 'approved_for_publish' },
-		pricing: { publicVisibility: 'visible', availabilityStatus: 'reserved' }
-	}
+	draft: { status: 'draft' },
+	inReview: { status: 'in_review' },
+	unpublished: { status: 'unpublished' },
+	archived: { status: 'archived' }
 } as const;
 
 export { APPROVED_IMAGE_REF };

@@ -154,6 +154,7 @@ function buildListing(listing: Listing, index: number, assetId: string) {
 		listingKind: 'property',
 		propertyType: listing.propertyType,
 		transactionType: 'sale',
+		status: 'published',
 		location: {
 			_type: 'locationFields',
 			country: { _type: 'reference', _ref: COUNTRY },
@@ -167,9 +168,8 @@ function buildListing(listing: Listing, index: number, assetId: string) {
 			priceDisplay,
 			currency: 'EUR',
 			priceQualifier: 'guide',
-			priceSourceStatus: 'source_confirmed',
-			availabilityStatus: 'available',
-			publicVisibility: 'visible'
+			priceConfirmed: true,
+			availabilityStatus: 'available'
 		},
 		specs: {
 			_type: 'specsFields',
@@ -191,14 +191,6 @@ function buildListing(listing: Listing, index: number, assetId: string) {
 					altText: `${listing.title} — exterior`
 				}
 			]
-		},
-		workflow: {
-			_type: 'workflowFields',
-			contentStatus: 'published',
-			publishReadiness: 'approved_for_publish',
-			humanReviewed: true,
-			approvedBy: 'review-seed',
-			approvedAt: new Date().toISOString()
 		}
 	};
 }

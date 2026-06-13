@@ -1,18 +1,19 @@
-/** Publish readiness values that may appear on public website routes. */
-export const APPROVED_PUBLISH_READINESS = ['approved_for_publish', 'published'] as const;
+/** The single status value that surfaces a document on the public website. */
+export const PUBLISHED_STATUS = 'published' as const;
 
-export type ApprovedPublishReadiness = (typeof APPROVED_PUBLISH_READINESS)[number];
+export type PublishedStatus = typeof PUBLISHED_STATUS;
 
 /**
  * GROQ param object passed to every public listing query.
  *
- * `previewAll` is the production default (false): the readiness/visibility/reserved
- * gates apply normally. It is flipped to true only by the env-gated dev preview mode
- * in queries/fetch.ts, which short-circuits those gates so draft/hidden/held listings
- * render in local dev. Kept here so `$previewAll` is always a defined GROQ param.
+ * `previewAll` is the production default (false): the publish-status gate
+ * applies normally. It is flipped to true only by the env-gated dev preview
+ * mode in queries/fetch.ts, which short-circuits the gate so non-published
+ * listings render in local dev. Kept here so `$previewAll` is always a
+ * defined GROQ param.
  */
 export const PUBLIC_QUERY_PARAMS = {
-	approvedReadiness: APPROVED_PUBLISH_READINESS,
+	publishedStatus: PUBLISHED_STATUS,
 	previewAll: false
 } as const;
 

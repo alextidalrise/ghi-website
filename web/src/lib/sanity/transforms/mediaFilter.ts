@@ -40,7 +40,7 @@ export type MediaBundleInput = {
 	videoUrl?: string | null;
 	virtualTourUrl?: string | null;
 	brochure?: MediaAssetInput | null;
-	brochureVisibility?: string | null;
+	brochurePublic?: boolean | null;
 };
 
 export type PublicMediaBundle = {
@@ -51,7 +51,7 @@ export type PublicMediaBundle = {
 	videoUrl: string | null;
 	virtualTourUrl: string | null;
 	brochure: ReturnType<typeof filterMediaAsset> | null;
-	brochureVisibility: string | null;
+	brochurePublic: boolean;
 };
 
 /** First public gallery image, then thumbnail override — used for hero, cards, and OG fallbacks. */
@@ -79,9 +79,8 @@ export function filterMediaBundle(media: MediaBundleInput | null | undefined): P
 		return null;
 	}
 
-	const brochureVisibility = media.brochureVisibility ?? 'request_only';
-	const includeBrochure =
-		brochureVisibility === 'public_approved' && isPublicMediaAsset(media.brochure ?? undefined);
+	const brochurePublic = media.brochurePublic === true;
+	const includeBrochure = brochurePublic && isPublicMediaAsset(media.brochure ?? undefined);
 
 	return {
 		gallery: filterMediaAssetList(media.gallery),
@@ -94,6 +93,6 @@ export function filterMediaBundle(media: MediaBundleInput | null | undefined): P
 		videoUrl: media.videoUrl ?? null,
 		virtualTourUrl: media.virtualTourUrl ?? null,
 		brochure: includeBrochure ? filterMediaAsset(media.brochure) : null,
-		brochureVisibility
+		brochurePublic
 	};
 }

@@ -1,19 +1,5 @@
 import { defineField, defineType } from 'sanity';
-import {
-	REVIEW_CATEGORIES,
-	REVIEW_SEVERITIES,
-	REVIEW_SOURCE_LEVELS
-} from '../constants/enums';
-
-type ReviewItemValue = {
-	label?: string;
-	detail?: string;
-	severity?: string;
-	sourceLevel?: string;
-	visibleToReviewer?: boolean;
-	blocksPublish?: boolean;
-	category?: string;
-};
+import { REVIEW_CATEGORIES } from '../constants/enums';
 
 export const reviewItem = defineType({
 	name: 'reviewItem',
@@ -33,35 +19,12 @@ export const reviewItem = defineType({
 			rows: 3
 		}),
 		defineField({
-			name: 'severity',
-			title: 'Severity',
-			type: 'string',
-			options: { list: [...REVIEW_SEVERITIES], layout: 'dropdown' },
-			initialValue: 'must_check',
-			validation: (Rule) => Rule.required()
-		}),
-		defineField({
-			name: 'sourceLevel',
-			title: 'Source level',
-			type: 'string',
-			options: { list: [...REVIEW_SOURCE_LEVELS], layout: 'dropdown' },
-			initialValue: 'derived',
-			validation: (Rule) => Rule.required(),
-			description: 'Whether this review item was flagged automatically or raised manually by a team member.'
-		}),
-		defineField({
-			name: 'visibleToReviewer',
-			title: 'Visible to reviewer',
-			type: 'boolean',
-			initialValue: true,
-			description: 'When false, item is hidden from the reviewer checklist.'
-		}),
-		defineField({
 			name: 'blocksPublish',
 			title: 'Blocks publish',
 			type: 'boolean',
 			initialValue: true,
-			description: 'When ticked, this listing cannot be approved for publishing until this item is resolved.'
+			description:
+				'When ticked, this listing cannot move to status = published until the item is resolved. Resolve by deleting the row once handled. Leave unticked to record a non-blocking note.'
 		}),
 		defineField({
 			name: 'category',
@@ -71,35 +34,17 @@ export const reviewItem = defineType({
 			validation: (Rule) => Rule.required()
 		})
 	],
-	validation: (Rule) =>
-		Rule.custom((value) => {
-			if (!value) return true;
-
-			const item = value as ReviewItemValue;
-
-			if (item.severity === 'internal_note') {
-				if (item.visibleToReviewer) {
-					return 'Internal notes must not be visible to the reviewer.';
-				}
-				if (item.blocksPublish) {
-					return 'Internal notes must not block publish.';
-				}
-			}
-
-			return true;
-		}),
 	preview: {
 		select: {
 			label: 'label',
-			severity: 'severity',
 			category: 'category',
 			blocksPublish: 'blocksPublish'
 		},
-		prepare({ label, severity, category, blocksPublish }) {
-			const blocker = blocksPublish ? ' · blocks publish' : '';
+		prepare({ label, category, blocksPublish }) {
+			const blocker = blocksPublish ? ' · blocks publish' : ' · note';
 			return {
 				title: label || 'Review item',
-				subtitle: [severity, category].filter(Boolean).join(' · ') + blocker
+				subtitle: (category || '').replace(/_/g, ' ') + blocker
 			};
 		}
 	}

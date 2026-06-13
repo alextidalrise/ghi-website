@@ -1,181 +1,41 @@
-import { defineArrayMember, defineField, defineType } from 'sanity';
-import {
-	CHANNEL_KEYS,
-	CHANNEL_READINESS_STATUSES,
-	CONTENT_STATUSES,
-	PUBLISH_READINESS
-} from '../constants/enums';
+import { defineArrayMember, defineField, type FieldDefinition } from 'sanity';
+import { LISTING_STATUSES } from '../constants/enums';
 import { ReviewItemsInput } from '../../components/ReviewItemsInput';
 
-type ReviewItemEntry = {
-	blocksPublish?: boolean;
-};
+/**
+ * Reusable status + reviewItems[] field definitions, applied at the document
+ * top level on every gateable doc. Together with `internal` they form the
+ * single Studio "Internal" group on each document.
+ *
+ * Public website rendering keys off `status === 'published'`. The publish
+ * gate validator (validators/rules.ts) refuses to set status = 'published'
+ * while any reviewItem has blocksPublish = true.
+ */
+export function statusField(group: string = 'internal'): FieldDefinition<'string'> {
+	return defineField({
+		name: 'status',
+		title: 'Status',
+		type: 'string',
+		group,
+		options: { list: [...LISTING_STATUSES], layout: 'dropdown' },
+		initialValue: 'draft',
+		validation: (Rule) => Rule.required(),
+		description:
+			'Lifecycle of this document. The website renders only `published`. To publish, clear all blocking review items first — the publish gate validator enforces this.'
+	});
+}
 
-export const channelReadinessItem = defineType({
-	name: 'channelReadinessItem',
-	title: 'Channel readiness',
-	type: 'object',
-	fields: [
-		defineField({
-			name: 'channel',
-			title: 'Channel',
-			type: 'string',
-			options: { list: [...CHANNEL_KEYS], layout: 'dropdown' },
-			validation: (Rule) => Rule.required()
-		}),
-		defineField({
-			name: 'status',
-			title: 'Status',
-			type: 'string',
-			options: { list: [...CHANNEL_READINESS_STATUSES], layout: 'dropdown' },
-			initialValue: 'not_ready',
-			validation: (Rule) => Rule.required()
-		}),
-		defineField({
-			name: 'notes',
-			title: 'Notes',
-			type: 'string'
-		})
-	],
-	preview: {
-		select: { title: 'channel', subtitle: 'status' }
-	}
-});
-
-export const workflowFields = defineType({
-	name: 'workflowFields',
-	title: 'Workflow & readiness',
-	type: 'object',
-	description: 'Internal publishing workflow — none of these fields appear on the website.',
-	fields: [
-		defineField({
-			name: 'contentStatus',
-			title: 'Content status',
-			type: 'string',
-			options: { list: [...CONTENT_STATUSES], layout: 'dropdown' },
-			initialValue: 'draft',
-			validation: (Rule) => Rule.required()
-		}),
-		defineField({
-			name: 'publishReadiness',
-			title: 'Publish readiness',
-			type: 'string',
-			options: { list: [...PUBLISH_READINESS], layout: 'dropdown' },
-			initialValue: 'metadata_only',
-			validation: (Rule) => Rule.required()
-		}),
-		defineField({
-			name: 'channelReadiness',
-			title: 'Channel readiness',
-			type: 'array',
-			of: [defineArrayMember({ type: 'channelReadinessItem' })]
-		}),
-		defineField({
-			name: 'reviewItems',
-			title: 'Review items',
-			type: 'array',
-			of: [defineArrayMember({ type: 'reviewItem' })],
-			description:
-				"Items flagged for review before this listing can be approved for publishing. Media checks should cover gallery order (first image is hero), and alt text — not image rights, public-use status, or aerial privacy. Use this instead of the older 'facts needing confirmation' field.",
-			components: {
-				input: ReviewItemsInput
-			}
-		}),
-		defineField({
-			name: 'factsNeedingConfirmation',
-			title: 'Facts needing confirmation (legacy)',
-			type: 'array',
-			of: [{ type: 'string' }],
-			description: 'Deprecated — use review items instead.',
-			hidden: true
-		}),
-		defineField({
-			name: 'missingSourceFields',
-			title: 'Missing source fields (legacy)',
-			type: 'array',
-			of: [{ type: 'string' }],
-			description: 'Deprecated — use review items instead.',
-			hidden: true
-		}),
-		defineField({
-			name: 'approvalNotes',
-			title: 'Approval notes',
-			type: 'text',
-			rows: 3
-		}),
-		defineField({
-			name: 'approvedBy',
-			title: 'Approved by',
-			type: 'string',
-			description: 'The name of the team member who approved this listing.'
-		}),
-		defineField({
-			name: 'approvedAt',
-			title: 'Approved at',
-			type: 'datetime'
-		}),
-		defineField({
-			name: 'lastSourceReviewAt',
-			title: 'Last source review at',
-			type: 'datetime'
-		}),
-		defineField({
-			name: 'doNotPublishReason',
-			title: 'Do not publish reason',
-			type: 'text',
-			rows: 3,
-			description: 'The reason this listing must not be published. Internal only — never shown on the website.'
-		}),
-		defineField({
-			name: 'humanReviewed',
-			title: 'Human reviewed',
-			type: 'boolean',
-			initialValue: false
-		})
-	],
-	validation: (Rule) =>
-		Rule.custom((value) => {
-			if (!value) return true;
-
-			const readiness = value.publishReadiness as string | undefined;
-			const reviewItems = (value.reviewItems ?? []) as ReviewItemEntry[];
-			const legacyFacts = value.factsNeedingConfirmation as string[] | undefined;
-			const doNotPublish = value.doNotPublishReason as string | undefined;
-
-			const blockers = reviewItems.filter((item) => item.blocksPublish);
-
-			if (readiness === 'approved_for_publish' && blockers.length > 0) {
-				return `Cannot approve for publish: ${blockers.length} publish-blocking review item(s) remain.`;
-			}
-
-			if (
-				readiness === 'approved_for_publish' &&
-				Array.isArray(legacyFacts) &&
-				legacyFacts.length > 0
-			) {
-				return 'Cannot approve for publish while legacy facts still need confirmation.';
-			}
-
-			if (readiness === 'approved_for_publish' && doNotPublish) {
-				return 'Cannot approve for publish while a do-not-publish reason is set.';
-			}
-
-			if (readiness === 'approved_for_publish' && !value.approvedBy) {
-				return 'Approved for publish requires an approver identity.';
-			}
-
-			return true;
-		}),
-	preview: {
-		select: {
-			contentStatus: 'contentStatus',
-			publishReadiness: 'publishReadiness'
-		},
-		prepare({ contentStatus, publishReadiness }) {
-			return {
-				title: publishReadiness || 'Workflow',
-				subtitle: contentStatus
-			};
+export function reviewItemsField(group: string = 'internal') {
+	return defineField({
+		name: 'reviewItems',
+		title: 'Review items',
+		type: 'array',
+		group,
+		of: [defineArrayMember({ type: 'reviewItem' })],
+		description:
+			'Items flagged for review before this listing can be published. Each item either blocks publish or is a non-blocking note.',
+		components: {
+			input: ReviewItemsInput
 		}
-	}
-});
+	});
+}

@@ -5,18 +5,20 @@ import { guideCallout, guideKeyFigures, guideSection } from './guideContent';
 import { marketingChannelNotes, marketingFields } from './marketingFields';
 import { ctaFields, enquiryRouting } from './ctaFields';
 import { golfFields } from './golfFields';
+import {
+	internalCommission,
+	internalFeesTax,
+	internalFields,
+	internalSourceEntry
+} from './internalFields';
 import { locationFields } from './locationFields';
 import { mediaAssetMetadata } from './mediaAssetMetadata';
 import { galleryGroup, mediaFields } from './mediaFields';
 import { pricingFields } from './pricingFields';
-import { privateReportingFields } from './privateReportingFields';
-import { sensitiveGovernanceFields } from './sensitiveGovernanceFields';
 import { relatedContentFields } from './relatedContentFields';
-import { seoFields } from './seoFields';
-import { sourceProvenance } from './sourceProvenance';
-import { specsFields } from './specsFields';
 import { reviewItem } from './reviewItem';
-import { channelReadinessItem, workflowFields } from './workflowFields';
+import { seoFields } from './seoFields';
+import { specsFields } from './specsFields';
 
 /** Shared object schemas referenced by document types. */
 export const objectTypes: SchemaTypeDefinition[] = [
@@ -24,10 +26,11 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	featureHighlight,
 	galleryGroup,
 	enquiryRouting,
-	channelReadinessItem,
 	reviewItem,
 	mediaAssetMetadata,
-	sourceProvenance,
+	internalSourceEntry,
+	internalCommission,
+	internalFeesTax,
 	marketingChannelNotes,
 	// Guide content objects (registered before the guideSection that nests them)
 	guideCallout,
@@ -44,13 +47,10 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	ctaFields,
 	relatedContentFields,
 	seoFields,
-	workflowFields,
-	sensitiveGovernanceFields,
-	privateReportingFields
+	internalFields
 ];
 
 export {
-	channelReadinessItem,
 	reviewItem,
 	contentFields,
 	marketingFields,
@@ -63,14 +63,14 @@ export {
 	guideKeyFigures,
 	guideSection,
 	golfFields,
+	internalCommission,
+	internalFeesTax,
+	internalFields,
+	internalSourceEntry,
 	locationFields,
 	mediaAssetMetadata,
 	mediaFields,
 	pricingFields,
-	privateReportingFields,
-	sensitiveGovernanceFields,
 	seoFields,
-	sourceProvenance,
-	specsFields,
-	workflowFields
+	specsFields
 };

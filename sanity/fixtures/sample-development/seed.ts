@@ -67,17 +67,6 @@ function readSanityCliAuthToken(): string | undefined {
 	}
 }
 
-function approvedWorkflow() {
-	return {
-		_type: 'workflowFields' as const,
-		contentStatus: 'published',
-		publishReadiness: 'approved_for_publish',
-		approvedBy: 'sample-fixture',
-		approvedAt: '2026-06-06T12:00:00.000Z',
-		humanReviewed: true
-	};
-}
-
 function mediaAsset(assetId: string, altText: string, key: string) {
 	return {
 		_key: key,
@@ -95,8 +84,7 @@ function pricing(fields: Record<string, unknown>) {
 	return {
 		_type: 'pricingFields' as const,
 		currency: 'EUR',
-		priceSourceStatus: 'source_confirmed',
-		publicVisibility: 'visible',
+		priceConfirmed: true,
 		...fields
 	};
 }
@@ -137,14 +125,14 @@ function buildUnit(assetId: string, u: RawUnit): IdentifiedSanityDocumentStub {
 		listingKind: 'unit',
 		floor: u.floor,
 		phase: 'Riverside Phase',
+		status: 'published',
 		pricing: pricing({
 			price: u.price,
 			priceDisplay: String(u.price),
 			availabilityStatus: u.status,
 			completionStatus: 'completed'
 		}),
-		specs: specs({ bedrooms: u.beds, bathrooms: u.beds, builtArea: u.area }),
-		workflow: approvedWorkflow()
+		specs: specs({ bedrooms: u.beds, bathrooms: u.beds, builtArea: u.area })
 	};
 }
 
@@ -163,13 +151,13 @@ function buildUnitType(
 		propertyType,
 		parentDevelopment: ref(IDS.development),
 		listingKind: 'unit_type',
+		status: 'published',
 		pricing: pricing({ availabilityStatus: 'available' }),
 		specs: specs({ bedrooms, builtArea: areaFrom }),
 		gallery: [
 			mediaAsset(assetId, `${name} — living space`, 'g1'),
 			mediaAsset(assetId, `${name} — terrace`, 'g2')
-		],
-		workflow: approvedWorkflow()
+		]
 	};
 }
 
@@ -261,13 +249,13 @@ function buildDevelopment(assetId: string, includeChildren = true): IdentifiedSa
 			_type: 'golfFields',
 			golfRelevance: 'frontline_golf'
 		},
+		status: 'published',
 		...(includeChildren
 			? {
 					unitTypes: [ref(IDS.type1, 'ut1'), ref(IDS.type2, 'ut2'), ref(IDS.type3, 'ut3')],
 					units: UNITS.map((u) => ref(`sample.unit.${u.key}`, u.key))
 				}
-			: {}),
-		workflow: approvedWorkflow()
+			: {})
 	};
 }
 

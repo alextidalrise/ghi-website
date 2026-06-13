@@ -65,7 +65,7 @@ describe('fetchListingCards', () => {
 		const raw = baseCard({
 			pricing: {
 				...goldenPropertyRaw.pricing,
-				priceSourceStatus: 'folder_hint_only'
+				priceConfirmed: false
 			} as RawPropertyCard['pricing']
 		});
 
@@ -99,7 +99,7 @@ describe('fetchListingCards', () => {
 		expect(result.total).toBe(1);
 		expect(result.cards).toHaveLength(1);
 		expect(result.cards[0]).toEqual({ kind: 'property', card: toPublicPropertyCard(raw) });
-		expect(JSON.stringify(result.cards[0])).not.toContain('priceSourceStatus');
+		expect(JSON.stringify(result.cards[0])).not.toContain('priceConfirmed');
 	});
 
 	it('discriminates a development row into a development card with aggregated inventory', async () => {

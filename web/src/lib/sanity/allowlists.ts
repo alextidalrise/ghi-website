@@ -74,7 +74,11 @@ export const LOCATION_PUBLIC = /* groq */ `{
   addressDisplay
 }`;
 
-/** Public pricing fields — governance fields excluded. */
+/**
+ * Public pricing fields. `priceConfirmed` rides through so the transform layer
+ * can collapse to POA when false; numeric prices are still projected so the
+ * transform — not GROQ — is the single point of POA enforcement.
+ */
 export const PRICING_PUBLIC = /* groq */ `{
   price,
   priceFrom,
@@ -82,7 +86,7 @@ export const PRICING_PUBLIC = /* groq */ `{
   priceDisplay,
   currency,
   priceQualifier,
-  priceSourceStatus,
+  priceConfirmed,
   availabilityStatus,
   completionStatus,
   completionDate,
@@ -101,7 +105,7 @@ export const MEDIA_PUBLIC = /* groq */ `{
   videoUrl,
   virtualTourUrl,
   brochure${MEDIA_ASSET_PUBLIC},
-  brochureVisibility
+  brochurePublic
 }`;
 
 /** Public website content fields — marketing source and editorial workflow excluded. */
@@ -395,7 +399,6 @@ export const DEVELOPMENT_PUBLIC = /* groq */ `{
   },
   sharedGallery[]${MEDIA_ASSET_PUBLIC},
   media${MEDIA_PUBLIC},
-  brochureVisibility,
   content${CONTENT_PUBLIC},
   golf${GOLF_PUBLIC},
   ctas${CTA_PUBLIC},
@@ -550,7 +553,6 @@ export const DEVELOPMENT_WITH_CANONICAL = /* groq */ `{
   },
   sharedGallery[]${MEDIA_ASSET_PUBLIC},
   media${MEDIA_PUBLIC},
-  brochureVisibility,
   content${CONTENT_PUBLIC},
   golf${GOLF_PUBLIC},
   ctas${CTA_PUBLIC},

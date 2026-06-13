@@ -1,5 +1,6 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { validatePricingFields } from '../validators/rules';
+import { reviewItemsField, statusField } from '../objects/workflowFields';
+import { validatePricingFields, validatePublishGate } from '../validators/rules';
 
 export const unit = defineType({
 	name: 'unit',
@@ -7,7 +8,7 @@ export const unit = defineType({
 	type: 'document',
 	groups: [
 		{ name: 'details', title: 'Details', default: true },
-		{ name: 'governance', title: 'Governance & workflow' }
+		{ name: 'internal', title: 'Internal' }
 	],
 	fields: [
 		defineField({
@@ -41,7 +42,7 @@ export const unit = defineType({
 			type: 'slug',
 			group: 'details',
 			description:
-				'The final segment of this unit\'s URL, nested under its development (e.g. .../epic-golden-mile/unit-14-04).',
+				"The final segment of this unit's URL, nested under its development (e.g. .../epic-golden-mile/unit-14-04).",
 			options: { source: (doc) => (doc.unitName as string) || (doc.unitNumber as string) || '', maxLength: 96 },
 			validation: (Rule) => Rule.required()
 		}),
@@ -60,7 +61,7 @@ export const unit = defineType({
 			group: 'details',
 			to: [{ type: 'unitType' }],
 			description:
-				'Recommended. The typology this unit belongs to (e.g. "2-bed apartment"). The unit page shares its type\'s gallery and inherits its property type; only this unit\'s price, size, floor and number are its own. When unset, the unit page falls back to the development\'s own imagery.'
+				"Recommended. The typology this unit belongs to (e.g. \"2-bed apartment\"). The unit page shares its type's gallery and inherits its property type; only this unit's price, size, floor and number are its own. When unset, the unit page falls back to the development's own imagery."
 		}),
 		defineField({
 			name: 'listingKind',
@@ -92,7 +93,7 @@ export const unit = defineType({
 			type: 'pricingFields',
 			group: 'details',
 			description:
-				'Pricing and availability for this unit. Reserved units must be set to hidden or internal — they will not appear on the website.'
+				'Pricing and availability for this unit. Reserved/sold units render as locked inventory rows; withdrawn units are dropped from the website.'
 		}),
 		defineField({
 			name: 'specs',
@@ -114,35 +115,30 @@ export const unit = defineType({
 			group: 'details',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
 			description:
-				'Optional. Photos specific to this unit. Normally left empty — the unit page inherits its unit type\'s shared gallery. Set this only when this unit genuinely has its own images, which then override the type\'s.'
+				"Optional. Photos specific to this unit. Normally left empty — the unit page inherits its unit type's shared gallery. Set this only when this unit genuinely has its own images, which then override the type's."
 		}),
+		statusField('internal'),
+		reviewItemsField('internal'),
 		defineField({
-			name: 'unitSpecificNotes',
-			title: 'Unit-specific notes',
-			type: 'text',
-			group: 'governance',
-			rows: 3,
-			description: 'Internal notes about this unit from the source or sales team. Not shown on the website.'
-		}),
-		defineField({
-			name: 'sourceProvenance',
-			title: 'Source provenance',
-			type: 'array',
-			group: 'governance',
-			of: [defineArrayMember({ type: 'sourceProvenance' })],
-			description: 'Internal audit trail showing where this unit\'s data came from. Not shown on the website.'
-		}),
-		defineField({
-			name: 'workflow',
-			title: 'Workflow & readiness',
-			type: 'workflowFields',
-			group: 'governance'
+			name: 'internal',
+			title: 'Internal',
+			type: 'internalFields',
+			group: 'internal',
+			description: 'Categorically private namespace — never projected by GROQ allowlists.'
 		})
 	],
 	validation: (Rule) =>
 		Rule.custom((document) => {
-			const doc = document as { pricing?: Parameters<typeof validatePricingFields>[0] };
-			return validatePricingFields(doc?.pricing);
+			const doc = document as {
+				pricing?: Parameters<typeof validatePricingFields>[0];
+				status?: string;
+				reviewItems?: Array<{ blocksPublish?: boolean }>;
+			};
+
+			const pricingResult = validatePricingFields(doc?.pricing);
+			if (pricingResult !== true) return pricingResult;
+
+			return validatePublishGate({ status: doc.status, reviewItems: doc.reviewItems });
 		}),
 	preview: {
 		select: {
@@ -150,11 +146,11 @@ export const unit = defineType({
 			unitNumber: 'unitNumber',
 			development: 'parentDevelopment.developmentName',
 			availability: 'pricing.availabilityStatus',
-			visibility: 'pricing.publicVisibility'
+			status: 'status'
 		},
-		prepare({ title, unitNumber, development, availability, visibility }) {
+		prepare({ title, unitNumber, development, availability, status }) {
 			const label = unitNumber ? `${title} (${unitNumber})` : title;
-			const subtitle = [development, availability, visibility].filter(Boolean).join(' · ');
+			const subtitle = [status, development, availability].filter(Boolean).join(' · ');
 			return { title: label || 'Unit', subtitle: subtitle || undefined };
 		}
 	}

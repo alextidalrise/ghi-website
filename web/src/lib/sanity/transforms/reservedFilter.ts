@@ -36,40 +36,14 @@ function dedupeById<T extends UnitLike>(units: T[]): T[] {
 	});
 }
 
-/** Exclude reserved or non-visible child units from development public payloads. */
-export function filterReservedUnits<T extends UnitLike>(units: T[] | null | undefined): T[] {
-	if (!Array.isArray(units)) {
-		return [];
-	}
-
-	return dedupeById(
-		units.filter((unit): unit is T => {
-			if (!unit) return false;
-
-			const pricing = unit.pricing;
-			if (!pricing) {
-				return true;
-			}
-
-			const visibility = pricing.publicVisibility ?? 'visible';
-			if (visibility !== 'visible') {
-				return false;
-			}
-
-			return pricing.availabilityStatus !== 'reserved';
-		})
-	);
-}
-
-export function filterReservedUnitTypes<T extends UnitLike>(unitTypes: T[] | null | undefined): T[] {
-	return filterReservedUnits(unitTypes);
-}
-
 /**
- * Units shown in the development inventory table. Hidden/internal/preview units are
- * dropped, but reserved and sold units are KEPT so the table can list them in a
- * locked, non-clickable row (matching the agreed inventory design). Availability
- * gating for clickability happens in the UI, not here.
+ * Inventory display policy (single source of truth):
+ * - withdrawn → drop from public output entirely.
+ * - reserved / sold → kept (rendered as a locked, non-clickable inventory row in the UI).
+ * - everything else → kept and clickable.
+ *
+ * Document-level `status` gating is handled upstream by the GROQ filter; this
+ * transform only encodes the availability-based display policy.
  */
 export function filterDisplayableUnits<T extends UnitLike>(units: T[] | null | undefined): T[] {
 	if (!Array.isArray(units)) {
@@ -79,9 +53,19 @@ export function filterDisplayableUnits<T extends UnitLike>(units: T[] | null | u
 	return dedupeById(
 		units.filter((unit): unit is T => {
 			if (!unit) return false;
-
-			const visibility = unit.pricing?.publicVisibility ?? 'visible';
-			return visibility === 'visible';
+			return unit.pricing?.availabilityStatus !== 'withdrawn';
 		})
 	);
 }
+
+/** Same policy applies to typology rows in the inventory. */
+export function filterReservedUnitTypes<T extends UnitLike>(unitTypes: T[] | null | undefined): T[] {
+	return filterDisplayableUnits(unitTypes);
+}
+
+/**
+ * Back-compat alias: external callers (and tests) used `filterReservedUnits`
+ * for the "exclude unsellable" view. Under the new policy, withdrawn-only is
+ * the sole categorical exclusion, so this resolves to `filterDisplayableUnits`.
+ */
+export const filterReservedUnits = filterDisplayableUnits;

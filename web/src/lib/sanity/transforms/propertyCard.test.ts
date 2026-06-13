@@ -74,7 +74,7 @@ describe('toPublicPropertyCard', () => {
 		expect(card.location?.addressDisplay).toBe('Costa del Sol, Spain');
 	});
 
-	it('strips folder_hint_only numeric prices and keeps POA display', () => {
+	it('strips numeric prices and renders POA when priceConfirmed is false', () => {
 		const card = toPublicPropertyCard(
 			baseCard({
 				pricing: {
@@ -83,7 +83,7 @@ describe('toPublicPropertyCard', () => {
 					priceTo: 720_000,
 					priceDisplay: 'POA',
 					currency: 'EUR',
-					priceSourceStatus: 'folder_hint_only',
+					priceConfirmed: false,
 					availabilityStatus: 'available',
 					completionStatus: null,
 					completionDate: null,
@@ -132,7 +132,7 @@ describe('toPublicPropertyCard', () => {
 		const card = toPublicPropertyCard(baseCard());
 		const serialized = JSON.stringify(card);
 
-		expect(serialized).not.toContain('priceSourceStatus');
+		expect(serialized).not.toContain('priceConfirmed');
 		expect(serialized).not.toContain('"media"');
 	});
 });

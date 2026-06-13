@@ -79,6 +79,14 @@
 		"migrate:backfill-unit-slugs:dry-run": "tsx migrations/backfill-unit-slugs-migrate.ts --dry-run",
 		"migrate:fix-draft-ref-prefix": "tsx migrations/fix-draft-ref-prefix-migrate.ts",
 		"migrate:fix-draft-ref-prefix:dry-run": "tsx migrations/fix-draft-ref-prefix-migrate.ts --dry-run",
+		"wipe:legacy-gating-fields": "tsx migrations/wipe-legacy-gating-fields.ts",
+		"wipe:legacy-gating-fields:dry-run": "tsx migrations/wipe-legacy-gating-fields.ts --dry-run",
+		"migrate:default-status": "tsx migrations/set-default-status-migrate.ts",
+		"migrate:default-status:dry-run": "tsx migrations/set-default-status-migrate.ts --dry-run",
+		"migrate:restore-review-items": "tsx migrations/restore-review-items-migrate.ts",
+		"migrate:restore-review-items:dry-run": "tsx migrations/restore-review-items-migrate.ts --dry-run",
+		"migrate:unit-specific-notes": "tsx migrations/migrate-unit-specific-notes.ts",
+		"migrate:unit-specific-notes:dry-run": "tsx migrations/migrate-unit-specific-notes.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

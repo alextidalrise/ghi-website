@@ -24,6 +24,6 @@ export function formatEnumLabel(value: string | null | undefined): string {
 	return value.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-export function effectiveBrochureVisibility(development: PublicDevelopment): string {
-	return development.brochureVisibility ?? development.media?.brochureVisibility ?? 'request_only';
+export function effectiveBrochurePublic(development: PublicDevelopment): boolean {
+	return development.media?.brochurePublic === true;
 }

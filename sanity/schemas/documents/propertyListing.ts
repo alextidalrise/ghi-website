@@ -1,11 +1,12 @@
-import { defineArrayMember, defineField, defineType } from 'sanity';
+import { defineField, defineType } from 'sanity';
 import { HideFieldTitle } from '../../components/HideFieldTitle';
 import { LocationFieldsInput } from '../../components/LocationFieldsInput';
 import { PROPERTY_LISTING_KINDS, PROPERTY_TYPES, TRANSACTION_TYPES } from '../constants/enums';
+import { reviewItemsField, statusField } from '../objects/workflowFields';
 import {
 	ghiListingIdRule,
 	validatePricingFields,
-	validatePrivateReportingFields
+	validatePublishGate
 } from '../validators/rules';
 
 export const propertyListing = defineType({
@@ -22,7 +23,7 @@ export const propertyListing = defineType({
 		{ name: 'golf', title: 'Golf' },
 		{ name: 'related', title: 'Related listings' },
 		{ name: 'seo', title: 'SEO & CTAs' },
-		{ name: 'governance', title: 'Governance & workflow' }
+		{ name: 'internal', title: 'Internal' }
 	],
 	fields: [
 		defineField({
@@ -81,14 +82,14 @@ export const propertyListing = defineType({
 			name: 'sourceReference',
 			title: 'Source reference',
 			type: 'string',
-			group: 'governance',
+			group: 'internal',
 			description: 'Internal reference from the source brochure or data provider. Not shown on the website.'
 		}),
 		defineField({
 			name: 'developerReference',
 			title: 'Developer reference',
 			type: 'string',
-			group: 'governance',
+			group: 'internal',
 			description: "The developer's own reference code for this property. Internal only unless specifically approved for public display."
 		}),
 		defineField({
@@ -106,7 +107,7 @@ export const propertyListing = defineType({
 			type: 'pricingFields',
 			group: 'pricing',
 			description:
-				'A price sourced only from a folder hint cannot be shown publicly. Reserved listings must be set to hidden or internal.'
+				'Untick "Price confirmed" to render POA on the website regardless of any numeric price.'
 		}),
 		defineField({
 			name: 'specs',
@@ -156,32 +157,14 @@ export const propertyListing = defineType({
 			type: 'seoFields',
 			group: 'seo'
 		}),
+		statusField('internal'),
+		reviewItemsField('internal'),
 		defineField({
-			name: 'sourceProvenance',
-			title: 'Source provenance',
-			type: 'array',
-			group: 'governance',
-			of: [defineArrayMember({ type: 'sourceProvenance' })],
-			description: 'Internal audit trail showing where this listing\'s data came from. Never shown on the website or in any public data.'
-		}),
-		defineField({
-			name: 'workflow',
-			title: 'Workflow & readiness',
-			type: 'workflowFields',
-			group: 'governance'
-		}),
-		defineField({
-			name: 'sensitiveGovernance',
-			title: 'Sensitive governance',
-			type: 'sensitiveGovernanceFields',
-			group: 'governance'
-		}),
-		defineField({
-			name: 'privateReporting',
-			title: 'Private reporting',
-			type: 'privateReportingFields',
-			group: 'governance',
-			description: 'Commission and financial details for internal reporting only. Never shown on the website.'
+			name: 'internal',
+			title: 'Internal',
+			type: 'internalFields',
+			group: 'internal',
+			description: 'Categorically private namespace — never projected by GROQ allowlists.'
 		})
 	],
 	validation: (Rule) =>
@@ -189,7 +172,8 @@ export const propertyListing = defineType({
 			const doc = document as {
 				listingKind?: string;
 				pricing?: Parameters<typeof validatePricingFields>[0];
-				privateReporting?: Parameters<typeof validatePrivateReportingFields>[0];
+				status?: string;
+				reviewItems?: Array<{ blocksPublish?: boolean }>;
 			};
 
 			if (doc?.listingKind && !['property', 'unit'].includes(doc.listingKind)) {
@@ -199,7 +183,7 @@ export const propertyListing = defineType({
 			const pricingResult = validatePricingFields(doc?.pricing);
 			if (pricingResult !== true) return pricingResult;
 
-			return validatePrivateReportingFields(doc?.privateReporting);
+			return validatePublishGate({ status: doc.status, reviewItems: doc.reviewItems });
 		}),
 	preview: {
 		select: {
@@ -208,10 +192,11 @@ export const propertyListing = defineType({
 			propertyType: 'propertyType',
 			listingKind: 'listingKind',
 			location: 'location.location.name',
-			priceDisplay: 'pricing.priceDisplay'
+			priceDisplay: 'pricing.priceDisplay',
+			status: 'status'
 		},
-		prepare({ title, ghiId, propertyType, listingKind, location: locationName, priceDisplay }) {
-			const subtitle = [ghiId, propertyType, listingKind, locationName, priceDisplay]
+		prepare({ title, ghiId, propertyType, listingKind, location: locationName, priceDisplay, status }) {
+			const subtitle = [status, ghiId, propertyType, listingKind, locationName, priceDisplay]
 				.filter(Boolean)
 				.join(' · ');
 			return {

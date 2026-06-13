@@ -75,7 +75,7 @@ function buildDemoCards(): PublicPropertyCard[] {
 				priceTo: 720_000,
 				priceDisplay: 'POA',
 				currency: 'EUR',
-				priceSourceStatus: 'folder_hint_only',
+				priceConfirmed: false,
 				availabilityStatus: 'available',
 				completionStatus: null,
 				completionDate: null,

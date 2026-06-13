@@ -1,21 +1,35 @@
-import { BookIcon, DesktopIcon, EarthAmericasIcon, EyeOpenIcon } from '@sanity/icons';
+import {
+	BookIcon,
+	CheckmarkIcon,
+	ClipboardIcon,
+	DesktopIcon,
+	DocumentIcon,
+	EarthAmericasIcon,
+	EditIcon,
+	EyeClosedIcon,
+	WarningOutlineIcon
+} from '@sanity/icons';
 import type { StructureResolver } from 'sanity/structure';
 
 /**
- * Individual review-blocker GROQ predicates. A propertyListing appears in the
- * "Needs review" view when ANY of these evaluate to true. Once every blocker is
- * resolved and the document is saved, the listing drops out automatically.
+ * Status-driven desk views. Each lifecycle stage gets its own list so the
+ * desk maps 1:1 to how listings move through intake → review → live → off.
+ * "Published but blocked" is a safety-net view that should normally be empty:
+ * if anything appears there, a published listing has an unresolved blocking
+ * review item and a human should resolve it or move the listing back to
+ * in_review.
  */
-const REVIEW_BLOCKERS = [
-	'workflow.humanReviewed != true',
-	'workflow.publishReadiness == "governance_hold"',
-	'sensitiveGovernance.sensitiveReviewStatus in ["pending", "in_review", "blocked"]',
-	'sensitiveGovernance.requiresHumanApproval == true',
-	'count(sourceProvenance[publicSafeStatus == "needs_review"]) > 0',
-	'count(workflow.reviewItems[blocksPublish == true]) > 0 || count(workflow.factsNeedingConfirmation) > 0 || count(workflow.missingSourceFields) > 0',
-];
+const DRAFTS_PREDICATE = 'coalesce(status, "draft") == "draft"';
+const IN_REVIEW_PREDICATE = 'coalesce(status, "draft") == "in_review"';
+const PUBLISHED_PREDICATE = 'coalesce(status, "draft") == "published"';
+const UNPUBLISHED_PREDICATE = 'coalesce(status, "draft") in ["unpublished", "archived"]';
+const PUBLISHED_BUT_BLOCKED_PREDICATE = `${PUBLISHED_PREDICATE} && count(reviewItems[blocksPublish == true]) > 0`;
 
-const NEEDS_REVIEW_FILTER = `_type == "propertyListing" && (${REVIEW_BLOCKERS.join(' || ')})`;
+const GATEABLE_TYPES = ['propertyListing', 'development', 'unit', 'unitType'] as const;
+const GATEABLE_TYPES_GROQ = `[${GATEABLE_TYPES.map((t) => `"${t}"`).join(', ')}]`;
+
+const filterFor = (predicate: string) =>
+	`_type in ${GATEABLE_TYPES_GROQ} && (${predicate})`;
 
 export const deskStructure: StructureResolver = (S) =>
 	S.list()
@@ -51,13 +65,13 @@ export const deskStructure: StructureResolver = (S) =>
 								.child(S.documentTypeList('unitType').title('Unit types'))
 						])
 				),
-		S.listItem()
-			.title('Places')
-			.icon(EarthAmericasIcon)
-			.child(
-				S.list()
-					.title('Places')
-					.items([
+			S.listItem()
+				.title('Places')
+				.icon(EarthAmericasIcon)
+				.child(
+					S.list()
+						.title('Places')
+						.items([
 							S.listItem()
 								.title('Countries')
 								.id('location-taxonomy-countries')
@@ -168,13 +182,63 @@ export const deskStructure: StructureResolver = (S) =>
 				),
 			S.divider(),
 			S.listItem()
-				.title('Needs review')
-				.icon(EyeOpenIcon)
+				.title('Listings status')
+				.icon(ClipboardIcon)
 				.child(
-					S.documentList()
-						.title('Needs review')
-						.schemaType('propertyListing')
-						.filter(NEEDS_REVIEW_FILTER)
-						.defaultOrdering([{ field: '_updatedAt', direction: 'desc' }])
+					S.list()
+						.title('Listings status')
+						.items([
+							S.listItem()
+								.title('Drafts')
+								.icon(DocumentIcon)
+								.child(
+									S.documentList()
+										.title('Drafts')
+										.schemaType('propertyListing')
+										.filter(filterFor(DRAFTS_PREDICATE))
+										.defaultOrdering([{ field: '_updatedAt', direction: 'desc' }])
+								),
+							S.listItem()
+								.title('In review')
+								.icon(EditIcon)
+								.child(
+									S.documentList()
+										.title('In review')
+										.schemaType('propertyListing')
+										.filter(filterFor(IN_REVIEW_PREDICATE))
+										.defaultOrdering([{ field: '_updatedAt', direction: 'desc' }])
+								),
+							S.listItem()
+								.title('Published')
+								.icon(CheckmarkIcon)
+								.child(
+									S.documentList()
+										.title('Published')
+										.schemaType('propertyListing')
+										.filter(filterFor(PUBLISHED_PREDICATE))
+										.defaultOrdering([{ field: '_updatedAt', direction: 'desc' }])
+								),
+							S.listItem()
+								.title('Unpublished')
+								.icon(EyeClosedIcon)
+								.child(
+									S.documentList()
+										.title('Unpublished')
+										.schemaType('propertyListing')
+										.filter(filterFor(UNPUBLISHED_PREDICATE))
+										.defaultOrdering([{ field: '_updatedAt', direction: 'desc' }])
+								),
+							S.divider(),
+							S.listItem()
+								.title('Published but blocked')
+								.icon(WarningOutlineIcon)
+								.child(
+									S.documentList()
+										.title('Published but blocked')
+										.schemaType('propertyListing')
+										.filter(filterFor(PUBLISHED_BUT_BLOCKED_PREDICATE))
+										.defaultOrdering([{ field: '_updatedAt', direction: 'desc' }])
+								)
+						])
 				)
 		]);

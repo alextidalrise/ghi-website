@@ -25,7 +25,7 @@
 			videoUrl: base?.videoUrl ?? null,
 			virtualTourUrl: base?.virtualTourUrl ?? null,
 			brochure: base?.brochure ?? null,
-			brochureVisibility: base?.brochureVisibility ?? development.brochureVisibility ?? 'request_only'
+			brochurePublic: base?.brochurePublic ?? false
 		};
 	});
 </script>

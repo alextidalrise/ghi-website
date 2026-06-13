@@ -1,5 +1,4 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { BROCHURE_VISIBILITY } from '../constants/enums';
 
 export const galleryGroup = defineType({
 	name: 'galleryGroup',
@@ -73,29 +72,28 @@ export const mediaFields = defineType({
 			name: 'brochure',
 			title: 'Brochure',
 			type: 'mediaAssetMetadata',
-			description: 'The downloadable property brochure. Hidden by default until brochure visibility is set to allow downloads.'
+			description:
+				'The downloadable property brochure. Stays internal-only until "Brochure public" is ticked.'
 		}),
 		defineField({
-			name: 'brochureVisibility',
-			title: 'Brochure visibility',
-			type: 'string',
-			options: { list: [...BROCHURE_VISIBILITY], layout: 'dropdown' },
-			initialValue: 'request_only',
-			description:
-				'Controls whether buyers can download the brochure — disabled, available on request, or openly downloadable. Must be explicitly set to allow downloads.'
+			name: 'brochurePublic',
+			title: 'Brochure public',
+			type: 'boolean',
+			initialValue: false,
+			description: 'Tick to expose the brochure to public buyers. Off by default.'
 		})
 	],
 	preview: {
 		select: {
 			firstAlt: 'gallery.0.altText',
-			brochureVisibility: 'brochureVisibility',
+			brochurePublic: 'brochurePublic',
 			galleryCount: 'gallery'
 		},
-		prepare({ firstAlt, brochureVisibility, galleryCount }) {
+		prepare({ firstAlt, brochurePublic, galleryCount }) {
 			const count = Array.isArray(galleryCount) ? galleryCount.length : 0;
 			return {
 				title: firstAlt || 'Media',
-				subtitle: [count ? `${count} gallery item(s)` : null, brochureVisibility]
+				subtitle: [count ? `${count} gallery item(s)` : null, brochurePublic ? 'Brochure public' : 'Brochure internal']
 					.filter(Boolean)
 					.join(' · ')
 			};

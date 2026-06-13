@@ -1,6 +1,7 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { PROPERTY_TYPES } from '../constants/enums';
-import { validatePricingFields } from '../validators/rules';
+import { reviewItemsField, statusField } from '../objects/workflowFields';
+import { validatePricingFields, validatePublishGate } from '../validators/rules';
 
 export const unitType = defineType({
 	name: 'unitType',
@@ -8,7 +9,7 @@ export const unitType = defineType({
 	type: 'document',
 	groups: [
 		{ name: 'details', title: 'Details', default: true },
-		{ name: 'governance', title: 'Governance & workflow' }
+		{ name: 'internal', title: 'Internal' }
 	],
 	fields: [
 		defineField({
@@ -46,11 +47,11 @@ export const unitType = defineType({
 		}),
 		defineField({
 			name: 'pricing',
-			title: 'Pricing & visibility',
+			title: 'Pricing',
 			type: 'pricingFields',
 			group: 'details',
 			description:
-				"Typical pricing for this unit type. Use 'Price from' to show a starting figure. Reserved status means this type will not appear on the website."
+				"Typical pricing for this unit type. Use 'Price from' to show a starting figure."
 		}),
 		defineField({
 			name: 'specs',
@@ -75,35 +76,38 @@ export const unitType = defineType({
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
 			description: 'Gallery images for this unit type. Shown on the website once approved.'
 		}),
+		statusField('internal'),
+		reviewItemsField('internal'),
 		defineField({
-			name: 'sourceProvenance',
-			title: 'Source provenance',
-			type: 'array',
-			group: 'governance',
-			of: [defineArrayMember({ type: 'sourceProvenance' })],
-			description: 'Internal audit trail showing where this unit type\'s data came from. Not shown on the website.'
-		}),
-		defineField({
-			name: 'workflow',
-			title: 'Workflow & readiness',
-			type: 'workflowFields',
-			group: 'governance'
+			name: 'internal',
+			title: 'Internal',
+			type: 'internalFields',
+			group: 'internal',
+			description: 'Categorically private namespace — never projected by GROQ allowlists.'
 		})
 	],
 	validation: (Rule) =>
 		Rule.custom((document) => {
-			const doc = document as { pricing?: Parameters<typeof validatePricingFields>[0] };
-			return validatePricingFields(doc?.pricing);
+			const doc = document as {
+				pricing?: Parameters<typeof validatePricingFields>[0];
+				status?: string;
+				reviewItems?: Array<{ blocksPublish?: boolean }>;
+			};
+
+			const pricingResult = validatePricingFields(doc?.pricing);
+			if (pricingResult !== true) return pricingResult;
+
+			return validatePublishGate({ status: doc.status, reviewItems: doc.reviewItems });
 		}),
 	preview: {
 		select: {
 			title: 'unitTypeName',
 			development: 'parentDevelopment.developmentName',
 			priceDisplay: 'pricing.priceDisplay',
-			visibility: 'pricing.publicVisibility'
+			status: 'status'
 		},
-		prepare({ title, development, priceDisplay, visibility }) {
-			const subtitle = [development, priceDisplay, visibility].filter(Boolean).join(' · ');
+		prepare({ title, development, priceDisplay, status }) {
+			const subtitle = [status, development, priceDisplay].filter(Boolean).join(' · ');
 			return { title: title || 'Unit type', subtitle: subtitle || undefined };
 		}
 	}
