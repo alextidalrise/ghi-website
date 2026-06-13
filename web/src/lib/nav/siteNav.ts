@@ -13,8 +13,9 @@ export const SITE_NAV_ITEMS: SiteNavItem[] = [
 	{ label: 'Spain', href: '/spain' },
 	{ label: 'Portugal', href: '/portugal' },
 	{ label: 'Front Line Collection', href: FRONTLINE_COLLECTION_PATH },
-	// Buying Guide page is not built yet; the nav links ahead of the page.
-	{ label: 'Buying Guide', href: '/buying-guide' },
+	// Points at the Guides hub. The label stays "Buying Guide" until other guide
+	// categories (location, golf) ship, at which point it becomes "Guides".
+	{ label: 'Buying Guide', href: '/guides' },
 	{ label: 'About Us', href: '/about' }
 ];
 

@@ -20,6 +20,11 @@ export type SitemapGolfCourseRow = {
 	_updatedAt?: string | null;
 };
 
+export type SitemapGuideRow = {
+	slug?: string | null;
+	_updatedAt?: string | null;
+};
+
 export type SitemapEntry = {
 	path: string;
 	lastmod?: string | null;
@@ -53,10 +58,19 @@ export function buildGolfCoursePath(row: SitemapGolfCourseRow): string | null {
 	return `/${row.countrySlug}/${row.locationSlug}/${row.communitySlug}/golf/${row.slug}`;
 }
 
+export function buildGuidePath(row: SitemapGuideRow): string | null {
+	if (!row.slug) {
+		return null;
+	}
+
+	return `/guides/${row.slug}`;
+}
+
 export function collectSitemapEntries(
 	taxonomyRows: SitemapTaxonomyRow[],
 	listingRows: SitemapListingRow[],
-	golfCourseRows: SitemapGolfCourseRow[] = []
+	golfCourseRows: SitemapGolfCourseRow[] = [],
+	guideRows: SitemapGuideRow[] = []
 ): SitemapEntry[] {
 	const byPath = new Map<string, SitemapEntry>();
 
@@ -88,6 +102,15 @@ export function collectSitemapEntries(
 
 	for (const row of golfCourseRows) {
 		add(buildGolfCoursePath(row), row._updatedAt);
+	}
+
+	// The Guides hub is a real page; include it whenever at least one guide exists.
+	if (guideRows.length > 0) {
+		add('/guides', null);
+	}
+
+	for (const row of guideRows) {
+		add(buildGuidePath(row), row._updatedAt);
 	}
 
 	return [...byPath.values()].sort((a, b) => a.path.localeCompare(b.path));

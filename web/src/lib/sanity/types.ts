@@ -21,6 +21,108 @@ type ArrayOf<T> = Array<
 >;
 
 // Source: schema.json
+export type Guide = {
+  _id: string;
+  _type: "guide";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  slug: Slug;
+  guideCategory: "buying" | "location" | "golf";
+  audienceLabel?: string;
+  order?: number;
+  tagline?: string;
+  intro?: string;
+  heroImage?: MediaAssetMetadata;
+  lastReviewed?: string;
+  sections: Array<
+    {
+      _key: string;
+    } & GuideSection
+  >;
+  advisorHeading?: string;
+  advisorBody?: string;
+  seo?: SeoFields;
+};
+
+export type SeoFields = {
+  _type: "seoFields";
+  seoTitle?: string;
+  metaDescription?: string;
+  openGraphTitle?: string;
+  openGraphDescription?: string;
+  openGraphImage?: MediaAssetMetadata;
+  noindex?: boolean;
+  schemaType?:
+    | "RealEstateListing"
+    | "Residence"
+    | "Apartment"
+    | "House"
+    | "Product";
+  primaryKeyword?: string;
+  secondaryKeywords?: Array<string>;
+  canonicalCluster?: string;
+  backLinks?: Array<{
+    label?: string;
+    url?: string;
+    _key: string;
+  }>;
+  supportingArticles?: Array<string>;
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
+};
+
+export type MediaAssetMetadata = {
+  _type: "mediaAssetMetadata";
+  asset?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  fileAsset?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  assetCategory?:
+    | "hero"
+    | "gallery"
+    | "floorplan"
+    | "brochure"
+    | "video"
+    | "render"
+    | "location"
+    | "lifestyle"
+    | "source_document";
+  order?: number;
+  altText?: string;
+  sourceDriveFileId?: string;
+  sourceMediaFolderUrl?: string;
+  sourceFileName?: string;
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
 export type PropertyListing = {
   _id: string;
   _type: "propertyListing";
@@ -129,31 +231,6 @@ export type WorkflowFields = {
   lastSourceReviewAt?: string;
   doNotPublishReason?: string;
   humanReviewed?: boolean;
-};
-
-export type SeoFields = {
-  _type: "seoFields";
-  seoTitle?: string;
-  metaDescription?: string;
-  openGraphTitle?: string;
-  openGraphDescription?: string;
-  openGraphImage?: MediaAssetMetadata;
-  noindex?: boolean;
-  schemaType?:
-    | "RealEstateListing"
-    | "Residence"
-    | "Apartment"
-    | "House"
-    | "Product";
-  primaryKeyword?: string;
-  secondaryKeywords?: Array<string>;
-  canonicalCluster?: string;
-  backLinks?: Array<{
-    label?: string;
-    url?: string;
-    _key: string;
-  }>;
-  supportingArticles?: Array<string>;
 };
 
 export type CtaFields = {
@@ -480,12 +557,6 @@ export type LocationFields = {
   exactAddressInternal?: string;
 };
 
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
-};
-
 export type UnitTypeReference = {
   _ref: string;
   _type: "reference";
@@ -523,52 +594,6 @@ export type Unit = {
     } & SourceProvenance
   >;
   workflow?: WorkflowFields;
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
-export type SanityFileAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
-};
-
-export type MediaAssetMetadata = {
-  _type: "mediaAssetMetadata";
-  asset?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  fileAsset?: {
-    asset?: SanityFileAssetReference;
-    media?: unknown;
-    _type: "file";
-  };
-  assetCategory?:
-    | "hero"
-    | "gallery"
-    | "floorplan"
-    | "brochure"
-    | "video"
-    | "render"
-    | "location"
-    | "lifestyle"
-    | "source_document";
-  order?: number;
-  altText?: string;
-  sourceDriveFileId?: string;
-  sourceMediaFolderUrl?: string;
-  sourceFileName?: string;
 };
 
 export type UnitType = {
@@ -807,16 +832,66 @@ export type LocationTaxonomy = {
   tagline?: string;
   coordinates?: Geopoint;
   isCatchAll?: boolean;
-  featuredListings?: Array<
-    {
-      _key: string;
-    } & PropertyListingReference
-  >;
+  featuredListings?: ArrayOf<PropertyListingReference | DevelopmentReference>;
   featuredLocations?: Array<
     {
       _key: string;
     } & LocationTaxonomyReference
   >;
+};
+
+export type GuideSection = {
+  _type: "guideSection";
+  heading: string;
+  anchor: Slug;
+  body: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "normal" | "h3" | "h4" | "blockquote";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | ({
+        _key: string;
+      } & GuideCallout)
+    | ({
+        _key: string;
+      } & GuideKeyFigures)
+    | ({
+        _key: string;
+      } & MediaAssetMetadata)
+  >;
+};
+
+export type GuideKeyFigures = {
+  _type: "guideKeyFigures";
+  caption?: string;
+  rows: Array<{
+    label: string;
+    value: string;
+    note?: string;
+    _type: "figure";
+    _key: string;
+  }>;
+};
+
+export type GuideCallout = {
+  _type: "guideCallout";
+  tone: "note" | "important";
+  title?: string;
+  body: string;
 };
 
 export type SourceProvenance = {
@@ -1010,11 +1085,16 @@ export type SanityImageAsset = {
 };
 
 export type AllSanitySchemaTypes =
+  | Guide
+  | SeoFields
+  | SanityImageAssetReference
+  | SanityFileAssetReference
+  | MediaAssetMetadata
+  | Slug
   | PropertyListing
   | PrivateReportingFields
   | SensitiveGovernanceFields
   | WorkflowFields
-  | SeoFields
   | CtaFields
   | PropertyListingReference
   | DevelopmentReference
@@ -1028,12 +1108,8 @@ export type AllSanitySchemaTypes =
   | PricingFields
   | LocationTaxonomyReference
   | LocationFields
-  | Slug
   | UnitTypeReference
   | Unit
-  | SanityImageAssetReference
-  | SanityFileAssetReference
-  | MediaAssetMetadata
   | UnitType
   | UnitReference
   | Development
@@ -1043,6 +1119,9 @@ export type AllSanitySchemaTypes =
   | GolfCourse
   | Geopoint
   | LocationTaxonomy
+  | GuideSection
+  | GuideKeyFigures
+  | GuideCallout
   | SourceProvenance
   | ReviewItem
   | ChannelReadinessItem
@@ -5336,152 +5415,304 @@ export type CountryFeaturedLocationsQueryResult = {
 // Variable: countryFeaturedListingsQuery
 // Query: *[    _type == "locationTaxonomy"    && type == "country"    && slug.current == $countrySlug  ][0]{    "cards": featuredListings[        (    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])    || @->_type == "development"  )  && (coalesce(@->workflow.publishReadiness, "") in $approvedReadiness || $previewAll)  && (coalesce(@->pricing.publicVisibility, "visible") == "visible" || $previewAll)  && (coalesce(@->pricing.availabilityStatus, "") != "reserved" || $previewAll)    ]->{  _type == "development" => {  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  "unitsAvailable": count((units[]->)[     (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)  &&   (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)  &&   (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll) ]),  "bedroomsFrom": math::min(    (unitTypes[]->)[     (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)  &&   (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)  &&   (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll) ].specs.bedrooms    + (units[]->)[     (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)  &&   (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)  &&   (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll) ].specs.bedrooms  ),  "bedroomsTo": math::max(    (unitTypes[]->)[     (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)  &&   (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)  &&   (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll) ].specs.bedrooms    + (units[]->)[     (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)  &&   (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)  &&   (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll) ].specs.bedrooms  ),  media{    gallery[0...1]{  asset,  fileAsset,  assetCategory,  order,  altText},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText}  }},  _type == "propertyListing" => {  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceSourceStatus,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  assetCategory,  order,  altText},    thumbnailOverride{  asset,  fileAsset,  assetCategory,  order,  altText}  }}}  }
 export type CountryFeaturedListingsQueryResult = {
-  cards: Array<{
-    _id: string;
-    ghiListingId: string;
-    title: string;
-    slug: string;
-    listingKind: "property" | "unit";
-    propertyType:
-      | "apartment"
-      | "development"
-      | "finca"
-      | "penthouse"
-      | "plot"
-      | "townhouse"
-      | "villa";
-    transactionType: "other" | "rent" | "sale" | "short_term";
-    countrySlug: string | null;
-    locationSlug: string | null;
-    communitySlug: string | null;
-    isCatchAll: boolean | false;
-    location: {
-      country: {
-        name: string;
-        slug: string;
-      } | null;
-      location: {
-        name: string;
-        slug: string;
-      } | null;
-      community: {
+  cards: Array<
+    | {
         _id: string;
-        name: string;
+        _type: "development";
+        ghiListingId: string;
+        title: string;
         slug: string;
-        isCatchAll: boolean | null;
-      };
-      addressDisplay: string;
-    } | null;
-    pricing: {
-      price: number | null;
-      priceFrom: number | null;
-      priceTo: number | null;
-      priceDisplay: string | null;
-      currency: string | null;
-      priceQualifier:
-        | "enquiry_led"
-        | "exact"
-        | "from"
-        | "guide"
-        | "poa"
-        | "reduced"
-        | null;
-      priceSourceStatus:
-        | "folder_hint_only"
-        | "manual_confirmed"
-        | "price_list_needs_review"
-        | "source_confirmed"
-        | "stale_needs_review"
-        | "unknown";
-      availabilityStatus:
-        | "available"
-        | "coming_soon"
-        | "reserved"
-        | "sold"
-        | "under_offer"
-        | "unknown"
-        | "withdrawn";
-      completionStatus:
-        | "completed"
-        | "key_ready"
-        | "near_completion"
-        | "off_plan"
-        | "under_construction"
-        | "unknown"
-        | null;
-      completionDate: string | null;
-      buildStatus:
-        | "completed"
-        | "in_progress"
-        | "not_started"
-        | "unknown"
-        | null;
-    } | null;
-    specs: {
-      bedrooms: number | null;
-      bathrooms: number | null;
-      builtArea: number | null;
-      builtAreaUnit: "sqft" | "sqm" | null;
-    } | null;
-    media: {
-      gallery: Array<{
-        asset: {
-          asset?: SanityImageAssetReference;
-          media?: unknown;
-          hotspot?: SanityImageHotspot;
-          crop?: SanityImageCrop;
-          alt?: string;
-          _type: "image";
-        } | null;
-        fileAsset: {
-          asset?: SanityFileAssetReference;
-          media?: unknown;
-          _type: "file";
-        } | null;
-        assetCategory:
-          | "brochure"
-          | "floorplan"
-          | "gallery"
-          | "hero"
-          | "lifestyle"
-          | "location"
-          | "render"
-          | "source_document"
-          | "video"
+        listingKind: string | null;
+        developmentDisplayMode:
+          | "enquiry_led"
+          | "flat_listing"
+          | "price_from_summary"
+          | "unit_types"
+          | "units";
+        developmentStatus:
+          | "completed"
+          | "near_completion"
+          | "off_plan"
+          | "planning"
+          | "sold_out"
+          | "under_construction"
+          | "unknown"
           | null;
-        order: number | null;
-        altText: string | null;
-      }> | null;
-      thumbnailOverride: {
-        asset: {
-          asset?: SanityImageAssetReference;
-          media?: unknown;
-          hotspot?: SanityImageHotspot;
-          crop?: SanityImageCrop;
-          alt?: string;
-          _type: "image";
+        countrySlug: string | null;
+        locationSlug: string | null;
+        communitySlug: string | null;
+        isCatchAll: boolean | false;
+        location: {
+          country: {
+            name: string;
+            slug: string;
+          } | null;
+          location: {
+            name: string;
+            slug: string;
+          } | null;
+          community: {
+            _id: string;
+            name: string;
+            slug: string;
+            isCatchAll: boolean | null;
+          };
+          addressDisplay: string;
         } | null;
-        fileAsset: {
-          asset?: SanityFileAssetReference;
-          media?: unknown;
-          _type: "file";
+        pricing: {
+          price: number | null;
+          priceFrom: number | null;
+          priceTo: number | null;
+          priceDisplay: string | null;
+          currency: string | null;
+          priceQualifier:
+            | "enquiry_led"
+            | "exact"
+            | "from"
+            | "guide"
+            | "poa"
+            | "reduced"
+            | null;
+          priceSourceStatus:
+            | "folder_hint_only"
+            | "manual_confirmed"
+            | "price_list_needs_review"
+            | "source_confirmed"
+            | "stale_needs_review"
+            | "unknown";
+          availabilityStatus:
+            | "available"
+            | "coming_soon"
+            | "reserved"
+            | "sold"
+            | "under_offer"
+            | "unknown"
+            | "withdrawn";
+          completionStatus:
+            | "completed"
+            | "key_ready"
+            | "near_completion"
+            | "off_plan"
+            | "under_construction"
+            | "unknown"
+            | null;
+          completionDate: string | null;
+          buildStatus:
+            | "completed"
+            | "in_progress"
+            | "not_started"
+            | "unknown"
+            | null;
         } | null;
-        assetCategory:
-          | "brochure"
-          | "floorplan"
-          | "gallery"
-          | "hero"
-          | "lifestyle"
-          | "location"
-          | "render"
-          | "source_document"
-          | "video"
-          | null;
-        order: number | null;
-        altText: string | null;
-      } | null;
-    } | null;
-  }> | null;
+        unitsAvailable: number | null;
+        bedroomsFrom: number | null;
+        bedroomsTo: number | null;
+        media: {
+          gallery: Array<{
+            asset: {
+              asset?: SanityImageAssetReference;
+              media?: unknown;
+              hotspot?: SanityImageHotspot;
+              crop?: SanityImageCrop;
+              alt?: string;
+              _type: "image";
+            } | null;
+            fileAsset: {
+              asset?: SanityFileAssetReference;
+              media?: unknown;
+              _type: "file";
+            } | null;
+            assetCategory:
+              | "brochure"
+              | "floorplan"
+              | "gallery"
+              | "hero"
+              | "lifestyle"
+              | "location"
+              | "render"
+              | "source_document"
+              | "video"
+              | null;
+            order: number | null;
+            altText: string | null;
+          }> | null;
+          thumbnailOverride: {
+            asset: {
+              asset?: SanityImageAssetReference;
+              media?: unknown;
+              hotspot?: SanityImageHotspot;
+              crop?: SanityImageCrop;
+              alt?: string;
+              _type: "image";
+            } | null;
+            fileAsset: {
+              asset?: SanityFileAssetReference;
+              media?: unknown;
+              _type: "file";
+            } | null;
+            assetCategory:
+              | "brochure"
+              | "floorplan"
+              | "gallery"
+              | "hero"
+              | "lifestyle"
+              | "location"
+              | "render"
+              | "source_document"
+              | "video"
+              | null;
+            order: number | null;
+            altText: string | null;
+          } | null;
+        } | null;
+      }
+    | {
+        _id: string;
+        ghiListingId: string;
+        title: string;
+        slug: string;
+        listingKind: "property" | "unit";
+        propertyType:
+          | "apartment"
+          | "development"
+          | "finca"
+          | "penthouse"
+          | "plot"
+          | "townhouse"
+          | "villa";
+        transactionType: "other" | "rent" | "sale" | "short_term";
+        countrySlug: string | null;
+        locationSlug: string | null;
+        communitySlug: string | null;
+        isCatchAll: boolean | false;
+        location: {
+          country: {
+            name: string;
+            slug: string;
+          } | null;
+          location: {
+            name: string;
+            slug: string;
+          } | null;
+          community: {
+            _id: string;
+            name: string;
+            slug: string;
+            isCatchAll: boolean | null;
+          };
+          addressDisplay: string;
+        } | null;
+        pricing: {
+          price: number | null;
+          priceFrom: number | null;
+          priceTo: number | null;
+          priceDisplay: string | null;
+          currency: string | null;
+          priceQualifier:
+            | "enquiry_led"
+            | "exact"
+            | "from"
+            | "guide"
+            | "poa"
+            | "reduced"
+            | null;
+          priceSourceStatus:
+            | "folder_hint_only"
+            | "manual_confirmed"
+            | "price_list_needs_review"
+            | "source_confirmed"
+            | "stale_needs_review"
+            | "unknown";
+          availabilityStatus:
+            | "available"
+            | "coming_soon"
+            | "reserved"
+            | "sold"
+            | "under_offer"
+            | "unknown"
+            | "withdrawn";
+          completionStatus:
+            | "completed"
+            | "key_ready"
+            | "near_completion"
+            | "off_plan"
+            | "under_construction"
+            | "unknown"
+            | null;
+          completionDate: string | null;
+          buildStatus:
+            | "completed"
+            | "in_progress"
+            | "not_started"
+            | "unknown"
+            | null;
+        } | null;
+        specs: {
+          bedrooms: number | null;
+          bathrooms: number | null;
+          builtArea: number | null;
+          builtAreaUnit: "sqft" | "sqm" | null;
+        } | null;
+        media: {
+          gallery: Array<{
+            asset: {
+              asset?: SanityImageAssetReference;
+              media?: unknown;
+              hotspot?: SanityImageHotspot;
+              crop?: SanityImageCrop;
+              alt?: string;
+              _type: "image";
+            } | null;
+            fileAsset: {
+              asset?: SanityFileAssetReference;
+              media?: unknown;
+              _type: "file";
+            } | null;
+            assetCategory:
+              | "brochure"
+              | "floorplan"
+              | "gallery"
+              | "hero"
+              | "lifestyle"
+              | "location"
+              | "render"
+              | "source_document"
+              | "video"
+              | null;
+            order: number | null;
+            altText: string | null;
+          }> | null;
+          thumbnailOverride: {
+            asset: {
+              asset?: SanityImageAssetReference;
+              media?: unknown;
+              hotspot?: SanityImageHotspot;
+              crop?: SanityImageCrop;
+              alt?: string;
+              _type: "image";
+            } | null;
+            fileAsset: {
+              asset?: SanityFileAssetReference;
+              media?: unknown;
+              _type: "file";
+            } | null;
+            assetCategory:
+              | "brochure"
+              | "floorplan"
+              | "gallery"
+              | "hero"
+              | "lifestyle"
+              | "location"
+              | "render"
+              | "source_document"
+              | "video"
+              | null;
+            order: number | null;
+            altText: string | null;
+          } | null;
+        } | null;
+      }
+  > | null;
 } | null;
 
 // Source: ../web/src/lib/sanity/queries/frontline.ts
@@ -5661,6 +5892,250 @@ export type SitemapGolfCoursesQueryResult = Array<{
   communitySlug: string;
   locationSlug: string | null;
   countrySlug: string | null;
+  _updatedAt: string;
+}>;
+
+// Source: ../web/src/lib/sanity/queries/guide.ts
+// Variable: guideBySlugQuery
+// Query: *[_type == "guide" && slug.current == $slug][0]{      _id,  _type,  title,  "slug": slug.current,  guideCategory,  audienceLabel,  tagline,  intro,  lastReviewed,  heroImage{  asset,  fileAsset,  assetCategory,  order,  altText},  sections[]{  heading,  "anchor": anchor.current,  body[]{    _type == "mediaAssetMetadata" => {      _type,      _key,      asset,      altText,      assetCategory,      "dimensions": asset.asset->metadata.dimensions    },    _type != "mediaAssetMetadata" => { ... }  }},  advisorHeading,  advisorBody,  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  assetCategory,  order,  altText},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},    "relatedGuides": *[      _type == "guide"      && guideCategory == ^.guideCategory      && defined(slug.current)      && slug.current != ^.slug.current    ] | order(coalesce(order, 999) asc, title asc) {  _id,  title,  "slug": slug.current,  guideCategory,  audienceLabel,  tagline,  heroImage{  asset,  fileAsset,  assetCategory,  order,  altText}}  }
+export type GuideBySlugQueryResult = {
+  _id: string;
+  _type: "guide";
+  title: string;
+  slug: string;
+  guideCategory: "buying" | "golf" | "location";
+  audienceLabel: string | null;
+  tagline: string | null;
+  intro: string | null;
+  lastReviewed: string | null;
+  heroImage: {
+    asset: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+    } | null;
+    fileAsset: {
+      asset?: SanityFileAssetReference;
+      media?: unknown;
+      _type: "file";
+    } | null;
+    assetCategory:
+      | "brochure"
+      | "floorplan"
+      | "gallery"
+      | "hero"
+      | "lifestyle"
+      | "location"
+      | "render"
+      | "source_document"
+      | "video"
+      | null;
+    order: number | null;
+    altText: string | null;
+  } | null;
+  sections: Array<{
+    heading: string;
+    anchor: string;
+    body: Array<
+      | {
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "blockquote" | "h3" | "h4" | "normal";
+          listItem?: "bullet" | "number";
+          markDefs?: Array<{
+            href: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }
+      | {
+          _key: string;
+          _type: "guideCallout";
+          tone: "important" | "note";
+          title?: string;
+          body: string;
+        }
+      | {
+          _key: string;
+          _type: "guideKeyFigures";
+          caption?: string;
+          rows: Array<{
+            label: string;
+            value: string;
+            note?: string;
+            _type: "figure";
+            _key: string;
+          }>;
+        }
+      | {
+          _type: "mediaAssetMetadata";
+          _key: string;
+          asset: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            alt?: string;
+            _type: "image";
+          } | null;
+          altText: string | null;
+          assetCategory:
+            | "brochure"
+            | "floorplan"
+            | "gallery"
+            | "hero"
+            | "lifestyle"
+            | "location"
+            | "render"
+            | "source_document"
+            | "video"
+            | null;
+          dimensions: SanityImageDimensions | null;
+        }
+    >;
+  }>;
+  advisorHeading: string | null;
+  advisorBody: string | null;
+  seo: {
+    seoTitle: string | null;
+    metaDescription: string | null;
+    openGraphTitle: string | null;
+    openGraphDescription: string | null;
+    openGraphImage: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      assetCategory:
+        | "brochure"
+        | "floorplan"
+        | "gallery"
+        | "hero"
+        | "lifestyle"
+        | "location"
+        | "render"
+        | "source_document"
+        | "video"
+        | null;
+      order: number | null;
+      altText: string | null;
+    } | null;
+    noindex: boolean | null;
+    schemaType:
+      | "Apartment"
+      | "House"
+      | "Product"
+      | "RealEstateListing"
+      | "Residence"
+      | null;
+    backLinks: Array<{
+      label: string | null;
+      url: string | null;
+    }> | null;
+    supportingArticles: Array<string> | null;
+  } | null;
+  relatedGuides: Array<{
+    _id: string;
+    title: string;
+    slug: string;
+    guideCategory: "buying" | "golf" | "location";
+    audienceLabel: string | null;
+    tagline: string | null;
+    heroImage: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      assetCategory:
+        | "brochure"
+        | "floorplan"
+        | "gallery"
+        | "hero"
+        | "lifestyle"
+        | "location"
+        | "render"
+        | "source_document"
+        | "video"
+        | null;
+      order: number | null;
+      altText: string | null;
+    } | null;
+  }>;
+} | null;
+
+// Source: ../web/src/lib/sanity/queries/guide.ts
+// Variable: guidesHubQuery
+// Query: *[_type == "guide" && defined(slug.current)]    | order(coalesce(order, 999) asc, title asc) {  _id,  title,  "slug": slug.current,  guideCategory,  audienceLabel,  tagline,  heroImage{  asset,  fileAsset,  assetCategory,  order,  altText}}
+export type GuidesHubQueryResult = Array<{
+  _id: string;
+  title: string;
+  slug: string;
+  guideCategory: "buying" | "golf" | "location";
+  audienceLabel: string | null;
+  tagline: string | null;
+  heroImage: {
+    asset: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+    } | null;
+    fileAsset: {
+      asset?: SanityFileAssetReference;
+      media?: unknown;
+      _type: "file";
+    } | null;
+    assetCategory:
+      | "brochure"
+      | "floorplan"
+      | "gallery"
+      | "hero"
+      | "lifestyle"
+      | "location"
+      | "render"
+      | "source_document"
+      | "video"
+      | null;
+    order: number | null;
+    altText: string | null;
+  } | null;
+}>;
+
+// Source: ../web/src/lib/sanity/queries/guide.ts
+// Variable: sitemapGuidesQuery
+// Query: *[    _type == "guide"    && defined(slug.current)    && coalesce(seo.noindex, false) != true  ]{    "slug": slug.current,    _updatedAt  }
+export type SitemapGuidesQueryResult = Array<{
+  slug: string;
   _updatedAt: string;
 }>;
 
@@ -12888,6 +13363,9 @@ declare module "@sanity/client" {
     '\n  *[\n    _type == "golfCourse"\n    && slug.current == $slug\n    && community->slug.current == $communitySlug\n    && community->parent->slug.current == $locationSlug\n    && community->parent->parent->slug.current == $countrySlug\n    && \n  (coalesce(reviewStatus, "draft") == "approved" || $previewAll)\n\n  ][0]{\n  _id,\n  name,\n  "slug": slug.current,\n  shortDescription,\n  tagline,\n  seoTitle,\n  metaDescription,\n  holes,\n  par,\n  designStyle,\n  websiteUrl,\n  media[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  community->{\n    _id,\n    name,\n    "slug": slug.current,\n    breadcrumbLabel,\n    "locationSlug": parent->slug.current,\n    "countrySlug": parent->parent->slug.current,\n    parent->{\n      _id,\n      name,\n      "slug": slug.current,\n      breadcrumbLabel\n    },\n    "country": parent->parent->{\n      _id,\n      name,\n      "slug": slug.current,\n      breadcrumbLabel\n    }\n  }\n}\n': GolfCourseByPathQueryResult;
     '\n  *[\n    _type == "golfCourse"\n    && \n  (coalesce(reviewStatus, "draft") == "approved" || $previewAll)\n\n    && defined(community._ref)\n    && (\n      community->parent._ref == $locationId\n      || $locationId in community->associatedLocations[]._ref\n    )\n  ] | order(name asc){\n  _id,\n  name,\n  "slug": slug.current,\n  shortDescription,\n  tagline,\n  seoTitle,\n  metaDescription,\n  holes,\n  par,\n  designStyle,\n  websiteUrl,\n  media[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  community->{\n    _id,\n    name,\n    "slug": slug.current,\n    breadcrumbLabel,\n    "locationSlug": parent->slug.current,\n    "countrySlug": parent->parent->slug.current,\n    parent->{\n      _id,\n      name,\n      "slug": slug.current,\n      breadcrumbLabel\n    },\n    "country": parent->parent->{\n      _id,\n      name,\n      "slug": slug.current,\n      breadcrumbLabel\n    }\n  }\n}\n': GolfCoursesByLocationQueryResult;
     '\n  *[\n    _type == "golfCourse"\n    && \n  (coalesce(reviewStatus, "draft") == "approved" || $previewAll)\n\n    && defined(slug.current)\n    && defined(community->slug.current)\n    && defined(community->parent->slug.current)\n    && defined(community->parent->parent->slug.current)\n  ]{\n    "slug": slug.current,\n    "communitySlug": community->slug.current,\n    "locationSlug": community->parent->slug.current,\n    "countrySlug": community->parent->parent->slug.current,\n    _updatedAt\n  }\n': SitemapGolfCoursesQueryResult;
+    '\n  *[_type == "guide" && slug.current == $slug][0]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  intro,\n  lastReviewed,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  sections[]{\n  heading,\n  "anchor": anchor.current,\n  body[]{\n    _type == "mediaAssetMetadata" => {\n      _type,\n      _key,\n      asset,\n      altText,\n      assetCategory,\n      "dimensions": asset.asset->metadata.dimensions\n    },\n    _type != "mediaAssetMetadata" => { ... }\n  }\n},\n  advisorHeading,\n  advisorBody,\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n,\n    "relatedGuides": *[\n      _type == "guide"\n      && guideCategory == ^.guideCategory\n      && defined(slug.current)\n      && slug.current != ^.slug.current\n    ] | order(coalesce(order, 999) asc, title asc) {\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n}\n  }\n': GuideBySlugQueryResult;
+    '\n  *[_type == "guide" && defined(slug.current)]\n    | order(coalesce(order, 999) asc, title asc) {\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n}\n': GuidesHubQueryResult;
+    '\n  *[\n    _type == "guide"\n    && defined(slug.current)\n    && coalesce(seo.noindex, false) != true\n  ]{\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapGuidesQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n) == $communitySlug\n  && slug.current == $slug\n\n    && (\n      (_type == "propertyListing" && listingKind in ["property", "unit"])\n      || _type == "development"\n    )\n    && \n  \n  (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)\n\n  && \n  (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)\n\n  && \n  (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll)\n\n\n  ][0]{\n    _type,\n    listingKind,\n    \n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  "slug": slug.current,\n  listingKind\n\n  }\n': ListingByPathQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && slug.current == $slug\n  && coalesce(location.community->isCatchAll, false) == true\n\n    && (\n      (_type == "propertyListing" && listingKind in ["property", "unit"])\n      || _type == "development"\n    )\n    && \n  \n  (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)\n\n  && \n  (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)\n\n  && \n  (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll)\n\n\n  ][0]{\n    _type,\n    listingKind,\n    \n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  "slug": slug.current,\n  listingKind\n\n  }\n': ListingByCatchAllPathQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && slug.current == $slug\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n    && coalesce(location.community->isCatchAll, false) != true\n    && (\n      (_type == "propertyListing" && listingKind in ["property", "unit"])\n      || _type == "development"\n    )\n    && \n  \n  (coalesce(workflow.publishReadiness, "") in $approvedReadiness || $previewAll)\n\n  && \n  (coalesce(pricing.publicVisibility, "visible") == "visible" || $previewAll)\n\n  && \n  (coalesce(pricing.availabilityStatus, "") != "reserved" || $previewAll)\n\n\n  ]{ \n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  "slug": slug.current,\n  listingKind\n }\n': ListingLegacyThreeSegmentPathQueryResult;

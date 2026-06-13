@@ -326,3 +326,20 @@ export const GOLF_COURSE_REVIEW_STATUSES = [
 	{ title: 'Approved', value: 'approved' },
 	{ title: 'Archived', value: 'archived' }
 ] as const;
+
+/**
+ * Guide categories. `buying` is live; `location` and `golf` are reserved so the
+ * section can expand without a schema change. A single `guide` document branches on
+ * this field (mirroring how `locationTaxonomy` branches on `type`).
+ */
+export const GUIDE_CATEGORIES = [
+	{ title: 'Buying guide', value: 'buying' },
+	{ title: 'Location guide', value: 'location' },
+	{ title: 'Golf guide', value: 'golf' }
+] as const;
+
+/** Tone of an editorial callout inside a guide section body. */
+export const GUIDE_CALLOUT_TONES = [
+	{ title: 'Note', value: 'note' },
+	{ title: 'Important', value: 'important' }
+] as const;

@@ -182,6 +182,57 @@ export const RELATED_PUBLIC = /* groq */ `{
 }`;
 
 /**
+ * Guide section body. Image members are reshaped to the public media projection so
+ * provenance fields never leak; every other member (text blocks, callouts, key
+ * figures) keeps its full shape (none carry sensitive fields). `_type` and `_key`
+ * are preserved on images so the portable-text renderer can dispatch and key them.
+ */
+export const GUIDE_SECTION_PUBLIC = /* groq */ `{
+  heading,
+  "anchor": anchor.current,
+  body[]{
+    _type == "mediaAssetMetadata" => {
+      _type,
+      _key,
+      asset,
+      altText,
+      assetCategory,
+      "dimensions": asset.asset->metadata.dimensions
+    },
+    _type != "mediaAssetMetadata" => { ... }
+  }
+}`;
+
+/** Guide card projection — hub grid and related-guides cross-links. */
+export const GUIDE_CARD_PUBLIC = /* groq */ `{
+  _id,
+  title,
+  "slug": slug.current,
+  guideCategory,
+  audienceLabel,
+  tagline,
+  heroImage${MEDIA_ASSET_PUBLIC}
+}`;
+
+/** Full guide page fields (no wrapping braces, so the by-slug query can add siblings). */
+export const GUIDE_DETAIL_FIELDS = /* groq */ `
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  guideCategory,
+  audienceLabel,
+  tagline,
+  intro,
+  lastReviewed,
+  heroImage${MEDIA_ASSET_PUBLIC},
+  sections[]${GUIDE_SECTION_PUBLIC},
+  advisorHeading,
+  advisorBody,
+  seo${SEO_PUBLIC}
+`;
+
+/**
  * Development card for grids and rails. Carries href-parity slugs (so catch-all /
  * id-prefix communities build correct URLs) plus aggregated inventory: count of
  * publicly available units and the bedroom range across visible+available units and

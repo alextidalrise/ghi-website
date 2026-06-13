@@ -120,6 +120,8 @@ export {
 
 export { sitemapListingsQuery, sitemapTaxonomyQuery } from './sitemap';
 
+export { guideBySlugQuery, guidesHubQuery, sitemapGuidesQuery } from './guide';
+
 export {
 	SIMILAR_LISTING_LIMIT,
 	fetchSimilarListingCards,

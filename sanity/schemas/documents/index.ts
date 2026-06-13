@@ -2,6 +2,7 @@ import type { SchemaTypeDefinition } from 'sanity';
 
 import { development } from './development';
 import { golfCourse } from './golfCourse';
+import { guide } from './guide';
 import { locationTaxonomy } from './locationTaxonomy';
 import { propertyListing } from './propertyListing';
 import { siteSettings } from './siteSettings';
@@ -16,12 +17,14 @@ export const documentTypes: SchemaTypeDefinition[] = [
 	development,
 	unitType,
 	unit,
-	propertyListing
+	propertyListing,
+	guide
 ];
 
 export {
 	development,
 	golfCourse,
+	guide,
 	locationTaxonomy,
 	propertyListing,
 	siteSettings,

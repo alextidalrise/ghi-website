@@ -1,4 +1,4 @@
-import { DesktopIcon, EarthAmericasIcon, EyeOpenIcon } from '@sanity/icons';
+import { BookIcon, DesktopIcon, EarthAmericasIcon, EyeOpenIcon } from '@sanity/icons';
 import type { StructureResolver } from 'sanity/structure';
 
 /**
@@ -106,6 +106,66 @@ export const deskStructure: StructureResolver = (S) =>
 				.title('Golf courses')
 				.schemaType('golfCourse')
 				.child(S.documentTypeList('golfCourse').title('Golf courses')),
+			S.listItem()
+				.title('Guides')
+				.icon(BookIcon)
+				.child(
+					S.list()
+						.title('Guides')
+						.items([
+							S.listItem()
+								.title('Buying guides')
+								.id('guides-buying')
+								.schemaType('guide')
+								.child(
+									S.documentList()
+										.id('guides-buying-list')
+										.title('Buying guides')
+										.schemaType('guide')
+										.apiVersion('2025-01-01')
+										.filter('_type == $schemaType && guideCategory == $category')
+										.params({ schemaType: 'guide', category: 'buying' })
+										.defaultOrdering([{ field: 'order', direction: 'asc' }])
+										.initialValueTemplates([])
+								),
+							S.listItem()
+								.title('Location guides')
+								.id('guides-location')
+								.schemaType('guide')
+								.child(
+									S.documentList()
+										.id('guides-location-list')
+										.title('Location guides')
+										.schemaType('guide')
+										.apiVersion('2025-01-01')
+										.filter('_type == $schemaType && guideCategory == $category')
+										.params({ schemaType: 'guide', category: 'location' })
+										.defaultOrdering([{ field: 'order', direction: 'asc' }])
+										.initialValueTemplates([])
+								),
+							S.listItem()
+								.title('Golf guides')
+								.id('guides-golf')
+								.schemaType('guide')
+								.child(
+									S.documentList()
+										.id('guides-golf-list')
+										.title('Golf guides')
+										.schemaType('guide')
+										.apiVersion('2025-01-01')
+										.filter('_type == $schemaType && guideCategory == $category')
+										.params({ schemaType: 'guide', category: 'golf' })
+										.defaultOrdering([{ field: 'order', direction: 'asc' }])
+										.initialValueTemplates([])
+								),
+							S.divider(),
+							S.listItem()
+								.title('All guides')
+								.id('guides-all')
+								.schemaType('guide')
+								.child(S.documentTypeList('guide').title('All guides'))
+						])
+				),
 			S.divider(),
 			S.listItem()
 				.title('Needs review')

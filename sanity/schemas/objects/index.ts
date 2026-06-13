@@ -1,6 +1,7 @@
 import type { SchemaTypeDefinition } from 'sanity';
 
 import { contentFields, featureHighlight } from './contentFields';
+import { guideCallout, guideKeyFigures, guideSection } from './guideContent';
 import { marketingChannelNotes, marketingFields } from './marketingFields';
 import { ctaFields, enquiryRouting } from './ctaFields';
 import { golfFields } from './golfFields';
@@ -28,6 +29,10 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	mediaAssetMetadata,
 	sourceProvenance,
 	marketingChannelNotes,
+	// Guide content objects (registered before the guideSection that nests them)
+	guideCallout,
+	guideKeyFigures,
+	guideSection,
 	// Primary field groups
 	locationFields,
 	pricingFields,
@@ -54,6 +59,9 @@ export {
 	enquiryRouting,
 	featureHighlight,
 	galleryGroup,
+	guideCallout,
+	guideKeyFigures,
+	guideSection,
 	golfFields,
 	locationFields,
 	mediaAssetMetadata,

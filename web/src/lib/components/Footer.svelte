@@ -27,7 +27,7 @@
 	// the nav's convention).
 	const resourceLinks = [
 		{ label: 'Front Line Collection', href: '/front-line-collection' },
-		{ label: 'Buying Guide', href: '/buying-guide' },
+		{ label: 'Buying Guide', href: '/guides' },
 		{ label: 'About Us', href: '/about' },
 		{ label: 'Contact', href: '/contact' }
 	];

@@ -13,6 +13,10 @@
 
 	const studioUrl = publicEnv.PUBLIC_SANITY_STUDIO_URL ?? 'http://localhost:3333/development';
 
+	// The pre-launch holding page is a full-screen takeover: it opts out of the
+	// SiteNav + Footer shell (and its padding) so nothing else shows while unlaunched.
+	const bare = $derived(page.route.id === '/soon');
+
 	onMount(() => {
 		if (!$isPreviewing) {
 			return;
@@ -41,13 +45,17 @@
 	</div>
 {/if}
 
-<SiteNav />
-
-<main class="site-main">
+{#if bare}
 	{@render children()}
-</main>
+{:else}
+	<SiteNav />
 
-<Footer countries={data.nav.countries} locations={data.nav.locations} />
+	<main class="site-main">
+		{@render children()}
+	</main>
+
+	<Footer countries={data.nav.countries} locations={data.nav.locations} />
+{/if}
 
 <style>
 	.preview-banner {
