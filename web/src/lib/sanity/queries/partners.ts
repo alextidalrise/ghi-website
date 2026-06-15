@@ -108,7 +108,13 @@ export async function fetchHomepagePartnerLogos(
 			if (!partner.slug || !partner.name) return null;
 			const logo = toPartnerLogo(partner.logo, partner.name);
 			if (!logo) return null;
-			return { name: partner.name, role: partner.name, logo: logo.url, srcset: logo.srcset, href: '/partners' };
+			return {
+				name: partner.name,
+				role: partner.name,
+				logo: logo.url,
+				srcset: logo.srcset,
+				href: `/partners#partner-${partner.slug}`
+			};
 		})
 		.filter((partner): partner is TrustedPartner => partner != null);
 }

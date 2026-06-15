@@ -13,7 +13,7 @@
 <!-- The card is a query container: it goes logo-left/body-right when it has the room
      (a category with one partner, full width) and stacks when it sits in a narrower
      column (two partners side by side, or on a phone). -->
-<article class="partner-card">
+<article class="partner-card" id="partner-{partner.slug}">
 	<a class="partner-card__link" href={introHref}>
 		<div class="partner-card__logo">
 			{#if partner.logo}
@@ -58,6 +58,8 @@
 		container-type: inline-size;
 		min-width: 0;
 		height: 100%;
+		/* Clear the fixed nav when arrived at via a #partner-<slug> anchor from the homepage wall. */
+		scroll-margin-top: calc(var(--nav-height) + var(--space-md));
 	}
 
 	/* One focusable target covers the whole card: the buyer is always heading to the
