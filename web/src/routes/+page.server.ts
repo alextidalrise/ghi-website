@@ -4,6 +4,7 @@ import {
 	fetchHomepageFeaturedListingCards,
 	fetchHomepageFeaturedLocations,
 	fetchHomepageFrontlineListingCards,
+	fetchHomepagePartnerLogos,
 	fetchSiteSettingsHero
 } from '$lib/sanity/queries';
 import { resolveHomepageHeroImage } from '$lib/sanity/transforms/taxonomyHero';
@@ -11,14 +12,21 @@ import { resolveHomepageHeroImage } from '$lib/sanity/transforms/taxonomyHero';
 export const load: PageServerLoad = async ({ parent }) => {
 	const { nav } = await parent();
 
-	const [featuredCards, frontlineCards, homepageHero, featuredCountries, featuredLocations] =
-		await Promise.all([
-			fetchHomepageFeaturedListingCards(),
-			fetchHomepageFrontlineListingCards(),
-			fetchSiteSettingsHero(),
-			fetchCountriesWithHero(),
-			fetchHomepageFeaturedLocations()
-		]);
+	const [
+		featuredCards,
+		frontlineCards,
+		homepageHero,
+		featuredCountries,
+		featuredLocations,
+		partnerLogos
+	] = await Promise.all([
+		fetchHomepageFeaturedListingCards(),
+		fetchHomepageFrontlineListingCards(),
+		fetchSiteSettingsHero(),
+		fetchCountriesWithHero(),
+		fetchHomepageFeaturedLocations(),
+		fetchHomepagePartnerLogos()
+	]);
 
 	return {
 		countries: nav.countries,
@@ -29,6 +37,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 		homepageHero: resolveHomepageHeroImage(homepageHero),
 		homepageHeroTagline: homepageHero?.tagline ?? null,
 		featuredCountries,
-		featuredLocations
+		featuredLocations,
+		partnerLogos
 	};
 };

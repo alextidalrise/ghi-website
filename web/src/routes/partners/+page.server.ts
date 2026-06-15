@@ -1,11 +1,13 @@
 import type { PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
-import { PARTNER_CATEGORIES } from '$lib/partners/partners';
+import { fetchPartnerCategories } from '$lib/sanity/queries';
 
 const BASE_PATH = '/partners';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
+
+	const categories = await fetchPartnerCategories();
 
 	const breadcrumbs: BreadcrumbItem[] = [
 		{ label: 'Home', href: '/' },
@@ -21,7 +23,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	};
 
 	return {
-		categories: PARTNER_CATEGORIES,
+		categories,
 		breadcrumbs,
 		seo,
 		breadcrumbJsonLd: breadcrumbListJsonLd(breadcrumbs, url.origin)

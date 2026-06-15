@@ -6,6 +6,8 @@
 		role: string;
 		/** Optional logo image URL. When present the cell renders the logo in place of the role label. */
 		logo?: string;
+		/** Optional responsive candidates for the logo image. */
+		srcset?: string;
 		/** Optional link to the partner. When present the cell becomes a focusable link. */
 		href?: string;
 	};
@@ -53,7 +55,13 @@
 					{#if partner.href}
 						<a class="partner__cell partner__cell--link" href={partner.href}>
 							{#if partner.logo}
-								<img class="partner__logo" src={partner.logo} alt={partner.name} loading="lazy" />
+								<img
+									class="partner__logo"
+									src={partner.logo}
+									srcset={partner.srcset}
+									alt={partner.name}
+									loading="lazy"
+								/>
 							{:else}
 								<span class="partner__role">{partner.role}</span>
 							{/if}
@@ -61,7 +69,13 @@
 					{:else}
 						<div class="partner__cell">
 							{#if partner.logo}
-								<img class="partner__logo" src={partner.logo} alt={partner.name} loading="lazy" />
+								<img
+									class="partner__logo"
+									src={partner.logo}
+									srcset={partner.srcset}
+									alt={partner.name}
+									loading="lazy"
+								/>
 							{:else}
 								<span class="partner__role">{partner.role}</span>
 							{/if}

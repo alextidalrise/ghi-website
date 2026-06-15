@@ -7,6 +7,7 @@ import {
 	EarthAmericasIcon,
 	EditIcon,
 	EyeClosedIcon,
+	UsersIcon,
 	WarningOutlineIcon
 } from '@sanity/icons';
 import type { StructureResolver } from 'sanity/structure';
@@ -178,6 +179,33 @@ export const deskStructure: StructureResolver = (S) =>
 								.id('guides-all')
 								.schemaType('guide')
 								.child(S.documentTypeList('guide').title('All guides'))
+						])
+				),
+			S.listItem()
+				.title('Partners')
+				.icon(UsersIcon)
+				.child(
+					S.list()
+						.title('Partners')
+						.items([
+							S.listItem()
+								.title('Partners')
+								.id('partners-list')
+								.schemaType('partner')
+								.child(
+									S.documentTypeList('partner')
+										.title('Partners')
+										.defaultOrdering([{ field: 'order', direction: 'asc' }])
+								),
+							S.listItem()
+								.title('Categories')
+								.id('partner-categories-list')
+								.schemaType('partnerCategory')
+								.child(
+									S.documentTypeList('partnerCategory')
+										.title('Categories')
+										.defaultOrdering([{ field: 'order', direction: 'asc' }])
+								)
 						])
 				),
 			S.divider(),

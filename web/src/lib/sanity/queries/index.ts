@@ -117,6 +117,14 @@ export { sitemapListingsQuery, sitemapTaxonomyQuery } from './sitemap';
 export { guideBySlugQuery, guidesHubQuery, sitemapGuidesQuery } from './guide';
 
 export {
+	partnerCategoriesQuery,
+	homepagePartnerLogosQuery,
+	HOMEPAGE_PARTNER_LOGOS_LIMIT,
+	fetchPartnerCategories,
+	fetchHomepagePartnerLogos
+} from './partners';
+
+export {
 	SIMILAR_LISTING_LIMIT,
 	fetchSimilarListingCards,
 	type FetchSimilarListingCardsInput,

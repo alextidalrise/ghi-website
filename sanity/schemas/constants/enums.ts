@@ -115,6 +115,7 @@ export const ASSET_CATEGORIES = [
 	{ title: 'Render', value: 'render' },
 	{ title: 'Location', value: 'location' },
 	{ title: 'Lifestyle', value: 'lifestyle' },
+	{ title: 'Logo', value: 'logo' },
 	{ title: 'Source document', value: 'source_document' }
 ] as const;
 

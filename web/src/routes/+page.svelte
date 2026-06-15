@@ -68,7 +68,7 @@
 		viewAllHref={FRONTLINE_COLLECTION_PATH}
 	/>
 
-	<TrustedPartners />
+	<TrustedPartners partners={data.partnerLogos.length ? data.partnerLogos : undefined} />
 
 	{#if data.featuredCards.length === 0 && data.frontlineCards.length === 0}
 		<div class="home-intro">

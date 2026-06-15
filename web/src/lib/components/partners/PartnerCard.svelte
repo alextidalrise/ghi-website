@@ -17,7 +17,12 @@
 	<a class="partner-card__link" href={introHref}>
 		<div class="partner-card__logo">
 			{#if partner.logo}
-				<img src={partner.logo} alt={partner.name} loading="lazy" width="160" height="80" />
+				<img
+					src={partner.logo.url}
+					srcset={partner.logo.srcset}
+					alt={partner.logo.alt}
+					loading="lazy"
+				/>
 			{:else}
 				<span class="partner-card__logo-placeholder">{partner.name}</span>
 			{/if}

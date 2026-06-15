@@ -21,6 +21,95 @@ type ArrayOf<T> = Array<
 >;
 
 // Source: schema.json
+export type PartnerCategoryReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "partnerCategory";
+};
+
+export type Partner = {
+  _id: string;
+  _type: "partner";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name: string;
+  slug: Slug;
+  category: PartnerCategoryReference;
+  coverage?: string;
+  logo?: MediaAssetMetadata;
+  description: string;
+  referralUrl?: string;
+  order?: number;
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
+};
+
+export type MediaAssetMetadata = {
+  _type: "mediaAssetMetadata";
+  asset?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  fileAsset?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  assetCategory?:
+    | "hero"
+    | "gallery"
+    | "floorplan"
+    | "brochure"
+    | "video"
+    | "render"
+    | "location"
+    | "lifestyle"
+    | "logo"
+    | "source_document";
+  order?: number;
+  altText?: string;
+  sourceDriveFileId?: string;
+  sourceMediaFolderUrl?: string;
+  sourceFileName?: string;
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
+export type PartnerCategory = {
+  _id: string;
+  _type: "partnerCategory";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name: string;
+  slug: Slug;
+  monogram?: string;
+  role?: string;
+  order?: number;
+};
+
 export type Guide = {
   _id: string;
   _type: "guide";
@@ -69,58 +158,6 @@ export type SeoFields = {
     _key: string;
   }>;
   supportingArticles?: Array<string>;
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
-export type SanityFileAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
-};
-
-export type MediaAssetMetadata = {
-  _type: "mediaAssetMetadata";
-  asset?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  fileAsset?: {
-    asset?: SanityFileAssetReference;
-    media?: unknown;
-    _type: "file";
-  };
-  assetCategory?:
-    | "hero"
-    | "gallery"
-    | "floorplan"
-    | "brochure"
-    | "video"
-    | "render"
-    | "location"
-    | "lifestyle"
-    | "source_document";
-  order?: number;
-  altText?: string;
-  sourceDriveFileId?: string;
-  sourceMediaFolderUrl?: string;
-  sourceFileName?: string;
-};
-
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
 };
 
 export type PropertyListing = {
@@ -991,12 +1028,15 @@ export type SanityImageAsset = {
 };
 
 export type AllSanitySchemaTypes =
-  | Guide
-  | SeoFields
+  | PartnerCategoryReference
+  | Partner
   | SanityImageAssetReference
   | SanityFileAssetReference
   | MediaAssetMetadata
   | Slug
+  | PartnerCategory
+  | Guide
+  | SeoFields
   | PropertyListing
   | InternalFields
   | CtaFields
@@ -1114,6 +1154,7 @@ export type DevelopmentByPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -1156,6 +1197,7 @@ export type DevelopmentByPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -1198,6 +1240,7 @@ export type DevelopmentByPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -1283,6 +1326,7 @@ export type DevelopmentByPathPreviewQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -1312,6 +1356,7 @@ export type DevelopmentByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -1342,6 +1387,7 @@ export type DevelopmentByPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -1371,6 +1417,7 @@ export type DevelopmentByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -1399,6 +1446,7 @@ export type DevelopmentByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -1429,6 +1477,7 @@ export type DevelopmentByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -1583,6 +1632,7 @@ export type DevelopmentByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -1669,6 +1719,7 @@ export type DevelopmentByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -1697,6 +1748,7 @@ export type DevelopmentByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -1785,6 +1837,7 @@ export type DevelopmentByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -1813,6 +1866,7 @@ export type DevelopmentByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -1895,6 +1949,7 @@ export type DevelopmentByPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -1937,6 +1992,7 @@ export type DevelopmentByPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -1979,6 +2035,7 @@ export type DevelopmentByPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -2064,6 +2121,7 @@ export type DevelopmentByPathQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -2093,6 +2151,7 @@ export type DevelopmentByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2123,6 +2182,7 @@ export type DevelopmentByPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -2152,6 +2212,7 @@ export type DevelopmentByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2180,6 +2241,7 @@ export type DevelopmentByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2210,6 +2272,7 @@ export type DevelopmentByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2364,6 +2427,7 @@ export type DevelopmentByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2450,6 +2514,7 @@ export type DevelopmentByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2478,6 +2543,7 @@ export type DevelopmentByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2566,6 +2632,7 @@ export type DevelopmentByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2594,6 +2661,7 @@ export type DevelopmentByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2676,6 +2744,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -2718,6 +2787,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -2760,6 +2830,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -2845,6 +2916,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -2874,6 +2946,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2904,6 +2977,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -2933,6 +3007,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2961,6 +3036,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -2991,6 +3067,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3145,6 +3222,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3231,6 +3309,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3259,6 +3338,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3347,6 +3427,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3375,6 +3456,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3457,6 +3539,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -3499,6 +3582,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -3541,6 +3625,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -3626,6 +3711,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -3655,6 +3741,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3685,6 +3772,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -3714,6 +3802,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3742,6 +3831,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3772,6 +3862,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -3926,6 +4017,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4012,6 +4104,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4040,6 +4133,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4128,6 +4222,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4156,6 +4251,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4250,6 +4346,7 @@ export type DevelopmentByGhiIdQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -4292,6 +4389,7 @@ export type DevelopmentByGhiIdQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -4334,6 +4432,7 @@ export type DevelopmentByGhiIdQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -4419,6 +4518,7 @@ export type DevelopmentByGhiIdQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -4448,6 +4548,7 @@ export type DevelopmentByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4478,6 +4579,7 @@ export type DevelopmentByGhiIdQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -4507,6 +4609,7 @@ export type DevelopmentByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4535,6 +4638,7 @@ export type DevelopmentByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4565,6 +4669,7 @@ export type DevelopmentByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4719,6 +4824,7 @@ export type DevelopmentByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4805,6 +4911,7 @@ export type DevelopmentByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4833,6 +4940,7 @@ export type DevelopmentByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4921,6 +5029,7 @@ export type DevelopmentByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -4949,6 +5058,7 @@ export type DevelopmentByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -5082,6 +5192,7 @@ export type HomepageFeaturedListingsQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -5110,6 +5221,7 @@ export type HomepageFeaturedListingsQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -5153,6 +5265,7 @@ export type CountryFeaturedLocationsQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -5277,6 +5390,7 @@ export type CountryFeaturedListingsQueryResult = {
               | "hero"
               | "lifestyle"
               | "location"
+              | "logo"
               | "render"
               | "source_document"
               | "video"
@@ -5305,6 +5419,7 @@ export type CountryFeaturedListingsQueryResult = {
               | "hero"
               | "lifestyle"
               | "location"
+              | "logo"
               | "render"
               | "source_document"
               | "video"
@@ -5417,6 +5532,7 @@ export type CountryFeaturedListingsQueryResult = {
               | "hero"
               | "lifestyle"
               | "location"
+              | "logo"
               | "render"
               | "source_document"
               | "video"
@@ -5445,6 +5561,7 @@ export type CountryFeaturedListingsQueryResult = {
               | "hero"
               | "lifestyle"
               | "location"
+              | "logo"
               | "render"
               | "source_document"
               | "video"
@@ -5483,6 +5600,7 @@ export type FrontlineHeroQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -5532,6 +5650,7 @@ export type GolfCourseByPathQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -5597,6 +5716,7 @@ export type GolfCoursesByLocationQueryResult = Array<{
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -5671,6 +5791,7 @@ export type GuideBySlugQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -5738,6 +5859,7 @@ export type GuideBySlugQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -5774,6 +5896,7 @@ export type GuideBySlugQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -5823,6 +5946,7 @@ export type GuideBySlugQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -5864,6 +5988,7 @@ export type GuidesHubQueryResult = Array<{
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -5986,6 +6111,7 @@ export type CountryBySlugQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -6032,6 +6158,7 @@ export type LocationBySlugQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -6077,6 +6204,7 @@ export type LocationPageContextQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -6140,6 +6268,7 @@ export type CommunityInLocationContextQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -6195,6 +6324,7 @@ export type LocationsByCountryQueryResult = Array<{
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -6248,6 +6378,23 @@ export type LocationBreadcrumbQueryResult =
         type: null;
         breadcrumbLabel: null;
         isCatchAll: null;
+        seoTitle: null;
+        metaDescription: null;
+        publicDescription: null;
+        overviewHeading: null;
+        heroImage: null;
+        tagline: null;
+        coordinates: null;
+      }>;
+    }
+  | {
+      chain: Array<{
+        _id: string;
+        name: string;
+        slug: string;
+        type: null;
+        breadcrumbLabel: null;
+        isCatchAll: null;
         seoTitle: string | null;
         metaDescription: string | null;
         publicDescription: null;
@@ -6290,6 +6437,7 @@ export type LocationBreadcrumbQueryResult =
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -6302,6 +6450,90 @@ export type LocationBreadcrumbQueryResult =
       }>;
     }
   | null;
+
+// Source: ../web/src/lib/sanity/queries/partners.ts
+// Variable: partnerCategoriesQuery
+// Query: *[    _type == "partnerCategory"    && defined(slug.current)    && count(*[_type == "partner" && references(^._id) && defined(slug.current)]) > 0  ] | order(coalesce(order, 999) asc, name asc) {  "id": slug.current,  name,  monogram,  role,  "partners": *[    _type == "partner"    && references(^._id)    && defined(slug.current)  ] | order(coalesce(order, 999) asc, name asc) {  _id,  name,  "slug": slug.current,  coverage,  description,  logo{  asset,  fileAsset,  assetCategory,  order,  altText}}}
+export type PartnerCategoriesQueryResult = Array<{
+  id: string;
+  name: string;
+  monogram: string | null;
+  role: string | null;
+  partners: Array<{
+    _id: string;
+    name: string;
+    slug: string;
+    coverage: string | null;
+    description: string;
+    logo: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      assetCategory:
+        | "brochure"
+        | "floorplan"
+        | "gallery"
+        | "hero"
+        | "lifestyle"
+        | "location"
+        | "logo"
+        | "render"
+        | "source_document"
+        | "video"
+        | null;
+      order: number | null;
+      altText: string | null;
+    } | null;
+  }>;
+}>;
+
+// Source: ../web/src/lib/sanity/queries/partners.ts
+// Variable: homepagePartnerLogosQuery
+// Query: *[    _type == "partner"    && defined(slug.current)    && defined(logo.asset)  ] | order(coalesce(order, 999) asc, name asc)[0...$limit] {  _id,  name,  "slug": slug.current,  logo{  asset,  fileAsset,  assetCategory,  order,  altText}}
+export type HomepagePartnerLogosQueryResult = Array<{
+  _id: string;
+  name: string;
+  slug: string;
+  logo: {
+    asset: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+    } | null;
+    fileAsset: {
+      asset?: SanityFileAssetReference;
+      media?: unknown;
+      _type: "file";
+    } | null;
+    assetCategory:
+      | "brochure"
+      | "floorplan"
+      | "gallery"
+      | "hero"
+      | "lifestyle"
+      | "location"
+      | "logo"
+      | "render"
+      | "source_document"
+      | "video"
+      | null;
+    order: number | null;
+    altText: string | null;
+  } | null;
+}>;
 
 // Source: ../web/src/lib/sanity/queries/propertyListing.ts
 // Variable: propertyByPathPreviewQuery
@@ -6355,6 +6587,7 @@ export type PropertyByPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -6397,6 +6630,7 @@ export type PropertyByPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -6439,6 +6673,7 @@ export type PropertyByPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -6616,6 +6851,7 @@ export type PropertyByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -6646,6 +6882,7 @@ export type PropertyByPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -6675,6 +6912,7 @@ export type PropertyByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -6703,6 +6941,7 @@ export type PropertyByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -6733,6 +6972,7 @@ export type PropertyByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -6779,6 +7019,7 @@ export type PropertyByPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -6854,6 +7095,7 @@ export type PropertyByPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -6896,6 +7138,7 @@ export type PropertyByPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -6938,6 +7181,7 @@ export type PropertyByPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -7115,6 +7359,7 @@ export type PropertyByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7145,6 +7390,7 @@ export type PropertyByPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -7174,6 +7420,7 @@ export type PropertyByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7202,6 +7449,7 @@ export type PropertyByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7232,6 +7480,7 @@ export type PropertyByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7278,6 +7527,7 @@ export type PropertyByPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7353,6 +7603,7 @@ export type PropertyByCatchAllPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -7395,6 +7646,7 @@ export type PropertyByCatchAllPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -7437,6 +7689,7 @@ export type PropertyByCatchAllPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -7614,6 +7867,7 @@ export type PropertyByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7644,6 +7898,7 @@ export type PropertyByCatchAllPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -7673,6 +7928,7 @@ export type PropertyByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7701,6 +7957,7 @@ export type PropertyByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7731,6 +7988,7 @@ export type PropertyByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7777,6 +8035,7 @@ export type PropertyByCatchAllPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -7852,6 +8111,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -7894,6 +8154,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -7936,6 +8197,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -8113,6 +8375,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8143,6 +8406,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -8172,6 +8436,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8200,6 +8465,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8230,6 +8496,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8276,6 +8543,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8363,6 +8631,7 @@ export type PropertyByGhiIdQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -8405,6 +8674,7 @@ export type PropertyByGhiIdQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -8447,6 +8717,7 @@ export type PropertyByGhiIdQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -8624,6 +8895,7 @@ export type PropertyByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8654,6 +8926,7 @@ export type PropertyByGhiIdQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -8683,6 +8956,7 @@ export type PropertyByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8711,6 +8985,7 @@ export type PropertyByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8741,6 +9016,7 @@ export type PropertyByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8787,6 +9063,7 @@ export type PropertyByGhiIdQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8927,6 +9204,7 @@ export type PropertyCardsByCommunityQueryResult = Array<{
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -8955,6 +9233,7 @@ export type PropertyCardsByCommunityQueryResult = Array<{
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9066,6 +9345,7 @@ export type PropertyCardsByLocationQueryResult = Array<{
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9094,6 +9374,7 @@ export type PropertyCardsByLocationQueryResult = Array<{
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9130,6 +9411,7 @@ export type SiteSettingsHeroQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9173,6 +9455,7 @@ export type HomepageFeaturedLocationsQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9220,6 +9503,7 @@ export type CountriesWithHeroQueryResult = Array<{
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -9229,6 +9513,42 @@ export type CountriesWithHeroQueryResult = Array<{
   } | null;
   tagline: string | null;
   coordinates: Geopoint | null;
+}>;
+
+// Source: ../web/src/lib/sanity/queries/settings.ts
+// Variable: locationHeroesBySlugQuery
+// Query: *[    _type == "locationTaxonomy"    && type == "location"    && defined(slug.current)    && slug.current in $slugs  ]{    "slug": slug.current,    heroImage{  asset,  fileAsset,  assetCategory,  order,  altText}  }
+export type LocationHeroesBySlugQueryResult = Array<{
+  slug: string;
+  heroImage: {
+    asset: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
+    } | null;
+    fileAsset: {
+      asset?: SanityFileAssetReference;
+      media?: unknown;
+      _type: "file";
+    } | null;
+    assetCategory:
+      | "brochure"
+      | "floorplan"
+      | "gallery"
+      | "hero"
+      | "lifestyle"
+      | "location"
+      | "logo"
+      | "render"
+      | "source_document"
+      | "video"
+      | null;
+    order: number | null;
+    altText: string | null;
+  } | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries/similar.ts
@@ -9332,6 +9652,7 @@ export type AutomaticSimilarPropertiesQueryResult = Array<{
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9360,6 +9681,7 @@ export type AutomaticSimilarPropertiesQueryResult = Array<{
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9471,6 +9793,7 @@ export type TagsSimilarPropertiesQueryResult = Array<{
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9499,6 +9822,7 @@ export type TagsSimilarPropertiesQueryResult = Array<{
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9619,6 +9943,7 @@ export type ManualSimilarPropertiesQueryResult =
                   | "hero"
                   | "lifestyle"
                   | "location"
+                  | "logo"
                   | "render"
                   | "source_document"
                   | "video"
@@ -9647,6 +9972,7 @@ export type ManualSimilarPropertiesQueryResult =
                   | "hero"
                   | "lifestyle"
                   | "location"
+                  | "logo"
                   | "render"
                   | "source_document"
                   | "video"
@@ -9756,6 +10082,7 @@ export type ManualSimilarPropertiesQueryResult =
                   | "hero"
                   | "lifestyle"
                   | "location"
+                  | "logo"
                   | "render"
                   | "source_document"
                   | "video"
@@ -9784,6 +10111,7 @@ export type ManualSimilarPropertiesQueryResult =
                   | "hero"
                   | "lifestyle"
                   | "location"
+                  | "logo"
                   | "render"
                   | "source_document"
                   | "video"
@@ -9901,6 +10229,7 @@ export type UnitByDevPathQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -9929,6 +10258,7 @@ export type UnitByDevPathQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -9970,6 +10300,7 @@ export type UnitByDevPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -9998,6 +10329,7 @@ export type UnitByDevPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -10064,6 +10396,7 @@ export type UnitByDevPathQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -10106,6 +10439,7 @@ export type UnitByDevPathQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -10148,6 +10482,7 @@ export type UnitByDevPathQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -10237,6 +10572,7 @@ export type UnitByDevPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -10266,6 +10602,7 @@ export type UnitByDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -10296,6 +10633,7 @@ export type UnitByDevPathQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -10325,6 +10663,7 @@ export type UnitByDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -10353,6 +10692,7 @@ export type UnitByDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -10383,6 +10723,7 @@ export type UnitByDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -10566,6 +10907,7 @@ export type UnitByDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -10669,6 +11011,7 @@ export type UnitByDevPathPreviewQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -10697,6 +11040,7 @@ export type UnitByDevPathPreviewQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -10738,6 +11082,7 @@ export type UnitByDevPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -10766,6 +11111,7 @@ export type UnitByDevPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -10832,6 +11178,7 @@ export type UnitByDevPathPreviewQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -10874,6 +11221,7 @@ export type UnitByDevPathPreviewQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -10916,6 +11264,7 @@ export type UnitByDevPathPreviewQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -11005,6 +11354,7 @@ export type UnitByDevPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -11034,6 +11384,7 @@ export type UnitByDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -11064,6 +11415,7 @@ export type UnitByDevPathPreviewQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -11093,6 +11445,7 @@ export type UnitByDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -11121,6 +11474,7 @@ export type UnitByDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -11151,6 +11505,7 @@ export type UnitByDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -11334,6 +11689,7 @@ export type UnitByDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -11437,6 +11793,7 @@ export type UnitByCatchAllDevPathQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -11465,6 +11822,7 @@ export type UnitByCatchAllDevPathQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -11506,6 +11864,7 @@ export type UnitByCatchAllDevPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -11534,6 +11893,7 @@ export type UnitByCatchAllDevPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -11600,6 +11960,7 @@ export type UnitByCatchAllDevPathQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -11642,6 +12003,7 @@ export type UnitByCatchAllDevPathQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -11684,6 +12046,7 @@ export type UnitByCatchAllDevPathQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -11773,6 +12136,7 @@ export type UnitByCatchAllDevPathQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -11802,6 +12166,7 @@ export type UnitByCatchAllDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -11832,6 +12197,7 @@ export type UnitByCatchAllDevPathQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -11861,6 +12227,7 @@ export type UnitByCatchAllDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -11889,6 +12256,7 @@ export type UnitByCatchAllDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -11919,6 +12287,7 @@ export type UnitByCatchAllDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -12102,6 +12471,7 @@ export type UnitByCatchAllDevPathQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -12205,6 +12575,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -12233,6 +12604,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
       | "hero"
       | "lifestyle"
       | "location"
+      | "logo"
       | "render"
       | "source_document"
       | "video"
@@ -12274,6 +12646,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -12302,6 +12675,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -12368,6 +12742,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -12410,6 +12785,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -12452,6 +12828,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -12541,6 +12918,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
         | "hero"
         | "lifestyle"
         | "location"
+        | "logo"
         | "render"
         | "source_document"
         | "video"
@@ -12570,6 +12948,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -12600,6 +12979,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
             | "hero"
             | "lifestyle"
             | "location"
+            | "logo"
             | "render"
             | "source_document"
             | "video"
@@ -12629,6 +13009,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -12657,6 +13038,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -12687,6 +13069,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -12870,6 +13253,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
           | "hero"
           | "lifestyle"
           | "location"
+          | "logo"
           | "render"
           | "source_document"
           | "video"
@@ -12962,6 +13346,8 @@ declare module "@sanity/client" {
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && isCatchAll != true\n    && (\n      parent._ref == $locationId\n      || $locationId in associatedLocations[]._ref\n    )\n  ] | order(name asc){\n    _id,\n    name,\n    "slug": slug.current,\n    type,\n    breadcrumbLabel,\n    seoTitle,\n    metaDescription,\n    publicDescription,\n    "canonicalLocationSlug": parent->slug.current,\n    "isAssociated": $locationId in associatedLocations[]._ref && parent._ref != $locationId\n  }\n': CommunitiesByLocationQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && isCatchAll != true\n    && defined(slug.current)\n    && defined(parent->slug.current)\n    && defined(parent->parent->slug.current)\n  ] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    "locationSlug": parent->slug.current,\n    "countrySlug": parent->parent->slug.current\n  }\n': CommunitiesForNavQueryResult;
     '\n  *[_id == $taxonomyId][0]{\n    "chain": [\n      ...*[_id == ^._id][0].parent->parent->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n      ...*[_id == ^._id][0].parent->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n      {\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n}\n    ][defined(name)]\n  }\n': LocationBreadcrumbQueryResult;
+    '\n  *[\n    _type == "partnerCategory"\n    && defined(slug.current)\n    && count(*[_type == "partner" && references(^._id) && defined(slug.current)]) > 0\n  ] | order(coalesce(order, 999) asc, name asc) {\n  "id": slug.current,\n  name,\n  monogram,\n  role,\n  "partners": *[\n    _type == "partner"\n    && references(^._id)\n    && defined(slug.current)\n  ] | order(coalesce(order, 999) asc, name asc) {\n  _id,\n  name,\n  "slug": slug.current,\n  coverage,\n  description,\n  logo{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n}\n}\n': PartnerCategoriesQueryResult;
+    '\n  *[\n    _type == "partner"\n    && defined(slug.current)\n    && defined(logo.asset)\n  ] | order(coalesce(order, 999) asc, name asc)[0...$limit] {\n  _id,\n  name,\n  "slug": slug.current,\n  logo{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n}\n': HomepagePartnerLogosQueryResult;
     '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n) == $communitySlug\n  && slug.current == $slug\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n  addressDisplay\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription,\n    "communitySlug": community->slug.current,\n    "locationSlug": community->parent->slug.current,\n    "countrySlug": community->parent->parent->slug.current\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription,\n    "communitySlug": community->slug.current,\n    "locationSlug": community->parent->slug.current,\n    "countrySlug": community->parent->parent->slug.current\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  content{\n  shortDescription,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  media{\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  brochurePublic\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': PropertyByPathPreviewQueryResult;
     '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n) == $communitySlug\n  && slug.current == $slug\n\n    && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n  addressDisplay\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription,\n    "communitySlug": community->slug.current,\n    "locationSlug": community->parent->slug.current,\n    "countrySlug": community->parent->parent->slug.current\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription,\n    "communitySlug": community->slug.current,\n    "locationSlug": community->parent->slug.current,\n    "countrySlug": community->parent->parent->slug.current\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  content{\n  shortDescription,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  media{\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  brochurePublic\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': PropertyByPathQueryResult;
     '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && slug.current == $slug\n  && coalesce(location.community->isCatchAll, false) == true\n\n    && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n  ][0]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  location{\n  country->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n  location->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n  community->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n},\n  addressDisplay\n},\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs,\n  golf{\n  golfRelevance,\n  primaryGolfCourse->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription,\n    "communitySlug": community->slug.current,\n    "locationSlug": community->parent->slug.current,\n    "countrySlug": community->parent->parent->slug.current\n  },\n  linkedGolfCourses[]->{\n    _id,\n    name,\n    "slug": slug.current,\n    shortDescription,\n    "communitySlug": community->slug.current,\n    "locationSlug": community->parent->slug.current,\n    "countrySlug": community->parent->parent->slug.current\n  },\n  distanceToPrimaryGolfCourse,\n  golfView,\n  buggyAccess,\n  golfMembershipInfo\n},\n  content{\n  shortDescription,\n  aboutDescription,\n  locationDescription,\n  golfDescription,\n  featureHighlights[]{\n    label,\n    value,\n    category,\n    isFilterable,\n    isHighlighted\n  },\n  amenities\n},\n  media{\n  gallery[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  galleryGroups[]{\n    title,\n    images[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n  },\n  thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  floorplans[]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  videoUrl,\n  virtualTourUrl,\n  brochure{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  brochurePublic\n},\n  ctas{\n  primaryCtaLabel,\n  secondaryCtaLabel,\n  formIntroText,\n  responseTimeText,\n  brochureCtaText,\n  brochureCtaEnabled\n},\n  related{\n  similarPropertiesMode\n},\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': PropertyByCatchAllPathQueryResult;
@@ -12974,6 +13360,7 @@ declare module "@sanity/client" {
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    homepageHero{\n      image{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n      tagline\n    }\n  }\n': SiteSettingsHeroQueryResult;
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    "locations": homepageFeaturedLocations[\n      \n  @->_type == "locationTaxonomy"\n  && @->type == "location"\n  && defined(@->slug.current)\n  && defined(@->parent->slug.current)\n\n    ]->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  "countrySlug": parent->slug.current,\n  "countryName": parent->name\n}\n  }\n': HomepageFeaturedLocationsQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && defined(slug.current)\n    && defined(heroImage.asset)\n  ] | order(name asc){\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n  tagline,\n  coordinates\n}\n': CountriesWithHeroQueryResult;
+    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && defined(slug.current)\n    && slug.current in $slugs\n  ]{\n    "slug": slug.current,\n    heroImage{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n  }\n': LocationHeroesBySlugQueryResult;
     '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n\n    && _id != $excludeId\n    && propertyType == $propertyType\n    && location.country->slug.current == $countrySlug\n    && location.location->slug.current == $locationSlug\n    && location.community->slug.current == $communitySlug\n  ] | order(_createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n  }\n}\n': AutomaticSimilarPropertiesQueryResult;
     '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n\n    && _id != $excludeId\n    && count((related.similarityTags)[@ in $tags]) > 0\n  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n  }\n}\n': TagsSimilarPropertiesQueryResult;
     '\n  *[_id == $listingId][0]{\n    "items": related.manualSimilarProperties[]->[\n      \n  (_type == "propertyListing" && listingKind in ["property", "unit"] && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n)\n  || (_type == "development" && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n)\n\n    ]{\n  _type,\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  developmentDisplayMode,\n  developmentStatus,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  assetCategory,\n  order,\n  altText\n}\n  }\n}\n  }\n': ManualSimilarPropertiesQueryResult;

@@ -207,6 +207,44 @@ export const GUIDE_SECTION_PUBLIC = /* groq */ `{
   }
 }`;
 
+/**
+ * Public partner projection. `referralUrl` is deliberately excluded — it is the GHI
+ * team's internal handoff and must never reach the browser.
+ */
+export const PARTNER_PUBLIC = /* groq */ `{
+  _id,
+  name,
+  "slug": slug.current,
+  coverage,
+  description,
+  logo${MEDIA_ASSET_PUBLIC}
+}`;
+
+/**
+ * Partner category with its partners inlined, ordered, and self-filtered to those with
+ * a usable slug. Categories with no partners are dropped at the query level so the page
+ * never renders an empty section header.
+ */
+export const PARTNER_CATEGORY_PUBLIC = /* groq */ `{
+  "id": slug.current,
+  name,
+  monogram,
+  role,
+  "partners": *[
+    _type == "partner"
+    && references(^._id)
+    && defined(slug.current)
+  ] | order(coalesce(order, 999) asc, name asc) ${PARTNER_PUBLIC}
+}`;
+
+/** Minimal partner projection for the homepage logo wall — only those with a logo. */
+export const PARTNER_LOGO_PUBLIC = /* groq */ `{
+  _id,
+  name,
+  "slug": slug.current,
+  logo${MEDIA_ASSET_PUBLIC}
+}`;
+
 /** Guide card projection — hub grid and related-guides cross-links. */
 export const GUIDE_CARD_PUBLIC = /* groq */ `{
   _id,

@@ -4,6 +4,8 @@ import { development } from './development';
 import { golfCourse } from './golfCourse';
 import { guide } from './guide';
 import { locationTaxonomy } from './locationTaxonomy';
+import { partner } from './partner';
+import { partnerCategory } from './partnerCategory';
 import { propertyListing } from './propertyListing';
 import { siteSettings } from './siteSettings';
 import { unit } from './unit';
@@ -18,7 +20,9 @@ export const documentTypes: SchemaTypeDefinition[] = [
 	unitType,
 	unit,
 	propertyListing,
-	guide
+	guide,
+	partnerCategory,
+	partner
 ];
 
 export {
@@ -26,6 +30,8 @@ export {
 	golfCourse,
 	guide,
 	locationTaxonomy,
+	partner,
+	partnerCategory,
 	propertyListing,
 	siteSettings,
 	unit,
