@@ -10,9 +10,13 @@
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
-	// Served from static/ at the site root — a brand asset already used elsewhere
-	// (the design-system demo cards), so it is known to exist and resolve.
-	const heroUrl = '/design-system/assets/andalucia-golf-villa.png';
+	let { data } = $props();
+
+	// Hero from siteSettings.homepageHero (auto AVIF/WebP + srcset) via the loader, with a
+	// fallback to the optimized static asset so the gate renders even if the CMS is down.
+	const fallbackHeroUrl = '/design-system/assets/andalucia-golf-villa.png';
+	const heroUrl = data.hero?.url ?? fallbackHeroUrl;
+	const heroSrcset = data.hero?.srcset || undefined;
 
 	let notifyOpen = $state(false);
 	let submitting = $state(false);
@@ -87,17 +91,27 @@
 		content="A curated portfolio of homes on and near Europe's premier golf courses. Launching soon."
 	/>
 	<meta property="og:image" content={heroUrl} />
-	<link rel="preload" as="image" href={heroUrl} fetchpriority="high" />
+	<link
+		rel="preload"
+		as="image"
+		href={heroUrl}
+		imagesrcset={heroSrcset}
+		imagesizes="100vw"
+		fetchpriority="high"
+	/>
 </svelte:head>
 
 <main class="holding on-dark" aria-labelledby="holding-title">
 	<div class="holding__photo" aria-hidden="true">
 		<img
 			src={heroUrl}
+			srcset={heroSrcset}
+			sizes="100vw"
 			alt=""
-			width="2752"
-			height="1536"
+			width="1920"
+			height="1080"
 			fetchpriority="high"
+			decoding="async"
 		/>
 	</div>
 	<div class="holding__scrim" aria-hidden="true"></div>

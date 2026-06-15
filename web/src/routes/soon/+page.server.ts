@@ -1,9 +1,19 @@
 import { fail } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
+import { fetchSiteSettingsHero } from '$lib/sanity/queries/settings';
+import { resolveHomepageHeroImage } from '$lib/sanity/transforms/taxonomyHero';
 
 // The holding page carries a form action, so it must render server-side, not prerender.
 export const prerender = false;
+
+// Hero comes from siteSettings.homepageHero (auto AVIF/WebP + srcset), the same image
+// the homepage uses. Resolves to null if unset/unreachable; the page falls back to the
+// optimized static asset so the gate always renders.
+export const load: PageServerLoad = async () => {
+	const hero = resolveHomepageHeroImage(await fetchSiteSettingsHero());
+	return { hero };
+};
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
