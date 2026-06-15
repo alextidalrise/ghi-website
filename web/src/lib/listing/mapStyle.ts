@@ -20,8 +20,6 @@ const MAPTILER_STYLE = 'dataviz';
 /** Keyless, free vector basemap (light monochrome) — the no-account fallback. */
 const OPENFREEMAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
 
-export const usingMapTiler = Boolean(MAPTILER_KEY);
-
 export function resolveMapStyleUrl(): string {
 	if (MAPTILER_KEY) {
 		return `https://api.maptiler.com/maps/${MAPTILER_STYLE}/style.json?key=${MAPTILER_KEY}`;
