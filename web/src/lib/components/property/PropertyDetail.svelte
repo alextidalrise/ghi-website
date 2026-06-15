@@ -6,6 +6,7 @@
 	import Gallery from './Gallery.svelte';
 	import PropertySummary from './PropertySummary.svelte';
 	import KeyFacts from './KeyFacts.svelte';
+	import Floorplan from './Floorplan.svelte';
 	import ContentSection from './ContentSection.svelte';
 	import Features from './Features.svelte';
 	import EnquiryRail from './EnquiryRail.svelte';
@@ -20,8 +21,6 @@
 	};
 
 	let { property, breadcrumbs, similarCards = [] }: Props = $props();
-
-	const enquireLabel = $derived(property.ctas?.primaryCtaLabel ?? 'Enquire about this property');
 </script>
 
 <article class="listing-page listing-page--property">
@@ -38,7 +37,7 @@
 			<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 			<PropertySummary listing={property} />
 			<KeyFacts listing={property} />
-			<a class="hero__cta" href="#enquire">{enquireLabel}</a>
+			<Floorplan floorplans={property.media?.floorplans} title={property.title ?? 'Property'} />
 		</div>
 	</section>
 
@@ -79,33 +78,6 @@
 
 	.hero__summary {
 		padding: var(--space-lg) var(--content-padding) 0;
-	}
-
-	.hero__cta {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		margin-top: var(--space-lg);
-		padding: 0.85rem 2rem;
-		background: var(--gold);
-		color: var(--green);
-		font-family: var(--sans);
-		font-size: var(--text-ui);
-		font-weight: 500;
-		letter-spacing: var(--tracking-wide);
-		text-transform: uppercase;
-		text-decoration: none;
-		border: 1px solid var(--gold);
-		transition:
-			background var(--duration-hover) var(--ease),
-			border-color var(--duration-hover) var(--ease);
-	}
-
-	.hero__cta:hover,
-	.hero__cta:focus-visible {
-		background: var(--green);
-		color: var(--white);
-		border-color: var(--green);
 	}
 
 	/* Desktop: a full-bleed gallery flush to the left edge and the nav, beside the
