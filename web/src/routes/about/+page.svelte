@@ -246,7 +246,9 @@
 
 <style>
 	.about-page {
-		padding-bottom: var(--space-2xl);
+		/* The page closes on the full-bleed green "Talk to us" band, which meets the
+		   green site footer directly; no trailing white gap between the two. */
+		padding-bottom: 0;
 	}
 
 	/* ---- Hero ---------------------------------------------------------------- */
@@ -294,18 +296,31 @@
 	}
 
 	/* The single typographic lift in the story — Playfair italic, no quote marks,
-	   no side-stripe; a hairline above and below sets it apart. */
+	   no side-stripe. An opening hairline plus a gold diamond mark it (gold as an
+	   accent mark, never the rule colour); there is no closing rule, so it never
+	   doubles up against the next section's full-bleed divider. Large italic Playfair
+	   has tall ascenders and deep descenders, so the leading is generous. */
 	.story__quote {
-		margin-top: var(--space-sm);
-		padding-block: var(--space-md);
-		border-block: 1px solid var(--border);
+		margin-top: var(--space-md);
+		padding-top: var(--space-lg);
+		border-top: 1px solid var(--border);
 		font-family: var(--serif);
 		font-style: italic;
 		font-weight: 400;
-		font-size: clamp(1.375rem, 1rem + 1.6vw, 1.875rem);
-		line-height: 1.4;
+		font-size: clamp(1.375rem, 1rem + 1.5vw, 1.8125rem);
+		line-height: 1.7;
 		color: var(--green);
-		text-wrap: balance;
+		text-wrap: pretty;
+	}
+
+	.story__quote::before {
+		content: '';
+		display: block;
+		width: 7px;
+		height: 7px;
+		margin-bottom: var(--space-md);
+		background: var(--gold);
+		transform: rotate(45deg);
 	}
 
 	/* ---- The right people --------------------------------------------------- */
@@ -557,11 +572,15 @@
 		width: 100vw;
 		margin-inline: calc(50% - 50vw);
 		margin-top: var(--section-gap);
-		padding-block: clamp(3rem, 4.5vw, 4.25rem);
+		padding-block: clamp(3rem, 4.5vw, 4.25rem) clamp(3.5rem, 5vw, 5rem);
+		/* Gradient settles to the footer's exact green so the band flows into the
+		   footer with no seam; the radial glow keeps the CTA distinct up top. */
 		background:
 			radial-gradient(120% 90% at 14% -20%, oklch(0.37 0.05 165) 0%, transparent 52%),
-			linear-gradient(180deg, oklch(0.31 0.035 165) 0%, oklch(0.24 0.03 165) 100%);
-		border-block: 1px solid oklch(0.82 0.05 85 / 0.28);
+			linear-gradient(180deg, oklch(0.31 0.035 165) 0%, var(--green) 100%);
+		/* Top gold hairline divides the band from the white team section above; no
+		   bottom rule, since the dark footer (not white content) follows it. */
+		border-top: 1px solid oklch(0.82 0.05 85 / 0.28);
 	}
 
 	.talk__inner {
