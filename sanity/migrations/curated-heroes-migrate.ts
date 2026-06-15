@@ -18,8 +18,11 @@ const PROJECT_ID = process.env.SANITY_STUDIO_PROJECT_ID ?? 's88o8sjb';
 const TOKEN =
 	process.env.SANITY_API_TOKEN ?? process.env.SANITY_AUTH_TOKEN ?? readSanityCliAuthToken();
 
-const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const LOCATIONS_ASSET_DIR = join(REPO_ROOT, 'web', 'static', 'design-system', 'assets', 'locations');
+const MIGRATIONS_DIR = dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = join(MIGRATIONS_DIR, '..', '..');
+// Seed imagery lives beside the migrations (not web/static/) so it ships with the
+// Sanity package for re-seeding without bloating every web deploy.
+const LOCATIONS_ASSET_DIR = join(MIGRATIONS_DIR, 'assets', 'locations');
 const HOMEPAGE_HERO_FILE = join(
 	REPO_ROOT,
 	'web',
