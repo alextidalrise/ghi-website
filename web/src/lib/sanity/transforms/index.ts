@@ -5,7 +5,7 @@ import {
 	type MediaAssetInput,
 	type MediaBundleInput
 } from './mediaFilter';
-import { stripInternalLocationFields, type LocationMapInput } from './mapPrivacy';
+import { stripInternalLocationFields, type GeoPoint, type LocationMapInput } from './mapPrivacy';
 import { filterPublicPricing, type PricingInput, type PublicPricing } from './pricingFilter';
 import {
 	filterDisplayableUnits,
@@ -59,6 +59,8 @@ type GolfCourseRef = {
 	name?: string | null;
 	slug?: string | null;
 	shortDescription?: string | null;
+	/** Exact course GPS point, surfaced for area-map pins (see GOLF_PUBLIC). */
+	coordinates?: GeoPoint | null;
 	countrySlug?: string | null;
 	locationSlug?: string | null;
 	communitySlug?: string | null;

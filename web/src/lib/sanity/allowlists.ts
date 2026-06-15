@@ -127,7 +127,15 @@ export const CONTENT_PUBLIC = /* groq */ `{
 /** Public specs object — full specsFields group is public when approved. */
 export const SPECS_PUBLIC = 'specs';
 
-/** Public golf fields — enrichment workflow fields excluded. */
+/**
+ * Public golf fields — enrichment workflow fields excluded.
+ *
+ * `coordinates` is the course's exact GPS point. It lives in the golf course's
+ * `governance` group (internal by default), but a named public golf course pinned
+ * on the area map is a buyer-facing aid, not a privacy leak — the *property's* own
+ * location stays area-only (community pin) regardless. Surfacing it here lets the
+ * area map drop precise course markers; see StyledAreaMap / mapPins.
+ */
 export const GOLF_PUBLIC = /* groq */ `{
   golfRelevance,
   primaryGolfCourse->{
@@ -135,6 +143,7 @@ export const GOLF_PUBLIC = /* groq */ `{
     name,
     "slug": slug.current,
     shortDescription,
+    coordinates,
     "communitySlug": community->slug.current,
     "locationSlug": community->parent->slug.current,
     "countrySlug": community->parent->parent->slug.current
@@ -144,6 +153,7 @@ export const GOLF_PUBLIC = /* groq */ `{
     name,
     "slug": slug.current,
     shortDescription,
+    coordinates,
     "communitySlug": community->slug.current,
     "locationSlug": community->parent->slug.current,
     "countrySlug": community->parent->parent->slug.current

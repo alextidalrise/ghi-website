@@ -68,7 +68,10 @@
 		viewAllHref={FRONTLINE_COLLECTION_PATH}
 	/>
 
-	<TrustedPartners partners={data.partnerLogos.length ? data.partnerLogos : undefined} />
+	<TrustedPartners
+		partners={data.partnerLogos.length ? data.partnerLogos : undefined}
+		ctaHref="/partners"
+	/>
 
 	{#if data.featuredCards.length === 0 && data.frontlineCards.length === 0}
 		<div class="home-intro">

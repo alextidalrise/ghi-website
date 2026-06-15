@@ -3,8 +3,9 @@
 	import type { PublicGolf } from '$lib/sanity/transforms';
 	import type { PortableTextBlock as PtBlock } from '@portabletext/types';
 	import PortableTextBlock from './PortableTextBlock.svelte';
-	import AreaMap from './AreaMap.svelte';
+	import StyledAreaMap from './StyledAreaMap.svelte';
 	import GolfCourseCard from './GolfCourseCard.svelte';
+	import { buildGolfPins } from '$lib/listing/mapPins';
 
 	type Props = {
 		description: PtBlock[] | null | undefined;
@@ -19,6 +20,7 @@
 	const hasDescription = $derived(Boolean(description && description.length > 0));
 	const hasCard = $derived(Boolean(golf?.primaryGolfCourse?.name));
 	const hasMap = $derived(Boolean(map?.coordinates));
+	const golfPins = $derived(buildGolfPins(golf));
 </script>
 
 <section class="location content-wrap" aria-labelledby="location-heading">
@@ -39,7 +41,7 @@
 			class:location__grid--card-only={hasCard && !hasMap}
 		>
 			{#if hasMap}
-				<AreaMap {map} />
+				<StyledAreaMap {map} {golfPins} />
 			{/if}
 			{#if hasCard}
 				<GolfCourseCard {golf} />
