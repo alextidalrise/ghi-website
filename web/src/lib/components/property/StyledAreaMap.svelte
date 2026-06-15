@@ -69,8 +69,16 @@
 				];
 				for (const h of handlers) h.disable();
 
+				// Only a total load failure (bad key, blocked host, dead network) should
+				// show the fallback. If the style hasn't loaded within the window, flip to
+				// error; otherwise non-fatal sub-resource errors below are ignored.
+				const loadTimeout = setTimeout(() => {
+					if (!cancelled && status === 'loading') status = 'error';
+				}, 8000);
+
 				m.on('load', () => {
 					if (cancelled) return;
+					clearTimeout(loadTimeout);
 					applyBrandWash(m);
 
 					// Collapse the (legally required) attribution to its compact "ⓘ" form;
@@ -109,8 +117,12 @@
 					status = 'ready';
 				});
 
-				m.on('error', () => {
-					if (!cancelled) status = 'error';
+				// MapLibre fires 'error' for non-fatal sub-resource failures too — one
+				// 403'd font-glyph range, a missing tile. Those must NOT blank a map that
+				// otherwise renders; log and move on. Total failures are caught by the
+				// load timeout above and the import catch below.
+				m.on('error', (e) => {
+					console.warn('[area-map] maplibre error', e.error);
 				});
 			} catch {
 				if (!cancelled) status = 'error';
