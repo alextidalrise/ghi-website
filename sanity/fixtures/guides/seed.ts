@@ -42,7 +42,9 @@ const IMAGE_SOURCE = join(
 
 const IDS = {
 	uk: 'guide.spain-uk-buyers',
-	intl: 'guide.spain-international-buyers'
+	intl: 'guide.spain-international-buyers',
+	ptUk: 'guide.portugal-uk-buyers',
+	ptIntl: 'guide.portugal-international-buyers'
 };
 
 // Earlier placeholder guides this seed replaces.
@@ -86,6 +88,10 @@ const para = (text: string) => block('normal', [span(text)]);
 const h3 = (text: string) => block('h3', [span(text)]);
 const h4 = (text: string) => block('h4', [span(text)]);
 const bullet = (text: string) => block('normal', [span(text)], { listItem: 'bullet' });
+
+/** A bullet whose opening label is emphasised, e.g. "**D7 visa:** for buyers with…". */
+const bulletLead = (lead: string, rest: string) =>
+	block('normal', [span(lead, ['strong']), span(rest)], { listItem: 'bullet' });
 
 /** A paragraph with a single inline link. */
 function paraWithLink(before: string, linkText: string, href: string, after = '.') {
@@ -572,6 +578,481 @@ function buildIntlGuide(): IdentifiedSanityDocumentStub {
 	};
 }
 
+// ── Portugal shared costs section ───────────────────────────────────────────────
+function ptCostsSection(audience: 'uk' | 'intl') {
+	return {
+		_type: 'guideSection',
+		heading: 'Costs of buying in Portugal',
+		anchor: { _type: 'slug', current: 'costs' },
+		body: [
+			para(
+				audience === 'uk'
+					? "In addition to the purchase price, budget for the following costs. Portugal's purchase tax structure differs from Spain's: the main transfer tax (IMT) uses a progressive scale rather than a flat rate."
+					: 'In addition to the purchase price, budget for the following costs. These apply equally to all international buyers regardless of nationality.'
+			),
+			keyFigures('What to budget on top of the purchase price', [
+				{
+					label: 'IMT (property transfer tax)',
+					value: '1%–7.5%',
+					note: 'Progressive, on resale at holiday-home rates. A flat 6% for values €661,000–€1,150,000, and 7.5% above.'
+				},
+				{
+					label: 'Stamp duty (Imposto de Selo)',
+					value: '0.8%',
+					note: 'Flat, on all property transactions.'
+				},
+				{
+					label: 'VAT (IVA) on new builds',
+					value: 'In lieu of IMT',
+					note: "New builds from a developer, usually within the quoted price."
+				},
+				{ label: 'Notary & land registry', value: '~1%' },
+				{ label: 'Legal fees', value: '0.5%–1% + VAT' },
+				{
+					label: 'Mortgage stamp duty',
+					value: '0.6%',
+					note: 'On the loan, if financing (0.5% for loans under 5 years).'
+				}
+			]),
+			callout(
+				'note',
+				'Total to budget',
+				'For most resale transactions in Portugal, allow 7% to 9% of the purchase price in additional costs. For premium Algarve properties above €1,000,000, the IMT rate increases and total costs can reach 9% to 10%.\n\nExample: on a €900,000 villa in Quinta do Lago, budget approximately €65,000 to €80,000 in purchase costs on top of the property price.'
+			),
+			para(
+				audience === 'uk'
+					? "IMT is calculated on whichever is higher: the declared purchase price or the property's official fiscal value (VPT). Where market values significantly exceed fiscal values, as is common in the Golden Triangle, the declared price typically governs. Your lawyer can confirm the position on any specific property."
+					: "IMT is calculated on whichever is higher: the declared purchase price or the property's official fiscal value (VPT). Your lawyer can confirm the position on any specific property before exchange."
+			)
+		]
+	};
+}
+
+// ── Portugal buying process (8 steps), shared with audience-specific wording ────
+function ptBuyingProcessSection(audience: 'uk' | 'intl') {
+	const flights =
+		audience === 'uk'
+			? 'over 300 days of sunshine per year, direct flights from the UK and a well-established community of international buyers.'
+			: 'over 300 days of sunshine per year, excellent international flight connections and a well-established community of international buyers from across Europe, the Americas and beyond.';
+	const nifRoute =
+		audience === 'uk'
+			? 'For UK buyers who are not yet resident in Portugal, the lawyer route is the most practical; they can obtain your NIF while you remain in the UK, saving a trip purely for administrative purposes.'
+			: 'For buyers travelling from outside Europe, the lawyer route is the most practical; they can obtain your NIF while you remain in your home country, avoiding a dedicated trip for administrative purposes alone.';
+	const lawyerLanguage = audience === 'uk' ? 'English-speaking' : 'multilingual';
+
+	return {
+		_type: 'guideSection',
+		heading: 'The buying process, step by step',
+		anchor: { _type: 'slug', current: 'buying-process' },
+		body: [
+			h3('Step 1: Research and choose your location'),
+			para(
+				"Portugal offers a range of exceptional golf destinations, each with its own character and appeal. The Algarve is Europe's premier golf destination, home to the Golden Triangle of Quinta do Lago, Vale do Lobo and Vilamoura, which together represent some of the finest golf resort living in the world. The region benefits from " +
+					flights
+			),
+			para(
+				'Comporta, north of the Algarve on the Atlantic coast, is an emerging luxury destination attracting buyers who want unspoilt nature, restricted development and a quieter, more private lifestyle. Cascais, on the Lisbon Riviera, appeals to buyers who want proximity to a major European capital, international schools and year-round urban amenities alongside excellent golf at courses including Oitavos Dunes.'
+			),
+			para(
+				'Take time to visit each area before deciding. The Algarve and Cascais serve different lifestyles, and understanding which suits you is worth the investment of time early in the process.'
+			),
+			callout(
+				'note',
+				'Our advice',
+				'The Golden Triangle (Quinta do Lago, Vale do Lobo and Vilamoura) is a tightly defined luxury market with limited supply and consistent demand. Properties here rarely need to be marketed hard. Engaging a specialist early gives you access to the best opportunities before they are widely listed.'
+			),
+			h3('Step 2: Get your NIF number'),
+			para(
+				audience === 'uk'
+					? 'The NIF (Numero de Identificacao Fiscal) is your Portuguese tax identification number, the equivalent of the NIE in Spain. It is required for all financial transactions in Portugal, including purchasing property, opening a bank account, paying taxes and setting up utilities. You cannot proceed with a purchase without one.'
+					: 'The NIF (Numero de Identificacao Fiscal) is your Portuguese tax identification number. It is required for all financial transactions in Portugal: purchasing property, opening a bank account, paying taxes and setting up utilities. You cannot proceed with a purchase without one.'
+			),
+			para(
+				'You can obtain your NIF in person at a Portuguese tax office (Financas) with your passport and proof of address, or through a Portuguese lawyer acting on your behalf via Power of Attorney. ' +
+					nifRoute
+			),
+			callout(
+				'note',
+				'What you need',
+				'Valid passport, proof of address from your home country (a recent utility bill or bank statement), and if applying via a lawyer, a Power of Attorney document. Processing is typically straightforward, often completed same day when done in person.'
+			),
+			h3('Step 3: Open a Portuguese bank account'),
+			para(
+				'A Portuguese bank account is required before completion. Property taxes, legal fees and the balance of the purchase price must be paid from a Portuguese account, and ongoing costs including IMI (council tax) and utility bills are most reliably managed by direct debit from a local account.'
+			),
+			para(
+				"Most Portuguese banks offer non-resident accounts to international buyers. You will need your NIF number, passport, proof of address and documentation confirming the purpose of the account. Anti-money laundering regulations require you to evidence the source of funds, particularly relevant for purchases in the Algarve's premium golf resorts where transaction values are high. Your lawyer can assist with account opening and can also do so on your behalf via Power of Attorney."
+			),
+			h3('Step 4: Appoint an independent lawyer'),
+			para(
+				"Appointing an independent Portuguese property lawyer is essential. In Portugal, the Notary's role at completion is to witness and certify the transaction, not to carry out legal due diligence on your behalf. All due diligence is your lawyer's responsibility, and without it you are exposed."
+			),
+			para(
+				"Your lawyer will check the land registry (Conservatoria do Registo Predial) to confirm clean title and the absence of mortgages, charges or encumbrances. They will verify the property's fiscal record at the tax authority (Financas), check building licences and habitation permits, confirm planning compliance, and ensure community fees and IMI are fully paid up to date. They will review and negotiate all contracts and manage the completion process at the Notary."
+			),
+			para(
+				'By appointing your lawyer under a Power of Attorney, they can manage every stage of the transaction on your behalf, including signing contracts and completing at the Notary, without you needing to be physically present in Portugal at any point. This is entirely standard practice and widely used by international buyers.'
+			),
+			callout(
+				'important',
+				'Important',
+				`Ensure your lawyer is entirely independent from the seller, developer and agent. In the Golden Triangle in particular, where developer relationships are close-knit, this independence matters. We work with a network of fully independent, ${lawyerLanguage} Portuguese property lawyers; see our Partners page.`
+			),
+			h3('Step 5: Make an offer and sign the reservation agreement'),
+			para(
+				"Once you have identified a property, you will make a formal offer through the agent. When accepted, a Reservation Agreement is signed and a reservation deposit paid, typically around €5,000 to €10,000 for standard properties and higher for premium Algarve properties. This reserves the property and triggers your lawyer's due diligence."
+			),
+			para(
+				'The reservation deposit is refundable if your lawyer identifies a fundamental legal issue with the property during due diligence. Ensure this protection is explicitly stated in the reservation agreement.'
+			),
+			callout(
+				'note',
+				'Timing',
+				'Due diligence in Portugal typically takes 3 to 6 weeks. Agree a clear timeline with your lawyer at the outset.'
+			),
+			h3('Step 6: Consider an independent survey'),
+			para(
+				'Commissioning an independent structural survey is not standard practice in Portugal, but it is strongly advisable, particularly for older properties, resale villas and new builds nearing completion. An architect or building surveyor will assess structural integrity, damp, roofing, electrical and plumbing systems and any snagging issues.'
+			),
+			para(
+				"For new-build properties in the Algarve's golf resorts, a snagging inspection before you accept the keys is especially recommended. Identifying and resolving defects before completion is significantly easier than after."
+			),
+			h3('Step 7: Sign the promissory contract (CPCV)'),
+			para(
+				'The CPCV (Contrato-Promessa de Compra e Venda) is the main binding purchase contract in Portugal. It sets out the agreed price, payment terms, completion date and all key conditions of the transaction. On signing, you pay a deposit, typically 10% to 20% of the purchase price, less any reservation deposit already paid.'
+			),
+			para(
+				'The CPCV carries strong legal protection for both parties, the same double-protection structure as the Spanish Contrato de Arras: if the buyer withdraws without legal justification, the deposit is forfeited; if the seller withdraws, they must return double the deposit to the buyer.'
+			),
+			callout(
+				'important',
+				'New builds',
+				'All stage payments on off-plan purchases must be protected by a bank guarantee or insurance policy provided by the developer. Your lawyer must confirm this is in place before any funds are transferred.'
+			),
+			h3('Step 8: Complete at the Notary (Escritura)'),
+			para(
+				'Completion in Portugal takes place at the office of a Notary (Cartorio Notarial). The Notary verifies the identities of all parties, confirms the transaction complies with Portuguese law and witnesses the signing of the final deed (Escritura Publica de Compra e Venda). The balance of the purchase price is paid at this point, along with all applicable taxes and fees.'
+			),
+			para(
+				'Both parties must be present in person or represented by their lawyer via Power of Attorney. Once the deed is signed, ownership transfers immediately. Your lawyer then registers the property in your name at the Land Registry. From reservation to completion typically takes 6 to 10 weeks for cash buyers and 10 to 14 weeks if a Portuguese mortgage is involved.'
+			),
+			callout(
+				'note',
+				'On the day',
+				'All funds must be in your Portuguese bank account in advance. For large international transfers, use a specialist currency exchange provider rather than a high-street bank; the difference in exchange rates on a six or seven-figure transfer can be material. See our Partners page for recommended providers.'
+			)
+		]
+	};
+}
+
+function buildPtUkGuide(): IdentifiedSanityDocumentStub {
+	return {
+		_id: IDS.ptUk,
+		_type: 'guide',
+		title: 'How to Buy Property in Portugal as a UK Buyer',
+		slug: { _type: 'slug', current: 'buying-property-in-portugal-uk-buyers' },
+		guideCategory: 'buying',
+		audienceLabel: 'For UK buyers',
+		order: 3,
+		tagline:
+			'A guide to buying golf property in the Algarve, Comporta and Cascais, from your first search to completion day.',
+		intro:
+			'Portugal is one of the most welcoming countries in Europe for overseas property buyers. There are no restrictions on UK nationals purchasing property, the legal process is clear and well-established, and the country continues to attract significant international investment. Thousands of UK buyers purchase in Portugal successfully every year.\n\nThis guide covers everything you need to know: your NIF number, opening a Portuguese bank account, the legal steps from reservation through to completion, costs to budget for, mortgage options and your ongoing tax obligations as a non-resident property owner. It also addresses one important recent change, the closure of the NHR tax regime, which affects how Portugal is now positioned for UK buyers considering relocation.',
+		lastReviewed: '2026-06-01',
+		sections: [
+			ptBuyingProcessSection('uk'),
+			ptCostsSection('uk'),
+			{
+				_type: 'guideSection',
+				heading: 'Mortgage options for UK buyers',
+				anchor: { _type: 'slug', current: 'mortgages' },
+				body: [
+					para(
+						"UK buyers can access Portuguese mortgages from Portuguese banks and from specialist international lenders. Portuguese banks typically lend non-residents up to 70% to 80% of the property's valuation, though in practice most non-resident buyers should plan for a 30% deposit plus buying costs."
+					),
+					para(
+						'Interest rates are linked to the Euribor rate for variable products, or fixed for the full term on fixed-rate products. The Portuguese mortgage market stabilised in 2025 following the ECB rate cycle, and fixed rates for non-residents are currently competitive. A specialist overseas mortgage broker can compare lenders and find the best structure for your circumstances.'
+					),
+					bullet(
+						'Mortgage terms are typically available up to 30 years, subject to your age at the end of the term.'
+					),
+					bullet(
+						'Portuguese mortgages are denominated in euros. If your income is in sterling, factor in the exchange rate risk on monthly repayments; this can be hedged using forward contracts through a specialist FX provider.'
+					),
+					bullet('If using a mortgage, budget for additional mortgage stamp duty of 0.6% on the loan amount.'),
+					bullet(
+						'Documentation typically required: two years of tax returns, three months of payslips, six to twelve months of bank statements, and confirmation of any existing mortgage or financial commitments.'
+					),
+					bullet(
+						'A mortgage agreement in principle, obtained before you begin viewing seriously, strengthens your position significantly when making an offer.'
+					),
+					paraWithLink(
+						'We work with specialist overseas mortgage brokers with experience in the Portuguese market. See our ',
+						'Partners page',
+						'/partners',
+						' for recommended specialists.'
+					)
+				]
+			},
+			{
+				_type: 'guideSection',
+				heading: 'Tax obligations as a property owner',
+				anchor: { _type: 'slug', current: 'tax-obligations' },
+				body: [
+					para(
+						'As a UK non-resident owning property in Portugal, you have a number of ongoing tax obligations. These are manageable with the right adviser but important to understand before you buy.'
+					),
+					h4('IMI (Portuguese council tax)'),
+					para(
+						"IMI (Imposto Municipal sobre Imoveis) is Portugal's annual property tax, charged by the local municipality. It is calculated as a percentage of the property's official fiscal value (VPT), not the market value. Rates vary by municipality but typically sit between 0.3% and 0.45% for urban properties. In the Algarve's Golden Triangle, where fiscal values are well below market values, annual IMI bills are often more modest than buyers expect."
+					),
+					h4('AIMI (additional IMI surcharge)'),
+					para(
+						'AIMI (Adicional ao IMI) is an additional surcharge that applies to property owners whose Portuguese property holdings exceed €600,000 in total fiscal value. The rate is 1% on the amount above this threshold, or 1.5% above €1,000,000 for individuals. For buyers in Quinta do Lago, Vale do Lobo and comparable premium markets, this surcharge may apply; your tax adviser will calculate your exposure based on the specific fiscal value of the property.'
+					),
+					h4('Rental income tax'),
+					para(
+						'If you rent your property, rental income derived in Portugal is subject to Portuguese tax. As a UK non-resident buyer post-Brexit, rental income is taxed at 25%. This applies to gross rental income unless a deduction for expenses is available under the applicable tax treaty between the UK and Portugal. Engaging a Portuguese tax adviser to manage your annual non-resident tax filing is strongly recommended.'
+					),
+					h4('Capital gains tax on sale'),
+					para(
+						"When you sell, 50% of any capital gain is subject to Portuguese income tax at the applicable non-resident rate of 28%. The remaining 50% is exempt. This partial exemption makes Portugal's CGT treatment on property relatively favourable by European standards. Reinvestment rules may also apply in certain circumstances; your adviser can confirm."
+					),
+					paraWithLink(
+						'Tax law in Portugal is subject to change. We strongly recommend appointing a ',
+						'Portuguese tax adviser',
+						'/partners',
+						' before completing your purchase, to understand your full obligations and structure your ownership efficiently from day one.'
+					)
+				]
+			},
+			{
+				_type: 'guideSection',
+				heading: 'A note on the NHR tax regime',
+				anchor: { _type: 'slug', current: 'nhr' },
+				body: [
+					para(
+						"Portugal's Non-Habitual Resident (NHR) tax regime, long regarded as one of the primary attractions for UK buyers considering relocation, closed to new applicants in 2024 and was fully phased out in March 2025. Many older buying guides and property websites still reference NHR as a current benefit. It is no longer available."
+					),
+					para(
+						'The NHR has been replaced by a new regime called IFICI (also known as NHR 2.0), introduced under the 2025 State Budget. IFICI offers a 20% flat tax rate on eligible Portuguese employment income for up to 10 years, but it is specifically targeted at qualified professionals working in scientific research, technology, innovation and related fields. It is not a general tax incentive for property buyers or retirees, and most UK buyers purchasing a golf property in the Algarve or Cascais will not qualify.'
+					),
+					para(
+						'This is a significant change from the position that attracted many UK buyers to Portugal over the past decade. If favourable tax treatment on relocation was part of your planning, we strongly recommend speaking with a Portuguese tax specialist before proceeding. The landscape has changed materially and the right structure will depend entirely on your individual circumstances.'
+					),
+					callout(
+						'note',
+						'If you already hold NHR',
+						'If you were already registered as an NHR prior to the closure, your status and benefits remain in place for the remainder of your 10-year period.'
+					)
+				]
+			},
+			{
+				_type: 'guideSection',
+				heading: 'The 90-day rule for UK buyers',
+				anchor: { _type: 'slug', current: 'residency' },
+				body: [
+					para(
+						'Buying property in Portugal does not grant you the right to live there. As a UK national post-Brexit, you can spend up to 90 days in Portugal within any 180-day period without a visa. For most holiday-home buyers, this is sufficient.'
+					),
+					para(
+						'If you intend to spend more time in Portugal, whether semi-retiring, relocating or working remotely, you will need to apply for an appropriate visa or residence permit. The most relevant options for UK buyers are:'
+					),
+					bulletLead(
+						'D7 Passive Income Visa',
+						': for buyers with sufficient passive income (pensions, dividends, rental income or savings) to support themselves without working in Portugal. The most commonly used route for retirees and those relocating for lifestyle reasons.'
+					),
+					bulletLead(
+						'Digital Nomad Visa',
+						': for buyers who work remotely for employers or clients based outside Portugal. Valid for up to 3 years and renewable.'
+					),
+					bulletLead(
+						'D8 Visa (remote work)',
+						': a variant of the digital nomad route suited to remote employees of foreign companies.'
+					),
+					paraWithLink(
+						'Residency applications should be handled by a qualified immigration lawyer. Our ',
+						'Partners page',
+						'/partners',
+						' includes recommended specialists who work with UK buyers in Portugal.'
+					)
+				]
+			}
+		],
+		advisorHeading: 'Ready to start your search?',
+		advisorBody:
+			'Speak to us about buying golf property in Portugal. No pressure, no obligation, just straightforward guidance from people who know the market.',
+		seo: {
+			_type: 'seoFields',
+			seoTitle: 'How to Buy Property in Portugal as a UK Buyer',
+			metaDescription:
+				'A step-by-step guide for UK buyers: NIF, the legal process, IMT and costs, mortgages, tax and the 90-day rule when buying golf property in Portugal.',
+			noindex: false
+		}
+	};
+}
+
+function buildPtIntlGuide(): IdentifiedSanityDocumentStub {
+	return {
+		_id: IDS.ptIntl,
+		_type: 'guide',
+		title: 'How to Buy Property in Portugal as an International Buyer',
+		slug: { _type: 'slug', current: 'buying-property-in-portugal-international-buyers' },
+		guideCategory: 'buying',
+		audienceLabel: 'For international buyers',
+		order: 4,
+		tagline:
+			'A guide to buying golf property in the Algarve, Comporta and Cascais, wherever in the world you are based.',
+		intro:
+			'Portugal welcomes buyers from across the world. There are no restrictions on foreign nationals purchasing property regardless of nationality, and the legal process is the same for everyone: clear, well-established and widely used by international buyers from Europe, the Americas, the Middle East and beyond.\n\nThis guide covers the full buying process from start to finish: your NIF number, opening a Portuguese bank account, the legal steps from reservation through to completion, costs to budget for, mortgage options and your ongoing tax obligations as a non-resident property owner. Where tax treatment differs between EU and non-EU buyers, this is noted clearly. It also addresses the closure of the NHR tax regime and what has replaced it, an important change that affects how Portugal is positioned for international buyers considering relocation.',
+		lastReviewed: '2026-06-01',
+		sections: [
+			ptBuyingProcessSection('intl'),
+			ptCostsSection('intl'),
+			{
+				_type: 'guideSection',
+				heading: 'Mortgage options for international buyers',
+				anchor: { _type: 'slug', current: 'mortgages' },
+				body: [
+					para(
+						"International buyers can access Portuguese mortgages from Portuguese banks and from specialist international lenders. Portuguese banks typically lend non-residents up to 70% to 80% of the property's valuation, though most non-resident buyers should plan for a 30% deposit plus buying costs."
+					),
+					para(
+						'Interest rates are linked to Euribor for variable-rate products, or fixed for the full term on fixed-rate mortgages. The Portuguese mortgage market has stabilised in 2025 following the ECB rate cycle, offering competitive conditions for international buyers. A specialist overseas mortgage broker can compare lenders and find the best structure for your circumstances.'
+					),
+					bullet(
+						'Mortgage terms are typically available up to 30 years, subject to your age at the end of the term.'
+					),
+					bullet(
+						'Portuguese mortgages are denominated in euros. If your income is in another currency, factor in the exchange rate risk on monthly repayments; this can be managed using forward contracts through a specialist FX provider.'
+					),
+					bullet('If using a mortgage, budget for additional mortgage stamp duty of 0.6% on the loan amount.'),
+					bullet(
+						'Documentation typically required: two years of tax returns, three months of payslips, six to twelve months of bank statements. Non-EU buyers may be asked for additional documentation depending on the lender.'
+					),
+					bullet(
+						'A mortgage agreement in principle, obtained before you begin viewing seriously, strengthens your negotiating position significantly.'
+					),
+					paraWithLink(
+						'We work with specialist overseas mortgage brokers with experience across the Portuguese market and with buyers from a wide range of countries. See our ',
+						'Partners page',
+						'/partners',
+						' for recommended specialists.'
+					)
+				]
+			},
+			{
+				_type: 'guideSection',
+				heading: 'Tax obligations as a property owner',
+				anchor: { _type: 'slug', current: 'tax-obligations' },
+				body: [
+					para(
+						'As a non-resident owning property in Portugal, you have a number of ongoing tax obligations. Your exact position will depend on your country of residence and whether a double taxation treaty exists between your country and Portugal. Taking specialist tax advice before you buy is strongly recommended.'
+					),
+					h4('IMI (Portuguese council tax)'),
+					para(
+						"IMI (Imposto Municipal sobre Imoveis) is Portugal's annual property tax, charged by the local municipality. It is calculated as a percentage of the property's official fiscal value (VPT), not the market value. Rates vary by municipality but typically sit between 0.3% and 0.45% for urban properties. In the Algarve's Golden Triangle, where fiscal values are well below market values, annual IMI bills are often more modest than buyers expect."
+					),
+					h4('AIMI (additional IMI surcharge)'),
+					para(
+						'AIMI (Adicional ao IMI) is an additional surcharge that applies to property owners whose Portuguese property holdings exceed €600,000 in total fiscal value. The rate is 1% on the amount above this threshold, rising to 1.5% above €1,000,000 for individuals. For buyers in Quinta do Lago, Vale do Lobo and comparable premium markets, this surcharge may apply. Your tax adviser will calculate your exposure based on the specific fiscal value of the property.'
+					),
+					h4('Rental income tax'),
+					para(
+						'If you rent your property, rental income derived in Portugal is subject to Portuguese tax regardless of your nationality. The rate and the ability to deduct expenses depend on your residency status.'
+					),
+					bullet(
+						'EU and EEA residents: generally taxed at 28% on rental income, with the ability to deduct eligible expenses against gross income.'
+					),
+					bullet(
+						"Non-EU residents (including buyers from the Americas, Middle East, Asia and other regions): taxed at 25% on gross rental income. The ability to deduct expenses may be more limited depending on your country's tax treaty with Portugal."
+					),
+					para(
+						'Portugal has double taxation treaties with many countries, which may reduce or eliminate the risk of being taxed twice on the same income. Your tax adviser can confirm the position for your specific country of residence.'
+					),
+					h4('Capital gains tax on sale'),
+					para(
+						"When you sell, 50% of any capital gain is subject to Portuguese income tax at the applicable non-resident rate of 28%. The remaining 50% is exempt. This partial exemption makes Portugal's CGT treatment on property comparatively favourable. Reinvestment rules may apply in certain circumstances; your adviser can confirm the position."
+					),
+					paraWithLink(
+						'Tax law in Portugal is subject to change, and the rules for non-residents are subject to EU regulatory oversight as well as bilateral tax treaties. We strongly recommend appointing a Portuguese tax adviser before completing your purchase. Our ',
+						'Partners page',
+						'/partners',
+						' lists recommended advisers with experience working with international buyers.'
+					)
+				]
+			},
+			{
+				_type: 'guideSection',
+				heading: 'A note on the NHR tax regime',
+				anchor: { _type: 'slug', current: 'nhr' },
+				body: [
+					para(
+						"Portugal's Non-Habitual Resident (NHR) tax regime, which for many years offered significant tax advantages to foreign buyers establishing residency in Portugal, closed to new applicants in 2024 and was fully phased out in March 2025. Many property websites and older buying guides still reference NHR as an active benefit. It is no longer available to new applicants."
+					),
+					para(
+						'The NHR has been replaced by IFICI (also known as NHR 2.0), introduced under the 2025 State Budget. IFICI offers a 20% flat tax rate on eligible Portuguese employment income for up to 10 years, but is specifically targeted at qualified professionals working in scientific research, technology, innovation and related fields. It is not a general tax incentive for property buyers or retirees, and most international buyers purchasing a golf property in Portugal will not qualify.'
+					),
+					para(
+						'If favourable tax treatment on relocation was part of your planning, we strongly recommend speaking with a Portuguese tax specialist before proceeding. The landscape has changed materially and the right structure will depend entirely on your individual circumstances.'
+					),
+					callout(
+						'note',
+						'If you already hold NHR',
+						'If you were already registered as an NHR prior to the closure, your status and benefits remain in place for the remainder of your 10-year period.'
+					)
+				]
+			},
+			{
+				_type: 'guideSection',
+				heading: 'Residency: what international buyers need to know',
+				anchor: { _type: 'slug', current: 'residency' },
+				body: [
+					para(
+						'Purchasing property in Portugal does not automatically grant you the right to live there. Your residency rights depend on your nationality.'
+					),
+					h4('EU and EEA citizens'),
+					para(
+						'Citizens of EU and EEA member states can reside in Portugal freely under freedom of movement. There is no minimum stay requirement and no visa needed for any length of stay. EU buyers who choose to become tax residents in Portugal simply need to register with the local authorities.'
+					),
+					h4('Non-EU buyers'),
+					para(
+						'Buyers from outside the EU, including those from the Americas, Middle East, Asia, Africa and other regions, will need to apply for an appropriate visa or residence permit if they wish to spend significant time in Portugal. The most relevant options are:'
+					),
+					bulletLead(
+						'D7 Passive Income Visa',
+						': for buyers with sufficient passive income (pensions, dividends, rental income or savings) to support themselves without working in Portugal. The most commonly used route for retirees and those relocating for lifestyle reasons.'
+					),
+					bulletLead(
+						'Digital Nomad Visa',
+						': for buyers who work remotely for employers or clients based outside Portugal. Valid for up to 3 years and renewable.'
+					),
+					bulletLead(
+						'Investment Fund Route',
+						': a qualifying investment of €500,000 or more into an approved Portuguese alternative investment fund can provide a pathway to residency and, after five years, permanent residency and eventual citizenship. This route is currently active but under regulatory review; specialist legal advice is essential before proceeding.'
+					),
+					paraWithLink(
+						'Residency applications should be handled by a qualified Portuguese immigration lawyer. Our ',
+						'Partners page',
+						'/partners',
+						' includes recommended specialists who work with international buyers across a range of nationalities.'
+					)
+				]
+			}
+		],
+		advisorHeading: 'Ready to start your search?',
+		advisorBody:
+			'Speak to us about buying golf property in Portugal. No pressure, no obligation, just straightforward guidance from people who know the market.',
+		seo: {
+			_type: 'seoFields',
+			seoTitle: 'How to Buy Property in Portugal as an International Buyer',
+			metaDescription:
+				'A step-by-step guide for international buyers: NIF, the legal process, IMT and costs, mortgages, tax (EU vs non-EU), the NHR change and residency in Portugal.',
+			noindex: false
+		}
+	};
+}
+
 async function main() {
 	console.log(`Buying guides → ${PROJECT_ID}/${dataset}${dryRun ? ' (dry run)' : ''}`);
 
@@ -591,7 +1072,7 @@ async function main() {
 	});
 
 	if (deleteMode) {
-		const ids = [IDS.uk, IDS.intl, ...RETIRED_SAMPLE_IDS];
+		const ids = [IDS.uk, IDS.intl, IDS.ptUk, IDS.ptIntl, ...RETIRED_SAMPLE_IDS];
 		console.log(`Deleting ${ids.length} guide documents…`);
 		if (dryRun) {
 			ids.forEach((id) => console.log(`  [dry-run] delete ${id}`));
@@ -614,7 +1095,12 @@ async function main() {
 		console.log(`  uploaded → ${assetId}`);
 	}
 
-	const documents: IdentifiedSanityDocumentStub[] = [buildUkGuide(assetId), buildIntlGuide()];
+	const documents: IdentifiedSanityDocumentStub[] = [
+		buildUkGuide(assetId),
+		buildIntlGuide(),
+		buildPtUkGuide(),
+		buildPtIntlGuide()
+	];
 
 	console.log(`Upserting ${documents.length} guides…`);
 	for (const doc of documents) {
@@ -636,8 +1122,10 @@ async function main() {
 
 	console.log('\nView (after `pnpm --filter web dev`):');
 	console.log('  Hub:             /guides');
-	console.log('  UK guide:        /guides/buying-property-in-spain-uk-buyers');
-	console.log('  International:   /guides/buying-property-in-spain-international-buyers');
+	console.log('  Spain (UK):      /guides/buying-property-in-spain-uk-buyers');
+	console.log('  Spain (intl):    /guides/buying-property-in-spain-international-buyers');
+	console.log('  Portugal (UK):   /guides/buying-property-in-portugal-uk-buyers');
+	console.log('  Portugal (intl): /guides/buying-property-in-portugal-international-buyers');
 }
 
 main().catch((error) => {
