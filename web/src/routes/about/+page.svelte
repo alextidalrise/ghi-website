@@ -10,26 +10,9 @@
 
 	// Destinations strip — real project location imagery (3:2). These are the places
 	// named in the copy; "and beyond" is carried in the section intro, not a fourth tile.
-	const destinations = [
-		{
-			name: 'Marbella',
-			region: 'Costa del Sol, Spain',
-			image: '/design-system/assets/locations/loc-marbella.jpg',
-			alt: 'Golf fairways running down to the Mediterranean above Marbella on the Costa del Sol'
-		},
-		{
-			name: 'Sotogrande',
-			region: 'Cádiz, Spain',
-			image: '/design-system/assets/locations/loc-sotogrande.jpg',
-			alt: 'Manicured championship course and low villas in the resort of Sotogrande'
-		},
-		{
-			name: 'The Algarve',
-			region: 'Southern Portugal',
-			image: '/design-system/assets/locations/loc-algarve.jpg',
-			alt: 'Pine-lined Algarve golf course above the Atlantic coastline in southern Portugal'
-		}
-	];
+	// Images come from each location's Sanity heroImage (auto AVIF/WebP + srcset) via the
+	// loader, so the strip uses the same optimized pipeline as the rest of the site.
+	const destinations = data.destinations;
 
 	// Team. Photo URLs are intentionally null until the real headshots land — the
 	// markup renders a sized monogram frame in their place, never a broken <img>.
@@ -168,7 +151,18 @@
 				{#each destinations as place (place.name)}
 					<li class="place">
 						<div class="place__frame">
-							<img src={place.image} alt={place.alt} loading="lazy" width="900" height="600" />
+							{#if place.image}
+								<img
+									src={place.image}
+									srcset={place.srcset || undefined}
+									sizes="(max-width: 48rem) 100vw, 30vw"
+									alt={place.alt}
+									loading="lazy"
+									decoding="async"
+									width="900"
+									height="600"
+								/>
+							{/if}
 						</div>
 						<div class="place__label">
 							<h3 class="place__name">{place.name}</h3>

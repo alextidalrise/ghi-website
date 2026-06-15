@@ -1,7 +1,37 @@
 import type { PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
+import { fetchLocationHeroesBySlug } from '$lib/sanity/queries/settings';
+import { buildImageSrcset, buildPublicImageUrl } from '$lib/sanity/image';
 
 const BASE_PATH = '/about';
+
+// 3:2 landscape crop to match the destinations strip tiles.
+const DESTINATION_IMAGE = { width: 900, height: 600, fit: 'crop' as const, quality: 82 };
+const DESTINATION_WIDTHS = [600, 900, 1200];
+
+// Destinations strip — the places named in the copy. Editorial labels (name/region/alt)
+// live here; the imagery now comes from each location's Sanity heroImage (auto AVIF/WebP
+// + responsive srcset) instead of raw static JPEGs, keyed by location slug.
+const DESTINATIONS = [
+	{
+		slug: 'marbella',
+		name: 'Marbella',
+		region: 'Costa del Sol, Spain',
+		alt: 'Golf fairways running down to the Mediterranean above Marbella on the Costa del Sol'
+	},
+	{
+		slug: 'sotogrande',
+		name: 'Sotogrande',
+		region: 'Cádiz, Spain',
+		alt: 'Manicured championship course and low villas in the resort of Sotogrande'
+	},
+	{
+		slug: 'algarve',
+		name: 'The Algarve',
+		region: 'Southern Portugal',
+		alt: 'Pine-lined Algarve golf course above the Atlantic coastline in southern Portugal'
+	}
+];
 
 export const load: PageServerLoad = async ({ url }) => {
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
@@ -10,6 +40,20 @@ export const load: PageServerLoad = async ({ url }) => {
 		{ label: 'Home', href: '/' },
 		{ label: 'About', href: BASE_PATH }
 	];
+
+	const heroes = await fetchLocationHeroesBySlug(DESTINATIONS.map((d) => d.slug));
+	const heroBySlug = new Map(heroes.map((h) => [h.slug, h.heroImage]));
+
+	const destinations = DESTINATIONS.map((d) => {
+		const asset = heroBySlug.get(d.slug);
+		return {
+			name: d.name,
+			region: d.region,
+			alt: d.alt,
+			image: buildPublicImageUrl(asset, DESTINATION_IMAGE),
+			srcset: buildImageSrcset(asset, DESTINATION_WIDTHS, DESTINATION_IMAGE)
+		};
+	});
 
 	const seo = {
 		title: 'About Us | Golf Homes International',
@@ -22,6 +66,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	return {
 		breadcrumbs,
 		seo,
+		destinations,
 		breadcrumbJsonLd: breadcrumbListJsonLd(breadcrumbs, url.origin)
 	};
 };

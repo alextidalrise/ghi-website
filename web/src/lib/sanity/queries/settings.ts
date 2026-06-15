@@ -6,6 +6,7 @@ import {
 	MEDIA_ASSET_PUBLIC
 } from '../allowlists';
 import { fetchPublic } from './fetch';
+import type { MediaAssetInput } from '../transforms/mediaFilter';
 import {
 	toCountryCards,
 	toLocationCards,
@@ -56,4 +57,31 @@ export async function fetchHomepageFeaturedLocations(): Promise<FeaturedLocation
 export async function fetchCountriesWithHero(): Promise<CountryFeatureCard[]> {
 	const raw = await fetchPublic<Array<TaxonomyWithHero | null>>(countriesWithHeroQuery);
 	return toCountryCards(raw);
+}
+
+export const locationHeroesBySlugQuery = defineQuery(`
+  *[
+    _type == "locationTaxonomy"
+    && type == "location"
+    && defined(slug.current)
+    && slug.current in $slugs
+  ]{
+    "slug": slug.current,
+    heroImage${MEDIA_ASSET_PUBLIC}
+  }
+`);
+
+export type LocationHeroBySlug = { slug: string | null; heroImage?: MediaAssetInput | null };
+
+/**
+ * Fetch the hero image for a hand-picked set of location slugs so pages outside the
+ * taxonomy tree (e.g. /about) can reuse the same optimized CDN heroes rather than
+ * shipping raw static JPEGs. Returns the heroImage asset keyed by slug; pages build
+ * their own crops via the image helpers.
+ */
+export async function fetchLocationHeroesBySlug(slugs: string[]): Promise<LocationHeroBySlug[]> {
+	const result = await fetchPublic<LocationHeroBySlug[]>(locationHeroesBySlugQuery, {
+		params: { slugs }
+	});
+	return result ?? [];
 }
