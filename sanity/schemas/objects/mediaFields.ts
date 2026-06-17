@@ -15,7 +15,8 @@ export const galleryGroup = defineType({
 			name: 'images',
 			title: 'Images',
 			type: 'array',
-			of: [defineArrayMember({ type: 'mediaAssetMetadata' })]
+			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' }
 		})
 	],
 	preview: {
@@ -39,6 +40,7 @@ export const mediaFields = defineType({
 			title: 'Gallery',
 			type: 'array',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' },
 			description: 'The first image is used as the listing hero on the website.'
 		}),
 		defineField({
@@ -56,7 +58,8 @@ export const mediaFields = defineType({
 			name: 'floorplans',
 			title: 'Floorplans',
 			type: 'array',
-			of: [defineArrayMember({ type: 'mediaAssetMetadata' })]
+			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' }
 		}),
 		defineField({
 			name: 'videoUrl',
