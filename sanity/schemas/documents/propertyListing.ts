@@ -141,7 +141,7 @@ export const propertyListing = defineType({
 		defineField({
 			name: 'content',
 			title: 'Website content',
-			type: 'contentFields',
+			type: 'propertyContentFields',
 			group: 'copyMedia'
 		}),
 		defineField({
@@ -153,7 +153,7 @@ export const propertyListing = defineType({
 		defineField({
 			name: 'media',
 			title: 'Media',
-			type: 'mediaFields',
+			type: 'propertyMediaFields',
 			group: 'copyMedia'
 		}),
 		defineField({

@@ -19,13 +19,6 @@ vi.mock('../image', () => ({
 	})
 }));
 
-function mediaAsset(ref: string, alt: string): MediaAssetInput {
-	return {
-		asset: { _type: 'image', asset: { _type: 'reference', _ref: ref } },
-		altText: alt
-	};
-}
-
 function cardLocationFromFixture() {
 	const location = goldenPropertyRaw.location!;
 	return {
@@ -102,23 +95,7 @@ describe('toPublicPropertyCard', () => {
 		expect(card.pricing?.priceDisplay).toBe('POA');
 	});
 
-	it('falls back to thumbnailOverride when first gallery item has no file', () => {
-		const card = toPublicPropertyCard(
-			baseCard({
-				media: {
-					gallery: [{ altText: 'Gallery slot without file' }],
-					thumbnailOverride: mediaAsset(APPROVED_IMAGE_REF, 'Thumbnail with file')
-				} as RawPropertyCard['media']
-			})
-		);
-
-		expect(card.heroImageUrl).toBe(
-			`https://cdn.sanity.io/images/test/production/${APPROVED_IMAGE_REF}?w=600&h=400`
-		);
-		expect(card.heroImageAlt).toBe('Thumbnail with file');
-	});
-
-	it('returns null hero URL when gallery and thumbnail have no file', () => {
+	it('returns null hero URL when the first gallery item has no file', () => {
 		const card = toPublicPropertyCard(
 			baseCard({
 				media: {

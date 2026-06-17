@@ -52,13 +52,12 @@
 	</div>
 
 	<PropertyLocation
-		description={property.content?.locationDescription}
 		address={property.location?.addressDisplay}
 		map={property.location?.map}
 		golf={property.golf}
 	/>
 
-	<GolfInfo golf={property.golf} description={property.content?.golfDescription} showCourses={false} />
+	<GolfInfo golf={property.golf} showCourses={false} />
 
 	{#if similarCards.length > 0}
 		<SimilarProperties cards={similarCards} />

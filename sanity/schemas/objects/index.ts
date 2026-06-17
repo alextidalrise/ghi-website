@@ -15,6 +15,8 @@ import { locationFields } from './locationFields';
 import { mediaAssetMetadata } from './mediaAssetMetadata';
 import { galleryGroup, mediaFields } from './mediaFields';
 import { pricingFields } from './pricingFields';
+import { propertyContentFields } from './propertyContentFields';
+import { propertyMediaFields } from './propertyMediaFields';
 import { propertyPricingFields } from './propertyPricingFields';
 import { relatedContentFields } from './relatedContentFields';
 import { reviewItem } from './reviewItem';
@@ -44,8 +46,10 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	specsFields,
 	golfFields,
 	contentFields,
+	propertyContentFields,
 	marketingFields,
 	mediaFields,
+	propertyMediaFields,
 	ctaFields,
 	relatedContentFields,
 	seoFields,
@@ -73,6 +77,8 @@ export {
 	mediaAssetMetadata,
 	mediaFields,
 	pricingFields,
+	propertyContentFields,
+	propertyMediaFields,
 	propertyPricingFields,
 	seoFields,
 	specsFields

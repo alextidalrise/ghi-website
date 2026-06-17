@@ -19,8 +19,6 @@ import {
 export const MEDIA_ASSET_PUBLIC = /* groq */ `{
   asset,
   fileAsset,
-  assetCategory,
-  order,
   altText
 }`;
 
@@ -105,7 +103,7 @@ export const PROPERTY_PRICING_PUBLIC = /* groq */ `{
   currency
 }`;
 
-/** Public media bundle for property/development pages. */
+/** Public media bundle for development pages. */
 export const MEDIA_PUBLIC = /* groq */ `{
   gallery[]${MEDIA_ASSET_PUBLIC},
   galleryGroups[]{
@@ -113,6 +111,16 @@ export const MEDIA_PUBLIC = /* groq */ `{
     images[]${MEDIA_ASSET_PUBLIC}
   },
   thumbnailOverride${MEDIA_ASSET_PUBLIC},
+  floorplans[]${MEDIA_ASSET_PUBLIC},
+  videoUrl,
+  virtualTourUrl,
+  brochure${MEDIA_ASSET_PUBLIC},
+  brochurePublic
+}`;
+
+/** Public media bundle for property pages — galleryGroups and thumbnailOverride removed. */
+export const PROPERTY_MEDIA_PUBLIC = /* groq */ `{
+  gallery[]${MEDIA_ASSET_PUBLIC},
   floorplans[]${MEDIA_ASSET_PUBLIC},
   videoUrl,
   virtualTourUrl,
@@ -134,6 +142,19 @@ export const CONTENT_PUBLIC = /* groq */ `{
     isHighlighted
   },
   amenities
+}`;
+
+/** Public website content for property pages — location/golf descriptions and amenities removed. */
+export const PROPERTY_CONTENT_PUBLIC = /* groq */ `{
+  shortDescription,
+  aboutDescription,
+  featureHighlights[]{
+    label,
+    value,
+    category,
+    isFilterable,
+    isHighlighted
+  }
 }`;
 
 /** Public specs object — full specsFields group is public when approved. */
@@ -222,7 +243,6 @@ export const GUIDE_SECTION_PUBLIC = /* groq */ `{
       _key,
       asset,
       altText,
-      assetCategory,
       "dimensions": asset.asset->metadata.dimensions
     },
     _type != "mediaAssetMetadata" => { ... }
@@ -365,8 +385,7 @@ export const PROPERTY_CARD_PUBLIC = /* groq */ `{
     builtAreaUnit
   },
   media{
-    gallery[0...1]${MEDIA_ASSET_PUBLIC},
-    thumbnailOverride${MEDIA_ASSET_PUBLIC}
+    gallery[0...1]${MEDIA_ASSET_PUBLIC}
   }
 }`;
 
@@ -394,8 +413,8 @@ export const PROPERTY_LISTING_PUBLIC = /* groq */ `{
   pricing${PROPERTY_PRICING_PUBLIC},
   specs,
   golf${GOLF_PUBLIC},
-  content${CONTENT_PUBLIC},
-  media${MEDIA_PUBLIC},
+  content${PROPERTY_CONTENT_PUBLIC},
+  media${PROPERTY_MEDIA_PUBLIC},
   ctas${CTA_PUBLIC},
   related${RELATED_PUBLIC},
   seo${SEO_PUBLIC}
@@ -576,8 +595,8 @@ export const PROPERTY_LISTING_WITH_CANONICAL = /* groq */ `{
   pricing${PROPERTY_PRICING_PUBLIC},
   specs,
   golf${GOLF_PUBLIC},
-  content${CONTENT_PUBLIC},
-  media${MEDIA_PUBLIC},
+  content${PROPERTY_CONTENT_PUBLIC},
+  media${PROPERTY_MEDIA_PUBLIC},
   ctas${CTA_PUBLIC},
   related${RELATED_PUBLIC},
   seo${SEO_PUBLIC},

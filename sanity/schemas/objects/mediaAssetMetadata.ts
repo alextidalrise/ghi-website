@@ -1,5 +1,4 @@
 import { defineField, defineType } from 'sanity';
-import { ASSET_CATEGORIES } from '../constants/enums';
 
 export const mediaAssetMetadata = defineType({
 	name: 'mediaAssetMetadata',
@@ -25,18 +24,6 @@ export const mediaAssetMetadata = defineType({
 			title: 'File asset',
 			description: 'Use for brochures, PDFs, and non-image files.',
 			type: 'file'
-		}),
-		defineField({
-			name: 'assetCategory',
-			title: 'Asset category',
-			type: 'string',
-			options: { list: [...ASSET_CATEGORIES], layout: 'dropdown' }
-		}),
-		defineField({
-			name: 'order',
-			title: 'Display order',
-			type: 'number',
-			validation: (Rule) => Rule.min(0).integer()
 		}),
 		defineField({
 			name: 'altText',
@@ -67,13 +54,11 @@ export const mediaAssetMetadata = defineType({
 	preview: {
 		select: {
 			title: 'altText',
-			category: 'assetCategory',
 			media: 'asset'
 		},
-		prepare({ title, category, media }) {
+		prepare({ title, media }) {
 			return {
 				title: title || 'Media asset',
-				subtitle: category,
 				media
 			};
 		}
