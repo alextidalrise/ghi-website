@@ -100,6 +100,8 @@
 		"migrate:unset-media-asset-metadata:dry-run": "tsx migrations/unset-media-asset-metadata-fields-migrate.ts --dry-run",
 		"migrate:unset-golf-fields": "tsx migrations/unset-golf-fields-migrate.ts",
 		"migrate:unset-golf-fields:dry-run": "tsx migrations/unset-golf-fields-migrate.ts --dry-run",
+		"migrate:marketing-cleanup": "tsx migrations/marketing-cleanup-migrate.ts",
+		"migrate:marketing-cleanup:dry-run": "tsx migrations/marketing-cleanup-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

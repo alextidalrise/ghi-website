@@ -3,6 +3,31 @@
 A short log of removed schema paths so future debugging has context for
 documents that may still carry legacy fields.
 
+## 2026-06-17 — Marketing group cleanup
+
+Trimmed the shared `marketingFields` object (used by `propertyListing` and
+`development`) to `marketingDescription` + `keyHooks`, and removed the internal
+`enquiryRouting` block from `ctaFields`. None of these were projected to the
+public site. The `marketing-cleanup-migrate` script copies the long-form copy to
+the renamed field and unsets the retired paths in the dev dataset.
+
+### Renamed field
+
+- `marketing.longFormDescription` → `marketing.marketingDescription`
+
+### Removed schema types
+
+- `marketingChannelNotes` (the `marketing.channelNotes` object: email, social,
+  paidAds, crm, brochure)
+- `enquiryRouting` (the `ctas.enquiryRouting` object: teamSlug, recipientEmail,
+  crmListingKey, trackingCampaign, internalNotes)
+
+### Removed document/object fields
+
+- `marketing.lifestyleAngle`, `marketing.investmentAngle`,
+  `marketing.audienceFit`, `marketing.channelNotes`
+- `ctas.enquiryRouting`
+
 ## 2026-06 — Sanity gating redesign
 
 The publish/visibility/availability model collapsed to five fields:

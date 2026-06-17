@@ -210,7 +210,6 @@ export type CtaFields = {
   responseTimeText?: string;
   brochureCtaText?: string;
   brochureCtaEnabled?: boolean;
-  enquiryRouting?: EnquiryRouting;
 };
 
 export type PropertyListingReference = {
@@ -256,43 +255,7 @@ export type PropertyMediaFields = {
 
 export type MarketingFields = {
   _type: "marketingFields";
-  longFormDescription?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  lifestyleAngle?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  investmentAngle?: Array<{
+  marketingDescription?: Array<{
     children?: Array<{
       marks?: Array<string>;
       text?: string;
@@ -311,8 +274,6 @@ export type MarketingFields = {
     _key: string;
   }>;
   keyHooks?: Array<string>;
-  audienceFit?: string;
-  channelNotes?: MarketingChannelNotes;
 };
 
 export type PropertyContentFields = {
@@ -789,24 +750,6 @@ export type InternalCommission = {
   source?: string;
 };
 
-export type EnquiryRouting = {
-  _type: "enquiryRouting";
-  teamSlug?: string;
-  recipientEmail?: string;
-  crmListingKey?: string;
-  trackingCampaign?: string;
-  internalNotes?: string;
-};
-
-export type MarketingChannelNotes = {
-  _type: "marketingChannelNotes";
-  email?: string;
-  social?: string;
-  paidAds?: string;
-  crm?: string;
-  brochure?: string;
-};
-
 export type LocationTaxonomy = {
   _id: string;
   _type: "locationTaxonomy";
@@ -1096,8 +1039,6 @@ export type AllSanitySchemaTypes =
   | SiteSettings
   | InternalFeesTax
   | InternalCommission
-  | EnquiryRouting
-  | MarketingChannelNotes
   | LocationTaxonomy
   | GuideSection
   | GuideKeyFigures
