@@ -68,16 +68,7 @@ type GolfCourseRef = {
 
 type GolfInput = {
 	golfRelevance?: string | null;
-	primaryGolfCourse?: GolfCourseRef | null;
 	linkedGolfCourses?: GolfCourseRef[] | null;
-	distanceToPrimaryGolfCourse?: string | null;
-	golfView?: boolean | null;
-	buggyAccess?: boolean | null;
-	golfMembershipInfo?: string | null;
-	golfNotes?: string | null;
-	golfEnrichmentStatus?: string | null;
-	golfEnrichedBy?: string | null;
-	golfEnrichedAt?: string | null;
 };
 
 type ContentInput = {
@@ -131,10 +122,9 @@ export type PublicRelated = {
 
 export type PublicCta = Omit<CtaInput, 'enquiryRouting'>;
 
-export type PublicGolf = Omit<
-	GolfInput,
-	'golfNotes' | 'golfEnrichmentStatus' | 'golfEnrichedBy' | 'golfEnrichedAt'
->;
+// The golf object no longer carries internal enrichment fields, so every field
+// is public — no filtering needed beyond the null guard in filterGolfFields.
+export type PublicGolf = GolfInput;
 
 export type PublicContent = Omit<ContentInput, 'humanReviewed' | 'reviewer' | 'reviewDate'>;
 
@@ -251,15 +241,7 @@ function filterGolfFields(golf: GolfInput | null | undefined): PublicGolf | null
 		return null;
 	}
 
-	const {
-		golfNotes: _notes,
-		golfEnrichmentStatus: _status,
-		golfEnrichedBy: _by,
-		golfEnrichedAt: _at,
-		...publicGolf
-	} = golf;
-
-	return publicGolf;
+	return golf;
 }
 
 function filterContentFields(content: ContentInput | null | undefined): PublicContent | null {

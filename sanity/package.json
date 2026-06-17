@@ -98,6 +98,8 @@
 		"migrate:unset-property-content-media:dry-run": "tsx migrations/unset-property-content-media-fields-migrate.ts --dry-run",
 		"migrate:unset-media-asset-metadata": "tsx migrations/unset-media-asset-metadata-fields-migrate.ts",
 		"migrate:unset-media-asset-metadata:dry-run": "tsx migrations/unset-media-asset-metadata-fields-migrate.ts --dry-run",
+		"migrate:unset-golf-fields": "tsx migrations/unset-golf-fields-migrate.ts",
+		"migrate:unset-golf-fields:dry-run": "tsx migrations/unset-golf-fields-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

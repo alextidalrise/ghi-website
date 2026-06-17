@@ -155,7 +155,6 @@
 		const popupHtml = `
 			<div class="golf-popup">
 				<p class="golf-popup__name">${escapeHtml(pin.name)}</p>
-				${pin.distance ? `<p class="golf-popup__distance">${escapeHtml(pin.distance)} from the property</p>` : ''}
 				${pin.href ? `<a class="golf-popup__link" href="${pin.href}">View course →</a>` : ''}
 			</div>`;
 
@@ -382,14 +381,6 @@
 		font-size: 1rem;
 		color: var(--green);
 		margin: 0;
-	}
-
-	:global(.golf-popup__distance) {
-		font-size: 0.6875rem;
-		letter-spacing: var(--tracking-wide);
-		text-transform: uppercase;
-		color: var(--muted);
-		margin: 0.3rem 0 0;
 	}
 
 	:global(.golf-popup__link) {

@@ -30,7 +30,7 @@
 			items.push({ label: 'Plot', value: `${specs.plotSize} ${unitLabel}` });
 		}
 
-		const courseName = listing.golf?.primaryGolfCourse?.name;
+		const courseName = listing.golf?.linkedGolfCourses?.[0]?.name;
 		if (courseName) items.push({ label: 'Golf course', value: courseName });
 
 		return items;

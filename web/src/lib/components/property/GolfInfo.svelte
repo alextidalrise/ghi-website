@@ -22,12 +22,7 @@
 			golf.golfRelevance !== 'not_applicable'
 	);
 
-	const courses = $derived([
-		...(golf?.primaryGolfCourse ? [golf.primaryGolfCourse] : []),
-		...(golf?.linkedGolfCourses ?? []).filter(
-			(c) => c?._id !== golf?.primaryGolfCourse?._id
-		)
-	]);
+	const courses = $derived(golf?.linkedGolfCourses ?? []);
 </script>
 
 {#if isRelevant || (description && description.length > 0) || courses.length > 0}
@@ -55,21 +50,6 @@
 					{/each}
 				</ul>
 			{/if}
-
-			<ul class="golf__facts">
-				{#if golf?.distanceToPrimaryGolfCourse}
-					<li>Distance: {golf.distanceToPrimaryGolfCourse}</li>
-				{/if}
-				{#if golf?.golfView}
-					<li>Golf course views</li>
-				{/if}
-				{#if golf?.buggyAccess}
-					<li>Buggy access</li>
-				{/if}
-				{#if golf?.golfMembershipInfo}
-					<li>{golf.golfMembershipInfo}</li>
-				{/if}
-			</ul>
 		</div>
 	</section>
 {/if}
@@ -119,23 +99,5 @@
 		font-size: var(--text-ui);
 		color: var(--muted);
 		margin: 0;
-	}
-
-	.golf__facts {
-		list-style: none;
-		margin: var(--space-md) 0 0;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.65rem;
-	}
-
-	.golf__facts li {
-		font-size: var(--text-small);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-		padding: 0.45rem 0.75rem;
-		border: 1px solid var(--border);
-		background: var(--white);
-		color: var(--green);
 	}
 </style>

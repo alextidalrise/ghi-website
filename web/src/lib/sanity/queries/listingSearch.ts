@@ -74,10 +74,7 @@ function scopeFilter(scope: ListingSearchScope): string {
 			return /* groq */ `location.country->slug.current == $countrySlug`;
 		case 'golfCourse':
 			return /* groq */ `
-        (
-          golf.primaryGolfCourse._ref == $golfCourseId
-          || $golfCourseId in golf.linkedGolfCourses[]._ref
-        )
+        $golfCourseId in golf.linkedGolfCourses[]._ref
       `;
 	}
 }
@@ -134,7 +131,6 @@ const FACET_FILTERS = /* groq */ `
   && (
     !defined($golfCourse)
     || count($golfCourse) == 0
-    || golf.primaryGolfCourse->slug.current in $golfCourse
     || count(golf.linkedGolfCourses[@->slug.current in $golfCourse]) > 0
   )
 `;

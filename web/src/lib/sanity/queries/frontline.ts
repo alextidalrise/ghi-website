@@ -26,10 +26,7 @@ const frontlineCourseOptionsQuery = /* groq */ `
       && listingKind in ["property", "unit"]
       && ${PUBLIC_LISTING_FILTER}
       && coalesce(golf.golfRelevance, "") == "frontline_golf"
-      && (
-        golf.primaryGolfCourse._ref == ^._id
-        || ^._id in golf.linkedGolfCourses[]._ref
-      )
+      && ^._id in golf.linkedGolfCourses[]._ref
     ]) > 0
   ] | order(name asc){
     "label": name,

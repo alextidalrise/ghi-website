@@ -58,7 +58,7 @@
 			items.push({ label: 'Developer', value: development.developerName });
 		}
 
-		const courseName = development.golf?.primaryGolfCourse?.name;
+		const courseName = development.golf?.linkedGolfCourses?.[0]?.name;
 		if (courseName) items.push({ label: 'Golf course', value: courseName });
 
 		return items;

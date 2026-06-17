@@ -24,7 +24,6 @@ describe('buildLocationGridIds', () => {
 describe('golfCourse listing scope', () => {
 	it('includes golf course id filter in count query', () => {
 		const query = buildListingCardsCountQuery({ type: 'golfCourse', golfCourseId: 'gc-1' });
-		expect(query).toContain('golf.primaryGolfCourse._ref == $golfCourseId');
 		expect(query).toContain('$golfCourseId in golf.linkedGolfCourses[]._ref');
 	});
 
@@ -47,9 +46,8 @@ describe('price facet filter', () => {
 });
 
 describe('golfCourse facet filter', () => {
-	it('matches on primary and linked course slugs', () => {
+	it('matches on linked course slugs', () => {
 		const query = buildListingCardsCountQuery({ type: 'global' });
-		expect(query).toContain('golf.primaryGolfCourse->slug.current in $golfCourse');
 		expect(query).toContain('count(golf.linkedGolfCourses[@->slug.current in $golfCourse]) > 0');
 	});
 

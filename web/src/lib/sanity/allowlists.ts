@@ -171,16 +171,6 @@ export const SPECS_PUBLIC = 'specs';
  */
 export const GOLF_PUBLIC = /* groq */ `{
   golfRelevance,
-  primaryGolfCourse->{
-    _id,
-    name,
-    "slug": slug.current,
-    shortDescription,
-    coordinates,
-    "communitySlug": community->slug.current,
-    "locationSlug": community->parent->slug.current,
-    "countrySlug": community->parent->parent->slug.current
-  },
   linkedGolfCourses[]->{
     _id,
     name,
@@ -190,11 +180,7 @@ export const GOLF_PUBLIC = /* groq */ `{
     "communitySlug": community->slug.current,
     "locationSlug": community->parent->slug.current,
     "countrySlug": community->parent->parent->slug.current
-  },
-  distanceToPrimaryGolfCourse,
-  golfView,
-  buggyAccess,
-  golfMembershipInfo
+  }
 }`;
 
 /** Public CTA fields — routing and internal templates excluded. */
