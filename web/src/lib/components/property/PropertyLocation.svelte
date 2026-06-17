@@ -8,7 +8,7 @@
 	import { buildGolfPins } from '$lib/listing/mapPins';
 
 	type Props = {
-		description: PtBlock[] | null | undefined;
+		description?: PtBlock[] | null | undefined;
 		address: string | null | undefined;
 		map: PublicMapPayload | null | undefined;
 		golf: PublicGolf | null | undefined;

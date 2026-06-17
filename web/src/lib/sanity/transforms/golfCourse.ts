@@ -95,9 +95,7 @@ function resolveGolfCourseHeroAsset(
 	media: MediaAssetInput[] | null | undefined
 ): MediaAssetInput | null {
 	const publicMedia = filterMediaAssetList(media);
-	const heroAsset =
-		publicMedia.find((item) => item.assetCategory === 'hero') ?? publicMedia[0] ?? null;
-	return filterMediaAsset(heroAsset);
+	return filterMediaAsset(publicMedia[0] ?? null);
 }
 
 /** Full-bleed page hero for a golf course document. */

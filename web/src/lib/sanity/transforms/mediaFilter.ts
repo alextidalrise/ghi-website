@@ -1,8 +1,6 @@
 export type MediaAssetInput = {
 	asset?: { _ref?: string; _type?: string; asset?: unknown } | null;
 	fileAsset?: unknown;
-	assetCategory?: string | null;
-	order?: number | null;
 	altText?: string | null;
 };
 

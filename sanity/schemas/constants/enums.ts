@@ -106,19 +106,6 @@ export const FEATURE_CATEGORIES = [
 	{ title: 'Investment', value: 'investment' }
 ] as const;
 
-export const ASSET_CATEGORIES = [
-	{ title: 'Hero', value: 'hero' },
-	{ title: 'Gallery', value: 'gallery' },
-	{ title: 'Floorplan', value: 'floorplan' },
-	{ title: 'Brochure', value: 'brochure' },
-	{ title: 'Video', value: 'video' },
-	{ title: 'Render', value: 'render' },
-	{ title: 'Location', value: 'location' },
-	{ title: 'Lifestyle', value: 'lifestyle' },
-	{ title: 'Logo', value: 'logo' },
-	{ title: 'Source document', value: 'source_document' }
-] as const;
-
 export const REVIEW_CATEGORIES = [
 	{ title: 'Price', value: 'price' },
 	{ title: 'Facts', value: 'facts' },
