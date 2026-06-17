@@ -382,7 +382,6 @@ export type LocationFields = {
   location?: LocationTaxonomyReference;
   country?: LocationTaxonomyReference;
   addressDisplay: string;
-  exactAddressInternal?: string;
 };
 
 export type UnitTypeReference = {

@@ -52,12 +52,6 @@ export const locationFields = defineType({
 			type: 'string',
 			description: 'The location label shown to buyers on the website (e.g. "Marbella, Costa del Sol"). Keep this general enough to protect the exact address.',
 			validation: (Rule) => Rule.required()
-		}),
-		defineField({
-			name: 'exactAddressInternal',
-			title: 'Exact address (internal)',
-			type: 'string',
-			description: 'The full street address. Internal only — not shown on the website.'
 		})
 	],
 	validation: (Rule) =>

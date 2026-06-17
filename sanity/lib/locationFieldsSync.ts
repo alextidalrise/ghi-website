@@ -10,7 +10,6 @@ export type LocationFieldsValue = {
 	location?: { _type: 'reference'; _ref: string };
 	community?: { _type: 'reference'; _ref: string };
 	addressDisplay?: string;
-	exactAddressInternal?: string;
 };
 
 export type ParentChain = {

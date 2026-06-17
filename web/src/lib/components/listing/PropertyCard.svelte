@@ -24,7 +24,9 @@
 		})
 	);
 	const price = $derived(formatListingPrice(card.pricing));
-	const locationLine = $derived(card.location?.addressDisplay ?? null);
+	// Community name only — the area/country are already established by the page
+	// context (e.g. the Nueva Andalucia page), so repeating them would be redundant.
+	const locationLine = $derived(card.location?.community?.name ?? card.location?.addressDisplay ?? null);
 	const specsLine = $derived(formatSpecs(card.specs));
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Property listing');
 
@@ -52,12 +54,12 @@
 	{/if}
 
 	<div class="property-card__body">
-		{#if locationLine}
-			<p class="property-card__location">{locationLine}</p>
-		{/if}
-
 		{#if card.title}
 			<h3 class="property-card__title">{card.title}</h3>
+		{/if}
+
+		{#if locationLine}
+			<p class="property-card__location">{locationLine}</p>
 		{/if}
 
 		{#if specsLine || price}
@@ -115,17 +117,17 @@
 	}
 
 	.property-card__location {
-		margin-bottom: 0.375rem;
+		margin: 0;
 		font-family: var(--sans);
 		font-size: var(--text-overline);
 		font-weight: 500;
 		letter-spacing: var(--tracking-overline);
 		text-transform: uppercase;
-		color: var(--gold);
+		color: var(--muted);
 	}
 
 	.property-card__title {
-		margin: 0 0 0.75rem;
+		margin: 0 0 0.375rem;
 		font-family: var(--serif);
 		font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.1875rem);
 		font-weight: 400;
