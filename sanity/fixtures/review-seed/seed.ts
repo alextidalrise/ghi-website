@@ -163,13 +163,10 @@ function buildListing(listing: Listing, index: number, assetId: string) {
 			addressDisplay: COMMUNITY_ADDRESS[listing.community]
 		},
 		pricing: {
-			_type: 'pricingFields',
+			_type: 'propertyPricingFields',
 			price: listing.price,
 			priceDisplay,
-			currency: 'EUR',
-			priceQualifier: 'guide',
-			priceConfirmed: true,
-			availabilityStatus: 'available'
+			currency: 'EUR'
 		},
 		specs: {
 			_type: 'specsFields',

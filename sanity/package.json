@@ -92,6 +92,8 @@
 		"migrate:restore-review-items:dry-run": "tsx migrations/restore-review-items-migrate.ts --dry-run",
 		"migrate:unit-specific-notes": "tsx migrations/migrate-unit-specific-notes.ts",
 		"migrate:unit-specific-notes:dry-run": "tsx migrations/migrate-unit-specific-notes.ts --dry-run",
+		"migrate:unset-property-pricing": "tsx migrations/unset-property-pricing-fields-migrate.ts",
+		"migrate:unset-property-pricing:dry-run": "tsx migrations/unset-property-pricing-fields-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

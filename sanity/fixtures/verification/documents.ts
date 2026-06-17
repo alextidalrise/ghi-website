@@ -89,13 +89,10 @@ export function buildGoldenProperty(assets: UploadedAssets) {
 		status: 'published',
 		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.location, FIXTURE_IDS.community),
 		pricing: {
-			_type: 'pricingFields',
+			_type: 'propertyPricingFields',
 			price: 895_000,
 			priceDisplay: '895000',
-			currency: 'EUR',
-			priceQualifier: 'guide',
-			priceConfirmed: true,
-			availabilityStatus: 'available'
+			currency: 'EUR'
 		},
 		specs: {
 			_type: 'specsFields',
@@ -239,12 +236,10 @@ export function buildMediaPrivacyProperty(assets: UploadedAssets) {
 		status: 'published',
 		location: verificationLocation(FIXTURE_IDS.country, FIXTURE_IDS.location, FIXTURE_IDS.community),
 		pricing: {
-			_type: 'pricingFields',
+			_type: 'propertyPricingFields',
 			price: 750_000,
 			priceDisplay: '750000',
-			currency: 'EUR',
-			priceConfirmed: true,
-			availabilityStatus: 'available'
+			currency: 'EUR'
 		},
 		specs: {
 			_type: 'specsFields',

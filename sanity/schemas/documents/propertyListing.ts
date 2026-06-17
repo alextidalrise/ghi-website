@@ -3,11 +3,7 @@ import { HideFieldTitle } from '../../components/HideFieldTitle';
 import { LocationFieldsInput } from '../../components/LocationFieldsInput';
 import { PROPERTY_LISTING_KINDS, PROPERTY_TYPES, TRANSACTION_TYPES } from '../constants/enums';
 import { reviewItemsField, statusField } from '../objects/workflowFields';
-import {
-	ghiListingIdRule,
-	validatePricingFields,
-	validatePublishGate
-} from '../validators/rules';
+import { ghiListingIdRule, validatePublishGate } from '../validators/rules';
 
 export const propertyListing = defineType({
 	name: 'propertyListing',
@@ -28,8 +24,7 @@ export const propertyListing = defineType({
 			name: 'price',
 			title: 'Price',
 			group: 'propertyInfo',
-			description:
-				'Untick "Price confirmed" to render POA on the website regardless of any numeric price.',
+			description: 'Enter the price. Type "POA" into Price display to hide the numeric price.',
 			options: { collapsible: false }
 		},
 		{ name: 'specs', title: 'Specs', group: 'propertyInfo', options: { collapsible: false } }
@@ -119,8 +114,8 @@ export const propertyListing = defineType({
 		}),
 		defineField({
 			name: 'pricing',
-			title: 'Pricing & availability',
-			type: 'pricingFields',
+			title: 'Pricing',
+			type: 'propertyPricingFields',
 			group: 'propertyInfo',
 			fieldset: 'price',
 			components: {
@@ -193,7 +188,6 @@ export const propertyListing = defineType({
 		Rule.custom((document) => {
 			const doc = document as {
 				listingKind?: string;
-				pricing?: Parameters<typeof validatePricingFields>[0];
 				status?: string;
 				reviewItems?: Array<{ blocksPublish?: boolean }>;
 			};
@@ -201,9 +195,6 @@ export const propertyListing = defineType({
 			if (doc?.listingKind && !['property', 'unit'].includes(doc.listingKind)) {
 				return 'Property listings must have listing kind "property" or "unit".';
 			}
-
-			const pricingResult = validatePricingFields(doc?.pricing);
-			if (pricingResult !== true) return pricingResult;
 
 			return validatePublishGate({ status: doc.status, reviewItems: doc.reviewItems });
 		}),

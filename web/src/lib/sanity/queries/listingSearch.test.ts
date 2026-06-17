@@ -38,6 +38,14 @@ describe('golfCourse listing scope', () => {
 	});
 });
 
+describe('price facet filter', () => {
+	it('gates developments on priceConfirmed but lets any priced property through', () => {
+		const query = buildListingCardsCountQuery({ type: 'global' });
+		expect(query).toContain('_type == "development" && pricing.priceConfirmed == true');
+		expect(query).toContain('_type == "propertyListing" && defined(pricing.price)');
+	});
+});
+
 describe('golfCourse facet filter', () => {
 	it('matches on primary and linked course slugs', () => {
 		const query = buildListingCardsCountQuery({ type: 'global' });

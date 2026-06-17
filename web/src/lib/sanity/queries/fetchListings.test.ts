@@ -63,10 +63,7 @@ function baseCard(overrides: Partial<RawPropertyCard> = {}): RawPropertyCard {
 describe('fetchListingCards', () => {
 	it('transforms raw card rows before returning page data', async () => {
 		const raw = baseCard({
-			pricing: {
-				...goldenPropertyRaw.pricing,
-				priceConfirmed: false
-			} as RawPropertyCard['pricing']
+			pricing: { ...goldenPropertyRaw.pricing } as RawPropertyCard['pricing']
 		});
 
 		mockedFetchPublic.mockImplementation(async (query) => {

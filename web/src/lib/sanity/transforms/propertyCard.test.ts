@@ -74,28 +74,31 @@ describe('toPublicPropertyCard', () => {
 		expect(card.location?.addressDisplay).toBe('Costa del Sol, Spain');
 	});
 
-	it('strips numeric prices and renders POA when priceConfirmed is false', () => {
+	it('passes a property price through unchanged — there is no confirmation gate', () => {
 		const card = toPublicPropertyCard(
 			baseCard({
 				pricing: {
 					price: 650_000,
-					priceFrom: 650_000,
-					priceTo: 720_000,
-					priceDisplay: 'POA',
-					currency: 'EUR',
-					priceConfirmed: false,
-					availabilityStatus: 'available',
-					completionStatus: null,
-					completionDate: null,
-					buildStatus: null,
-					priceQualifier: null
+					priceDisplay: '650000',
+					currency: 'EUR'
 				}
 			})
 		);
 
-		expect(card.pricing?.price).toBeUndefined();
-		expect(card.pricing?.priceFrom).toBeUndefined();
-		expect(card.pricing?.priceTo).toBeUndefined();
+		expect(card.pricing?.price).toBe(650_000);
+	});
+
+	it('preserves a manual POA priceDisplay', () => {
+		const card = toPublicPropertyCard(
+			baseCard({
+				pricing: {
+					price: 650_000,
+					priceDisplay: 'POA',
+					currency: 'EUR'
+				}
+			})
+		);
+
 		expect(card.pricing?.priceDisplay).toBe('POA');
 	});
 
