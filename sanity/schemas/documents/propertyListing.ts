@@ -14,23 +14,33 @@ export const propertyListing = defineType({
 	title: 'Property listing',
 	type: 'document',
 	groups: [
-		{ name: 'identity', title: 'Identity', default: true },
-		{ name: 'location', title: 'Place' },
-		{ name: 'pricing', title: 'Pricing & availability' },
-		{ name: 'specs', title: 'Specifications' },
-		{ name: 'content', title: 'Content & media' },
-		{ name: 'marketing', title: 'Marketing source' },
+		{ name: 'propertyInfo', title: 'Property Information', default: true },
+		{ name: 'copyMedia', title: 'Property Copy & Media' },
+		{ name: 'marketing', title: 'Marketing' },
 		{ name: 'golf', title: 'Golf' },
-		{ name: 'related', title: 'Related listings' },
-		{ name: 'seo', title: 'SEO & CTAs' },
-		{ name: 'internal', title: 'Internal' }
+		{ name: 'internal', title: 'Internal' },
+		{ name: 'review', title: 'Review' }
+	],
+	fieldsets: [
+		{ name: 'identity', title: 'Identity', group: 'propertyInfo', options: { collapsible: false } },
+		{ name: 'place', title: 'Place', group: 'propertyInfo', options: { collapsible: false } },
+		{
+			name: 'price',
+			title: 'Price',
+			group: 'propertyInfo',
+			description:
+				'Untick "Price confirmed" to render POA on the website regardless of any numeric price.',
+			options: { collapsible: false }
+		},
+		{ name: 'specs', title: 'Specs', group: 'propertyInfo', options: { collapsible: false } }
 	],
 	fields: [
 		defineField({
 			name: 'ghiListingId',
 			title: 'GHI listing ID',
 			type: 'string',
-			group: 'identity',
+			group: 'propertyInfo',
+			fieldset: 'identity',
 			description: 'The unique listing reference used across the site (e.g. GHI00123). Auto-assigned — do not edit manually.',
 			validation: (Rule) => ghiListingIdRule(Rule)
 		}),
@@ -38,7 +48,8 @@ export const propertyListing = defineType({
 			name: 'title',
 			title: 'Title',
 			type: 'string',
-			group: 'identity',
+			group: 'propertyInfo',
+			fieldset: 'identity',
 			description:
 				'The headline shown on the listing page and in search results. Write for buyers — no internal codes, commission notes, or unconfirmed prices.',
 			validation: (Rule) => Rule.required()
@@ -47,7 +58,8 @@ export const propertyListing = defineType({
 			name: 'slug',
 			title: 'Slug',
 			type: 'slug',
-			group: 'identity',
+			group: 'propertyInfo',
+			fieldset: 'identity',
 			options: { source: 'title', maxLength: 96 },
 			validation: (Rule) => Rule.required()
 		}),
@@ -55,7 +67,8 @@ export const propertyListing = defineType({
 			name: 'listingKind',
 			title: 'Listing kind',
 			type: 'string',
-			group: 'identity',
+			group: 'propertyInfo',
+			fieldset: 'identity',
 			options: { list: [...PROPERTY_LISTING_KINDS], layout: 'radio' },
 			initialValue: 'property',
 			validation: (Rule) => Rule.required(),
@@ -65,7 +78,8 @@ export const propertyListing = defineType({
 			name: 'propertyType',
 			title: 'Property type',
 			type: 'string',
-			group: 'identity',
+			group: 'propertyInfo',
+			fieldset: 'identity',
 			options: { list: [...PROPERTY_TYPES], layout: 'dropdown' },
 			validation: (Rule) => Rule.required()
 		}),
@@ -73,7 +87,8 @@ export const propertyListing = defineType({
 			name: 'transactionType',
 			title: 'Transaction type',
 			type: 'string',
-			group: 'identity',
+			group: 'propertyInfo',
+			fieldset: 'identity',
 			options: { list: [...TRANSACTION_TYPES], layout: 'dropdown' },
 			initialValue: 'sale',
 			validation: (Rule) => Rule.required()
@@ -95,7 +110,8 @@ export const propertyListing = defineType({
 		defineField({
 			name: 'location',
 			type: 'locationFields',
-			group: 'location',
+			group: 'propertyInfo',
+			fieldset: 'place',
 			components: {
 				field: HideFieldTitle,
 				input: LocationFieldsInput
@@ -105,15 +121,21 @@ export const propertyListing = defineType({
 			name: 'pricing',
 			title: 'Pricing & availability',
 			type: 'pricingFields',
-			group: 'pricing',
-			description:
-				'Untick "Price confirmed" to render POA on the website regardless of any numeric price.'
+			group: 'propertyInfo',
+			fieldset: 'price',
+			components: {
+				field: HideFieldTitle
+			}
 		}),
 		defineField({
 			name: 'specs',
 			title: 'Specifications',
 			type: 'specsFields',
-			group: 'specs'
+			group: 'propertyInfo',
+			fieldset: 'specs',
+			components: {
+				field: HideFieldTitle
+			}
 		}),
 		defineField({
 			name: 'golf',
@@ -125,7 +147,7 @@ export const propertyListing = defineType({
 			name: 'content',
 			title: 'Website content',
 			type: 'contentFields',
-			group: 'content'
+			group: 'copyMedia'
 		}),
 		defineField({
 			name: 'marketing',
@@ -137,28 +159,28 @@ export const propertyListing = defineType({
 			name: 'media',
 			title: 'Media',
 			type: 'mediaFields',
-			group: 'content'
+			group: 'copyMedia'
 		}),
 		defineField({
 			name: 'related',
 			title: 'Related listings',
 			type: 'relatedContentFields',
-			group: 'related'
+			group: 'marketing'
 		}),
 		defineField({
 			name: 'ctas',
 			title: 'Enquiry & CTAs',
 			type: 'ctaFields',
-			group: 'seo'
+			group: 'marketing'
 		}),
 		defineField({
 			name: 'seo',
 			title: 'SEO',
 			type: 'seoFields',
-			group: 'seo'
+			group: 'marketing'
 		}),
-		statusField('internal'),
-		reviewItemsField('internal'),
+		statusField('review'),
+		reviewItemsField('review'),
 		defineField({
 			name: 'internal',
 			title: 'Internal',
