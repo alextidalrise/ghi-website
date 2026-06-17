@@ -94,6 +94,10 @@
 		"migrate:unit-specific-notes:dry-run": "tsx migrations/migrate-unit-specific-notes.ts --dry-run",
 		"migrate:unset-property-pricing": "tsx migrations/unset-property-pricing-fields-migrate.ts",
 		"migrate:unset-property-pricing:dry-run": "tsx migrations/unset-property-pricing-fields-migrate.ts --dry-run",
+		"migrate:unset-property-content-media": "tsx migrations/unset-property-content-media-fields-migrate.ts",
+		"migrate:unset-property-content-media:dry-run": "tsx migrations/unset-property-content-media-fields-migrate.ts --dry-run",
+		"migrate:unset-media-asset-metadata": "tsx migrations/unset-media-asset-metadata-fields-migrate.ts",
+		"migrate:unset-media-asset-metadata:dry-run": "tsx migrations/unset-media-asset-metadata-fields-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {
