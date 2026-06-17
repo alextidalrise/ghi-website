@@ -51,7 +51,6 @@ type CtaInput = {
 	responseTimeText?: string | null;
 	brochureCtaText?: string | null;
 	brochureCtaEnabled?: boolean | null;
-	enquiryRouting?: unknown;
 };
 
 type GolfCourseRef = {
@@ -120,7 +119,7 @@ export type PublicRelated = {
 	similarPropertiesMode?: string | null;
 };
 
-export type PublicCta = Omit<CtaInput, 'enquiryRouting'>;
+export type PublicCta = CtaInput;
 
 // The golf object no longer carries internal enrichment fields, so every field
 // is public — no filtering needed beyond the null guard in filterGolfFields.
@@ -232,8 +231,7 @@ function filterCtaFields(ctas: CtaInput | null | undefined): PublicCta | null {
 		return null;
 	}
 
-	const { enquiryRouting: _er, ...publicCtas } = ctas;
-	return publicCtas;
+	return ctas;
 }
 
 function filterGolfFields(golf: GolfInput | null | undefined): PublicGolf | null {
