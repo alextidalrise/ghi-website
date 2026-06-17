@@ -71,16 +71,8 @@ function buildDemoCards(): PublicPropertyCard[] {
 			media: null,
 			pricing: {
 				price: 650_000,
-				priceFrom: 650_000,
-				priceTo: 720_000,
 				priceDisplay: 'POA',
-				currency: 'EUR',
-				priceConfirmed: false,
-				availabilityStatus: 'available',
-				completionStatus: null,
-				completionDate: null,
-				buildStatus: null,
-				priceQualifier: null
+				currency: 'EUR'
 			}
 		})
 	);

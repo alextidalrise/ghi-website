@@ -93,6 +93,18 @@ export const PRICING_PUBLIC = /* groq */ `{
   buildStatus
 }`;
 
+/**
+ * Public pricing for a single property. Properties carry only a numeric price,
+ * an optional display override, and a currency — no range, qualifier,
+ * confirmation gate, or availability/completion/build status (those remain on
+ * developments/units via PRICING_PUBLIC). "POA" is a manual priceDisplay value.
+ */
+export const PROPERTY_PRICING_PUBLIC = /* groq */ `{
+  price,
+  priceDisplay,
+  currency
+}`;
+
 /** Public media bundle for property/development pages. */
 export const MEDIA_PUBLIC = /* groq */ `{
   gallery[]${MEDIA_ASSET_PUBLIC},
@@ -345,7 +357,7 @@ export const PROPERTY_CARD_PUBLIC = /* groq */ `{
     community->{ _id, name, "slug": slug.current, isCatchAll },
     addressDisplay
   },
-  pricing${PRICING_PUBLIC},
+  pricing${PROPERTY_PRICING_PUBLIC},
   specs{
     bedrooms,
     bathrooms,
@@ -379,7 +391,7 @@ export const PROPERTY_LISTING_PUBLIC = /* groq */ `{
   propertyType,
   transactionType,
   location${LOCATION_PUBLIC},
-  pricing${PRICING_PUBLIC},
+  pricing${PROPERTY_PRICING_PUBLIC},
   specs,
   golf${GOLF_PUBLIC},
   content${CONTENT_PUBLIC},
@@ -561,7 +573,7 @@ export const PROPERTY_LISTING_WITH_CANONICAL = /* groq */ `{
   propertyType,
   transactionType,
   location${LOCATION_PUBLIC},
-  pricing${PRICING_PUBLIC},
+  pricing${PROPERTY_PRICING_PUBLIC},
   specs,
   golf${GOLF_PUBLIC},
   content${CONTENT_PUBLIC},

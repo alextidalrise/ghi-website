@@ -15,6 +15,7 @@ import { locationFields } from './locationFields';
 import { mediaAssetMetadata } from './mediaAssetMetadata';
 import { galleryGroup, mediaFields } from './mediaFields';
 import { pricingFields } from './pricingFields';
+import { propertyPricingFields } from './propertyPricingFields';
 import { relatedContentFields } from './relatedContentFields';
 import { reviewItem } from './reviewItem';
 import { seoFields } from './seoFields';
@@ -39,6 +40,7 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	// Primary field groups
 	locationFields,
 	pricingFields,
+	propertyPricingFields,
 	specsFields,
 	golfFields,
 	contentFields,
@@ -71,6 +73,7 @@ export {
 	mediaAssetMetadata,
 	mediaFields,
 	pricingFields,
+	propertyPricingFields,
 	seoFields,
 	specsFields
 };

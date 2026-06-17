@@ -18,8 +18,15 @@ const LISTING_BASE_FILTER = /* groq */ `
 /** Numeric value used for price filters and sorts. */
 const PRICE_NUMERIC = /* groq */ `coalesce(pricing.price, pricing.priceFrom)`;
 
-/** Only confirmed prices participate in numeric filters and sorts. */
-const PRICE_FILTERABLE = /* groq */ `pricing.priceConfirmed == true`;
+/**
+ * Which rows participate in numeric price filters. Developments still gate on
+ * `priceConfirmed`; properties (which no longer carry that field) are filterable
+ * whenever they expose a numeric price.
+ */
+const PRICE_FILTERABLE = /* groq */ `(
+    (_type == "development" && pricing.priceConfirmed == true)
+    || (_type == "propertyListing" && defined(pricing.price))
+  )`;
 
 /** Allowlisted sort fragments — only composed from validated ListingSort values. */
 export const SORT_ORDER_FRAGMENTS = {

@@ -42,10 +42,7 @@ export const goldenPropertyRaw: RawPropertyListing = {
 	pricing: {
 		price: 895_000,
 		priceDisplay: '895000',
-		currency: 'EUR',
-		priceQualifier: 'guide',
-		priceConfirmed: true,
-		availabilityStatus: 'available'
+		currency: 'EUR'
 	},
 	specs: { bedrooms: 4, bathrooms: 3, builtArea: 280, builtAreaUnit: 'sqm' },
 	content: {
@@ -136,9 +133,7 @@ export const mediaPrivacyPropertyRaw: RawPropertyListing = {
 	pricing: {
 		price: 750_000,
 		priceDisplay: '750000',
-		currency: 'EUR',
-		priceConfirmed: true,
-		availabilityStatus: 'available'
+		currency: 'EUR'
 	},
 	specs: { bedrooms: 3, bathrooms: 2, builtArea: 200, builtAreaUnit: 'sqm' },
 	content: {
