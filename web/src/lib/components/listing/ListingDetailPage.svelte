@@ -10,7 +10,7 @@
 	import DevelopmentKeyFacts from '$lib/components/development/KeyFacts.svelte';
 	import DevelopmentSummary from '$lib/components/development/Summary.svelte';
 	import SharedAmenities from '$lib/components/development/SharedAmenities.svelte';
-	import UnitsTable from '$lib/components/development/UnitsTable.svelte';
+	import UnitsInventory from '$lib/components/development/UnitsInventory.svelte';
 	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
 	import { shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
 	import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
@@ -83,8 +83,10 @@
 			</aside>
 		</div>
 
-		<UnitsTable
+		<UnitsInventory
 			units={development.units}
+			unitTypes={development.unitTypes}
+			developmentName={development.developmentName ?? development.title}
 			{developmentPath}
 			showPricing={showInventoryPricing}
 		/>
