@@ -144,7 +144,7 @@ async function main() {
 	const patch = {
 		heroImage: {
 			_type: 'mediaAssetMetadata',
-			asset: { _type: 'reference', _ref: assetId },
+			asset: { _type: 'image', asset: { _type: 'reference', _ref: assetId } },
 			altText: ALT_TEXT
 		}
 	};
