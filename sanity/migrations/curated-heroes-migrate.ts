@@ -293,7 +293,7 @@ async function main() {
 		const patch = {
 			heroImage: {
 				_type: 'mediaAssetMetadata',
-				asset: { _type: 'reference', _ref: assetId },
+				asset: { _type: 'image', asset: { _type: 'reference', _ref: assetId } },
 				altText: country.altText
 			},
 			tagline: country.tagline
@@ -319,7 +319,7 @@ async function main() {
 		const patch = {
 			heroImage: {
 				_type: 'mediaAssetMetadata',
-				asset: { _type: 'reference', _ref: assetId },
+				asset: { _type: 'image', asset: { _type: 'reference', _ref: assetId } },
 				altText: location.altText
 			},
 			tagline: location.tagline
@@ -338,7 +338,7 @@ async function main() {
 		settingsPatch.homepageHero = {
 			image: {
 				_type: 'mediaAssetMetadata',
-				asset: { _type: 'reference', _ref: homepageAssetId },
+				asset: { _type: 'image', asset: { _type: 'reference', _ref: homepageAssetId } },
 				altText: ''
 			},
 			tagline: HOMEPAGE_TAGLINE
