@@ -10,13 +10,15 @@ export const propertyMediaFields = defineType({
 			title: 'Gallery',
 			type: 'array',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' },
 			description: 'The first image is used as the listing hero on the website.'
 		}),
 		defineField({
 			name: 'floorplans',
 			title: 'Floorplans',
 			type: 'array',
-			of: [defineArrayMember({ type: 'mediaAssetMetadata' })]
+			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' }
 		}),
 		defineField({
 			name: 'videoUrl',
