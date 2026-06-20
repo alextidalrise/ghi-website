@@ -11,7 +11,6 @@
 	import Highlights from './Highlights.svelte';
 	import EnquiryRail from './EnquiryRail.svelte';
 	import PropertyLocation from './PropertyLocation.svelte';
-	import GolfInfo from './GolfInfo.svelte';
 	import SimilarProperties from '$lib/components/listing/SimilarProperties.svelte';
 
 	type Props = {
@@ -56,8 +55,6 @@
 		map={property.location?.map}
 		golf={property.golf}
 	/>
-
-	<GolfInfo golf={property.golf} showCourses={false} />
 
 	{#if similarCards.length > 0}
 		<SimilarProperties cards={similarCards} />
