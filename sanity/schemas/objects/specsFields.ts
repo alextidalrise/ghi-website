@@ -1,11 +1,18 @@
 import { defineField, defineType } from 'sanity';
-import { AREA_UNITS, GARDEN_TYPES, ORIENTATIONS, POOL_TYPES, VIEW_TYPES } from '../constants/enums';
+import { AREA_UNITS, GARDEN_TYPES, ORIENTATIONS, POOL_TYPES, PROPERTY_BUILD_STATUSES, VIEW_TYPES } from '../constants/enums';
 
 export const specsFields = defineType({
 	name: 'specsFields',
 	title: 'Specifications',
 	type: 'object',
 	fields: [
+		defineField({
+			name: 'buildStatus',
+			title: 'Build status',
+			type: 'string',
+			options: { list: [...PROPERTY_BUILD_STATUSES], layout: 'radio' },
+			initialValue: 'built'
+		}),
 		defineField({
 			name: 'bedrooms',
 			title: 'Bedrooms',

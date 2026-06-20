@@ -334,6 +334,7 @@ export type GolfFields = {
 
 export type SpecsFields = {
   _type: "specsFields";
+  buildStatus?: "built" | "off_plan";
   bedrooms?: number;
   bathrooms?: number;
   builtArea?: number;

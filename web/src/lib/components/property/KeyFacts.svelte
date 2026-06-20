@@ -15,6 +15,10 @@
 		const items: Fact[] = [];
 		const specs = listing.specs as Record<string, unknown> | null | undefined;
 
+		// Built is the default; treat an unset value (legacy listings) as Built too.
+		const buildStatus = specs?.buildStatus as string | undefined;
+		items.push({ label: 'Build status', value: buildStatus === 'off_plan' ? 'Off-Plan' : 'Built' });
+
 		if (specs?.bedrooms != null) items.push({ label: 'Bedrooms', value: String(specs.bedrooms) });
 		if (specs?.bathrooms != null) items.push({ label: 'Bathrooms', value: String(specs.bathrooms) });
 
@@ -30,8 +34,20 @@
 			items.push({ label: 'Plot', value: `${specs.plotSize} ${unitLabel}` });
 		}
 
-		const courseName = listing.golf?.linkedGolfCourses?.[0]?.name;
-		if (courseName) items.push({ label: 'Golf course', value: courseName });
+		const orientation = specs?.orientation as string | undefined;
+		if (orientation && orientation !== 'unknown') {
+			// Stored as enum slugs (e.g. "south_west"); present as "South-west".
+			const label = orientation.replace(/_/g, '-');
+			items.push({ label: 'Orientation', value: label.charAt(0).toUpperCase() + label.slice(1) });
+		}
+
+		// Only surface the course on frontline-golf properties.
+		if (listing.golf?.golfRelevance === 'frontline_golf') {
+			const courseName = listing.golf?.linkedGolfCourses?.[0]?.name;
+			if (courseName) items.push({ label: 'Frontline golf course', value: courseName });
+		}
+
+		if (listing.ghiListingId) items.push({ label: 'Listing ID', value: listing.ghiListingId });
 
 		return items;
 	});

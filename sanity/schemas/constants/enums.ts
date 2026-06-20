@@ -40,6 +40,11 @@ export const AREA_UNITS = [
 	{ title: 'Square feet', value: 'sqft' }
 ] as const;
 
+export const PROPERTY_BUILD_STATUSES = [
+	{ title: 'Built', value: 'built' },
+	{ title: 'Off-Plan', value: 'off_plan' }
+] as const;
+
 export const POOL_TYPES = [
 	{ title: 'Private', value: 'private' },
 	{ title: 'Communal', value: 'communal' },
