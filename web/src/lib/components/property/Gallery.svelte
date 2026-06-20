@@ -518,11 +518,13 @@
 		opacity: 1;
 	}
 
-	/* On phones the stage becomes a true edge-to-edge hero, flush under the fixed
-	   nav. Only the stage bleeds; the filmstrip keeps its gutter.
-	   100vw breakout matches the FrontlineListings convention; .site-main's
-	   overflow-x: clip absorbs it without a horizontal scrollbar. */
-	@media (max-width: 760px) {
+	/* Below the desktop split (< 1024px) the gallery is stacked full-width, so the
+	   stage becomes a true edge-to-edge hero, flush under the fixed nav. This runs
+	   to the desktop breakpoint so phones AND tablets bleed alike (the desktop rule
+	   in PropertyDetail takes over at 1024px). Only the stage bleeds; the filmstrip
+	   keeps its gutter. 100vw breakout matches the FrontlineListings convention;
+	   .site-main's overflow-x: clip absorbs it without a horizontal scrollbar. */
+	@media (max-width: 1023px) {
 		.gallery {
 			padding-block-start: 0;
 		}
@@ -531,9 +533,12 @@
 			width: 100vw;
 			margin-inline: calc(50% - 50vw);
 		}
+	}
 
-		/* Arrows cover the photo on a phone; swipe is the gesture, and the counter
-		   signals there is more. Hidden on the stage and in the lightbox. */
+	/* Arrows cover the photo on a phone; swipe is the gesture, and the counter
+	   signals there is more. Hidden on the stage and in the lightbox. Tablets keep
+	   the arrows (pointer-friendly, and they sit over the bled photo like desktop). */
+	@media (max-width: 760px) {
 		.gallery__nav,
 		.lightbox__nav {
 			display: none;

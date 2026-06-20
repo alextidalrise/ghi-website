@@ -275,7 +275,7 @@
 
 <style>
 	.floorplan {
-		padding-block: var(--space-md);
+		padding-block: var(--space-sm);
 	}
 
 	/* Overline header, matching the Key Facts rhythm directly above it. */

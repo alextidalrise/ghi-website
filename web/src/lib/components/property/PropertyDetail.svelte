@@ -8,7 +8,7 @@
 	import KeyFacts from './KeyFacts.svelte';
 	import Floorplan from './Floorplan.svelte';
 	import ContentSection from './ContentSection.svelte';
-	import Features from './Features.svelte';
+	import Highlights from './Highlights.svelte';
 	import EnquiryRail from './EnquiryRail.svelte';
 	import PropertyLocation from './PropertyLocation.svelte';
 	import GolfInfo from './GolfInfo.svelte';
@@ -43,8 +43,8 @@
 
 	<div class="property-body content-wrap">
 		<div class="property-body__main">
+			<Highlights content={property.content} />
 			<ContentSection title="About" body={property.content?.aboutDescription} bare />
-			<Features content={property.content} />
 		</div>
 		<aside class="property-body__rail">
 			<EnquiryRail listing={property} />
@@ -69,6 +69,16 @@
 		padding-bottom: 0;
 	}
 
+	/* The hero bleeds to the viewport edges (gallery flush left, info column near
+	   the right edge). Let every section below share those same near-edge rails
+	   instead of the narrow 1060px reading column, so the body lines up under the
+	   gallery and breathes on wide screens. Overriding the token cascades to every
+	   descendant `.content-wrap` (body, location, golf, similar) at once; prose
+	   blocks keep their own ch-based caps, so line length stays readable. */
+	.listing-page--property {
+		--content-max: none;
+	}
+
 	/* Transparent wrapper until the desktop split kicks in, so the gallery and
 	   summary participate directly in the mobile/tablet stack. */
 	.hero {
@@ -76,7 +86,7 @@
 	}
 
 	.hero__summary {
-		padding: var(--space-lg) var(--content-padding) 0;
+		padding: var(--space-sm) var(--content-padding) 0;
 	}
 
 	/* Desktop: a full-bleed gallery flush to the left edge and the nav, beside the
@@ -88,7 +98,22 @@
 			grid-template-columns: minmax(0, 1.62fr) minmax(21rem, 1fr);
 			gap: clamp(2rem, 3vw, 3.5rem);
 			align-items: start;
-			padding: 0 clamp(1.5rem, 3vw, 3rem) 0 0;
+			padding: 0 var(--content-padding) 0 0;
+		}
+
+		/* Pin the gallery while the taller info column (summary → key facts →
+		   floorplan) scrolls up past it. The gallery is shorter than the info
+		   column, so without this it sat at the top and left dead space below it;
+		   sticky keeps it in view through the hero and closes that gap. Engages only
+		   when the info column is the taller of the two (it has the travel room);
+		   on listings where the gallery is taller it simply rests in place. */
+		.hero__gallery {
+			position: sticky;
+			/* Pin flush under the nav. The gallery's resting position is already at
+			   nav-height, so any larger offset would engage sticky at scroll 0 and
+			   push it down, opening a gap below the nav. */
+			top: var(--nav-height);
+			align-self: start;
 		}
 
 		.hero__summary {
@@ -152,6 +177,15 @@
 		.listing-page--property {
 			display: flex;
 			flex-direction: column;
+		}
+
+		/* `.content-wrap` centres itself with margin-inline:auto; inside this flex
+		   column that shrinks each section to its content width instead of filling,
+		   so Location and Similar rendered narrower than the rest. Force full width.
+		   `:global` is required because these sections are rendered by child
+		   components and don't carry this component's scope hash. */
+		.listing-page--property > :global(.content-wrap) {
+			width: 100%;
 		}
 
 		.hero__gallery {
