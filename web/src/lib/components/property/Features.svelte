@@ -7,8 +7,6 @@
 
 	let { content }: Props = $props();
 
-	const YES_VALUES = new Set(['yes', 'true', 'included', 'available']);
-
 	/* Below this many features, a two-tier split (signature lead + grouped tail)
 	   separates too little to be worth it; we show one calm list instead. */
 	const SPLIT_MIN = 7;
@@ -219,10 +217,9 @@
 
 	/* Build the ordered, de-duplicated feature pool, then either split it into a
 	   ranked signature lead plus a grouped tail (long lists) or leave it as one
-	   quiet list (short lists). Boolean / value-less feature highlights are folded
-	   in for parity with the prior behaviour; highlights whose value is a
-	   descriptive note carry internal provenance, not public copy, and are
-	   skipped. */
+	   quiet list (short lists). Every feature highlight contributes its label; the
+	   optional `value` is internal detail (the enrichment pipeline often sets it
+	   equal to the label) and is never surfaced here. Amenity strings follow. */
 	const model = $derived.by((): Model => {
 		const seen = new Set<string>();
 		const pool: string[] = [];
@@ -238,12 +235,7 @@
 			pool.push(label);
 		};
 
-		for (const highlight of content?.featureHighlights ?? []) {
-			const label = highlight?.label?.trim();
-			if (!label) continue;
-			const value = highlight.value?.trim();
-			if (!value || YES_VALUES.has(value.toLowerCase())) add(label);
-		}
+		for (const highlight of content?.featureHighlights ?? []) add(highlight?.label);
 		for (const amenity of content?.amenities ?? []) add(amenity);
 
 		if (pool.length < SPLIT_MIN) {
