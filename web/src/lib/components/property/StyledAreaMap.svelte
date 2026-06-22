@@ -3,7 +3,7 @@
 	import type { PublicMapPayload } from '$lib/sanity/transforms/mapPrivacy';
 	import type { GolfPin } from '$lib/listing/mapPins';
 	import { buildOsmExternalUrl } from '$lib/listing/osmEmbed';
-	import { resolveMapStyleUrl, applyBrandWash, circlePolygon } from '$lib/listing/mapStyle';
+	import { resolveMapStyleUrl, applyBrandWash, boostPlaceLabels, circlePolygon } from '$lib/listing/mapStyle';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 
 	type Props = {
@@ -23,6 +23,8 @@
 	// Non-reactive handle to the live map instance.
 	let mapInstance: import('maplibre-gl').Map | null = null;
 	let handlers: Array<{ enable: () => void; disable: () => void }> = [];
+	// The calm opening frame, captured on load so Reset can return to it.
+	let initialBounds: import('maplibre-gl').LngLatBounds | null = null;
 
 	const reduceMotion =
 		typeof window !== 'undefined' &&
@@ -33,6 +35,16 @@
 		for (const h of handlers) h.enable();
 		mode = 'interactive';
 		container?.querySelector<HTMLElement>('.maplibregl-canvas')?.focus();
+	}
+
+	function reset() {
+		if (mode === 'idle' || !mapInstance) return;
+		for (const h of handlers) h.disable();
+		mode = 'idle';
+		// Glide (or jump, with reduced motion) back to the opening frame.
+		if (initialBounds) {
+			mapInstance.fitBounds(initialBounds, { padding: 56, maxZoom: 14.5, animate: !reduceMotion });
+		}
 	}
 
 	onMount(() => {
@@ -80,6 +92,7 @@
 					if (cancelled) return;
 					clearTimeout(loadTimeout);
 					applyBrandWash(m);
+					boostPlaceLabels(m);
 
 					// Collapse the (legally required) attribution to its compact "ⓘ" form;
 					// the OSM/MapTiler credit stays one tap away, styling handles the rest.
@@ -88,7 +101,8 @@
 						?.classList.remove('maplibregl-compact-show');
 
 					// Property area: a soft disc, never a precise pin (privacy: area_only).
-					m.addSource('property-area', { type: 'geojson', data: circlePolygon(coords) });
+					const areaRadiusKm = 2.2;
+					m.addSource('property-area', { type: 'geojson', data: circlePolygon(coords, areaRadiusKm) });
 					m.addLayer({
 						id: 'property-area-fill',
 						type: 'fill',
@@ -109,10 +123,15 @@
 						addGolfMarker(maplibre, m, pin);
 					}
 
-					// Frame the area disc plus every pin in one calm view.
-					bounds.extend([coords.lng - 0.018, coords.lat - 0.018]);
-					bounds.extend([coords.lng + 0.018, coords.lat + 0.018]);
+					// Frame the area disc plus every pin in one calm view — pad out from the
+					// disc radius so the larger bubble always sits comfortably inside the frame.
+					const frameKm = areaRadiusKm * 1.25;
+					const latPad = frameKm / 110.574;
+					const lngPad = frameKm / (111.32 * Math.cos((coords.lat * Math.PI) / 180));
+					bounds.extend([coords.lng - lngPad, coords.lat - latPad]);
+					bounds.extend([coords.lng + lngPad, coords.lat + latPad]);
 					m.fitBounds(bounds, { padding: 56, maxZoom: 14.5, animate: false });
+					initialBounds = bounds;
 
 					status = 'ready';
 				});
@@ -201,10 +220,17 @@
 				<div class="area-map__state" aria-hidden="true">
 					<span class="area-map__spinner"></span>
 				</div>
-			{:else if mode === 'idle'}
+			{:else}
 				<!-- Static-first: the styled map sits still until the visitor chooses to explore. -->
-				<div class="area-map__veil">
-					<button type="button" class="area-map__explore" onclick={activate}>Explore map</button>
+				{#if mode === 'idle'}
+					<div class="area-map__veil" aria-hidden="true"></div>
+				{/if}
+				<div class="area-map__controls">
+					{#if mode === 'idle'}
+						<button type="button" class="area-map__ctrl" onclick={activate}>Explore</button>
+					{:else}
+						<button type="button" class="area-map__ctrl" onclick={reset}>Reset</button>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -271,14 +297,11 @@
 		}
 	}
 
-	/* The "explore" affordance: a gentle veil + a single pill. pointer-events stay
-	   off the veil so golf pins are tappable before the map is unlocked; only the
-	   button captures clicks. */
+	/* Static-first cue: a gentle veil over the idle map. pointer-events stay off so
+	   golf pins remain tappable before the map is unlocked. */
 	.area-map__veil {
 		position: absolute;
 		inset: 0;
-		display: grid;
-		place-items: center;
 		pointer-events: none;
 		background: linear-gradient(
 			180deg,
@@ -288,24 +311,35 @@
 		transition: opacity var(--duration-hover) var(--ease);
 	}
 
-	.area-map__explore {
+	/* Small Explore / Reset controls, parked in the top-right of the frame. */
+	.area-map__controls {
+		position: absolute;
+		top: 0.6rem;
+		right: 0.6rem;
+		display: flex;
+		gap: 0.4rem;
+		z-index: 2;
+	}
+
+	.area-map__ctrl {
 		pointer-events: auto;
 		font-family: var(--sans);
-		font-size: var(--text-ui);
+		font-size: 0.6875rem;
 		letter-spacing: var(--tracking-wide);
 		text-transform: uppercase;
 		color: var(--green);
-		background: var(--white);
+		background: color-mix(in srgb, var(--white) 92%, transparent);
 		border: 1px solid var(--green);
-		padding: 0.7rem 1.6rem;
+		padding: 0.3rem 0.7rem;
 		cursor: pointer;
+		box-shadow: 0 1px 3px rgba(31, 61, 52, 0.18);
 		transition:
 			background var(--duration-hover) var(--ease),
 			color var(--duration-hover) var(--ease);
 	}
 
-	.area-map__explore:hover,
-	.area-map__explore:focus-visible {
+	.area-map__ctrl:hover,
+	.area-map__ctrl:focus-visible {
 		background: var(--green);
 		color: var(--white);
 	}
@@ -424,7 +458,7 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		.area-map__veil,
-		.area-map__explore {
+		.area-map__ctrl {
 			transition: none;
 		}
 		.area-map__spinner {

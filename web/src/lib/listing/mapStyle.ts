@@ -57,8 +57,44 @@ export function applyBrandWash(map: {
 	}
 }
 
+/**
+ * Surface more settlement labels — neighbourhoods, urbanisations, villages — on
+ * the "dataviz" base style, which ships deliberately sparse (it's built as a quiet
+ * backdrop for data overlays, so it gates everything below town tier to zoom 13+).
+ * We do two things to place-label layers: lower the zoom gate, and tighten the
+ * collision padding. Once the gate is open the limiter is MapLibre's collision
+ * pass (which drops labels that would touch), so trimming the padding lets more of
+ * the already-eligible neighbourhood names survive at our framing zoom. Their
+ * text-size already clamps to a legible ~10px here. Guarded per layer so a
+ * differing fallback style (OpenFreeMap) is skipped, never thrown.
+ */
+export function boostPlaceLabels(map: {
+	getStyle: () => {
+		layers?: Array<{ id: string; type: string; 'source-layer'?: string; minzoom?: number }>;
+	};
+	setLayerZoomRange: (layer: string, minzoom: number, maxzoom: number) => void;
+	setLayoutProperty: (layer: string, prop: string, value: unknown) => void;
+}): void {
+	const layers = map.getStyle().layers ?? [];
+	for (const layer of layers) {
+		// Settlement labels live in the `place` source-layer in both styles' schemas.
+		if (layer.type !== 'symbol' || layer['source-layer'] !== 'place') continue;
+		// Only pull down tiers gated above our ~12–13 framing zoom (town/village/
+		// neighbourhood); city/country are already visible and left untouched.
+		if ((layer.minzoom ?? 0) < 11) continue;
+		try {
+			map.setLayerZoomRange(layer.id, 9, 24);
+			// Default text-padding is 2px; halving it lets neighbouring names pack
+			// closer before collision drops them — a touch more density, not clutter.
+			map.setLayoutProperty(layer.id, 'text-padding', 1);
+		} catch {
+			// Layer set differs between MapTiler and OpenFreeMap — skip quietly.
+		}
+	}
+}
+
 /** A ~`radiusKm` GeoJSON circle polygon around a point, for the property-area disc. */
-export function circlePolygon(center: GeoPoint, radiusKm = 1.4, steps = 64): Feature<Polygon> {
+export function circlePolygon(center: GeoPoint, radiusKm = 1.4, steps = 128): Feature<Polygon> {
 	const coords: [number, number][] = [];
 	const latR = radiusKm / 110.574;
 	const lngR = radiusKm / (111.32 * Math.cos((center.lat * Math.PI) / 180));
