@@ -18,7 +18,7 @@
 
 	const mapLabel = $derived(map?.label ?? address ?? null);
 	const hasDescription = $derived(Boolean(description && description.length > 0));
-	const hasCard = $derived(Boolean(golf?.linkedGolfCourses?.[0]?.name));
+	const hasCard = $derived(Boolean(golf?.linkedGolfCourses?.some((course) => course?.name)));
 	const hasMap = $derived(Boolean(map?.coordinates));
 	const golfPins = $derived(buildGolfPins(golf));
 </script>
