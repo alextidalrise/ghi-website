@@ -53,7 +53,7 @@
 
 	<ExploreByCountry countries={data.featuredCountries} />
 
-	<FeaturedLocations locations={data.featuredLocations} />
+	<FeaturedLocations locations={data.featuredLocations} columns={5} />
 
 	<FeaturedListings
 		cards={data.featuredCards}

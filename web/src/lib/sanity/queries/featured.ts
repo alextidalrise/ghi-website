@@ -24,7 +24,7 @@ import {
 export const FRONTLINE_LISTING_LIMIT = 8;
 export const HOMEPAGE_FEATURED_LIMIT = 8;
 export const COUNTRY_FEATURED_LIMIT = 6;
-export const HOMEPAGE_FEATURED_LOCATIONS_LIMIT = 6;
+export const HOMEPAGE_FEATURED_LOCATIONS_LIMIT = 10;
 export const COUNTRY_FEATURED_LOCATIONS_LIMIT = 6;
 
 export type { ListingSearchScope };

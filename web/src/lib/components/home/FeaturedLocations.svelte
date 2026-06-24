@@ -5,12 +5,15 @@
 		locations: FeaturedLocationCard[];
 		heading?: string;
 		summary?: string;
+		/** Columns in the desktop grid. Cards shrink to fit; the rail is used below. */
+		columns?: number;
 	};
 
 	let {
 		locations,
 		heading = 'Featured locations',
-		summary = 'Six destinations across Spain and Portugal.'
+		summary = 'Ten destinations across Spain and Portugal.',
+		columns = 3
 	}: Props = $props();
 </script>
 
@@ -23,8 +26,8 @@
 			{/if}
 		</div>
 
-		<!-- Two rows of three on desktop; a single swipeable rail on phones. -->
-		<ul class="featured-locations__grid">
+		<!-- Grid of `columns` per row on desktop; a single swipeable rail on phones. -->
+		<ul class="featured-locations__grid" style="--columns: {columns}">
 			{#each locations as location, index (location.href)}
 				<li class="location-tile" style="--reveal-delay: {index * 70}ms">
 					<a class="location-tile__link" href={location.href}>
@@ -81,10 +84,10 @@
 		font-size: var(--text-ui);
 	}
 
-	/* Desktop / tablet: two rows of three. */
+	/* Desktop: a fixed number of columns; cards shrink to fit. */
 	.featured-locations__grid {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(var(--columns, 3), minmax(0, 1fr));
 		gap: var(--space-md);
 		margin: 0;
 		padding: 0;
@@ -194,10 +197,11 @@
 		outline-offset: 3px;
 	}
 
-	/* Phones: collapse the grid into one swipeable rail so six tiles cost one row of
-	   vertical space instead of six. Full-bleed to the viewport edge so the next tile
-	   peeks in, signalling that the row scrolls. No JS — native scroll-snap only. */
-	@media (max-width: 767px) {
+	/* Phones & tablets: collapse the grid into one swipeable rail so ten tiles cost one
+	   row of vertical space instead of ten — and avoid cramming five tiles into a narrow
+	   width. Full-bleed to the viewport edge so the next tile peeks in, signalling that
+	   the row scrolls. No JS — native scroll-snap only. */
+	@media (max-width: 1023px) {
 		.featured-locations__grid {
 			grid-auto-flow: column;
 			grid-template-columns: none;
