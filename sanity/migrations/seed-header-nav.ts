@@ -77,14 +77,31 @@ function readSanityCliAuthToken(): string | undefined {
 	}
 }
 
+const DRAFT_ID = `drafts.${SITE_SETTINGS_ID}`;
+
+/** True when an unpublished draft of the singleton exists. */
+async function draftExists(client: SanityClient): Promise<boolean> {
+	return client.fetch<boolean>(`defined(*[_id == $id][0]._id)`, { id: DRAFT_ID });
+}
+
 async function seed(client: SanityClient) {
 	// Make sure the singleton exists before patching, without disturbing its other fields.
 	await client.createIfNotExists({ _id: SITE_SETTINGS_ID, _type: 'siteSettings' });
-	await client.patch(SITE_SETTINGS_ID).set({ headerNav: HEADER_NAV, headerCta: HEADER_CTA }).commit();
+	const fields = { headerNav: HEADER_NAV, headerCta: HEADER_CTA };
+	await client.patch(SITE_SETTINGS_ID).set(fields).commit();
+	// The Studio edits the draft, and publishing it would otherwise overwrite the
+	// published doc — wiping these fields. Mirror them onto the draft when one exists so
+	// the menu shows in the Studio and survives the next publish.
+	if (await draftExists(client)) {
+		await client.patch(DRAFT_ID).set(fields).commit();
+	}
 }
 
 async function unset(client: SanityClient) {
 	await client.patch(SITE_SETTINGS_ID).unset(['headerNav', 'headerCta']).commit();
+	if (await draftExists(client)) {
+		await client.patch(DRAFT_ID).unset(['headerNav', 'headerCta']).commit();
+	}
 }
 
 async function main() {
