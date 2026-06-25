@@ -528,7 +528,7 @@
 		color: var(--green);
 		background: var(--gold);
 		border: 1px solid var(--gold);
-		padding: 0.72rem 1.6rem;
+		padding: 0.62rem 1.5rem;
 		text-decoration: none;
 		white-space: nowrap;
 		transition:
