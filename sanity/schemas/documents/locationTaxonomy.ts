@@ -157,8 +157,9 @@ export const locationTaxonomy = defineType({
 			name: 'coordinates',
 			title: 'Coordinates',
 			type: 'geopoint',
-			description: 'Map pin for this community. Used on all listings in this community.',
-			hidden: ({ document }) => document?.type !== 'community'
+			description:
+				'Map pin for this place. On a community it pins every listing within it; on a location it positions the area map on the location page.',
+			hidden: ({ document }) => document?.type === 'country'
 		}),
 		defineField({
 			name: 'isCatchAll',

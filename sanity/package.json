@@ -110,6 +110,8 @@
 		"migrate:unset-golf-fields:dry-run": "tsx migrations/unset-golf-fields-migrate.ts --dry-run",
 		"migrate:marketing-cleanup": "tsx migrations/marketing-cleanup-migrate.ts",
 		"migrate:marketing-cleanup:dry-run": "tsx migrations/marketing-cleanup-migrate.ts --dry-run",
+		"migrate:promote-algarve-communities": "tsx migrations/promote-algarve-communities-migrate.ts",
+		"migrate:promote-algarve-communities:dry-run": "tsx migrations/promote-algarve-communities-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {
