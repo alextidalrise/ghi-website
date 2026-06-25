@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
+import { handleListingEnquiry } from '$lib/listing/enquiryAction';
 import { buildUnitDetailPageData, type UnitPathParams } from '$lib/listing/detailPage';
 import {
 	fetchPublicUnit,
@@ -8,6 +9,11 @@ import {
 	unitByDevPathQuery
 } from '$lib/sanity/queries';
 import { toPublicUnitListing, type RawUnitListing } from '$lib/sanity/transforms';
+
+// The enquiry rail on nested unit pages posts here.
+export const actions: Actions = {
+	enquire: (event) => handleListingEnquiry(event)
+};
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
 	const queryParams = {

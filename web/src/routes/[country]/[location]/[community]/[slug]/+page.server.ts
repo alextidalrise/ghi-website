@@ -1,5 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
+import { handleListingEnquiry } from '$lib/listing/enquiryAction';
 import {
 	buildDevelopmentDetailPageData,
 	buildPropertyDetailPageData,
@@ -34,6 +35,11 @@ type StalePathRow = {
 	locationSlug?: string | null;
 	communitySlug?: string | null;
 	slug?: string | null;
+};
+
+// The enquiry rail (property + development + catch-all unit) posts here.
+export const actions: Actions = {
+	enquire: (event) => handleListingEnquiry(event)
 };
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {

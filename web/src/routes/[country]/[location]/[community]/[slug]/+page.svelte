@@ -2,9 +2,9 @@
 	import ListingDetailPage from '$lib/components/listing/ListingDetailPage.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 	import ListingDetailPreview from './ListingDetailPreview.svelte';
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	const property = $derived(data.preview ? null : data.pageType === 'property' ? data.property : null);
 	const development = $derived(
@@ -51,5 +51,6 @@
 		{development}
 		breadcrumbs={data.breadcrumbs}
 		similarCards={data.similarCards}
+		{form}
 	/>
 {/if}

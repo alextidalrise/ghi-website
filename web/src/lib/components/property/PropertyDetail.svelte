@@ -2,6 +2,7 @@
 	import type { PublicPropertyListing } from '$lib/sanity/transforms';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
+	import type { EnquiryFormResult } from '$lib/listing/enquiryAction';
 	import Breadcrumbs from './Breadcrumbs.svelte';
 	import Gallery from './Gallery.svelte';
 	import PropertySummary from './PropertySummary.svelte';
@@ -17,9 +18,16 @@
 		property: PublicPropertyListing;
 		breadcrumbs: BreadcrumbItem[];
 		similarCards?: SimilarListingCard[];
+		form?: EnquiryFormResult | null;
 	};
 
-	let { property, breadcrumbs, similarCards = [] }: Props = $props();
+	let { property, breadcrumbs, similarCards = [], form = null }: Props = $props();
+
+	// Floorplans are gated: the CTA in the hero column routes the visitor down to the
+	// enquiry rail in floorplan-request mode. Incrementing a counter (rather than a bool)
+	// lets the rail re-trigger the open/scroll if the CTA is clicked again after dismissal.
+	let floorplanRequest = $state(0);
+	const hasFloorplans = $derived(property.media?.floorplansAvailable ?? false);
 </script>
 
 <article class="listing-page listing-page--property">
@@ -36,7 +44,7 @@
 			<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 			<PropertySummary listing={property} />
 			<KeyFacts listing={property} />
-			<Floorplan floorplans={property.media?.floorplans} title={property.title ?? 'Property'} />
+			<Floorplan {hasFloorplans} onRequest={() => (floorplanRequest += 1)} />
 		</div>
 	</section>
 
@@ -46,7 +54,7 @@
 			<ContentSection title="About" body={property.content?.aboutDescription} bare />
 		</div>
 		<aside class="property-body__rail">
-			<EnquiryRail listing={property} />
+			<EnquiryRail listing={property} {form} floorplanSignal={floorplanRequest} />
 		</aside>
 	</div>
 
