@@ -12,6 +12,7 @@
 	import SharedAmenities from '$lib/components/development/SharedAmenities.svelte';
 	import UnitsInventory from '$lib/components/development/UnitsInventory.svelte';
 	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
+	import type { EnquiryFormResult } from '$lib/listing/enquiryAction';
 	import { shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
 	import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
@@ -22,6 +23,7 @@
 		development?: PublicDevelopment | null;
 		breadcrumbs: BreadcrumbItem[];
 		similarCards?: SimilarListingCard[];
+		form?: EnquiryFormResult | null;
 	};
 
 	let {
@@ -29,7 +31,8 @@
 		property = null,
 		development = null,
 		breadcrumbs,
-		similarCards = []
+		similarCards = [],
+		form = null
 	}: Props = $props();
 
 	const displayMode = $derived(development?.developmentDisplayMode ?? 'flat_listing');
@@ -52,7 +55,7 @@
 </script>
 
 {#if pageType === 'property' && property}
-	<PropertyDetail {property} {breadcrumbs} {similarCards} />
+	<PropertyDetail {property} {breadcrumbs} {similarCards} {form} />
 {:else if pageType === 'development' && development}
 	<article class="listing-page listing-page--development">
 		<!-- Mirrors the property page: a full-bleed gallery beside the headline facts,
@@ -79,7 +82,7 @@
 				/>
 			</div>
 			<aside class="listing-body__rail">
-				<EnquiryRail listing={development} heading="Enquire about this development" />
+				<EnquiryRail listing={development} heading="Enquire about this development" {form} />
 			</aside>
 		</div>
 

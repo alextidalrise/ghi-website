@@ -1,9 +1,9 @@
 <script lang="ts">
 	import ListingDetailPage from '$lib/components/listing/ListingDetailPage.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
 <svelte:head>
@@ -41,4 +41,5 @@
 	property={data.property}
 	breadcrumbs={data.breadcrumbs}
 	similarCards={data.similarCards}
+	{form}
 />

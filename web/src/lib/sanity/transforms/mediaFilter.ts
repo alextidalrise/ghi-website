@@ -46,6 +46,10 @@ export type PublicMediaBundle = {
 	galleryGroups: Array<{ title?: string; images: ReturnType<typeof filterMediaAssetList> }>;
 	thumbnailOverride: ReturnType<typeof filterMediaAsset> | null;
 	floorplans: ReturnType<typeof filterMediaAssetList>;
+	/** Whether any public floorplan exists, independent of whether the assets are
+	    exposed. Property/unit detail pages gate the plans behind a request CTA and
+	    strip the assets from the payload, so they read this flag rather than the array. */
+	floorplansAvailable: boolean;
 	videoUrl: string | null;
 	virtualTourUrl: string | null;
 	brochure: ReturnType<typeof filterMediaAsset> | null;
@@ -79,6 +83,7 @@ export function filterMediaBundle(media: MediaBundleInput | null | undefined): P
 
 	const brochurePublic = media.brochurePublic === true;
 	const includeBrochure = brochurePublic && isPublicMediaAsset(media.brochure ?? undefined);
+	const floorplans = filterMediaAssetList(media.floorplans);
 
 	return {
 		gallery: filterMediaAssetList(media.gallery),
@@ -87,7 +92,8 @@ export function filterMediaBundle(media: MediaBundleInput | null | undefined): P
 			images: filterMediaAssetList(group.images)
 		})),
 		thumbnailOverride: filterMediaAsset(media.thumbnailOverride),
-		floorplans: filterMediaAssetList(media.floorplans),
+		floorplans,
+		floorplansAvailable: floorplans.length > 0,
 		videoUrl: media.videoUrl ?? null,
 		virtualTourUrl: media.virtualTourUrl ?? null,
 		brochure: includeBrochure ? filterMediaAsset(media.brochure) : null,

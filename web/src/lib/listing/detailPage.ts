@@ -54,6 +54,23 @@ function applyPreviewSeo(seo: PropertySeoMeta & { canonicalUrl: string }) {
 	return { ...seo, noindex: true };
 }
 
+/**
+ * Floorplans are gated behind a "Request floorplan" CTA on property and unit pages, so
+ * the plan images must never reach the browser. Strip the assets from the payload while
+ * leaving `floorplansAvailable` intact, so the CTA still knows whether to render. The
+ * altText is dropped with the assets, so no caption leaks either. Developments are
+ * untouched — their gallery still composes floorplans into the photo set.
+ */
+function gatePropertyFloorplans(property: PublicPropertyListing): PublicPropertyListing {
+	if (!property.media || property.media.floorplans.length === 0) {
+		return property;
+	}
+	return {
+		...property,
+		media: { ...property.media, floorplans: [] }
+	};
+}
+
 export function buildPropertyDetailPageData(
 	property: PublicPropertyListing,
 	siteOrigin: string,
@@ -64,6 +81,7 @@ export function buildPropertyDetailPageData(
 		similarCards?: PropertyDetailPageData['similarCards'];
 	} = {}
 ): PropertyDetailPageData {
+	property = gatePropertyFloorplans(property);
 	const { countrySlug, locationSlug, communitySlug, slug } = params;
 	const isCatchAll = property.location?.community?.isCatchAll === true;
 	const canonicalPath = buildCanonicalPath({
@@ -216,6 +234,7 @@ export function buildUnitDetailPageData(
 		similarCards?: PropertyDetailPageData['similarCards'];
 	} = {}
 ): PropertyDetailPageData {
+	listing = gatePropertyFloorplans(listing);
 	const developmentPath = buildCanonicalPath({
 		countrySlug: context.countrySlug,
 		locationSlug: context.locationSlug,
