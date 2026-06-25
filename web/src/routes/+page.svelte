@@ -1,8 +1,7 @@
 <script lang="ts">
 	import DiscoveryBar from '$lib/components/listing/DiscoveryBar.svelte';
 	import BuyerGuides from '$lib/components/home/BuyerGuides.svelte';
-	import ExploreByCountry from '$lib/components/home/ExploreByCountry.svelte';
-	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
+	import DestinationsByCountry from '$lib/components/home/DestinationsByCountry.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import TrustedPartners from '$lib/components/home/TrustedPartners.svelte';
@@ -51,9 +50,10 @@
 <section class="home-content content-wrap">
 	<BuyerGuides />
 
-	<ExploreByCountry countries={data.featuredCountries} />
-
-	<FeaturedLocations locations={data.featuredLocations} columns={5} />
+	<DestinationsByCountry
+		countries={data.featuredCountries}
+		locations={data.featuredLocations}
+	/>
 
 	<FeaturedListings
 		cards={data.featuredCards}
