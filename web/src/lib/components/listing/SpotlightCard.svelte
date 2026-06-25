@@ -107,7 +107,7 @@
 		{:else}
 			<span class="spotlight-card__img spotlight-card__img--placeholder" aria-hidden="true"></span>
 		{/if}
-		{#if locationLine}
+		{#if locationLine && surface !== 'green'}
 			<span class="spotlight-card__chip">{locationLine}</span>
 		{/if}
 	</span>
@@ -194,12 +194,6 @@
 		text-transform: uppercase;
 		background: var(--white);
 		color: var(--charcoal);
-	}
-
-	.spotlight-card--green .spotlight-card__chip {
-		background: var(--green);
-		color: var(--on-green);
-		border: 1px solid oklch(0.82 0.05 85 / 0.5);
 	}
 
 	.spotlight-card__body {
