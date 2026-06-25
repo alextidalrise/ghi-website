@@ -369,12 +369,12 @@
 	.site-nav__link {
 		position: relative;
 		font-family: var(--sans);
-		font-size: var(--text-ui);
-		font-weight: 500;
-		letter-spacing: var(--tracking-wide);
+		font-size: 0.8125rem;
+		font-weight: 300;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.8);
-		padding: 0 1.25rem;
+		color: var(--on-green);
+		padding: 0 1.15rem;
 		height: var(--nav-height);
 		display: flex;
 		align-items: center;
@@ -395,8 +395,8 @@
 	.site-nav__link::after {
 		content: '';
 		position: absolute;
-		left: 1.25rem;
-		right: 1.25rem;
+		left: 1.15rem;
+		right: 1.15rem;
 		bottom: 0;
 		height: 2px;
 		background: var(--gold);
@@ -430,7 +430,7 @@
 		background: none;
 		border: none;
 		cursor: pointer;
-		color: rgba(255, 255, 255, 0.8);
+		color: var(--on-green);
 		transition: color var(--duration-hover) var(--ease);
 	}
 
@@ -452,14 +452,14 @@
 	.site-nav__submenu {
 		position: absolute;
 		top: 100%;
-		right: 0;
+		left: 0;
 		min-width: 13rem;
 		list-style: none;
 		background: var(--green-deep);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-top: 2px solid var(--gold);
-		padding: 0.5rem 0;
-		box-shadow: 0 18px 40px rgba(15, 22, 17, 0.35);
+		padding: 0.4rem 0;
+		box-shadow: 0 22px 48px rgba(15, 22, 17, 0.4);
 		opacity: 0;
 		visibility: hidden;
 		transform: translateY(-0.5rem);
@@ -482,15 +482,20 @@
 		display: block;
 		font-family: var(--sans);
 		font-size: var(--text-ui);
-		font-weight: 500;
-		letter-spacing: var(--tracking-wide);
-		color: rgba(255, 255, 255, 0.8);
-		padding: 0.6rem 1.5rem;
+		font-weight: 400;
+		letter-spacing: normal;
+		color: var(--on-green);
+		padding: 0.7rem 1.75rem 0.7rem 1.25rem;
 		text-decoration: none;
 		white-space: nowrap;
 		transition:
 			color var(--duration-hover) var(--ease),
 			background var(--duration-hover) var(--ease);
+	}
+
+	/* Hairline between rows keeps the second tier reading as a considered list. */
+	.site-nav__submenu li + li .site-nav__submenu-link {
+		border-top: 1px solid rgba(255, 255, 255, 0.07);
 	}
 
 	.site-nav__submenu-link:hover,
@@ -510,14 +515,17 @@
 
 	.site-nav__cta {
 		font-family: var(--sans);
-		font-size: var(--text-ui);
-		font-weight: 500;
-		letter-spacing: var(--tracking-wide);
+		font-size: 0.8125rem;
+		font-weight: 400;
+		letter-spacing: 0.14em;
+		/* Tracked caps gain a trailing gap after the last letter; nudge the text back
+		   so the label sits optically centred in the button. */
+		text-indent: 0.14em;
 		text-transform: uppercase;
 		color: var(--green);
 		background: var(--gold);
 		border: 1px solid var(--gold);
-		padding: 0.7rem 1.6rem;
+		padding: 0.72rem 1.6rem;
 		text-decoration: none;
 		white-space: nowrap;
 		transition:
@@ -738,7 +746,10 @@
 		border-color: var(--on-green);
 	}
 
-	@media (max-width: 56rem) {
+	/* Collapse to the drawer while the full menu still has room. The airier nav type
+	   needs ~1140px to lay out without clipping, so the hamburger takes over below 72rem
+	   rather than letting the links crowd the Contact action off the bar. */
+	@media (max-width: 72rem) {
 		.site-nav {
 			padding: 0 1.25rem;
 		}
