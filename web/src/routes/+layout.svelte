@@ -48,7 +48,7 @@
 {#if bare}
 	{@render children()}
 {:else}
-	<SiteNav />
+	<SiteNav nav={data.headerNav} />
 
 	<main class="site-main">
 		{@render children()}

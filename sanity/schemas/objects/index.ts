@@ -2,6 +2,7 @@ import type { SchemaTypeDefinition } from 'sanity';
 
 import { contentFields, featureHighlight } from './contentFields';
 import { guideCallout, guideKeyFigures, guideSection } from './guideContent';
+import { navLink, navMenuChild, navMenuItem } from './headerNav';
 import { marketingFields } from './marketingFields';
 import { ctaFields } from './ctaFields';
 import { golfFields } from './golfFields';
@@ -37,6 +38,10 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	guideCallout,
 	guideKeyFigures,
 	guideSection,
+	// Header navigation (navLink registered before the items that nest it)
+	navLink,
+	navMenuChild,
+	navMenuItem,
 	// Primary field groups
 	locationFields,
 	pricingFields,
@@ -72,6 +77,9 @@ export {
 	locationFields,
 	mediaAssetMetadata,
 	mediaFields,
+	navLink,
+	navMenuChild,
+	navMenuItem,
 	pricingFields,
 	propertyContentFields,
 	propertyMediaFields,
