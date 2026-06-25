@@ -2,7 +2,6 @@ import { defineQuery } from 'groq';
 import {
 	FEATURED_LOCATION_PROJECTION,
 	FEATURED_LOCATION_REF_FILTER,
-	LOCATION_TAXONOMY_PUBLIC,
 	MEDIA_ASSET_PUBLIC
 } from '../allowlists';
 import { fetchPublic } from './fetch';
@@ -33,13 +32,20 @@ export const homepageFeaturedLocationsQuery = defineQuery(`
   }
 `);
 
+// The country selector is flag-led, not photo-led: it no longer requires (or projects)
+// heroImage. flagUrl dereferences the linked flag asset to its raw URL so the SVG ships
+// crisp and un-rasterised; a country with no flag yet still renders via a built-in stamp.
 export const countriesWithHeroQuery = defineQuery(`
   *[
     _type == "locationTaxonomy"
     && type == "country"
     && defined(slug.current)
-    && defined(heroImage.asset)
-  ] | order(name asc)${LOCATION_TAXONOMY_PUBLIC}
+  ] | order(name asc){
+    name,
+    "slug": slug.current,
+    tagline,
+    "flagUrl": flag.asset->url
+  }
 `);
 
 export async function fetchSiteSettingsHero(): Promise<HomepageHero | null> {

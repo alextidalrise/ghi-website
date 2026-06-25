@@ -2,7 +2,6 @@ import { buildImageSrcset, buildPublicImageUrl } from '../image';
 import type { MediaAssetInput } from './mediaFilter';
 
 const HERO_WIDTHS = [960, 1280, 1600, 1920, 2400];
-const COUNTRY_CARD = { width: 800, height: 600, fit: 'crop' as const, quality: 85 };
 const LOCATION_CARD = { width: 600, height: 800, fit: 'crop' as const, quality: 85 };
 const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 85 };
 
@@ -16,8 +15,8 @@ export type TaxonomyHero = {
 export type CountryFeatureCard = {
 	name: string;
 	href: string;
-	image: string;
-	alt: string;
+	/** Raw flag asset URL (SVG) linked in Sanity; null falls back to a built-in stamp. */
+	flagUrl: string | null;
 	tagline: string | null;
 };
 
@@ -40,6 +39,8 @@ export type TaxonomyWithHero = {
 	slug?: string | null;
 	tagline?: string | null;
 	heroImage?: MediaAssetInput | null;
+	/** Dereferenced flag asset URL, projected only by the country selector query. */
+	flagUrl?: string | null;
 	countrySlug?: string | null;
 	countryName?: string | null;
 };
@@ -80,7 +81,7 @@ export function resolveHomepageHero(hero: HomepageHero): TaxonomyHero | null {
 
 function resolveCardImage(
 	asset: MediaAssetInput | null | undefined,
-	options: typeof COUNTRY_CARD | typeof LOCATION_CARD,
+	options: typeof LOCATION_CARD,
 	fallbackName: string
 ): { image: string; alt: string } | null {
 	if (!asset) return null;
@@ -92,18 +93,15 @@ function resolveCardImage(
 }
 
 export function toCountryCard(doc: TaxonomyWithHero | null | undefined): CountryFeatureCard | null {
+	// The selector identifies a country by name + slug. The flag and tagline are both
+	// optional: a missing flag falls back to a built-in stamp, a missing tagline is
+	// simply omitted — neither should drop the country off the homepage.
 	if (!doc?.slug || !doc.name) return null;
-
-	// A card needs a picture; the tagline is optional and simply omitted when absent
-	// (don't silently drop the whole card because an editor skipped the tagline).
-	const cardImage = resolveCardImage(doc.heroImage, COUNTRY_CARD, doc.name);
-	if (!cardImage) return null;
 
 	return {
 		name: doc.name,
 		href: `/${doc.slug}`,
-		image: cardImage.image,
-		alt: cardImage.alt,
+		flagUrl: doc.flagUrl ?? null,
 		tagline: doc.tagline?.trim() || null
 	};
 }

@@ -136,6 +136,15 @@ export const locationTaxonomy = defineType({
 			hidden: ({ document }) => document?.type === 'community'
 		}),
 		defineField({
+			name: 'flag',
+			title: 'Flag',
+			type: 'image',
+			description:
+				'Country flag for the homepage "Explore by country" selector. Upload an SVG so it stays crisp at any size. Shown as a small framed stamp, not a background — a simple national flag works best.',
+			options: { accept: 'image/svg+xml' },
+			hidden: ({ document }) => document?.type !== 'country'
+		}),
+		defineField({
 			name: 'tagline',
 			title: 'Tagline',
 			type: 'string',

@@ -6,47 +6,63 @@
 	};
 
 	let { countries }: Props = $props();
+
+	/** Country slug from the card href (`/spain` → `spain`), used to key the fallback stamp. */
+	function slugOf(href: string): string {
+		return href.replace(/^\//, '').split('/')[0];
+	}
 </script>
+
+<!-- Flag stamp: prefer the SVG linked in Sanity; fall back to a built-in stamp so a
+     country still renders before an editor uploads its flag. Spain and Portugal ship
+     hand-drawn fallbacks (matching the buyer-guide flags); any other country gets a
+     neutral green field until its flag is added in the CMS. The country name carries the
+     meaning, so the flag is decorative (empty alt / aria-hidden). -->
+{#snippet flag(country: CountryFeatureCard)}
+	{#if country.flagUrl}
+		<img src={country.flagUrl} alt="" width="48" height="32" loading="lazy" decoding="async" />
+	{:else if slugOf(country.href) === 'spain'}
+		<svg viewBox="0 0 30 20" aria-hidden="true">
+			<rect width="30" height="20" fill="#AA151B" />
+			<rect y="5" width="30" height="10" fill="#F1BF00" />
+		</svg>
+	{:else if slugOf(country.href) === 'portugal'}
+		<svg viewBox="0 0 30 20" aria-hidden="true">
+			<rect width="30" height="20" fill="#DA291C" />
+			<rect width="12" height="20" fill="#046A38" />
+			<circle cx="12" cy="10" r="3.1" fill="#FFE12C" stroke="#046A38" stroke-width="0.7" />
+		</svg>
+	{:else}
+		<svg viewBox="0 0 30 20" aria-hidden="true">
+			<rect width="30" height="20" fill="#1F3D34" />
+		</svg>
+	{/if}
+{/snippet}
 
 {#if countries.length > 0}
 	<section class="explore" aria-labelledby="explore-heading">
 		<h2 id="explore-heading" class="explore__heading">Explore by country</h2>
 
-		<div class="explore__grid">
+		<ul class="rows">
 			{#each countries as country, index (country.href)}
-				<a class="country-card" href={country.href} style="--reveal-delay: {index * 90}ms">
-					<span class="country-card__media">
-						<img
-							src={country.image}
-							alt={country.alt}
-							width="800"
-							height="600"
-							loading="lazy"
-						/>
-					</span>
-					<span class="country-card__scrim" aria-hidden="true"></span>
-					<span class="country-card__body">
-						<span class="country-card__name">{country.name}</span>
-						{#if country.tagline}
-							<span class="country-card__tagline">{country.tagline}</span>
-						{/if}
-						<span class="country-card__cue">
-							Explore {country.name}
-							<svg
-								class="country-card__arrow"
-								width="20"
-								height="10"
-								viewBox="0 0 20 10"
-								fill="none"
-								aria-hidden="true"
-							>
+				<li>
+					<a class="row" href={country.href} style="--reveal-delay: {index * 90}ms">
+						<span class="row__flag">{@render flag(country)}</span>
+						<span class="row__text">
+							<span class="row__name">{country.name}</span>
+							{#if country.tagline}
+								<span class="row__tagline">{country.tagline}</span>
+							{/if}
+						</span>
+						<span class="row__cue" aria-hidden="true">
+							<svg viewBox="0 0 20 10" width="20" height="10" fill="none">
 								<path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" stroke-width="1.25" />
 							</svg>
 						</span>
-					</span>
-				</a>
+					</a>
+				</li>
 			{/each}
-		</div>
+		</ul>
 	</section>
 {/if}
 
@@ -55,120 +71,116 @@
 		margin-bottom: var(--space-lg);
 	}
 
-	.explore__grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: var(--space-lg);
+	.rows {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		/* Top + bottom hairlines bracket the band (Emphasis Ladder, tier 2). */
+		border-block: 1px solid var(--border);
 	}
 
-	.country-card {
-		position: relative;
-		display: block;
-		min-height: clamp(20rem, 34vw, 28rem);
+	.rows li + li {
+		border-top: 1px solid var(--border);
+	}
+
+	.row {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		align-items: center;
+		gap: clamp(1rem, 0.5rem + 2vw, 2rem);
+		padding-block: clamp(1.1rem, 0.8rem + 1vw, 1.6rem);
+		text-decoration: none;
+		color: var(--green);
+		transition: background var(--duration-hover) var(--ease);
+	}
+
+	/* The flag is a 1px-framed emblem — a passport/luggage-tag stamp, never a backdrop.
+	   Square corners hold the zero-radius brand signal. */
+	.row__flag {
+		flex: 0 0 auto;
+		display: inline-flex;
+		width: 3rem;
+		height: 2rem;
 		overflow: hidden;
 		border: 1px solid var(--border);
-		color: var(--on-green);
-		text-decoration: none;
-		isolation: isolate;
+		transition: border-color var(--duration-hover) var(--ease);
 	}
 
-	.country-card__media {
-		position: absolute;
-		inset: 0;
-		z-index: 0;
-	}
-
-	.country-card__media img {
+	.row__flag :global(svg),
+	.row__flag img {
+		display: block;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: transform var(--duration-image) var(--ease);
 	}
 
-	.country-card__scrim {
-		position: absolute;
-		inset: 0;
-		z-index: 1;
-		background: linear-gradient(
-			to top,
-			oklch(0.18 0.03 165 / 0.82) 0%,
-			oklch(0.18 0.03 165 / 0.45) 38%,
-			oklch(0.18 0.03 165 / 0.05) 72%
-		);
-		transition: opacity var(--duration-hover) var(--ease);
+	.row__text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+		min-width: 0;
 	}
 
-	.country-card__body {
-		position: absolute;
-		inset-inline: 0;
-		bottom: 0;
-		z-index: 2;
-		display: grid;
-		gap: var(--space-xs);
-		padding: var(--space-xl);
-	}
-
-	.country-card__name {
+	.row__name {
 		font-family: var(--serif);
-		font-weight: 600;
-		font-size: var(--text-h2);
-		line-height: 1.05;
-		letter-spacing: var(--tracking-tight);
+		font-weight: 400;
+		font-size: var(--text-h3);
+		line-height: 1.1;
+		color: var(--green);
 	}
 
-	.country-card__tagline {
-		max-width: 24rem;
+	.row__tagline {
 		font-family: var(--sans);
 		font-size: var(--text-ui);
-		font-weight: 350;
-		line-height: 1.5;
-		color: oklch(0.92 0.02 85 / 0.92);
+		font-weight: 300;
+		line-height: 1.4;
+		color: var(--muted);
 	}
 
-	.country-card__cue {
+	.row__cue {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-sm);
-		margin-top: var(--space-sm);
-		font-family: var(--sans);
-		font-size: 0.85rem;
-		font-weight: 400;
-		letter-spacing: var(--tracking-wide);
-		text-transform: uppercase;
+		justify-self: end;
+		padding-inline: 0.25rem;
 		color: var(--gold);
 	}
 
-	.country-card__arrow {
+	.row__cue svg {
 		transition: transform var(--duration-hover) var(--ease);
 	}
 
-	.country-card:hover .country-card__media img,
-	.country-card:focus-visible .country-card__media img {
-		transform: scale(1.04);
+	.row:hover,
+	.row:focus-visible {
+		/* Faint warm wash across the whole row — calm feedback, no side-stripe. */
+		background: oklch(0.97 0.012 95);
+		outline: none;
 	}
 
-	.country-card:hover .country-card__arrow,
-	.country-card:focus-visible .country-card__arrow {
+	.row:hover .row__flag,
+	.row:focus-visible .row__flag {
+		border-color: var(--gold);
+	}
+
+	.row:hover .row__cue svg,
+	.row:focus-visible .row__cue svg {
 		transform: translateX(4px);
 	}
 
-	.country-card:focus-visible {
+	.row:focus-visible {
 		outline: 2px solid var(--gold);
-		outline-offset: 3px;
+		outline-offset: -2px;
 	}
 
-	@media (max-width: 720px) {
-		.explore__grid {
-			grid-template-columns: 1fr;
-		}
-
-		.country-card {
-			min-height: 18rem;
+	@media (prefers-reduced-motion: reduce) {
+		.row:hover .row__cue svg,
+		.row:focus-visible .row__cue svg {
+			transform: none;
 		}
 	}
 
+	/* Staggered entrance — enhances an already-visible default; reduced-motion skips it. */
 	@media (prefers-reduced-motion: no-preference) {
-		.country-card {
+		.row {
 			opacity: 0;
 			transform: translateY(16px);
 			animation: country-reveal 0.7s var(--ease) forwards;
