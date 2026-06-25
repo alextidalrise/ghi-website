@@ -100,6 +100,14 @@ export {
 } from './nav';
 
 export {
+	headerNavQuery,
+	fetchHeaderNav,
+	type HeaderNav,
+	type HeaderNavItem,
+	type HeaderNavLink
+} from './headerNav';
+
+export {
 	golfCourseByPathQuery,
 	golfCoursesByLocationQuery,
 	sitemapGolfCoursesQuery

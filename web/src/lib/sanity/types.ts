@@ -98,56 +98,6 @@ export type PartnerCategory = {
   order?: number;
 };
 
-export type Guide = {
-  _id: string;
-  _type: "guide";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title: string;
-  slug: Slug;
-  guideCategory: "buying" | "location" | "golf";
-  audienceLabel?: string;
-  order?: number;
-  tagline?: string;
-  intro?: string;
-  heroImage?: MediaAssetMetadata;
-  lastReviewed?: string;
-  sections: Array<
-    {
-      _key: string;
-    } & GuideSection
-  >;
-  advisorHeading?: string;
-  advisorBody?: string;
-  seo?: SeoFields;
-};
-
-export type SeoFields = {
-  _type: "seoFields";
-  seoTitle?: string;
-  metaDescription?: string;
-  openGraphTitle?: string;
-  openGraphDescription?: string;
-  openGraphImage?: MediaAssetMetadata;
-  noindex?: boolean;
-  schemaType?:
-    | "RealEstateListing"
-    | "Residence"
-    | "Apartment"
-    | "House"
-    | "Product";
-  primaryKeyword?: string;
-  secondaryKeywords?: Array<string>;
-  canonicalCluster?: string;
-  backLinks?: Array<{
-    label?: string;
-    url?: string;
-    _key: string;
-  }>;
-  supportingArticles?: Array<string>;
-};
-
 export type PropertyListing = {
   _id: string;
   _type: "propertyListing";
@@ -200,6 +150,31 @@ export type InternalFields = {
   >;
   sourceFolderUrl?: string;
   legalDocsDriveFolderId?: string;
+};
+
+export type SeoFields = {
+  _type: "seoFields";
+  seoTitle?: string;
+  metaDescription?: string;
+  openGraphTitle?: string;
+  openGraphDescription?: string;
+  openGraphImage?: MediaAssetMetadata;
+  noindex?: boolean;
+  schemaType?:
+    | "RealEstateListing"
+    | "Residence"
+    | "Apartment"
+    | "House"
+    | "Product";
+  primaryKeyword?: string;
+  secondaryKeywords?: Array<string>;
+  canonicalCluster?: string;
+  backLinks?: Array<{
+    label?: string;
+    url?: string;
+    _key: string;
+  }>;
+  supportingArticles?: Array<string>;
 };
 
 export type CtaFields = {
@@ -710,6 +685,15 @@ export type SiteSettings = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  headerNav?: Array<
+    {
+      _key: string;
+    } & NavMenuItem
+  >;
+  headerCta?: {
+    label?: string;
+    link?: NavLink;
+  };
   homepageFeaturedListings?: Array<
     {
       _key: string;
@@ -732,6 +716,21 @@ export type SiteSettings = {
   >;
 };
 
+export type GuideReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "guide";
+};
+
+export type NavLink = {
+  _type: "navLink";
+  linkType?: "reference" | "internal" | "external";
+  reference?: LocationTaxonomyReference | GuideReference;
+  internalPath?: string;
+  externalUrl?: string;
+};
+
 export type InternalFeesTax = {
   _type: "internalFeesTax";
   communityFeesAmount?: number;
@@ -748,6 +747,48 @@ export type InternalCommission = {
   currency?: string;
   notes?: string;
   source?: string;
+};
+
+export type NavMenuItem = {
+  _type: "navMenuItem";
+  label: string;
+  link?: NavLink;
+  children?: Array<
+    {
+      _key: string;
+    } & NavMenuChild
+  >;
+};
+
+export type NavMenuChild = {
+  _type: "navMenuChild";
+  label: string;
+  link: NavLink;
+};
+
+export type Guide = {
+  _id: string;
+  _type: "guide";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  slug: Slug;
+  guideCategory: "buying" | "location" | "golf";
+  audienceLabel?: string;
+  order?: number;
+  tagline?: string;
+  intro?: string;
+  heroImage?: MediaAssetMetadata;
+  lastReviewed?: string;
+  sections: Array<
+    {
+      _key: string;
+    } & GuideSection
+  >;
+  advisorHeading?: string;
+  advisorBody?: string;
+  seo?: SeoFields;
 };
 
 export type LocationTaxonomy = {
@@ -778,6 +819,13 @@ export type LocationTaxonomy = {
   overviewHeading?: string;
   publicDescription?: string;
   heroImage?: MediaAssetMetadata;
+  flag?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
   tagline?: string;
   coordinates?: Geopoint;
   isCatchAll?: boolean;
@@ -787,6 +835,22 @@ export type LocationTaxonomy = {
       _key: string;
     } & LocationTaxonomyReference
   >;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x: number;
+  y: number;
+  height: number;
+  width: number;
 };
 
 export type GuideSection = {
@@ -875,22 +939,6 @@ export type GalleryGroup = {
       _key: string;
     } & MediaAssetMetadata
   >;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x: number;
-  y: number;
-  height: number;
-  width: number;
 };
 
 export type FeatureHighlight = {
@@ -1009,10 +1057,9 @@ export type AllSanitySchemaTypes =
   | MediaAssetMetadata
   | Slug
   | PartnerCategory
-  | Guide
-  | SeoFields
   | PropertyListing
   | InternalFields
+  | SeoFields
   | CtaFields
   | PropertyListingReference
   | DevelopmentReference
@@ -1037,17 +1084,22 @@ export type AllSanitySchemaTypes =
   | GolfCourse
   | Geopoint
   | SiteSettings
+  | GuideReference
+  | NavLink
   | InternalFeesTax
   | InternalCommission
+  | NavMenuItem
+  | NavMenuChild
+  | Guide
   | LocationTaxonomy
+  | SanityImageCrop
+  | SanityImageHotspot
   | GuideSection
   | GuideKeyFigures
   | GuideCallout
   | InternalSourceEntry
   | ReviewItem
   | GalleryGroup
-  | SanityImageCrop
-  | SanityImageHotspot
   | FeatureHighlight
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -4717,6 +4769,31 @@ export type SitemapGuidesQueryResult = Array<{
   _updatedAt: string;
 }>;
 
+// Source: ../web/src/lib/sanity/queries/headerNav.ts
+// Variable: headerNavQuery
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{		"items": coalesce(headerNav, [])[]{			label,			"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),			"external": link.linkType == "external",			"children": coalesce(children, [])[]{				label,				"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),				"external": link.linkType == "external"			}		},		"cta": headerCta{			label,			"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),			"external": link.linkType == "external"		}	}
+export type HeaderNavQueryResult = {
+  items:
+    | Array<{
+        label: string;
+        href: string | null;
+        external: false | true;
+        children:
+          | Array<{
+              label: string;
+              href: string | null;
+              external: false | true;
+            }>
+          | Array<never>;
+      }>
+    | Array<never>;
+  cta: {
+    label: string | null;
+    href: string | null;
+    external: false | true;
+  } | null;
+} | null;
+
 // Source: ../web/src/lib/sanity/queries/listingResolver.ts
 // Variable: listingByPathQuery
 // Query: *[    _type in ["propertyListing", "development"]    &&   coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current) == $countrySlug  && coalesce(  location.location->slug.current,  location.community->parent->slug.current) == $locationSlug  && coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )) == $communitySlug  && slug.current == $slug    && (      (_type == "propertyListing" && listingKind in ["property", "unit"])      || _type == "development"    )    &&   (coalesce(status, "") == $publishedStatus || $previewAll)  ][0]{    _type,    listingKind,      "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  "slug": slug.current,  listingKind  }
@@ -6759,36 +6836,12 @@ export type HomepageFeaturedLocationsQueryResult = {
 
 // Source: ../web/src/lib/sanity/queries/settings.ts
 // Variable: countriesWithHeroQuery
-// Query: *[    _type == "locationTaxonomy"    && type == "country"    && defined(slug.current)    && defined(heroImage.asset)  ] | order(name asc){  _id,  name,  "slug": slug.current,  type,  breadcrumbLabel,  isCatchAll,  seoTitle,  metaDescription,  publicDescription,  overviewHeading,  heroImage{  asset,  fileAsset,  altText},  tagline,  coordinates}
+// Query: *[    _type == "locationTaxonomy"    && type == "country"    && defined(slug.current)  ] | order(name asc){    name,    "slug": slug.current,    tagline,    "flagUrl": flag.asset->url  }
 export type CountriesWithHeroQueryResult = Array<{
-  _id: string;
   name: string;
   slug: string;
-  type: "community" | "country" | "location";
-  breadcrumbLabel: string | null;
-  isCatchAll: boolean | null;
-  seoTitle: string | null;
-  metaDescription: string | null;
-  publicDescription: string | null;
-  overviewHeading: string | null;
-  heroImage: {
-    asset: {
-      asset?: SanityImageAssetReference;
-      media?: unknown;
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      alt?: string;
-      _type: "image";
-    } | null;
-    fileAsset: {
-      asset?: SanityFileAssetReference;
-      media?: unknown;
-      _type: "file";
-    } | null;
-    altText: string | null;
-  } | null;
   tagline: string | null;
-  coordinates: Geopoint | null;
+  flagUrl: string | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries/settings.ts
@@ -9585,6 +9638,7 @@ declare module "@sanity/client" {
     '\n  *[_type == "guide" && slug.current == $slug][0]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  intro,\n  lastReviewed,\n  heroImage{\n  asset,\n  fileAsset,\n  altText\n},\n  sections[]{\n  heading,\n  "anchor": anchor.current,\n  body[]{\n    _type == "mediaAssetMetadata" => {\n      _type,\n      _key,\n      asset,\n      altText,\n      "dimensions": asset.asset->metadata.dimensions\n    },\n    _type != "mediaAssetMetadata" => { ... }\n  }\n},\n  advisorHeading,\n  advisorBody,\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n,\n    "relatedGuides": *[\n      _type == "guide"\n      && guideCategory == ^.guideCategory\n      && defined(slug.current)\n      && slug.current != ^.slug.current\n    ] | order(coalesce(order, 999) asc, title asc) {\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText\n}\n}\n  }\n': GuideBySlugQueryResult;
     '\n  *[_type == "guide" && defined(slug.current)]\n    | order(coalesce(order, 999) asc, title asc) {\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText\n}\n}\n': GuidesHubQueryResult;
     '\n  *[\n    _type == "guide"\n    && defined(slug.current)\n    && coalesce(seo.noindex, false) != true\n  ]{\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapGuidesQueryResult;
+    '\n\t*[_type == "siteSettings" && _id == "siteSettings"][0]{\n\t\t"items": coalesce(headerNav, [])[]{\n\t\t\tlabel,\n\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t"external": link.linkType == "external",\n\t\t\t"children": coalesce(children, [])[]{\n\t\t\t\tlabel,\n\t\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t\t"external": link.linkType == "external"\n\t\t\t}\n\t\t},\n\t\t"cta": headerCta{\n\t\t\tlabel,\n\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t"external": link.linkType == "external"\n\t\t}\n\t}\n': HeaderNavQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n) == $communitySlug\n  && slug.current == $slug\n\n    && (\n      (_type == "propertyListing" && listingKind in ["property", "unit"])\n      || _type == "development"\n    )\n    && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n  ][0]{\n    _type,\n    listingKind,\n    \n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  "slug": slug.current,\n  listingKind\n\n  }\n': ListingByPathQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && slug.current == $slug\n  && coalesce(location.community->isCatchAll, false) == true\n\n    && (\n      (_type == "propertyListing" && listingKind in ["property", "unit"])\n      || _type == "development"\n    )\n    && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n  ][0]{\n    _type,\n    listingKind,\n    \n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  "slug": slug.current,\n  listingKind\n\n  }\n': ListingByCatchAllPathQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && slug.current == $slug\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n    && coalesce(location.community->isCatchAll, false) != true\n    && (\n      (_type == "propertyListing" && listingKind in ["property", "unit"])\n      || _type == "development"\n    )\n    && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n  ]{ \n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  "slug": slug.current,\n  listingKind\n }\n': ListingLegacyThreeSegmentPathQueryResult;
@@ -9611,7 +9665,7 @@ declare module "@sanity/client" {
     '\n  *[\n    _type == "propertyListing"\n    && listingKind in ["property", "unit"]\n    && coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n    && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n    && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n  ] | order(title asc)[$start...$end]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText\n}\n  }\n}\n': PropertyCardsByLocationQueryResult;
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    homepageHero{\n      image{\n  asset,\n  fileAsset,\n  altText\n},\n      tagline\n    }\n  }\n': SiteSettingsHeroQueryResult;
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    "locations": homepageFeaturedLocations[\n      \n  @->_type == "locationTaxonomy"\n  && @->type == "location"\n  && defined(@->slug.current)\n  && defined(@->parent->slug.current)\n\n    ]->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText\n},\n  "countrySlug": parent->slug.current,\n  "countryName": parent->name\n}\n  }\n': HomepageFeaturedLocationsQueryResult;
-    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && defined(slug.current)\n    && defined(heroImage.asset)\n  ] | order(name asc){\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  altText\n},\n  tagline,\n  coordinates\n}\n': CountriesWithHeroQueryResult;
+    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && defined(slug.current)\n  ] | order(name asc){\n    name,\n    "slug": slug.current,\n    tagline,\n    "flagUrl": flag.asset->url\n  }\n': CountriesWithHeroQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && defined(slug.current)\n    && slug.current in $slugs\n  ]{\n    "slug": slug.current,\n    heroImage{\n  asset,\n  fileAsset,\n  altText\n}\n  }\n': LocationHeroesBySlugQueryResult;
     '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n\n    && _id != $excludeId\n    && propertyType == $propertyType\n    && location.country->slug.current == $countrySlug\n    && location.location->slug.current == $locationSlug\n    && location.community->slug.current == $communitySlug\n  ] | order(_createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText\n}\n  }\n}\n': AutomaticSimilarPropertiesQueryResult;
     '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n\n    && _id != $excludeId\n    && count((related.similarityTags)[@ in $tags]) > 0\n  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText\n}\n  }\n}\n': TagsSimilarPropertiesQueryResult;

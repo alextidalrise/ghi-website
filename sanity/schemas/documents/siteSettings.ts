@@ -8,6 +8,34 @@ export const siteSettings = defineType({
 	type: 'document',
 	fields: [
 		defineField({
+			name: 'headerNav',
+			title: 'Header navigation',
+			type: 'array',
+			of: [{ type: 'navMenuItem' }],
+			description:
+				'The main menu in the site header. Drag to reorder. Each item can carry an optional dropdown of sub-items (for example the locations under a country). Leave this empty to fall back to the built-in default menu.',
+			validation: (Rule) => Rule.max(8)
+		}),
+		defineField({
+			name: 'headerCta',
+			title: 'Header button',
+			type: 'object',
+			description: 'The highlighted button at the end of the header (currently “Contact”).',
+			fields: [
+				defineField({ name: 'label', title: 'Label', type: 'string' }),
+				defineField({ name: 'link', title: 'Link', type: 'navLink' })
+			],
+			validation: (Rule) =>
+				Rule.custom((value) => {
+					const v = value as { label?: string; link?: { linkType?: string } } | undefined;
+					if (!v) return true;
+					const hasLabel = Boolean(v.label);
+					const hasLink = Boolean(v.link?.linkType);
+					if (hasLabel !== hasLink) return 'Give the button both a label and a link, or leave both empty.';
+					return true;
+				})
+		}),
+		defineField({
 			name: 'homepageFeaturedListings',
 			title: 'Homepage featured listings',
 			type: 'array',

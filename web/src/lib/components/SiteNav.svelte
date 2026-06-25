@@ -1,27 +1,66 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { afterNavigate } from '$app/navigation';
-	import { buildSiteNavItems, isNavItemActive, SITE_NAV_CTA } from '$lib/nav/siteNav';
+	import { buildSiteNav, isNavItemActive, isSiteNavItemActive, type SiteNavItem } from '$lib/nav/siteNav';
+	import type { HeaderNav } from '$lib/sanity/queries/headerNav';
 
-	const navItems = buildSiteNavItems();
+	let { nav = null }: { nav?: HeaderNav | null } = $props();
 
-	let open = $state(false);
+	const site = $derived(buildSiteNav(nav));
+	const navItems = $derived(site.items);
+	const cta = $derived(site.cta);
+
+	let open = $state(false); // mobile drawer
+	let openMenu = $state<number | null>(null); // desktop dropdown index, if any
+	let expanded = $state<number | null>(null); // mobile accordion index, if any
 	let navRoot = $state<HTMLElement>();
 	let drawer = $state<HTMLElement>();
 	let toggleButton = $state<HTMLButtonElement>();
 
-	function isActive(href: string): boolean {
+	function isActive(href: string | null): boolean {
 		return isNavItemActive(href, page.url.pathname);
 	}
 
-	// Close the drawer after any navigation (e.g. a link tap inside it). afterNavigate
-	// only fires on real route changes, unlike an effect that tracks the pathname.
+	function itemActive(item: SiteNavItem): boolean {
+		return isSiteNavItemActive(item, page.url.pathname);
+	}
+
+	function openDropdown(i: number) {
+		openMenu = i;
+	}
+
+	function closeDropdown(i: number) {
+		if (openMenu === i) openMenu = null;
+	}
+
+	function toggleDropdown(i: number) {
+		openMenu = openMenu === i ? null : i;
+	}
+
+	// Close a desktop dropdown once focus leaves its item entirely (keyboard users tabbing
+	// past the last sub-link). relatedTarget is the element focus is moving to.
+	function handleItemFocusOut(event: FocusEvent, i: number) {
+		const next = event.relatedTarget as Node | null;
+		const item = event.currentTarget as HTMLElement;
+		if (!next || !item.contains(next)) closeDropdown(i);
+	}
+
+	function onWindowKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && openMenu !== null) {
+			openMenu = null;
+		}
+	}
+
+	// Close everything after any navigation (e.g. a link tap inside the drawer or a
+	// dropdown). afterNavigate only fires on real route changes.
 	afterNavigate(() => {
 		open = false;
+		openMenu = null;
+		expanded = null;
 	});
 
-	// While open: lock body scroll, trap focus inside the nav, and wire Escape to close.
-	// The cleanup restores everything and returns focus to the toggle.
+	// While the drawer is open: lock body scroll, trap focus inside the nav, and wire
+	// Escape to close. The cleanup restores everything and returns focus to the toggle.
 	$effect(() => {
 		if (!open) return;
 
@@ -74,26 +113,103 @@
 	});
 </script>
 
+<svelte:window onkeydown={onWindowKeydown} />
+
 <nav class="site-nav" aria-label="Main" bind:this={navRoot}>
 	<a href="/" class="site-nav__logo" aria-label="Golf Homes International home">
 		<img src="/design-system/assets/logo-white.svg" alt="" width="140" height="32" />
 	</a>
 
 	<ul class="site-nav__menu">
-		{#each navItems as item (item.href)}
-			<li>
-				<a
-					href={item.href}
-					class="site-nav__link"
-					class:is-active={isActive(item.href)}
-					aria-current={isActive(item.href) ? 'page' : undefined}
+		{#each navItems as item, i (item.label)}
+			{#if item.children.length}
+				<li
+					class="site-nav__item site-nav__item--has-menu"
+					onpointerenter={() => openDropdown(i)}
+					onpointerleave={() => closeDropdown(i)}
+					onfocusin={() => openDropdown(i)}
+					onfocusout={(event) => handleItemFocusOut(event, i)}
 				>
-					{item.label}
-				</a>
-			</li>
+					{#if item.href}
+						<a
+							href={item.href}
+							class="site-nav__link"
+							class:is-active={itemActive(item)}
+							aria-current={isActive(item.href) ? 'page' : undefined}
+							target={item.external ? '_blank' : undefined}
+							rel={item.external ? 'noopener noreferrer' : undefined}
+						>
+							{item.label}
+						</a>
+						<button
+							type="button"
+							class="site-nav__caret"
+							class:is-open={openMenu === i}
+							aria-label={`${openMenu === i ? 'Hide' : 'Show'} ${item.label} menu`}
+							aria-expanded={openMenu === i}
+							onclick={() => toggleDropdown(i)}
+						>
+							<svg class="site-nav__chevron" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+								<path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</button>
+					{:else}
+						<button
+							type="button"
+							class="site-nav__link site-nav__link--button"
+							class:is-active={itemActive(item)}
+							aria-haspopup="true"
+							aria-expanded={openMenu === i}
+							onclick={() => toggleDropdown(i)}
+						>
+							{item.label}
+							<svg class="site-nav__chevron" class:is-open={openMenu === i} width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+								<path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</button>
+					{/if}
+
+					<ul class="site-nav__submenu" class:is-open={openMenu === i} aria-label={item.label}>
+						{#each item.children as child (child.label)}
+							<li>
+								<a
+									href={child.href}
+									class="site-nav__submenu-link"
+									class:is-active={isActive(child.href)}
+									aria-current={isActive(child.href) ? 'page' : undefined}
+									target={child.external ? '_blank' : undefined}
+									rel={child.external ? 'noopener noreferrer' : undefined}
+								>
+									{child.label}
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</li>
+			{:else if item.href}
+				<li class="site-nav__item">
+					<a
+						href={item.href}
+						class="site-nav__link"
+						class:is-active={isActive(item.href)}
+						aria-current={isActive(item.href) ? 'page' : undefined}
+						target={item.external ? '_blank' : undefined}
+						rel={item.external ? 'noopener noreferrer' : undefined}
+					>
+						{item.label}
+					</a>
+				</li>
+			{/if}
 		{/each}
 		<li class="site-nav__cta-item">
-			<a href={SITE_NAV_CTA.href} class="site-nav__cta">{SITE_NAV_CTA.label}</a>
+			<a
+				href={cta.href}
+				class="site-nav__cta"
+				target={cta.external ? '_blank' : undefined}
+				rel={cta.external ? 'noopener noreferrer' : undefined}
+			>
+				{cta.label}
+			</a>
 		</li>
 	</ul>
 
@@ -130,22 +246,81 @@
 	bind:this={drawer}
 >
 	<ul class="site-nav__drawer-menu">
-		{#each navItems as item (item.href)}
-			<li>
-				<a
-					href={item.href}
-					class="site-nav__drawer-link"
-					class:is-active={isActive(item.href)}
-					aria-current={isActive(item.href) ? 'page' : undefined}
-					tabindex={open ? 0 : -1}
-				>
-					{item.label}
-				</a>
+		{#each navItems as item, i (item.label)}
+			<li class="site-nav__drawer-item">
+				{#if item.children.length}
+					<div class="site-nav__drawer-row">
+						{#if item.href}
+							<a
+								href={item.href}
+								class="site-nav__drawer-link"
+								class:is-active={isActive(item.href)}
+								aria-current={isActive(item.href) ? 'page' : undefined}
+								target={item.external ? '_blank' : undefined}
+								rel={item.external ? 'noopener noreferrer' : undefined}
+								tabindex={open ? 0 : -1}
+							>
+								{item.label}
+							</a>
+						{:else}
+							<span class="site-nav__drawer-link site-nav__drawer-link--static">{item.label}</span>
+						{/if}
+						<button
+							type="button"
+							class="site-nav__drawer-accordion"
+							class:is-open={expanded === i}
+							aria-label={`${expanded === i ? 'Hide' : 'Show'} ${item.label} submenu`}
+							aria-expanded={expanded === i}
+							aria-controls={`drawer-submenu-${i}`}
+							tabindex={open ? 0 : -1}
+							onclick={() => (expanded = expanded === i ? null : i)}
+						>
+							<svg class="site-nav__chevron" width="14" height="8" viewBox="0 0 10 6" aria-hidden="true">
+								<path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</button>
+					</div>
+					<ul id={`drawer-submenu-${i}`} class="site-nav__drawer-submenu" hidden={expanded !== i}>
+						{#each item.children as child (child.label)}
+							<li>
+								<a
+									href={child.href}
+									class="site-nav__drawer-sublink"
+									class:is-active={isActive(child.href)}
+									aria-current={isActive(child.href) ? 'page' : undefined}
+									target={child.external ? '_blank' : undefined}
+									rel={child.external ? 'noopener noreferrer' : undefined}
+									tabindex={open && expanded === i ? 0 : -1}
+								>
+									{child.label}
+								</a>
+							</li>
+						{/each}
+					</ul>
+				{:else if item.href}
+					<a
+						href={item.href}
+						class="site-nav__drawer-link"
+						class:is-active={isActive(item.href)}
+						aria-current={isActive(item.href) ? 'page' : undefined}
+						target={item.external ? '_blank' : undefined}
+						rel={item.external ? 'noopener noreferrer' : undefined}
+						tabindex={open ? 0 : -1}
+					>
+						{item.label}
+					</a>
+				{/if}
 			</li>
 		{/each}
 	</ul>
-	<a href={SITE_NAV_CTA.href} class="site-nav__drawer-cta" tabindex={open ? 0 : -1}>
-		{SITE_NAV_CTA.label}
+	<a
+		href={cta.href}
+		class="site-nav__drawer-cta"
+		target={cta.external ? '_blank' : undefined}
+		rel={cta.external ? 'noopener noreferrer' : undefined}
+		tabindex={open ? 0 : -1}
+	>
+		{cta.label}
 	</a>
 </aside>
 
@@ -183,6 +358,14 @@
 		list-style: none;
 	}
 
+	/* Each item is its own positioning context so a dropdown can anchor beneath it. */
+	.site-nav__item {
+		position: relative;
+		display: flex;
+		align-items: center;
+		height: var(--nav-height);
+	}
+
 	.site-nav__link {
 		position: relative;
 		font-family: var(--sans);
@@ -195,9 +378,17 @@
 		height: var(--nav-height);
 		display: flex;
 		align-items: center;
+		gap: 0.4rem;
 		text-decoration: none;
 		white-space: nowrap;
 		transition: color var(--duration-hover) var(--ease);
+	}
+
+	/* Button-styled parent (a dropdown heading with no link of its own). */
+	.site-nav__link--button {
+		background: none;
+		border: none;
+		cursor: pointer;
 	}
 
 	/* Gold underline anchored to the base of the bar; revealed for the active page. */
@@ -227,9 +418,93 @@
 		transform: scaleX(1);
 	}
 
+	/* When a parent carries its own link, the caret is a separate, narrow toggle so the
+	   link stays clickable and the dropdown stays operable by touch/click. */
+	.site-nav__caret {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: var(--nav-height);
+		padding: 0 0.85rem 0 0;
+		margin-left: -0.6rem;
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: rgba(255, 255, 255, 0.8);
+		transition: color var(--duration-hover) var(--ease);
+	}
+
+	.site-nav__caret:hover,
+	.site-nav__caret:focus-visible {
+		color: var(--gold);
+	}
+
+	.site-nav__chevron {
+		transition: transform var(--duration-hover) var(--ease);
+	}
+
+	.site-nav__caret.is-open .site-nav__chevron,
+	.site-nav__chevron.is-open {
+		transform: rotate(180deg);
+	}
+
+	/* Dropdown panel — anchored to the base of the bar, hidden until its item is open. */
+	.site-nav__submenu {
+		position: absolute;
+		top: 100%;
+		right: 0;
+		min-width: 13rem;
+		list-style: none;
+		background: var(--green-deep);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-top: 2px solid var(--gold);
+		padding: 0.5rem 0;
+		box-shadow: 0 18px 40px rgba(15, 22, 17, 0.35);
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-0.5rem);
+		pointer-events: none;
+		transition:
+			opacity var(--duration-hover) var(--ease),
+			transform var(--duration-hover) var(--ease),
+			visibility var(--duration-hover) var(--ease);
+		z-index: 1;
+	}
+
+	.site-nav__submenu.is-open {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		pointer-events: auto;
+	}
+
+	.site-nav__submenu-link {
+		display: block;
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		font-weight: 500;
+		letter-spacing: var(--tracking-wide);
+		color: rgba(255, 255, 255, 0.8);
+		padding: 0.6rem 1.5rem;
+		text-decoration: none;
+		white-space: nowrap;
+		transition:
+			color var(--duration-hover) var(--ease),
+			background var(--duration-hover) var(--ease);
+	}
+
+	.site-nav__submenu-link:hover,
+	.site-nav__submenu-link:focus-visible,
+	.site-nav__submenu-link.is-active {
+		color: var(--gold);
+		background: rgba(255, 255, 255, 0.04);
+	}
+
 	/* Contact: the bar's one accent. Gold reads against deep green where a green
 	   button would disappear. Separated from the text links so it parses as an action. */
 	.site-nav__cta-item {
+		display: flex;
+		align-items: center;
 		margin-left: 1.25rem;
 	}
 
@@ -349,15 +624,27 @@
 		flex-direction: column;
 	}
 
+	/* A parent row: the link (or static label) and the accordion toggle share a line. */
+	.site-nav__drawer-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
 	.site-nav__drawer-link {
 		position: relative;
 		display: block;
+		flex: 1;
 		font-family: var(--serif);
 		font-size: 1.375rem;
 		color: var(--on-green);
 		text-decoration: none;
 		padding: 1rem 2rem;
 		transition: color var(--duration-hover) var(--ease);
+	}
+
+	.site-nav__drawer-link--static {
+		color: rgba(255, 255, 255, 0.65);
 	}
 
 	.site-nav__drawer-link:hover,
@@ -378,6 +665,53 @@
 		bottom: 1rem;
 		width: 2px;
 		background: var(--gold);
+	}
+
+	.site-nav__drawer-accordion {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 3.5rem;
+		align-self: stretch;
+		background: none;
+		border: none;
+		border-left: 1px solid rgba(255, 255, 255, 0.08);
+		color: var(--on-green);
+		cursor: pointer;
+	}
+
+	.site-nav__drawer-accordion:hover,
+	.site-nav__drawer-accordion:focus-visible {
+		color: var(--gold);
+	}
+
+	.site-nav__drawer-accordion.is-open .site-nav__chevron {
+		transform: rotate(180deg);
+	}
+
+	.site-nav__drawer-submenu {
+		list-style: none;
+		background: rgba(0, 0, 0, 0.18);
+	}
+
+	.site-nav__drawer-sublink {
+		position: relative;
+		display: block;
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.75);
+		text-decoration: none;
+		padding: 0.85rem 2rem 0.85rem 2.75rem;
+		transition: color var(--duration-hover) var(--ease);
+	}
+
+	.site-nav__drawer-sublink:hover,
+	.site-nav__drawer-sublink:focus-visible,
+	.site-nav__drawer-sublink.is-active {
+		color: var(--gold);
 	}
 
 	.site-nav__drawer-cta {
@@ -432,9 +766,12 @@
 		.site-nav__scrim,
 		.site-nav__link::after,
 		.site-nav__toggle-bar,
+		.site-nav__chevron,
+		.site-nav__submenu,
 		.site-nav__cta,
 		.site-nav__drawer-cta,
-		.site-nav__drawer-link {
+		.site-nav__drawer-link,
+		.site-nav__submenu-link {
 			transition: none;
 		}
 	}
