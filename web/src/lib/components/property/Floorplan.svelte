@@ -1,15 +1,14 @@
 <script lang="ts">
-	// Floorplans are gated behind a request CTA: the plans vary too much in format to
-	// preview inline, so we capture the lead and email the plan over. The assets are
-	// stripped from the payload server-side (see gatePropertyFloorplans), so this
-	// component never receives image data — only whether a plan exists.
+	// Floorplans are gated behind a request CTA: rather than preview the plan inline (their
+	// formats vary too much), we always invite a request and email it over. The assets are
+	// stripped from the payload server-side (see gatePropertyFloorplans), so this component
+	// renders no image data.
 	type Props = {
-		hasFloorplans: boolean;
 		/** Routes the visitor to the enquiry rail, flagged as a floorplan request. */
 		onRequest: () => void;
 	};
 
-	let { hasFloorplans, onRequest }: Props = $props();
+	let { onRequest }: Props = $props();
 </script>
 
 <section class="floorplan" aria-label="Floorplan">
@@ -17,25 +16,19 @@
 		<span class="floorplan__label">Floorplan</span>
 	</div>
 
-	{#if hasFloorplans}
-		<button type="button" class="floorplan__cta" onclick={onRequest}>
-			<span class="floorplan__icon" aria-hidden="true">
-				<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-					<rect x="3" y="3" width="18" height="18" />
-					<path d="M3 9h9M12 3v18M12 14h9M16 14v7" />
-				</svg>
-			</span>
-			<span class="floorplan__body">
-				<span class="floorplan__title">Request floorplan</span>
-				<span class="floorplan__note">Sent on request — we'll email it straight over.</span>
-			</span>
-			<span class="floorplan__arrow" aria-hidden="true">→</span>
-		</button>
-	{:else}
-		<div class="floorplan__empty-frame">
-			<span class="floorplan__empty">No floorplan available</span>
-		</div>
-	{/if}
+	<button type="button" class="floorplan__cta" onclick={onRequest}>
+		<span class="floorplan__icon" aria-hidden="true">
+			<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+				<rect x="3" y="3" width="18" height="18" />
+				<path d="M3 9h9M12 3v18M12 14h9M16 14v7" />
+			</svg>
+		</span>
+		<span class="floorplan__body">
+			<span class="floorplan__title">Request floorplan</span>
+			<span class="floorplan__note">Sent on request — we'll email it straight over.</span>
+		</span>
+		<span class="floorplan__arrow" aria-hidden="true">→</span>
+	</button>
 </section>
 
 <style>
@@ -158,21 +151,6 @@
 	.floorplan__cta:focus-visible {
 		outline: 2px solid var(--green);
 		outline-offset: 3px;
-	}
-
-	/* --- Empty state ---------------------------------------------------- */
-	.floorplan__empty-frame {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding-block: clamp(1.5rem, 4vw, 2.25rem);
-		border: 1px solid var(--border);
-	}
-
-	.floorplan__empty {
-		font-family: var(--sans);
-		font-size: var(--text-ui);
-		color: var(--muted);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

@@ -22,7 +22,6 @@
 			galleryGroups: base?.galleryGroups ?? [],
 			thumbnailOverride: base?.thumbnailOverride ?? null,
 			floorplans: base?.floorplans ?? [],
-			floorplansAvailable: base?.floorplansAvailable ?? false,
 			videoUrl: base?.videoUrl ?? null,
 			virtualTourUrl: base?.virtualTourUrl ?? null,
 			brochure: base?.brochure ?? null,
