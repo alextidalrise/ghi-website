@@ -76,6 +76,12 @@
 		}
 		return formatPropertyType(listing.propertyType) || null;
 	});
+
+	// Built is the default; treat an unset value (legacy listings) as Built too.
+	const buildStatusBadge = $derived.by(() => {
+		const specs = listing.specs as Record<string, unknown> | null | undefined;
+		return specs?.buildStatus === 'off_plan' ? 'Off-Plan' : 'Built';
+	});
 </script>
 
 <header class="summary">
@@ -86,16 +92,15 @@
 
 	<div class="summary__meta">
 		<p class="summary__price tabular-nums">{priceLabel}</p>
-		{#if goldBadge || outlineBadge}
-			<ul class="summary__badges">
-				{#if goldBadge}
-					<li class="badge badge--gold">{goldBadge}</li>
-				{/if}
-				{#if outlineBadge}
-					<li class="badge badge--outline">{outlineBadge}</li>
-				{/if}
-			</ul>
-		{/if}
+		<ul class="summary__badges">
+			{#if goldBadge}
+				<li class="badge badge--gold">{goldBadge}</li>
+			{/if}
+			<li class="badge badge--outline">{buildStatusBadge}</li>
+			{#if outlineBadge}
+				<li class="badge badge--outline">{outlineBadge}</li>
+			{/if}
+		</ul>
 	</div>
 </header>
 

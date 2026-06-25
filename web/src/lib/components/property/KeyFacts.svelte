@@ -15,10 +15,6 @@
 		const items: Fact[] = [];
 		const specs = listing.specs as Record<string, unknown> | null | undefined;
 
-		// Built is the default; treat an unset value (legacy listings) as Built too.
-		const buildStatus = specs?.buildStatus as string | undefined;
-		items.push({ label: 'Build status', value: buildStatus === 'off_plan' ? 'Off-Plan' : 'Built' });
-
 		if (specs?.bedrooms != null) items.push({ label: 'Bedrooms', value: String(specs.bedrooms) });
 		if (specs?.bathrooms != null) items.push({ label: 'Bathrooms', value: String(specs.bathrooms) });
 
