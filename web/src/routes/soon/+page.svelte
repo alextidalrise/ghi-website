@@ -15,8 +15,8 @@
 	// Hero from siteSettings.homepageHero (auto AVIF/WebP + srcset) via the loader, with a
 	// fallback to the optimized static asset so the gate renders even if the CMS is down.
 	const fallbackHeroUrl = '/design-system/assets/andalucia-golf-villa.png';
-	const heroUrl = data.hero?.url ?? fallbackHeroUrl;
-	const heroSrcset = data.hero?.srcset || undefined;
+	const heroUrl = $derived(data.hero?.url ?? fallbackHeroUrl);
+	const heroSrcset = $derived(data.hero?.srcset || undefined);
 
 	let notifyOpen = $state(false);
 	let submitting = $state(false);
