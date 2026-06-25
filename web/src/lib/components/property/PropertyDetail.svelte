@@ -27,7 +27,6 @@
 	// enquiry rail in floorplan-request mode. Incrementing a counter (rather than a bool)
 	// lets the rail re-trigger the open/scroll if the CTA is clicked again after dismissal.
 	let floorplanRequest = $state(0);
-	const hasFloorplans = $derived(property.media?.floorplansAvailable ?? false);
 </script>
 
 <article class="listing-page listing-page--property">
@@ -44,7 +43,7 @@
 			<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 			<PropertySummary listing={property} />
 			<KeyFacts listing={property} />
-			<Floorplan {hasFloorplans} onRequest={() => (floorplanRequest += 1)} />
+			<Floorplan onRequest={() => (floorplanRequest += 1)} />
 		</div>
 	</section>
 

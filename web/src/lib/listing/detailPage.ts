@@ -56,10 +56,9 @@ function applyPreviewSeo(seo: PropertySeoMeta & { canonicalUrl: string }) {
 
 /**
  * Floorplans are gated behind a "Request floorplan" CTA on property and unit pages, so
- * the plan images must never reach the browser. Strip the assets from the payload while
- * leaving `floorplansAvailable` intact, so the CTA still knows whether to render. The
- * altText is dropped with the assets, so no caption leaks either. Developments are
- * untouched — their gallery still composes floorplans into the photo set.
+ * the plan images must never reach the browser. Strip the assets (and their altText) from
+ * the payload entirely; the CTA always renders, so nothing here needs them. Developments
+ * are untouched — their gallery still composes floorplans into the photo set.
  */
 function gatePropertyFloorplans(property: PublicPropertyListing): PublicPropertyListing {
 	if (!property.media || property.media.floorplans.length === 0) {
