@@ -483,7 +483,8 @@
 		font-family: var(--sans);
 		font-size: var(--text-ui);
 		font-weight: 400;
-		letter-spacing: normal;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
 		color: var(--on-green);
 		padding: 0.7rem 1.75rem 0.7rem 1.25rem;
 		text-decoration: none;
@@ -639,20 +640,27 @@
 		justify-content: space-between;
 	}
 
+	/* Same vocabulary as the desktop bar — light tracked caps in warm ivory — just
+	   sized up for the vertical, touch-first drawer. The Playfair wordmark at the top
+	   keeps the serif present; the menu items stay sans, matching desktop. */
 	.site-nav__drawer-link {
 		position: relative;
 		display: block;
 		flex: 1;
-		font-family: var(--serif);
-		font-size: 1.375rem;
+		font-family: var(--sans);
+		font-size: 1rem;
+		font-weight: 300;
+		letter-spacing: 0.11em;
+		line-height: 1.3;
+		text-transform: uppercase;
 		color: var(--on-green);
 		text-decoration: none;
-		padding: 1rem 2rem;
+		padding: 1.05rem 2rem;
 		transition: color var(--duration-hover) var(--ease);
 	}
 
 	.site-nav__drawer-link--static {
-		color: rgba(255, 255, 255, 0.65);
+		color: rgba(245, 241, 232, 0.55);
 	}
 
 	.site-nav__drawer-link:hover,
@@ -669,8 +677,8 @@
 		content: '';
 		position: absolute;
 		left: 0;
-		top: 1rem;
-		bottom: 1rem;
+		top: 1.05rem;
+		bottom: 1.05rem;
 		width: 2px;
 		background: var(--gold);
 	}
@@ -703,17 +711,25 @@
 		background: rgba(0, 0, 0, 0.18);
 	}
 
+	/* Children read uppercase / tracked at Regular 400 — the same way the desktop
+	   dropdown presents them — recessed and indented beneath their parent. */
 	.site-nav__drawer-sublink {
 		position: relative;
 		display: block;
 		font-family: var(--sans);
-		font-size: var(--text-ui);
-		letter-spacing: var(--tracking-wide);
+		font-size: 0.9375rem;
+		font-weight: 400;
+		letter-spacing: 0.1em;
 		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.75);
+		color: var(--on-green);
 		text-decoration: none;
-		padding: 0.85rem 2rem 0.85rem 2.75rem;
+		padding: 0.9rem 2rem 0.9rem 2.75rem;
 		transition: color var(--duration-hover) var(--ease);
+	}
+
+	/* Hairline between rows, echoing the desktop dropdown. */
+	.site-nav__drawer-submenu li + li .site-nav__drawer-sublink {
+		border-top: 1px solid rgba(255, 255, 255, 0.06);
 	}
 
 	.site-nav__drawer-sublink:hover,
@@ -723,17 +739,18 @@
 	}
 
 	.site-nav__drawer-cta {
-		margin: 1.5rem 2rem 0;
+		margin: 1.75rem 2rem 0;
 		text-align: center;
 		font-family: var(--sans);
 		font-size: var(--text-ui);
-		font-weight: 500;
-		letter-spacing: var(--tracking-wide);
+		font-weight: 400;
+		letter-spacing: 0.14em;
+		text-indent: 0.14em;
 		text-transform: uppercase;
 		color: var(--green);
 		background: var(--gold);
 		border: 1px solid var(--gold);
-		padding: 0.9rem 1.6rem;
+		padding: 0.95rem 1.6rem;
 		text-decoration: none;
 		transition:
 			background var(--duration-hover) var(--ease),
