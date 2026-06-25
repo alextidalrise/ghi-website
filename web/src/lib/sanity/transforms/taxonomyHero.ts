@@ -23,6 +23,8 @@ export type CountryFeatureCard = {
 export type FeaturedLocationCard = {
 	name: string;
 	countryLabel: string;
+	/** Parent country slug, used to group locations by country on the homepage. */
+	countrySlug: string;
 	href: string;
 	image: string;
 	alt: string;
@@ -115,6 +117,7 @@ export function toLocationCard(doc: TaxonomyWithHero | null | undefined): Featur
 	return {
 		name: doc.name,
 		countryLabel: doc.countryName,
+		countrySlug: doc.countrySlug,
 		href: `/${doc.countrySlug}/${doc.slug}`,
 		image: cardImage.image,
 		alt: cardImage.alt,
