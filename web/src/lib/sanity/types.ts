@@ -694,6 +694,26 @@ export type SiteSettings = {
     label?: string;
     link?: NavLink;
   };
+  footer?: {
+    brandStatement?: string;
+    inviteLead?: string;
+    inviteCta?: NavMenuChild;
+    columns?: Array<
+      {
+        _key: string;
+      } & FooterColumn
+    >;
+    legalLinks?: Array<
+      {
+        _key: string;
+      } & NavMenuChild
+    >;
+    socialLinks?: Array<
+      {
+        _key: string;
+      } & SocialLink
+    >;
+  };
   homepageFeaturedListings?: Array<
     {
       _key: string;
@@ -714,6 +734,12 @@ export type SiteSettings = {
       _key: string;
     } & LocationTaxonomyReference
   >;
+};
+
+export type NavMenuChild = {
+  _type: "navMenuChild";
+  label: string;
+  link: NavLink;
 };
 
 export type GuideReference = {
@@ -749,6 +775,23 @@ export type InternalCommission = {
   source?: string;
 };
 
+export type SocialLink = {
+  _type: "socialLink";
+  platform: "instagram" | "facebook" | "linkedin" | "youtube" | "x";
+  url: string;
+};
+
+export type FooterColumn = {
+  _type: "footerColumn";
+  heading: string;
+  links?: Array<
+    {
+      _key: string;
+    } & NavMenuChild
+  >;
+  highlightLink?: NavMenuChild;
+};
+
 export type NavMenuItem = {
   _type: "navMenuItem";
   label: string;
@@ -758,12 +801,6 @@ export type NavMenuItem = {
       _key: string;
     } & NavMenuChild
   >;
-};
-
-export type NavMenuChild = {
-  _type: "navMenuChild";
-  label: string;
-  link: NavLink;
 };
 
 export type Guide = {
@@ -1084,12 +1121,14 @@ export type AllSanitySchemaTypes =
   | GolfCourse
   | Geopoint
   | SiteSettings
+  | NavMenuChild
   | GuideReference
   | NavLink
   | InternalFeesTax
   | InternalCommission
+  | SocialLink
+  | FooterColumn
   | NavMenuItem
-  | NavMenuChild
   | Guide
   | LocationTaxonomy
   | SanityImageCrop
@@ -4438,6 +4477,49 @@ export type CountryFeaturedListingsQueryResult = {
         } | null;
       }
   > | null;
+} | null;
+
+// Source: ../web/src/lib/sanity/queries/footer.ts
+// Variable: footerQuery
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0].footer{		brandStatement,		inviteLead,		"invite": inviteCta{		label,		"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),		"external": link.linkType == "external"	},		"columns": coalesce(columns, [])[]{			heading,			"links": coalesce(links, [])[]{		label,		"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),		"external": link.linkType == "external"	},			"highlight": highlightLink{		label,		"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),		"external": link.linkType == "external"	}		},		"legalLinks": coalesce(legalLinks, [])[]{		label,		"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),		"external": link.linkType == "external"	},		"socialLinks": coalesce(socialLinks, [])[]{ platform, url }	}
+export type FooterQueryResult = {
+  brandStatement: string | null;
+  inviteLead: string | null;
+  invite: {
+    label: string;
+    href: string | null;
+    external: false | true;
+  } | null;
+  columns:
+    | Array<{
+        heading: string;
+        links:
+          | Array<{
+              label: string;
+              href: string | null;
+              external: false | true;
+            }>
+          | Array<never>;
+        highlight: {
+          label: string;
+          href: string | null;
+          external: false | true;
+        } | null;
+      }>
+    | Array<never>;
+  legalLinks:
+    | Array<{
+        label: string;
+        href: string | null;
+        external: false | true;
+      }>
+    | Array<never>;
+  socialLinks:
+    | Array<{
+        platform: "facebook" | "instagram" | "linkedin" | "x" | "youtube";
+        url: string;
+      }>
+    | Array<never>;
 } | null;
 
 // Source: ../web/src/lib/sanity/queries/frontline.ts
@@ -9631,6 +9713,7 @@ declare module "@sanity/client" {
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    "cards": homepageFeaturedListings[\n      \n  (\n    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])\n    || @->_type == "development"\n  )\n  && (coalesce(@->status, "") == $publishedStatus || $previewAll)\n\n    ]->{\n  _type == "development" => {\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText\n}\n  }\n},\n  _type == "propertyListing" => {\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText\n}\n  }\n}\n}\n  }\n': HomepageFeaturedListingsQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && slug.current == $countrySlug\n  ][0]{\n    "locations": featuredLocations[\n      \n  @->_type == "locationTaxonomy"\n  && @->type == "location"\n  && defined(@->slug.current)\n  && defined(@->parent->slug.current)\n\n    ]->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText\n},\n  "countrySlug": parent->slug.current,\n  "countryName": parent->name\n}\n  }\n': CountryFeaturedLocationsQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && slug.current == $countrySlug\n  ][0]{\n    "cards": featuredListings[\n      \n  (\n    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])\n    || @->_type == "development"\n  )\n  && (coalesce(@->status, "") == $publishedStatus || $previewAll)\n\n    ]->{\n  _type == "development" => {\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText\n}\n  }\n},\n  _type == "propertyListing" => {\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText\n}\n  }\n}\n}\n  }\n': CountryFeaturedListingsQueryResult;
+    '\n\t*[_type == "siteSettings" && _id == "siteSettings"][0].footer{\n\t\tbrandStatement,\n\t\tinviteLead,\n\t\t"invite": inviteCta{\n\t\tlabel,\n\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t"external": link.linkType == "external"\n\t},\n\t\t"columns": coalesce(columns, [])[]{\n\t\t\theading,\n\t\t\t"links": coalesce(links, [])[]{\n\t\tlabel,\n\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t"external": link.linkType == "external"\n\t},\n\t\t\t"highlight": highlightLink{\n\t\tlabel,\n\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t"external": link.linkType == "external"\n\t}\n\t\t},\n\t\t"legalLinks": coalesce(legalLinks, [])[]{\n\t\tlabel,\n\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t"external": link.linkType == "external"\n\t},\n\t\t"socialLinks": coalesce(socialLinks, [])[]{ platform, url }\n\t}\n': FooterQueryResult;
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    frontlineHero{\n      image{\n  asset,\n  fileAsset,\n  altText\n},\n      eyebrow,\n      headline,\n      lead\n    }\n  }\n': FrontlineHeroQueryResult;
     '\n  *[\n    _type == "golfCourse"\n    && slug.current == $slug\n    && community->slug.current == $communitySlug\n    && community->parent->slug.current == $locationSlug\n    && community->parent->parent->slug.current == $countrySlug\n    && \n  (coalesce(reviewStatus, "draft") == "approved" || $previewAll)\n\n  ][0]{\n  _id,\n  name,\n  "slug": slug.current,\n  shortDescription,\n  tagline,\n  seoTitle,\n  metaDescription,\n  holes,\n  par,\n  designStyle,\n  websiteUrl,\n  media[]{\n  asset,\n  fileAsset,\n  altText\n},\n  community->{\n    _id,\n    name,\n    "slug": slug.current,\n    breadcrumbLabel,\n    "locationSlug": parent->slug.current,\n    "countrySlug": parent->parent->slug.current,\n    parent->{\n      _id,\n      name,\n      "slug": slug.current,\n      breadcrumbLabel\n    },\n    "country": parent->parent->{\n      _id,\n      name,\n      "slug": slug.current,\n      breadcrumbLabel\n    }\n  }\n}\n': GolfCourseByPathQueryResult;
     '\n  *[\n    _type == "golfCourse"\n    && \n  (coalesce(reviewStatus, "draft") == "approved" || $previewAll)\n\n    && defined(community._ref)\n    && (\n      community->parent._ref == $locationId\n      || $locationId in community->associatedLocations[]._ref\n    )\n  ] | order(name asc){\n  _id,\n  name,\n  "slug": slug.current,\n  shortDescription,\n  tagline,\n  seoTitle,\n  metaDescription,\n  holes,\n  par,\n  designStyle,\n  websiteUrl,\n  media[]{\n  asset,\n  fileAsset,\n  altText\n},\n  community->{\n    _id,\n    name,\n    "slug": slug.current,\n    breadcrumbLabel,\n    "locationSlug": parent->slug.current,\n    "countrySlug": parent->parent->slug.current,\n    parent->{\n      _id,\n      name,\n      "slug": slug.current,\n      breadcrumbLabel\n    },\n    "country": parent->parent->{\n      _id,\n      name,\n      "slug": slug.current,\n      breadcrumbLabel\n    }\n  }\n}\n': GolfCoursesByLocationQueryResult;

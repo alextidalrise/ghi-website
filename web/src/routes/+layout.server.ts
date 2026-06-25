@@ -1,14 +1,7 @@
 import { redirect, type Cookies } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
-import { fetchHeaderNav, fetchNavTaxonomy, type NavTaxonomy } from '$lib/sanity/queries';
-
-const EMPTY_NAV: NavTaxonomy = {
-	countries: [],
-	locations: [],
-	communities: [],
-	primaryCountrySlug: 'spain'
-};
+import { fetchHeaderNav, fetchFooter } from '$lib/sanity/queries';
 
 // Paths that must stay reachable even during a launch takeover: the holding page
 // itself, plus internal tooling, the API, and the Sanity preview entry points.
@@ -49,7 +42,7 @@ export const load: LayoutServerLoad = async ({ locals: { preview }, url, route, 
 	// The holding route renders bare (no nav/footer), so it needs no taxonomy — and
 	// skipping the Sanity call keeps it standing even if the dataset is empty/unreachable.
 	if (route.id === '/soon') {
-		return { preview, nav: EMPTY_NAV, headerNav: null };
+		return { preview, footer: null, headerNav: null };
 	}
 
 	// LAUNCH_MODE flips the whole site to the holding page while keeping every real
@@ -64,7 +57,7 @@ export const load: LayoutServerLoad = async ({ locals: { preview }, url, route, 
 		}
 	}
 
-	const [nav, headerNav] = await Promise.all([fetchNavTaxonomy(), fetchHeaderNav()]);
+	const [footer, headerNav] = await Promise.all([fetchFooter(), fetchHeaderNav()]);
 
-	return { preview, nav, headerNav };
+	return { preview, footer, headerNav };
 };

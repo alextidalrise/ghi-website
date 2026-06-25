@@ -5,14 +5,14 @@ import {
 	fetchHomepageFeaturedLocations,
 	fetchHomepageFrontlineListingCards,
 	fetchHomepagePartnerLogos,
+	fetchNavTaxonomy,
 	fetchSiteSettingsHero
 } from '$lib/sanity/queries';
 import { resolveHomepageHeroImage } from '$lib/sanity/transforms/taxonomyHero';
 
-export const load: PageServerLoad = async ({ parent }) => {
-	const { nav } = await parent();
-
+export const load: PageServerLoad = async () => {
 	const [
+		nav,
 		featuredCards,
 		frontlineCards,
 		homepageHero,
@@ -20,6 +20,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 		featuredLocations,
 		partnerLogos
 	] = await Promise.all([
+		fetchNavTaxonomy(),
 		fetchHomepageFeaturedListingCards(),
 		fetchHomepageFrontlineListingCards(),
 		fetchSiteSettingsHero(),

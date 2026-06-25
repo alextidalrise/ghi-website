@@ -1,39 +1,26 @@
 <script lang="ts">
-	import { SITE_NAV_CTA } from '$lib/nav/siteNav';
-	import type { NavCountryOption, NavLocationOption } from '$lib/sanity/queries/nav';
+	import { buildFooter } from '$lib/footer/footerContent';
+	import type { FooterContent, FooterSocialPlatform } from '$lib/sanity/queries';
 
 	type Props = {
-		countries: NavCountryOption[];
-		locations: NavLocationOption[];
+		footer: FooterContent | null;
 	};
 
-	let { countries, locations }: Props = $props();
+	let { footer }: Props = $props();
 
-	// Footer geography is curated, not exhaustive: a few locations per country with a
-	// link through to the country page for the rest. Honours "curation over volume"
-	// while still updating itself as Sanity content grows.
-	const LOCATIONS_PER_COUNTRY = 5;
+	// The whole footer — columns, CTA, legal, socials — is authored in Sanity, falling
+	// back to the built-in defaults when a piece is left empty or the dataset is empty.
+	const content = $derived(buildFooter(footer));
 
-	const countryColumns = $derived(
-		countries.map((country) => ({
-			...country,
-			locations: locations
-				.filter((location) => location.countrySlug === country.slug)
-				.slice(0, LOCATIONS_PER_COUNTRY)
-		}))
-	);
-
-	// Editorial/site pages, linked ahead of the routes that aren't built yet (matching
-	// the nav's convention).
-	const resourceLinks = [
-		{ label: 'Front Line Collection', href: '/front-line-collection' },
-		{ label: 'Buying Guide', href: '/guides' },
-		{ label: 'About Us', href: '/about' },
-		{ label: 'Contact', href: '/contact' }
-	];
+	const SOCIAL_LABELS: Record<FooterSocialPlatform, string> = {
+		instagram: 'Instagram',
+		facebook: 'Facebook',
+		linkedin: 'LinkedIn',
+		youtube: 'YouTube',
+		x: 'X'
+	};
 
 	const year = new Date().getFullYear();
-	const instagramUrl = 'https://www.instagram.com/golfhomesinternational';
 
 	type Status = 'idle' | 'submitting' | 'success' | 'error';
 	let email = $state('');
@@ -70,6 +57,24 @@
 	}
 </script>
 
+{#snippet socialIcon(platform: FooterSocialPlatform)}
+	<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+		{#if platform === 'instagram'}
+			<rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="none" stroke="currentColor" stroke-width="1.6" />
+			<circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6" />
+			<circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" />
+		{:else if platform === 'facebook'}
+			<path fill="currentColor" d="M13.5 21v-7h2.3l.4-2.7h-2.7V9.5c0-.8.2-1.3 1.4-1.3h1.5V5.8c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.1H8v2.7h2.5V21h3z" />
+		{:else if platform === 'linkedin'}
+			<path fill="currentColor" d="M6.94 8.5H4.3V20h2.64V8.5zM5.62 4a1.53 1.53 0 100 3.06 1.53 1.53 0 000-3.06zM20 20h-2.64v-6.2c0-1.48-.53-2.49-1.85-2.49-1.01 0-1.61.68-1.88 1.34-.1.24-.12.57-.12.9V20H11.5s.04-10.5 0-11.5h2.6v1.63c.35-.54.98-1.31 2.39-1.31 1.74 0 3.04 1.14 3.04 3.6V20z" />
+		{:else if platform === 'youtube'}
+			<path fill="currentColor" d="M21.6 8.2a2.5 2.5 0 00-1.76-1.76C18.27 6 12 6 12 6s-6.27 0-7.84.44A2.5 2.5 0 002.4 8.2 26 26 0 002 12a26 26 0 00.4 3.8 2.5 2.5 0 001.76 1.76C5.73 18 12 18 12 18s6.27 0 7.84-.44a2.5 2.5 0 001.76-1.76A26 26 0 0022 12a26 26 0 00-.4-3.8zM10 14.6V9.4l4.5 2.6-4.5 2.6z" />
+		{:else if platform === 'x'}
+			<path fill="currentColor" d="M17.5 4h2.6l-5.7 6.5L21 20h-5.3l-4.1-5.4L6.8 20H4.2l6.1-7L4 4h5.4l3.7 4.9L17.5 4zm-.9 14.4h1.4L8.5 5.5H7l9.6 12.9z" />
+		{/if}
+	</svg>
+{/snippet}
+
 <footer class="footer on-dark">
 	<div class="footer__inner content-wrap">
 		<!-- Tier 1: brand + invitation -->
@@ -83,15 +88,18 @@
 						height="66"
 					/>
 				</a>
-				<p class="footer__statement">
-					Curated residential property on and near the finest golf courses of Spain and Portugal.
-				</p>
+				<p class="footer__statement">{content.brandStatement}</p>
 			</div>
 
 			<div class="footer__invite">
-				<p class="footer__invite-lead">Considering a move?</p>
-				<a href={SITE_NAV_CTA.href} class="footer__invite-cta">
-					Make an enquiry
+				<p class="footer__invite-lead">{content.inviteLead}</p>
+				<a
+					href={content.invite.href}
+					class="footer__invite-cta"
+					target={content.invite.external ? '_blank' : undefined}
+					rel={content.invite.external ? 'noopener noreferrer' : undefined}
+				>
+					{content.invite.label}
 					<span class="footer__arrow" aria-hidden="true">&rarr;</span>
 				</a>
 			</div>
@@ -99,35 +107,38 @@
 
 		<!-- Tier 2: index columns + newsletter -->
 		<div class="footer__columns">
-			{#each countryColumns as country (country._id)}
-				<nav class="footer__col" aria-label={country.name}>
-					<h2 class="footer__heading">{country.name}</h2>
+			{#each content.columns as column (column.heading)}
+				<nav class="footer__col" aria-label={column.heading}>
+					<h2 class="footer__heading">{column.heading}</h2>
 					<ul class="footer__list">
-						{#each country.locations as location (location._id)}
+						{#each column.links as link (link.href)}
 							<li>
-								<a class="footer__link" href={`/${country.slug}/${location.slug}`}>
-									{location.name}
+								<a
+									class="footer__link"
+									href={link.href}
+									target={link.external ? '_blank' : undefined}
+									rel={link.external ? 'noopener noreferrer' : undefined}
+								>
+									{link.label}
 								</a>
 							</li>
 						{/each}
-						<li>
-							<a class="footer__link footer__link--all" href={`/${country.slug}`}>
-								{country.locations.length ? `All ${country.name}` : `Explore ${country.name}`}
-								<span class="footer__arrow" aria-hidden="true">&rarr;</span>
-							</a>
-						</li>
+						{#if column.highlight}
+							<li>
+								<a
+									class="footer__link footer__link--all"
+									href={column.highlight.href}
+									target={column.highlight.external ? '_blank' : undefined}
+									rel={column.highlight.external ? 'noopener noreferrer' : undefined}
+								>
+									{column.highlight.label}
+									<span class="footer__arrow" aria-hidden="true">&rarr;</span>
+								</a>
+							</li>
+						{/if}
 					</ul>
 				</nav>
 			{/each}
-
-			<nav class="footer__col" aria-label="Resources">
-				<h2 class="footer__heading">Explore</h2>
-				<ul class="footer__list">
-					{#each resourceLinks as link (link.href)}
-						<li><a class="footer__link" href={link.href}>{link.label}</a></li>
-					{/each}
-				</ul>
-			</nav>
 		</div>
 
 		<!-- Newsletter — its own block so the column count never affects its placement -->
@@ -173,23 +184,37 @@
 		<div class="footer__baseline">
 			<p class="footer__copyright">© {year} Golf Homes International. All rights reserved.</p>
 			<div class="footer__baseline-right">
-				<ul class="footer__legal">
-					<li><a class="footer__link" href="/privacy">Privacy</a></li>
-					<li><a class="footer__link" href="/terms">Terms</a></li>
-				</ul>
-				<a
-					class="footer__social"
-					href={instagramUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-					aria-label="Golf Homes International on Instagram"
-				>
-					<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
-						<rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="none" stroke="currentColor" stroke-width="1.6" />
-						<circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6" />
-						<circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" />
-					</svg>
-				</a>
+				{#if content.legalLinks.length}
+					<ul class="footer__legal">
+						{#each content.legalLinks as link (link.href)}
+							<li>
+								<a
+									class="footer__link"
+									href={link.href}
+									target={link.external ? '_blank' : undefined}
+									rel={link.external ? 'noopener noreferrer' : undefined}
+								>
+									{link.label}
+								</a>
+							</li>
+						{/each}
+					</ul>
+				{/if}
+				{#if content.socials.length}
+					<div class="footer__socials">
+						{#each content.socials as social (social.platform)}
+							<a
+								class="footer__social"
+								href={social.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label={`Golf Homes International on ${SOCIAL_LABELS[social.platform]}`}
+							>
+								{@render socialIcon(social.platform)}
+							</a>
+						{/each}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -475,6 +500,12 @@
 
 	.footer__legal .footer__link {
 		font-size: var(--text-small);
+	}
+
+	.footer__socials {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-md);
 	}
 
 	.footer__social {

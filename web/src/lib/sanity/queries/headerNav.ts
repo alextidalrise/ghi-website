@@ -4,8 +4,9 @@ import { fetchPublic } from './fetch';
 // Resolves a navLink to a concrete href. References become canonical paths derived from
 // the linked doc's slug (country -> /spain, location -> /spain/marbella, community ->
 // /spain/marbella?community=…, guide -> /guides/…); the manual styles pass straight
-// through. The field is always named `link`, so the same fragment serves every level.
-const NAV_HREF = `select(
+// through. The field is always named `link`, so the same fragment serves every level —
+// the header items and the footer's labelled links alike (the footer query reuses these).
+export const NAV_HREF = `select(
 		link.linkType == "external" => link.externalUrl,
 		link.linkType == "internal" => link.internalPath,
 		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,
@@ -14,7 +15,7 @@ const NAV_HREF = `select(
 		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current
 	)`;
 
-const NAV_EXTERNAL = `link.linkType == "external"`;
+export const NAV_EXTERNAL = `link.linkType == "external"`;
 
 export const headerNavQuery = defineQuery(`
 	*[_type == "siteSettings" && _id == "siteSettings"][0]{

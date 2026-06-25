@@ -54,7 +54,7 @@
 		{@render children()}
 	</main>
 
-	<Footer countries={data.nav.countries} locations={data.nav.locations} />
+	<Footer footer={data.footer} />
 {/if}
 
 <style>

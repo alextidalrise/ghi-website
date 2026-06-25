@@ -36,6 +36,62 @@ export const siteSettings = defineType({
 				})
 		}),
 		defineField({
+			name: 'footer',
+			title: 'Footer',
+			type: 'object',
+			description:
+				'The site footer. Leave any field empty to fall back to its built-in default. Geography columns are curated here rather than generated from the location list.',
+			options: { collapsible: true, collapsed: true },
+			fields: [
+				defineField({
+					name: 'brandStatement',
+					title: 'Brand statement',
+					type: 'text',
+					rows: 2,
+					description: 'The short sentence under the logo.',
+					validation: (Rule) => Rule.max(200)
+				}),
+				defineField({
+					name: 'inviteLead',
+					title: 'Invitation lead',
+					type: 'string',
+					description: 'The lead line above the footer call-to-action (currently “Considering a move?”).',
+					validation: (Rule) => Rule.max(80)
+				}),
+				defineField({
+					name: 'inviteCta',
+					title: 'Invitation button',
+					type: 'navMenuChild',
+					description: 'The call-to-action beside the brand (currently “Make an enquiry” → Contact).'
+				}),
+				defineField({
+					name: 'columns',
+					title: 'Index columns',
+					type: 'array',
+					of: [{ type: 'footerColumn' }],
+					description:
+						'The link columns — countries with their locations, plus an editorial column like “Explore”. Drag to reorder.',
+					validation: (Rule) => Rule.max(6)
+				}),
+				defineField({
+					name: 'legalLinks',
+					title: 'Legal links',
+					type: 'array',
+					of: [{ type: 'navMenuChild' }],
+					description: 'The small links in the baseline (currently Privacy, Terms).',
+					validation: (Rule) => Rule.max(6)
+				}),
+				defineField({
+					name: 'socialLinks',
+					title: 'Social links',
+					type: 'array',
+					of: [{ type: 'socialLink' }],
+					description: 'Social profiles shown in the baseline. Each renders with its platform icon.',
+					validation: (Rule) => Rule.max(6)
+				})
+			]
+		}),
+		defineField({
 			name: 'homepageFeaturedListings',
 			title: 'Homepage featured listings',
 			type: 'array',

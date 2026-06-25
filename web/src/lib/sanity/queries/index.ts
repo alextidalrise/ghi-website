@@ -108,6 +108,16 @@ export {
 } from './headerNav';
 
 export {
+	footerQuery,
+	fetchFooter,
+	type FooterContent,
+	type FooterColumn,
+	type FooterLink,
+	type FooterSocial,
+	type FooterSocialPlatform
+} from './footer';
+
+export {
 	golfCourseByPathQuery,
 	golfCoursesByLocationQuery,
 	sitemapGolfCoursesQuery
