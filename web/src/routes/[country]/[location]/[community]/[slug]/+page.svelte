@@ -43,7 +43,12 @@
 </svelte:head>
 
 {#if data.preview}
-	<ListingDetailPreview {data} />
+	<!-- Remount the preview when the editor switches documents: ListingDetailPreview
+	     wires its Sanity live query once on mount, so without this key a client-side
+	     navigation to another listing would keep showing the first one's data. -->
+	{#key data.canonicalUrl}
+		<ListingDetailPreview {data} />
+	{/key}
 {:else}
 	<ListingDetailPage
 		pageType={data.pageType}

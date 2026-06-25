@@ -12,7 +12,7 @@
 	// named in the copy; "and beyond" is carried in the section intro, not a fourth tile.
 	// Images come from each location's Sanity heroImage (auto AVIF/WebP + srcset) via the
 	// loader, so the strip uses the same optimized pipeline as the rest of the site.
-	const destinations = data.destinations;
+	const destinations = $derived(data.destinations);
 
 	// Team. Photo URLs are intentionally null until the real headshots land — the
 	// markup renders a sized monogram frame in their place, never a broken <img>.

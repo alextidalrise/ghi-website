@@ -24,6 +24,11 @@
 		data: PreviewPageData;
 	} = $props();
 
+	// useQuery wires its live subscription once on mount; the query/params for a given
+	// document never change while this component stays mounted, and the parent remounts
+	// it (keyed on canonicalUrl) when the editor switches documents. So reading the
+	// initial value of `data` here is intentional, not a missed reactivity.
+	// svelte-ignore state_referenced_locally
 	const listingQuery = useQuery<RawPropertyListing | RawDevelopment | null>(
 		data.previewQuery,
 		data.queryParams,
