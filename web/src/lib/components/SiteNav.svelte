@@ -481,7 +481,9 @@
 	.site-nav__submenu-link {
 		display: block;
 		font-family: var(--sans);
-		font-size: var(--text-ui);
+		/* Match the top-level link size so children never outweigh their parent;
+		   hierarchy comes from the panel, the indent, and the gold active marker. */
+		font-size: 0.8125rem;
 		font-weight: 400;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
