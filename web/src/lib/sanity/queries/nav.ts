@@ -9,6 +9,8 @@ export type NavCountryOption = {
 	_id: string;
 	name: string;
 	slug: string;
+	/** Dereferenced flag SVG URL; null falls back to a built-in stamp (Spain/Portugal). */
+	flagUrl: string | null;
 };
 
 export type NavLocationOption = {
@@ -36,12 +38,14 @@ export type NavTaxonomy = {
 const DEFAULT_PRIMARY_COUNTRY_SLUG = 'spain';
 
 export async function fetchNavTaxonomy(): Promise<NavTaxonomy> {
-	const rows = await fetchPublic<Array<{ _id: string; name: string; slug?: string | null }>>(
-		countriesForNavQuery
-	);
+	const rows = await fetchPublic<
+		Array<{ _id: string; name: string; slug?: string | null; flagUrl?: string | null }>
+	>(countriesForNavQuery);
 
 	const countries = (rows ?? []).flatMap((row) =>
-		row.slug ? [{ _id: row._id, name: row.name, slug: row.slug }] : []
+		row.slug
+			? [{ _id: row._id, name: row.name, slug: row.slug, flagUrl: row.flagUrl ?? null }]
+			: []
 	);
 
 	const locationGroups = await Promise.all(
