@@ -85,6 +85,7 @@
 	<PageHero
 		image={locationHero.url}
 		srcset={locationHero.srcset}
+		lqip={locationHero.lqip}
 		alt={locationHero.alt}
 		breadcrumbs={data.breadcrumbs}
 		lead={heroLead ?? undefined}

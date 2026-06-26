@@ -11,7 +11,11 @@
 
 <section class="home-hero on-dark">
 	{#if data.homepageHero}
-		<div class="home-hero__bg" aria-hidden="true">
+		<div
+			class="home-hero__bg"
+			aria-hidden="true"
+			style:background-image={data.homepageHero.lqip ? `url(${data.homepageHero.lqip})` : undefined}
+		>
 			<img
 				src={data.homepageHero.url}
 				srcset={data.homepageHero.srcset}
@@ -20,6 +24,7 @@
 				width="1920"
 				height="1080"
 				fetchpriority="high"
+				decoding="async"
 			/>
 		</div>
 		<div class="home-hero__overlay" aria-hidden="true"></div>
@@ -109,6 +114,10 @@
 		position: absolute;
 		inset: 0;
 		z-index: 0;
+		/* Blurred LQIP shows through until the hero photo paints over it. */
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.home-hero__bg img {

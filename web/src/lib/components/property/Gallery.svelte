@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-	import { buildPublicImageUrl } from '$lib/sanity/image';
+	import { buildPublicImageUrl, getImagePlaceholder, getImageDimensions } from '$lib/sanity/image';
+	import BlurImage from '$lib/components/media/BlurImage.svelte';
 	import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
 	import type { PublicMediaBundle } from '$lib/sanity/transforms/mediaFilter';
 
@@ -94,10 +94,13 @@
 		active ? buildPublicImageUrl(active.asset, { width: 1500, height: 1000, fit: 'crop', quality: 82 }) : null
 	);
 	const stageSrcset = $derived(active ? buildSrcset(active.asset, STAGE_WIDTHS, STAGE_RATIO, 'crop', 82) : '');
+	const stageLqip = $derived(active ? getImagePlaceholder(active.asset) : null);
 	const lightboxSrc = $derived(
 		active ? buildPublicImageUrl(active.asset, { width: 1500, fit: 'clip', quality: 85 }) : null
 	);
 	const lightboxSrcset = $derived(active ? buildSrcset(active.asset, LIGHTBOX_WIDTHS, null, 'clip', 85) : '');
+	const lightboxLqip = $derived(active ? getImagePlaceholder(active.asset) : null);
+	const lightboxDims = $derived(active ? getImageDimensions(active.asset) : null);
 
 	// Preload sources for the first stage image so it stays a clean LCP element.
 	const preloadSrcset = $derived(items[0] ? buildSrcset(items[0].asset, STAGE_WIDTHS, STAGE_RATIO, 'crop', 82) : '');
@@ -125,21 +128,41 @@
 	$effect(() => {
 		const strip = filmstripEl;
 		if (!strip) return;
+		void activeIndex; // re-center on navigation
 		const child = strip.children[activeIndex] as HTMLElement | undefined;
 		if (!child) return;
 		const target = child.offsetLeft - (strip.clientWidth - child.clientWidth) / 2;
 		strip.scrollTo({ left: Math.max(0, target), behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 	});
 
-	// Preload the neighbouring lightbox frame so navigation feels instant.
+	// Preload both neighbours so prev/next feels instant — the stage variant always,
+	// and the lightbox-resolution variant while the lightbox is open. We warm via
+	// srcset + sizes (NOT a single URL) so the browser runs the same responsive
+	// selection as the visible <img> and caches the exact candidate it will display
+	// — critical on high-DPR screens, where sizes="100vw" picks the largest width.
+	// A persistent Set keyed on the srcset prevents re-issuing on every re-render.
+	const preloaded = new Set<string>();
+	function warm(srcset: string, sizes: string) {
+		if (!srcset || preloaded.has(srcset)) return;
+		preloaded.add(srcset);
+		const img = new Image();
+		img.sizes = sizes; // set before srcset so candidate selection uses it
+		img.srcset = srcset;
+	}
 	$effect(() => {
-		if (!lightboxOpen || total < 2) return;
-		const nextItem = items[(activeIndex + 1) % total];
-		const url = buildPublicImageUrl(nextItem.asset, { width: 1500, fit: 'clip', quality: 85 });
-		if (url) new Image().src = url;
+		if (total < 2) return;
+		// Stage warms ±1; the lightbox warms ±2 so rapid forward/back clicking
+		// (which can outrun a single neighbour) still lands on a cached frame.
+		const at = (offset: number) => items[(activeIndex + offset + total * 2) % total].asset;
+		for (const offset of [1, -1]) {
+			warm(buildSrcset(at(offset), STAGE_WIDTHS, STAGE_RATIO, 'crop', 82), STAGE_SIZES);
+		}
+		if (lightboxOpen) {
+			for (const offset of [1, -1, 2, -2]) {
+				warm(buildSrcset(at(offset), LIGHTBOX_WIDTHS, null, 'clip', 85), LIGHTBOX_SIZES);
+			}
+		}
 	});
-
-	const fadeDuration = $derived(prefersReducedMotion ? 0 : 200);
 
 	function select(index: number) {
 		activeIndex = index;
@@ -268,16 +291,18 @@
 					: 'View photo fullscreen'}
 			>
 				{#if stageSrc}
-					<img
-						class="gallery__stage-img"
+					<BlurImage
 						src={stageSrc}
 						srcset={stageSrcset}
+						lqip={stageLqip}
 						sizes={STAGE_SIZES}
 						alt={active?.alt ?? title}
-						width="1500"
-						height="1000"
+						width={1500}
+						height={1000}
+						fill
+						objectFit="cover"
+						loading="eager"
 						fetchpriority="high"
-						decoding="async"
 					/>
 				{/if}
 				<span class="gallery__zoom" aria-hidden="true">View</span>
@@ -332,17 +357,20 @@
 					onpointerup={onPointerUp}
 					onpointercancel={onPointerCancel}
 				>
-					{#key activeIndex}
-						<img
-							class="lightbox__img"
-							src={lightboxSrc}
-							srcset={lightboxSrcset}
-							sizes={LIGHTBOX_SIZES}
-							alt={active.alt}
-							decoding="async"
-							in:fade={{ duration: fadeDuration }}
-						/>
-					{/key}
+					<!-- A single persistent <img>: src/srcset/lqip update reactively on
+					     navigation. The lqip background shows instantly (no fade), so a
+					     cold frame shows the blur immediately rather than a blank screen. -->
+					<img
+						class="lightbox__img"
+						src={lightboxSrc}
+						srcset={lightboxSrcset}
+						sizes={LIGHTBOX_SIZES}
+						alt={active.alt}
+						width={lightboxDims?.width}
+						height={lightboxDims?.height}
+						decoding="async"
+						style:background-image={lightboxLqip ? `url(${lightboxLqip})` : undefined}
+					/>
 				</figure>
 
 				{#if total > 1}
@@ -394,13 +422,6 @@
 		   reach the swipe handlers instead of being eaten by the browser's
 		   gesture detector (which otherwise fires pointercancel on real phones). */
 		touch-action: pan-y;
-	}
-
-	.gallery__stage-img {
-		display: block;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
 	}
 
 	.gallery__zoom {
@@ -584,9 +605,17 @@
 	}
 
 	.lightbox__img {
+		/* width/height attrs supply the aspect-ratio; auto + max constraints scale it
+		   within the viewport without distortion and reserve space before load (no
+		   reflow on swipe). The lqip background sits behind the contained image. */
+		width: auto;
+		height: auto;
 		max-width: 100%;
 		max-height: calc(100vh - 7rem);
 		object-fit: contain;
+		background-size: contain;
+		background-position: center;
+		background-repeat: no-repeat;
 		pointer-events: auto;
 		/* The img is the touch target (the figure is pointer-events:none), so the
 		   swipe gesture must be claimed here. Background scroll is already locked. */

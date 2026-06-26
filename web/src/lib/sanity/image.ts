@@ -75,4 +75,27 @@ export function buildImageSrcset(
 	return parts.join(', ');
 }
 
+/**
+ * Base64 LQIP data URI for a blur-up placeholder, or null.
+ * Requires the GROQ projection to deref `asset.asset->metadata.lqip`.
+ * Note: OG-image builders must NOT use this — they emit meta tags, not visual <img>.
+ */
+export function getImagePlaceholder(asset: MediaAssetInput | null | undefined): string | null {
+	if (!isPublicMediaAsset(asset)) return null;
+	return asset?.lqip ?? null;
+}
+
+/**
+ * Intrinsic source dimensions for width/height (CLS) hardening, or null.
+ * Requires the GROQ projection to deref `asset.asset->metadata.dimensions`.
+ * Use for un-cropped images; for cropped renders prefer the crop box dimensions.
+ */
+export function getImageDimensions(
+	asset: MediaAssetInput | null | undefined
+): { width: number; height: number } | null {
+	const d = asset?.dimensions;
+	if (!d?.width || !d?.height) return null;
+	return { width: d.width, height: d.height };
+}
+
 export { builder as publicImageBuilder };

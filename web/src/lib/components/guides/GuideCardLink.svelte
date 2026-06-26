@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { buildImageSrcset, buildPublicImageUrl } from '$lib/sanity/image';
+	import { buildImageSrcset, buildPublicImageUrl, getImagePlaceholder } from '$lib/sanity/image';
 	import { guidePath } from '$lib/guides/routes';
 	import type { GuideCard } from '$lib/guides/types';
 
@@ -12,12 +12,16 @@
 	const srcset = $derived(
 		buildImageSrcset(card.heroImage, [320, 480, 640], { height: 360, fit: 'crop', quality: 82 })
 	);
+	const lqip = $derived(getImagePlaceholder(card.heroImage));
 	const alt = $derived(card.heroImage?.altText?.trim() || card.title || 'Guide');
 </script>
 
 <a class="guide-card" {href}>
 	{#if image}
-		<div class="guide-card__media">
+		<div
+			class="guide-card__media"
+			style:background-image={lqip ? `url(${lqip})` : undefined}
+		>
 			<img
 				src={image}
 				srcset={srcset || undefined}
@@ -62,6 +66,10 @@
 		aspect-ratio: 4 / 3;
 		overflow: hidden;
 		background: var(--green);
+		/* Blurred LQIP shows through until the photo paints over it. */
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.guide-card__media img {

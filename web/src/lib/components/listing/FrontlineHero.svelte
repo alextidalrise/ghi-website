@@ -50,7 +50,10 @@
 	</div>
 
 	{#if image}
-		<div class="fh__media">
+		<div
+			class="fh__media"
+			style:background-image={image.lqip ? `url(${image.lqip})` : undefined}
+		>
 			<img
 				src={image.url}
 				srcset={image.srcset || undefined}
@@ -59,6 +62,7 @@
 				width="1600"
 				height="1400"
 				fetchpriority="high"
+				decoding="async"
 			/>
 		</div>
 	{/if}
@@ -198,6 +202,10 @@
 		min-height: 100%;
 		/* Hold a generous frame on very tall content so the image never collapses. */
 		min-block-size: clamp(20rem, 38vw, 32rem);
+		/* Blurred LQIP shows through until the hero photo paints over it. */
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.fh__media img {

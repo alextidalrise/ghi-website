@@ -2,7 +2,7 @@
 	import type { PublicDevelopment } from '$lib/sanity/transforms';
 	import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
 	import { formatListingPrice, formatPropertyType } from '$lib/listing/formatPrice';
-	import { buildPublicImageUrl, buildImageSrcset } from '$lib/sanity/image';
+	import { buildPublicImageUrl, buildImageSrcset, getImagePlaceholder } from '$lib/sanity/image';
 
 	type Props = {
 		units: PublicDevelopment['units'];
@@ -377,7 +377,13 @@
 						onclick={() => selectType(group.key)}
 					>
 						{#if selectorHasImages}
-							<span class="tfilter__media" aria-hidden="true">
+							<span
+								class="tfilter__media"
+								aria-hidden="true"
+								style:background-image={group.image && getImagePlaceholder(group.image)
+									? `url(${getImagePlaceholder(group.image)})`
+									: undefined}
+							>
 								{#if group.image}
 									<img
 										src={thumbSrc(group.image, 220)}
@@ -681,6 +687,10 @@
 		aspect-ratio: 3 / 2;
 		background: color-mix(in srgb, var(--green) 6%, var(--white));
 		overflow: hidden;
+		/* Blurred LQIP shows through until the thumbnail paints over it. */
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.tfilter__media img {

@@ -1,4 +1,4 @@
-import { buildPublicImageUrl } from '../image';
+import { buildPublicImageUrl, getImagePlaceholder } from '../image';
 import { resolveListingHeroImage } from './mediaFilter';
 import { filterPublicPricing, type PublicPricing } from './pricingFilter';
 import { CARD_HERO_IMAGE, toPublicPropertyCard, type PublicPropertyCard, type RawPropertyCard } from './propertyCard';
@@ -48,6 +48,7 @@ export type PublicDevelopmentCard = {
 	bedroomsTo: number | null;
 	heroImageUrl: string | null;
 	heroImageAlt: string | null;
+	heroImageLqip: string | null;
 };
 
 export type SimilarListingCard =
@@ -83,7 +84,8 @@ export function toPublicDevelopmentCard(raw: RawDevelopmentCard): PublicDevelopm
 		bedroomsFrom: raw.bedroomsFrom ?? null,
 		bedroomsTo: raw.bedroomsTo ?? null,
 		heroImageUrl,
-		heroImageAlt: heroAsset?.altText ?? raw.title ?? null
+		heroImageAlt: heroAsset?.altText ?? raw.title ?? null,
+		heroImageLqip: getImagePlaceholder(heroAsset)
 	};
 }
 

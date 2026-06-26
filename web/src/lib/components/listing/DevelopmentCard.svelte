@@ -43,6 +43,8 @@
 			width={CARD_HERO_IMAGE.width}
 			height={CARD_HERO_IMAGE.height}
 			loading="lazy"
+			decoding="async"
+			style:background-image={card.heroImageLqip ? `url(${card.heroImageLqip})` : undefined}
 		/>
 	{/if}
 
@@ -103,6 +105,10 @@
 		height: auto;
 		aspect-ratio: 3 / 2;
 		object-fit: cover;
+		/* Blurred LQIP shows through until the real image paints over it. */
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	.property-card__body {
