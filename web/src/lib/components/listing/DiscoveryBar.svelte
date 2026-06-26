@@ -746,16 +746,23 @@
 		background-size: 0.6em auto;
 	}
 
-	/* The Location/Community/Type/Budget selects sit directly in the row. Letting them shrink
-	   (min-width: 0) keeps a long option value — e.g. Spain's longer location names — from
-	   overflowing the row and dragging its right-aligned text off-screen (which read as a
-	   left-aligned value). The country select is nested in .srow__control, so it's unaffected. */
+	/* The Location/Community/Type/Budget selects sit directly in the row. They fill the space
+	   between label and right edge (flex: 1, min-width: 0 so long Spain names never overflow),
+	   and right-align their value via direction: rtl — iOS Safari ignores text-align on a native
+	   select, so rtl is the only reliable way to pin the value right across browsers. Options are
+	   reset to ltr so the open dropdown still reads left-to-right. The country select is nested in
+	   .srow__control, so it's unaffected. */
 	.srow > select {
 		flex: 1;
 		min-width: 0;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+		direction: rtl;
+	}
+
+	.srow > select option {
+		direction: ltr;
 	}
 
 	.srow.is-empty select {
