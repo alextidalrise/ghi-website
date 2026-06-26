@@ -88,7 +88,8 @@ export const countriesForNavQuery = defineQuery(`
   ] | order(name asc) {
     _id,
     name,
-    "slug": slug.current
+    "slug": slug.current,
+    "flagUrl": flag.asset->url
   }
 `);
 

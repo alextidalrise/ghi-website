@@ -5100,11 +5100,12 @@ export type CommunityInLocationContextQueryResult = {
 
 // Source: ../web/src/lib/sanity/queries/location.ts
 // Variable: countriesForNavQuery
-// Query: *[    _type == "locationTaxonomy"    && type == "country"    && defined(slug.current)  ] | order(name asc) {    _id,    name,    "slug": slug.current  }
+// Query: *[    _type == "locationTaxonomy"    && type == "country"    && defined(slug.current)  ] | order(name asc) {    _id,    name,    "slug": slug.current,    "flagUrl": flag.asset->url  }
 export type CountriesForNavQueryResult = Array<{
   _id: string;
   name: string;
   slug: string;
+  flagUrl: string | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries/location.ts
@@ -9730,7 +9731,7 @@ declare module "@sanity/client" {
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && slug.current == $locationSlug\n    && parent->slug.current == $countrySlug\n  ][0]{\n    _id,\n    name,\n    "slug": slug.current,\n    type,\n    breadcrumbLabel,\n    seoTitle,\n    metaDescription,\n    publicDescription,\n    overviewHeading,\n    heroImage{\n  asset,\n  fileAsset,\n  altText\n},\n    tagline,\n    linkedLocations[]{\n      includeInGrid,\n      showLink,\n      location->{\n        _id,\n        name,\n        "slug": slug.current,\n        breadcrumbLabel\n      }\n    }\n  }\n': LocationPageContextQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && isCatchAll == true\n    && slug.current == $communitySlug\n    && parent._ref == $locationId\n  ][0]{\n    _id,\n    "slug": slug.current\n  }\n': CatchAllCommunityInLocationQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && slug.current == $communitySlug\n    && (\n      parent._ref == $locationId\n      || $locationId in associatedLocations[]._ref\n    )\n  ][0]{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  altText\n},\n  tagline,\n  coordinates\n}\n': CommunityInLocationContextQueryResult;
-    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && defined(slug.current)\n  ] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current\n  }\n': CountriesForNavQueryResult;
+    '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && defined(slug.current)\n  ] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    "flagUrl": flag.asset->url\n  }\n': CountriesForNavQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && parent->slug.current == $countrySlug\n  ] | order(name asc){\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  altText\n},\n  tagline,\n  coordinates\n}\n': LocationsByCountryQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && isCatchAll != true\n    && (\n      parent._ref == $locationId\n      || $locationId in associatedLocations[]._ref\n    )\n  ] | order(name asc){\n    _id,\n    name,\n    "slug": slug.current,\n    type,\n    breadcrumbLabel,\n    seoTitle,\n    metaDescription,\n    publicDescription,\n    "canonicalLocationSlug": parent->slug.current,\n    "isAssociated": $locationId in associatedLocations[]._ref && parent._ref != $locationId\n  }\n': CommunitiesByLocationQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && isCatchAll != true\n    && defined(slug.current)\n    && defined(parent->slug.current)\n    && defined(parent->parent->slug.current)\n  ] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    "locationSlug": parent->slug.current,\n    "countrySlug": parent->parent->slug.current\n  }\n': CommunitiesForNavQueryResult;
