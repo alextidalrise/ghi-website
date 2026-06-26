@@ -99,34 +99,15 @@
 	</PageHero>
 {/if}
 
-<article class="location-page" class:location-page--has-hero={locationHero}>
+<article class="location-page">
 	{#if !locationHero}
 		<Breadcrumbs items={data.breadcrumbs} />
+		<div class="location-page__title content-wrap">
+			<h1>{heroTitle}</h1>
+		</div>
 	{/if}
 
-	<div class="location-page__top content-wrap">
-		{#if !locationHero}
-			<h1>{heroTitle}</h1>
-		{/if}
-
-		{#if overviewBody}
-			<AreaOverview heading={overviewHeading} body={overviewBody} />
-		{:else if !locationHero}
-			<p class="location-page__intro">{placeholderBody}</p>
-		{/if}
-
-		<GolfCoursesSection
-			courses={data.golfCourseCards}
-			heading={`Golf courses in ${data.location.name}`}
-		/>
-
-		<FrontlineListings
-			cards={data.frontlineCards}
-			heading={`Frontline golf in ${data.location.name}`}
-			viewAllHref={data.frontlineViewAllHref}
-		/>
-	</div>
-
+	<!-- Properties lead the page, surfacing directly beneath the hero. -->
 	<div id="properties" class="location-page__results">
 		<ListingResults
 			basePath={data.canonicalPath}
@@ -139,8 +120,30 @@
 		/>
 	</div>
 
-	{#if data.directCommunities.length > 0 || data.associatedCommunities.length > 0 || data.relatedAreaLinks.length > 0}
+	<!-- Golf editorial bands sit between the listings and the area write-up. -->
+	<div class="location-page__golf content-wrap">
+		<GolfCoursesSection
+			courses={data.golfCourseCards}
+			heading={`Golf courses in ${data.location.name}`}
+		/>
+
+		<FrontlineListings
+			cards={data.frontlineCards}
+			heading={`Frontline golf in ${data.location.name}`}
+			viewAllHref={data.frontlineViewAllHref}
+		/>
+	</div>
+
+	{#if overviewBody || !locationHero || data.directCommunities.length > 0 || data.associatedCommunities.length > 0 || data.relatedAreaLinks.length > 0}
 		<div class="location-page__after content-wrap">
+			<!-- The long area write-up reads as context for the communities it covers,
+			     so it leads this block, just above the community links. -->
+			{#if overviewBody}
+				<AreaOverview heading={overviewHeading} body={overviewBody} />
+			{:else if !locationHero}
+				<p class="location-page__intro">{placeholderBody}</p>
+			{/if}
+
 			{#if data.directCommunities.length > 0}
 				<section class="location-page__list" aria-labelledby="communities-heading">
 					<h2 id="communities-heading">Communities</h2>
@@ -196,18 +199,25 @@
 		padding-bottom: var(--space-2xl);
 	}
 
-	.location-page__top {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
+	/* No-hero pages lead with the title; clear the breadcrumbs above it. The
+	   listings that follow bring their own --section-gap, so the title needs no
+	   bottom spacing of its own. */
+	.location-page__title {
 		padding-top: var(--space-xl);
 	}
 
-	/* Section rhythm between the overview, related-area links, and the green
-	   frontline band — mirrors the country page's --section-gap cadence so the
-	   green band never hugs the overview's "Read more". The siblings are
-	   child-component roots (own Svelte scope), so the gap part is :global while
-	   staying anchored to this component's scoped __top. */
-	.location-page__top > :global(* + *) {
+	/* Golf bands carry the mid-page rhythm between the listings and the write-up. */
+	.location-page__golf {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		margin-top: var(--section-gap);
+	}
+
+	/* Section rhythm between the golf rail and the green frontline band — mirrors
+	   the country page's --section-gap cadence. The siblings are child-component
+	   roots (own Svelte scope), so the gap part is :global while staying anchored
+	   to this component's scoped __golf. */
+	.location-page__golf > :global(* + *) {
 		margin-top: var(--section-gap);
 	}
 
@@ -216,22 +226,15 @@
 	   own edge is the divider, so the ruled white band above drops its now-redundant
 	   bottom rule and runs straight into the green. (Only matches when both bands
 	   render: an empty golf or frontline section emits no element.) */
-	.location-page__top > :global(.golf + .frontline) {
+	.location-page__golf > :global(.golf + .frontline) {
 		margin-top: 0;
 	}
-	.location-page__top > :global(.golf:has(+ .frontline)) {
+	.location-page__golf > :global(.golf:has(+ .frontline)) {
 		border-bottom-color: transparent;
 	}
 
-	/* The page title (no-hero pages only) leads straight into its first block;
-	   keep that pairing tight rather than a full section apart. */
-	.location-page__top > :global(h1 + *) {
-		margin-top: var(--space-md);
-	}
-
-	/* The hero already carries generous breathing room above the rail/links;
-	   don't stack another --space-xl on top of it. */
-	.location-page--has-hero .location-page__top:empty {
+	/* An empty golf/frontline pair emits no element at all; don't reserve the gap. */
+	.location-page__golf:empty {
 		display: none;
 	}
 
@@ -241,7 +244,6 @@
 	}
 
 	.location-page__intro {
-		margin-top: var(--space-md);
 		max-width: 42rem;
 	}
 
@@ -249,8 +251,13 @@
 		margin-top: var(--section-gap);
 	}
 
-	.location-page__list + .location-page__list {
+	/* Within the closing block: the area write-up to the first community list is a
+	   full section transition; the list-to-list steps below it are tighter. */
+	.location-page__after > :global(* + *) {
 		margin-top: var(--space-xl);
+	}
+	.location-page__after > :global(.overview + *) {
+		margin-top: var(--section-gap);
 	}
 
 	.location-page__list h2 {
