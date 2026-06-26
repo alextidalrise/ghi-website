@@ -48,7 +48,7 @@
 </div>
 
 <section class="home-content content-wrap">
-	<BuyerGuides />
+	<BuyerGuides countries={data.featuredCountries} />
 
 	<DestinationsByCountry
 		countries={data.featuredCountries}
