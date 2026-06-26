@@ -17,6 +17,10 @@
 	   clearing the 4.5 floor PRODUCT.md sets for the older, affluent audience. */
 	--muted: #6b6b6b;
 	--hero-dark: #0e1410;
+	/* Faint wash in the brand green hue (NOT the warm cream removed on 2026-06-01).
+	   A low-emphasis surface for distinguishing a supporting band without a hairline
+	   frame or the rationed green-punctuation band. See the Emphasis Ladder. */
+	--surface-tint: oklch(0.972 0.012 168);
 
 	/* Typography families */
 	--serif: 'Playfair Display', 'Georgia', serif;
