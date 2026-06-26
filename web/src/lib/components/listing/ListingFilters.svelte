@@ -2,17 +2,18 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import {
-		buildListingSearchHref,
-		parseListingSearchParams,
-		type ListingSearchParams
-	} from '$lib/listing/searchParams';
+	import { buildListingSearchHref, type ListingSearchParams } from '$lib/listing/searchParams';
 	import {
 		GOLF_RELEVANCE,
 		MIN_BEDS_OPTIONS,
 		PROPERTY_TYPES,
-		SORT_OPTIONS
+		SORT_OPTIONS,
+		SORT_VALUES,
+		type ListingSort
 	} from '$lib/listing/filterOptions';
+	import Select from '$lib/components/ui/Select.svelte';
+	import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
+	import PriceMenu from '$lib/components/ui/PriceMenu.svelte';
 
 	type CommunityOption = { label: string; value: string };
 	type CourseOption = { label: string; value: string };
@@ -21,9 +22,9 @@
 		basePath: string;
 		searchParams: ListingSearchParams;
 		communityOptions?: CommunityOption[];
-		/** Golf course/club options. When non-empty, renders the Course filter pill. */
+		/** Golf course/club options. When non-empty, renders the Course filter. */
 		courseOptions?: CourseOption[];
-		/** Whether to show the generic golf-relevance pill (hidden on the frontline page). */
+		/** Whether to show the generic golf-relevance filter (hidden on the frontline page). */
 		showGolfRelevance?: boolean;
 	};
 
@@ -36,26 +37,52 @@
 	}: Props = $props();
 
 	let form: HTMLFormElement | undefined;
-	// Starts false to match SSR; flips true after mount so per-menu Apply buttons
-	// can be hidden only once auto-apply is wired up (no hydration mismatch).
-	let enhanced = $state(false);
+	let sheet = $state<HTMLDialogElement>();
+	// Starts false to match SSR; flips true after mount so the mobile drawer (and the
+	// hiding of the no-JS Apply button) only engage once JS is live — no hydration shift.
+	let mounted = $state(false);
 	onMount(() => {
-		enhanced = true;
+		mounted = true;
 	});
 
-	const propertyTypeLabel = $derived(
-		PROPERTY_TYPES.find((option) => option.value === searchParams.propertyType)?.label ?? null
-	);
-	const communityLabel = $derived(
-		communityOptions.find((option) => option.value === searchParams.community)?.label ?? null
-	);
-	const bedsLabel = $derived(searchParams.minBeds ? `${searchParams.minBeds}+ beds` : null);
-	const priceLabel = $derived(formatPriceRange(searchParams.minPrice, searchParams.maxPrice));
-	const golfLabel = $derived(formatGolfLabel(searchParams.golfRelevance));
-	const courseLabel = $derived(formatCourseLabel(searchParams.golfCourse));
-	const sortLabel = $derived(
-		SORT_OPTIONS.find((option) => option.value === searchParams.sort)?.label ?? 'Newest'
-	);
+	// The "Bedrooms" list already carries its own "Any beds" entry; drop it so the
+	// Select's placeholder owns the empty state instead.
+	const bedsOptions = MIN_BEDS_OPTIONS.filter((option) => option.value !== '');
+
+	// Local, editable mirror of the applied params. Re-synced whenever navigation lands
+	// new searchParams (and when the drawer closes without applying).
+	let propertyType = $state('');
+	let minBeds = $state('');
+	let community = $state('');
+	let sort = $state<ListingSort>('newest');
+	let minPrice = $state<number | null>(null);
+	let maxPrice = $state<number | null>(null);
+	let golfRelevance = $state<string[]>([]);
+	let golfCourse = $state<string[]>([]);
+
+	function syncFromParams() {
+		propertyType = searchParams.propertyType ?? '';
+		minBeds = searchParams.minBeds != null ? String(searchParams.minBeds) : '';
+		community = searchParams.community ?? '';
+		sort = searchParams.sort;
+		minPrice = searchParams.minPrice;
+		maxPrice = searchParams.maxPrice;
+		golfRelevance = [...searchParams.golfRelevance];
+		golfCourse = [...searchParams.golfCourse];
+	}
+
+	$effect(() => {
+		// Track every applied field so a navigation re-syncs the editable mirror.
+		searchParams.propertyType;
+		searchParams.minBeds;
+		searchParams.community;
+		searchParams.sort;
+		searchParams.minPrice;
+		searchParams.maxPrice;
+		searchParams.golfRelevance;
+		searchParams.golfCourse;
+		syncFromParams();
+	});
 
 	const hasActiveFilters = $derived(
 		searchParams.propertyType != null ||
@@ -67,310 +94,289 @@
 			searchParams.golfCourse.length > 0
 	);
 
-	function formatPriceShort(value: number): string {
-		if (value >= 1_000_000) {
-			const millions = value / 1_000_000;
-			const text = millions % 1 === 0 ? String(millions) : millions.toFixed(2).replace(/0+$/, '');
-			return `€${text}M`;
-		}
-		if (value >= 1000) return `€${Math.round(value / 1000)}k`;
-		return `€${value}`;
+	// Active-filter count for the mobile trigger badge (sort isn't a filter).
+	const activeCount = $derived(
+		(searchParams.propertyType ? 1 : 0) +
+			(searchParams.minBeds != null ? 1 : 0) +
+			(searchParams.community ? 1 : 0) +
+			(searchParams.minPrice != null || searchParams.maxPrice != null ? 1 : 0) +
+			searchParams.golfRelevance.length +
+			searchParams.golfCourse.length
+	);
+
+	const sortLabel = $derived(
+		SORT_OPTIONS.find((option) => option.value === searchParams.sort)?.label ?? 'Newest'
+	);
+
+	function nextParams(): ListingSearchParams {
+		return {
+			page: 1, // any filter change returns to the first page
+			sort: (SORT_VALUES as readonly string[]).includes(sort) ? sort : 'newest',
+			propertyType: (propertyType || null) as ListingSearchParams['propertyType'],
+			minPrice: minPrice ?? null,
+			maxPrice: maxPrice ?? null,
+			minBeds: minBeds ? Number(minBeds) : null,
+			community: community || null,
+			golfRelevance: [...golfRelevance] as ListingSearchParams['golfRelevance'],
+			golfCourse: [...golfCourse]
+		};
 	}
 
-	function formatPriceRange(min: number | null, max: number | null): string | null {
-		if (min != null && max != null) return `${formatPriceShort(min)}–${formatPriceShort(max)}`;
-		if (min != null) return `${formatPriceShort(min)}+`;
-		if (max != null) return `Up to ${formatPriceShort(max)}`;
-		return null;
-	}
-
-	function formatGolfLabel(values: string[]): string | null {
-		if (values.length === 0) return null;
-		if (values.length === 1) {
-			return GOLF_RELEVANCE.find((option) => option.value === values[0])?.label ?? null;
-		}
-		return `Golf (${values.length})`;
-	}
-
-	function formatCourseLabel(values: string[]): string | null {
-		if (values.length === 0) return null;
-		if (values.length === 1) {
-			return courseOptions.find((option) => option.value === values[0])?.label ?? '1 course';
-		}
-		return `Courses (${values.length})`;
-	}
-
-	/** Progressive enhancement: derive clean params from the live form and SPA-navigate. */
-	function submitForm() {
-		if (!browser || !form) return;
-		const usp = new URLSearchParams();
-		for (const [key, value] of new FormData(form)) {
-			if (typeof value === 'string' && value !== '') usp.append(key, value);
-		}
-		const url = new URL(`${basePath}?${usp.toString()}`, window.location.origin);
-		const next = parseListingSearchParams(url);
-		next.page = 1; // any filter change returns to the first page
-		closeAll();
-		goto(buildListingSearchHref(basePath, next), { noScroll: true, keepFocus: true });
+	/** JS path: build a clean href from local state and SPA-navigate. */
+	function applyNow() {
+		if (!browser) return;
+		goto(buildListingSearchHref(basePath, nextParams()), { noScroll: true, keepFocus: true });
 	}
 
 	function onSubmit(event: SubmitEvent) {
 		if (!browser) return; // no-JS: let the native GET form submit
 		event.preventDefault();
-		submitForm();
+		applyNow();
 	}
 
-	function onControlChange() {
-		// Auto-apply on selection once JS is available.
-		submitForm();
+	function openSheet() {
+		sheet?.showModal();
 	}
 
-	function closeAll(except?: EventTarget | null) {
-		if (!form) return;
-		for (const node of form.querySelectorAll<HTMLDetailsElement>('details[open]')) {
-			if (node !== except) node.open = false;
-		}
+	function closeSheet() {
+		sheet?.close();
 	}
 
-	/** Keep one menu open at a time. */
-	function onToggle(event: Event) {
-		const node = event.currentTarget as HTMLDetailsElement;
-		if (node.open) closeAll(node);
+	function applyFromSheet() {
+		closeSheet();
+		applyNow();
 	}
 
-	function onWindowPointerDown(event: PointerEvent) {
-		if (!form) return;
-		if (!form.contains(event.target as Node)) closeAll();
-	}
-
-	function onWindowKeydown(event: KeyboardEvent) {
-		if (event.key === 'Escape') closeAll();
+	function clearAll() {
+		closeSheet();
+		if (browser) goto(basePath, { noScroll: true, keepFocus: true });
 	}
 </script>
 
-<svelte:window onpointerdown={onWindowPointerDown} onkeydown={onWindowKeydown} />
-
 <form
-	class="filter-bar"
-	class:filter-bar--enhanced={enhanced}
+	class="lf"
+	class:lf--ready={mounted}
 	method="GET"
 	action={basePath}
 	bind:this={form}
 	onsubmit={onSubmit}
 	aria-label="Filter and sort properties"
 >
-	<div class="filter-bar__group">
-		<details class="pill" class:pill--active={priceLabel} ontoggle={onToggle}>
-			<summary class="pill__trigger">
-				<span class="pill__label">Price</span>
-				{#if priceLabel}<span class="pill__value">{priceLabel}</span>{/if}
-				<span class="pill__chevron" aria-hidden="true"></span>
-			</summary>
-			<div class="pill__menu pill__menu--wide">
-				<div class="price-fields">
-					<label class="price-field">
-						<span>Min</span>
-						<input
-							type="number"
-							name="minPrice"
-							min="0"
-							step="50000"
-							inputmode="numeric"
-							value={searchParams.minPrice ?? ''}
-							placeholder="No min"
-						/>
-					</label>
-					<label class="price-field">
-						<span>Max</span>
-						<input
-							type="number"
-							name="maxPrice"
-							min="0"
-							step="50000"
-							inputmode="numeric"
-							value={searchParams.maxPrice ?? ''}
-							placeholder="No max"
-						/>
-					</label>
-				</div>
-				<button class="pill__apply" type="submit">Apply price</button>
+	<!-- ===== Desktop bar / no-JS fallback ===== -->
+	<div class="filter-bar">
+		<!-- Core single-select narrowers share one tray, in the homepage design language. -->
+		<div class="filter-bar__tray fc-tray">
+			<PriceMenu bind:minPrice bind:maxPrice onchange={applyNow} />
+			<Select
+				variant="tray"
+				label="Property type"
+				placeholder="Any type"
+				name="propertyType"
+				options={[...PROPERTY_TYPES]}
+				bind:value={propertyType}
+				onchange={applyNow}
+			/>
+			<Select
+				variant="tray"
+				label="Bedrooms"
+				placeholder="Any beds"
+				name="minBeds"
+				options={[...bedsOptions]}
+				bind:value={minBeds}
+				onchange={applyNow}
+			/>
+			{#if communityOptions.length > 0}
+				<Select
+					variant="tray"
+					label="Community"
+					placeholder="All communities"
+					name="community"
+					options={communityOptions}
+					bind:value={community}
+					onchange={applyNow}
+				/>
+			{/if}
+
+			<!-- Golf is still a filter, so it shares the tray as a matching cell. -->
+			{#if courseOptions.length > 0}
+				<MultiSelect
+					variant="tray"
+					label="Golf course"
+					name="golfCourse"
+					options={courseOptions}
+					bind:value={golfCourse}
+					onchange={applyNow}
+				/>
+			{/if}
+			{#if showGolfRelevance}
+				<MultiSelect
+					variant="tray"
+					label="Golf"
+					name="golfRelevance"
+					options={[...GOLF_RELEVANCE]}
+					bind:value={golfRelevance}
+					onchange={applyNow}
+				/>
+			{/if}
+		</div>
+
+		<!-- Reorder + reset live apart from the filters (Sort changes order, not the set). -->
+		<div class="filter-bar__sort">
+			{#if hasActiveFilters}
+				<a class="filter-bar__reset" href={basePath}>Clear all</a>
+			{/if}
+			<Select
+				variant="pill"
+				align="end"
+				label="Sort"
+				name="sort"
+				options={[...SORT_OPTIONS]}
+				activeWhenSet={false}
+				bind:value={sort}
+				onchange={applyNow}
+			/>
+		</div>
+
+		<!-- No-JS submit: hidden once JS auto-apply is live. -->
+		<button class="fc-apply filter-bar__submit" type="submit" class:is-hidden={mounted}>
+			Apply filters
+		</button>
+	</div>
+
+	<!-- ===== Mobile trigger (JS only) ===== -->
+	<button class="lf-trigger" type="button" onclick={openSheet} aria-haspopup="dialog">
+		<span class="lf-trigger__icon" aria-hidden="true">
+			<svg viewBox="0 0 20 20" fill="none">
+				<path d="M2 5h16M5 10h10M8 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+			</svg>
+		</span>
+		<span class="lf-trigger__label">Filter &amp; sort</span>
+		{#if activeCount > 0}<span class="lf-trigger__badge">{activeCount}</span>{/if}
+		<span class="lf-trigger__meta">{sortLabel}</span>
+		<span class="lf-trigger__chev" aria-hidden="true"></span>
+	</button>
+</form>
+
+<!-- ===== Mobile sheet (JS only) ===== -->
+<dialog
+	class="lf-sheet"
+	bind:this={sheet}
+	onclose={syncFromParams}
+	aria-label="Filter and sort properties"
+>
+	<div class="lf-sheet__head">
+		<p class="lf-sheet__title">Filter &amp; sort</p>
+		<button class="lf-sheet__close" type="button" onclick={closeSheet} aria-label="Close">
+			<svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+				<path d="M4 4l12 12M16 4 4 16" stroke="currentColor" stroke-width="1.5" />
+			</svg>
+		</button>
+	</div>
+
+	<div class="lf-sheet__body">
+		<div class="lf-row">
+			<span class="lf-row__label" id="lf-price-label">Price</span>
+			<div class="lf-price" role="group" aria-labelledby="lf-price-label">
+				<input
+					type="number"
+					inputmode="numeric"
+					min="0"
+					step="50000"
+					placeholder="No min"
+					aria-label="Minimum price"
+					bind:value={minPrice}
+				/>
+				<span aria-hidden="true">–</span>
+				<input
+					type="number"
+					inputmode="numeric"
+					min="0"
+					step="50000"
+					placeholder="No max"
+					aria-label="Maximum price"
+					bind:value={maxPrice}
+				/>
 			</div>
-		</details>
+		</div>
 
-		<details class="pill" class:pill--active={propertyTypeLabel} ontoggle={onToggle}>
-			<summary class="pill__trigger">
-				<span class="pill__label">Property type</span>
-				{#if propertyTypeLabel}<span class="pill__value">{propertyTypeLabel}</span>{/if}
-				<span class="pill__chevron" aria-hidden="true"></span>
-			</summary>
-			<fieldset class="pill__menu option-list" data-auto>
-				<legend class="sr-only">Property type</legend>
-				<label class="option">
-					<input
-						type="radio"
-						name="propertyType"
-						value=""
-						checked={searchParams.propertyType == null}
-						onchange={onControlChange}
-					/>
-					<span>Any type</span>
-				</label>
+		<label class="lf-row">
+			<span class="lf-row__label">Property type</span>
+			<select class="lf-select" class:is-empty={!propertyType} bind:value={propertyType}>
+				<option value="">Any type</option>
 				{#each PROPERTY_TYPES as option (option.value)}
-					<label class="option">
-						<input
-							type="radio"
-							name="propertyType"
-							value={option.value}
-							checked={searchParams.propertyType === option.value}
-							onchange={onControlChange}
-						/>
-						<span>{option.label}</span>
-					</label>
+					<option value={option.value}>{option.label}</option>
 				{/each}
-				<button class="pill__apply" type="submit">Apply</button>
-			</fieldset>
-		</details>
+			</select>
+		</label>
 
-		<details class="pill" class:pill--active={bedsLabel} ontoggle={onToggle}>
-			<summary class="pill__trigger">
-				<span class="pill__label">Bedrooms</span>
-				{#if bedsLabel}<span class="pill__value">{bedsLabel}</span>{/if}
-				<span class="pill__chevron" aria-hidden="true"></span>
-			</summary>
-			<fieldset class="pill__menu option-list" data-auto>
-				<legend class="sr-only">Minimum bedrooms</legend>
-				{#each MIN_BEDS_OPTIONS as option (option.value)}
-					<label class="option">
-						<input
-							type="radio"
-							name="minBeds"
-							value={option.value}
-							checked={String(searchParams.minBeds ?? '') === option.value}
-							onchange={onControlChange}
-						/>
-						<span>{option.label}</span>
-					</label>
+		<label class="lf-row">
+			<span class="lf-row__label">Bedrooms</span>
+			<select class="lf-select" class:is-empty={!minBeds} bind:value={minBeds}>
+				<option value="">Any beds</option>
+				{#each bedsOptions as option (option.value)}
+					<option value={option.value}>{option.label}</option>
 				{/each}
-				<button class="pill__apply" type="submit">Apply</button>
-			</fieldset>
-		</details>
+			</select>
+		</label>
 
 		{#if communityOptions.length > 0}
-			<details class="pill" class:pill--active={communityLabel} ontoggle={onToggle}>
-				<summary class="pill__trigger">
-					<span class="pill__label">Community</span>
-					{#if communityLabel}<span class="pill__value">{communityLabel}</span>{/if}
-					<span class="pill__chevron" aria-hidden="true"></span>
-				</summary>
-				<fieldset class="pill__menu option-list option-list--scroll" data-auto>
-					<legend class="sr-only">Community</legend>
-					<label class="option">
-						<input
-							type="radio"
-							name="community"
-							value=""
-							checked={searchParams.community == null}
-							onchange={onControlChange}
-						/>
-						<span>All communities</span>
-					</label>
+			<label class="lf-row">
+				<span class="lf-row__label">Community</span>
+				<select class="lf-select" class:is-empty={!community} bind:value={community}>
+					<option value="">All communities</option>
 					{#each communityOptions as option (option.value)}
-						<label class="option">
-							<input
-								type="radio"
-								name="community"
-								value={option.value}
-								checked={searchParams.community === option.value}
-								onchange={onControlChange}
-							/>
-							<span>{option.label}</span>
-						</label>
+						<option value={option.value}>{option.label}</option>
 					{/each}
-					<button class="pill__apply" type="submit">Apply</button>
-				</fieldset>
-			</details>
+				</select>
+			</label>
 		{/if}
 
 		{#if courseOptions.length > 0}
-			<details class="pill" class:pill--active={courseLabel} ontoggle={onToggle}>
-				<summary class="pill__trigger">
-					<span class="pill__label">Golf course</span>
-					{#if courseLabel}<span class="pill__value">{courseLabel}</span>{/if}
-					<span class="pill__chevron" aria-hidden="true"></span>
-				</summary>
-				<fieldset class="pill__menu option-list option-list--scroll">
-					<legend class="sr-only">Golf course or club</legend>
-					{#each courseOptions as option (option.value)}
-						<label class="option">
-							<input
-								type="checkbox"
-								name="golfCourse"
-								value={option.value}
-								checked={searchParams.golfCourse.includes(option.value)}
-							/>
-							<span>{option.label}</span>
-						</label>
-					{/each}
-					<button class="pill__apply" type="submit">Apply</button>
-				</fieldset>
-			</details>
-		{/if}
-
-		{#if showGolfRelevance}
-			<details class="pill" class:pill--active={golfLabel} ontoggle={onToggle}>
-				<summary class="pill__trigger">
-					<span class="pill__label">Golf</span>
-					{#if golfLabel}<span class="pill__value">{golfLabel}</span>{/if}
-					<span class="pill__chevron" aria-hidden="true"></span>
-				</summary>
-				<fieldset class="pill__menu option-list">
-					<legend class="sr-only">Golf relevance</legend>
-					{#each GOLF_RELEVANCE as option (option.value)}
-						<label class="option">
-							<input
-								type="checkbox"
-								name="golfRelevance"
-								value={option.value}
-								checked={searchParams.golfRelevance.includes(option.value)}
-							/>
-							<span>{option.label}</span>
-						</label>
-					{/each}
-					<button class="pill__apply" type="submit">Apply</button>
-				</fieldset>
-			</details>
-		{/if}
-	</div>
-
-	<div class="filter-bar__sort">
-		{#if hasActiveFilters}
-			<a class="filter-bar__reset" href={basePath}>Clear all</a>
-		{/if}
-		<details class="pill pill--sort" ontoggle={onToggle}>
-			<summary class="pill__trigger">
-				<span class="pill__label">Sort</span>
-				<span class="pill__value">{sortLabel}</span>
-				<span class="pill__chevron" aria-hidden="true"></span>
-			</summary>
-			<fieldset class="pill__menu pill__menu--right option-list" data-auto>
-				<legend class="sr-only">Sort by</legend>
-				{#each SORT_OPTIONS as option (option.value)}
-					<label class="option">
-						<input
-							type="radio"
-							name="sort"
-							value={option.value}
-							checked={searchParams.sort === option.value}
-							onchange={onControlChange}
-						/>
+			<fieldset class="lf-checks">
+				<legend class="lf-row__label">Golf course</legend>
+				{#each courseOptions as option (option.value)}
+					<label class="lf-check">
+						<input type="checkbox" bind:group={golfCourse} value={option.value} />
 						<span>{option.label}</span>
 					</label>
 				{/each}
-				<button class="pill__apply" type="submit">Apply</button>
 			</fieldset>
-		</details>
+		{/if}
+
+		{#if showGolfRelevance}
+			<fieldset class="lf-checks">
+				<legend class="lf-row__label">Golf</legend>
+				{#each GOLF_RELEVANCE as option (option.value)}
+					<label class="lf-check">
+						<input type="checkbox" bind:group={golfRelevance} value={option.value} />
+						<span>{option.label}</span>
+					</label>
+				{/each}
+			</fieldset>
+		{/if}
+
+		<label class="lf-row lf-row--sort">
+			<span class="lf-row__label">Sort by</span>
+			<select class="lf-select" bind:value={sort}>
+				{#each SORT_OPTIONS as option (option.value)}
+					<option value={option.value}>{option.label}</option>
+				{/each}
+			</select>
+		</label>
 	</div>
-</form>
+
+	<div class="lf-sheet__foot">
+		{#if hasActiveFilters}
+			<button class="lf-clear" type="button" onclick={clearAll}>Clear all</button>
+		{/if}
+		<button class="lf-apply" type="button" onclick={applyFromSheet}>
+			<span>Show properties</span>
+			<svg viewBox="0 0 26 12" fill="none" aria-hidden="true">
+				<path d="M0 6h23M19 1.5 24 6l-5 4.5" stroke="currentColor" stroke-width="1.5" />
+			</svg>
+		</button>
+	</div>
+</dialog>
 
 <style>
 	.filter-bar {
@@ -383,10 +389,9 @@
 		border-bottom: 1px solid var(--border);
 	}
 
-	.filter-bar__group {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-xs) var(--space-sm);
+	/* The tray takes the lead width; sort + clear flow to the right and wrap underneath. */
+	.filter-bar__tray {
+		flex: 1 1 34rem;
 	}
 
 	.filter-bar__sort {
@@ -410,211 +415,397 @@
 		border-color: var(--gold);
 	}
 
-	/* --- Pill + dropdown --- */
-	.pill {
-		position: relative;
+	.filter-bar__submit {
+		flex: none;
 	}
 
-	.pill__trigger {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5ch;
-		min-height: 2.75rem;
-		padding: 0.5rem 0.875rem;
-		border: 1px solid var(--border);
-		background: var(--white);
-		color: var(--charcoal);
-		font-family: var(--sans);
-		font-size: var(--text-ui);
-		white-space: nowrap;
-		cursor: pointer;
-		list-style: none;
-		user-select: none;
-		transition: border-color var(--duration-hover) var(--ease),
-			color var(--duration-hover) var(--ease);
-	}
-
-	.pill__trigger::-webkit-details-marker {
+	.filter-bar__submit.is-hidden {
 		display: none;
 	}
 
-	.pill__trigger:hover,
-	.pill__trigger:focus-visible {
-		border-color: var(--green);
+	/* ===================== MOBILE TRIGGER ===================== */
+	.lf-trigger {
+		display: none;
+		width: 100%;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.875rem 1.125rem;
+		border: 1px solid var(--green);
+		background: var(--white);
 		color: var(--green);
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		cursor: pointer;
+		text-align: left;
 	}
 
-	.pill[open] > .pill__trigger {
-		border-color: var(--green);
-		color: var(--green);
+	.lf-trigger__icon {
+		flex: none;
+		display: flex;
 	}
 
-	.pill--active > .pill__trigger {
-		border-color: var(--green);
-		color: var(--green);
+	.lf-trigger__icon svg {
+		width: 1.25rem;
+		height: 1.25rem;
 	}
 
-	.pill__value {
-		color: var(--green);
+	/* Editorial serif (with Playfair's handsome ampersand), echoing the homepage
+	   trigger summary — reads considered, not like a generic app control. */
+	.lf-trigger__label {
+		font-family: var(--serif);
+		font-weight: 400;
+		font-size: 1.125rem;
+		letter-spacing: 0;
+	}
+
+	.lf-trigger__badge {
+		flex: none;
+		min-width: 1.25rem;
+		height: 1.25rem;
+		padding: 0 0.35rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--green);
+		color: var(--on-green);
+		font-size: var(--text-small);
 		font-weight: 500;
 	}
 
-	.pill--active > .pill__trigger .pill__label {
+	.lf-trigger__meta {
+		margin-left: auto;
 		color: var(--muted);
+		font-family: var(--serif);
+		font-style: italic;
+		font-size: 1rem;
 	}
 
-	.pill__chevron {
+	.lf-trigger__chev {
+		flex: none;
 		width: 0.5rem;
 		height: 0.5rem;
-		margin-left: 0.25rem;
-		border-right: 1px solid currentColor;
-		border-bottom: 1px solid currentColor;
+		border-right: 1.5px solid var(--muted);
+		border-bottom: 1.5px solid var(--muted);
 		transform: translateY(-1px) rotate(45deg);
-		transition: transform var(--duration-hover) var(--ease);
 	}
 
-	.pill[open] > .pill__trigger .pill__chevron {
-		transform: translateY(2px) rotate(225deg);
+	.lf-trigger:focus-visible {
+		outline: 2px solid var(--green);
+		outline-offset: 2px;
 	}
 
-	.pill__menu {
-		position: absolute;
-		top: calc(100% + 0.375rem);
-		left: 0;
-		/* Sits above the results grid below; semantic dropdown layer. */
-		z-index: 50;
-		display: grid;
-		gap: var(--space-xs);
-		min-width: 12rem;
-		max-width: min(20rem, 90vw);
-		margin: 0;
-		padding: var(--space-sm);
-		border: 1px solid var(--green);
+	/* ===================== MOBILE SHEET ===================== */
+	.lf-sheet {
+		width: 100%;
+		max-width: 34rem;
+		max-height: 90vh;
+		margin: auto auto 0;
+		padding: 0;
+		border: 0;
+		border-top: 2px solid var(--gold);
 		background: var(--white);
-		box-shadow: 0 16px 40px -24px rgba(31, 61, 52, 0.45);
+		color: var(--charcoal);
+		/* Flex column so the body scrolls between a fixed head and a sticky foot. */
+		flex-direction: column;
 	}
 
-	.pill__menu--right {
-		left: auto;
-		right: 0;
+	.lf-sheet[open] {
+		display: flex;
 	}
 
-	.pill__menu--wide {
-		min-width: 16rem;
+	.lf-sheet::backdrop {
+		background: oklch(0.18 0.02 165 / 0.55);
 	}
 
-	/* Fieldsets carry the menu chrome via .pill__menu; strip their intrinsic width floor. */
-	fieldset.pill__menu {
-		min-inline-size: 0;
-	}
-
-	.option-list--scroll {
-		max-height: 16rem;
-		overflow-y: auto;
-	}
-
-	.option {
+	.lf-sheet__head {
+		flex: none;
 		display: flex;
 		align-items: center;
-		gap: 0.625rem;
-		padding: 0.4375rem 0.375rem;
-		font-family: var(--sans);
-		font-size: var(--text-ui);
+		justify-content: space-between;
+		padding: 1.25rem 1.25rem 0.75rem;
+	}
+
+	.lf-sheet__title {
+		margin: 0;
+		font-family: var(--serif);
+		font-style: italic;
+		font-size: 1.375rem;
+		color: var(--green);
+	}
+
+	.lf-sheet__close {
+		flex: none;
+		width: 2.5rem;
+		height: 2.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--border);
+		background: transparent;
 		color: var(--charcoal);
 		cursor: pointer;
 	}
 
-	.option:hover {
-		color: var(--green);
+	.lf-sheet__close svg {
+		width: 1.1rem;
+		height: 1.1rem;
 	}
 
-	.option input {
-		accent-color: var(--green);
-		width: 1rem;
-		height: 1rem;
-		flex-shrink: 0;
+	.lf-sheet__close:focus-visible {
+		outline: 2px solid var(--green);
+		outline-offset: 2px;
 	}
 
-	.price-fields {
+	.lf-sheet__body {
+		flex: 1;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		padding: 0 1.25rem;
+	}
+
+	.lf-row {
 		display: flex;
-		gap: var(--space-sm);
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		margin: 0;
+		padding: 1rem 0;
+		border-top: 1px solid var(--border);
 	}
 
-	.price-field {
-		display: grid;
-		gap: var(--space-xs);
+	.lf-sheet__body > .lf-row:first-child,
+	.lf-sheet__body > .lf-checks:first-child {
+		border-top: 0;
+	}
+
+	.lf-row__label {
 		font-family: var(--sans);
-		font-size: var(--text-small);
+		font-weight: 500;
+		font-size: 0.6875rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--muted);
+		flex: none;
+	}
+
+	/* Native selects in the sheet: editorial serif value, right-aligned (rtl pins the
+	   value to the right reliably on iOS; options reset to ltr). Mirrors the home sheet. */
+	.lf-select {
+		flex: 1;
+		min-width: 0;
+		appearance: none;
+		margin: 0;
+		padding: 0 1.3em 0 0;
+		border: 0;
+		background: transparent;
+		font-family: var(--serif);
+		font-size: 1.1875rem;
+		color: var(--charcoal);
+		text-align: right;
+		direction: rtl;
+		cursor: pointer;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1.5 7 7l6-5.5' stroke='%236B6B6B' stroke-width='1.5'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: right 0 center;
+		background-size: 0.6em auto;
+	}
+
+	.lf-select option {
+		direction: ltr;
+	}
+
+	.lf-select.is-empty {
+		font-style: italic;
 		color: var(--muted);
 	}
 
-	.price-field input {
-		width: 100%;
-		padding: 0.5rem 0;
+	.lf-select:focus-visible {
+		outline: 2px solid var(--green);
+		outline-offset: 3px;
+	}
+
+	.lf-price {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--muted);
+	}
+
+	.lf-price input {
+		width: 6.5rem;
+		padding: 0.4rem 0;
 		border: 0;
 		border-bottom: 1px solid var(--border);
 		background: transparent;
 		color: var(--charcoal);
-		font: inherit;
+		font-family: var(--sans);
 		font-size: var(--text-ui);
+		text-align: right;
 	}
 
-	.price-field input:focus {
+	.lf-price input:focus {
 		outline: 0;
 		border-color: var(--green);
 	}
 
-	.pill__apply {
-		margin-top: var(--space-xs);
-		padding: 0.625rem 1rem;
+	.lf-checks {
+		margin: 0;
+		padding: 1rem 0;
+		border: 0;
+		border-top: 1px solid var(--border);
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.lf-checks legend {
+		padding: 0;
+		margin-bottom: 0.25rem;
+	}
+
+	.lf-check {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		font-family: var(--sans);
+		font-size: var(--text-body);
+		color: var(--charcoal);
+		cursor: pointer;
+	}
+
+	.lf-check input {
+		flex: none;
+		width: 1.1rem;
+		height: 1.1rem;
+		accent-color: var(--green);
+	}
+
+	.lf-row--sort {
+		border-top-width: 1px;
+	}
+
+	.lf-sheet__foot {
+		flex: none;
+		display: flex;
+		align-items: center;
+		gap: var(--space-md);
+		padding: 1rem 1.25rem 1.5rem;
+		border-top: 1px solid var(--border);
+	}
+
+	.lf-clear {
+		flex: none;
+		padding: 0.5rem 0;
+		border: 0;
+		background: transparent;
+		color: var(--green);
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		border-bottom: 1px solid transparent;
+		cursor: pointer;
+	}
+
+	.lf-clear:hover,
+	.lf-clear:focus-visible {
+		border-color: var(--gold);
+	}
+
+	.lf-apply {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		min-height: 3.25rem;
 		border: 1px solid var(--green);
 		background: var(--green);
 		color: var(--on-green);
 		font-family: var(--sans);
+		font-weight: 500;
 		font-size: var(--text-ui);
 		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
 		cursor: pointer;
 		transition: background-color var(--duration-hover) var(--ease);
 	}
 
-	.pill__apply:hover,
-	.pill__apply:focus-visible {
+	.lf-apply svg {
+		width: 1.5rem;
+		height: 0.75rem;
+	}
+
+	.lf-apply:hover,
+	.lf-apply:focus-visible {
 		background: var(--charcoal);
 		border-color: var(--charcoal);
 	}
 
-	/* Single-select menus auto-apply on change once enhanced, so their Apply button
-	   is redundant. Price (range) and Golf (multi) keep theirs. The button stays in
-	   the no-JS DOM as the submit affordance. */
-	.filter-bar--enhanced [data-auto] .pill__apply {
-		display: none;
-	}
+	/* ===================== RESPONSIVE SWAP ===================== */
+	/* Below 60rem the inline tray gets cramped, so JS users get the trigger + drawer.
+	   Without JS (no .lf--ready) the inline bar stays, collapsing to a 2-col grid as a
+	   functional fallback. */
+	@media (max-width: 60rem) {
+		.filter-bar__tray {
+			flex-basis: 100%;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1px;
+			background: var(--border);
+		}
 
-	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border: 0;
-	}
+		.filter-bar__tray > :global(.fc-field) {
+			border-right: 0;
+			background: var(--white);
+		}
 
-	@media (max-width: 760px) {
+		.filter-bar__tray > :global(.fc-field--multi) {
+			grid-column: 1 / -1;
+		}
+
 		.filter-bar__sort {
 			margin-left: 0;
 			width: 100%;
 			justify-content: space-between;
 		}
+
+		.lf--ready .filter-bar {
+			display: none;
+		}
+
+		.lf--ready .lf-trigger {
+			display: flex;
+		}
+	}
+
+	/* ===================== MOTION ===================== */
+	@media (prefers-reduced-motion: no-preference) {
+		.lf-sheet[open] {
+			animation: lf-sheet-rise 0.34s var(--ease);
+		}
+
+		.lf-sheet[open]::backdrop {
+			animation: lf-backdrop-fade 0.34s var(--ease);
+		}
+
+		@keyframes lf-sheet-rise {
+			from {
+				transform: translateY(100%);
+			}
+		}
+
+		@keyframes lf-backdrop-fade {
+			from {
+				opacity: 0;
+			}
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.pill__trigger,
-		.pill__chevron,
 		.filter-bar__reset,
-		.pill__apply {
+		.lf-apply {
 			transition: none;
 		}
 	}
