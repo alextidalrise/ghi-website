@@ -499,6 +499,8 @@
 		width: 100%;
 		max-width: 34rem;
 		max-height: 90vh;
+		/* dvh accounts for the iOS Safari toolbar; falls back to vh on older engines. */
+		max-height: 88dvh;
 		margin: auto auto 0;
 		padding: 0;
 		border: 0;
@@ -557,7 +559,11 @@
 	}
 
 	.lf-sheet__body {
-		flex: 1;
+		/* flex-basis: auto (not the 0% in `flex: 1`) so the body keeps its content height
+		   when the dialog is content-sized — iOS Safari collapses a 0%-basis child to 0.
+		   min-height: 0 still lets it shrink + scroll when content exceeds the cap. */
+		flex: 1 1 auto;
+		min-height: 0;
 		overflow-y: auto;
 		overscroll-behavior: contain;
 		padding: 0 1.25rem;
