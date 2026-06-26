@@ -47,7 +47,11 @@
 		{ value: 'b5', label: '€5M+', min: 5_000_000, max: null }
 	] as const;
 
-	const initialCountrySlug = $derived(countries[0]?.slug ?? '');
+	/* Spain is the larger, lead portfolio, so it's the default selection; fall back to the
+	   first country if Spain isn't in the dataset (e.g. a future market reshuffle). */
+	const initialCountrySlug = $derived(
+		countries.find((country) => country.slug === 'spain')?.slug ?? countries[0]?.slug ?? ''
+	);
 
 	let countrySlug = $state('');
 	let locationSlug = $state('');
@@ -740,6 +744,18 @@
 		background-repeat: no-repeat;
 		background-position: right 0 center;
 		background-size: 0.6em auto;
+	}
+
+	/* The Location/Community/Type/Budget selects sit directly in the row. Letting them shrink
+	   (min-width: 0) keeps a long option value — e.g. Spain's longer location names — from
+	   overflowing the row and dragging its right-aligned text off-screen (which read as a
+	   left-aligned value). The country select is nested in .srow__control, so it's unaffected. */
+	.srow > select {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 
 	.srow.is-empty select {
