@@ -37,8 +37,10 @@
 </section>
 
 <!-- The search panel bridges the hero and the content below: its upper half sits over
-     the photograph, its lower half over the page. It is a sibling of the hero (not a
-     child), so the hero's overflow:hidden never clips it. -->
+     the photograph, its lower half over the white page, which flows straight into the
+     white "Explore by country" section beneath it — no tinted band competing with the
+     bar at the seam. It is a sibling of the hero (not a child), so the hero's overflow
+     never clips it. -->
 <div class="home-search content-wrap">
 	<DiscoveryBar
 		countries={data.countries}
@@ -48,12 +50,15 @@
 </div>
 
 <section class="home-content content-wrap">
-	<BuyerGuides countries={data.featuredCountries} />
-
 	<DestinationsByCountry
 		countries={data.featuredCountries}
 		locations={data.featuredLocations}
 	/>
+
+	<!-- Lead-magnet signpost sits below the white "Explore by country" index so its faint
+	     green tint never lands directly under the search bar (where it competed with the
+	     bar and left awkward whitespace). -->
+	<BuyerGuides countries={data.featuredCountries} />
 
 	<FeaturedListings
 		cards={data.featuredCards}
