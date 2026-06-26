@@ -2,6 +2,10 @@ export type MediaAssetInput = {
 	asset?: { _ref?: string; _type?: string; asset?: unknown } | null;
 	fileAsset?: unknown;
 	altText?: string | null;
+	/** Base64 LQIP placeholder, dereferenced via `asset.asset->metadata.lqip` in GROQ. */
+	lqip?: string | null;
+	/** Intrinsic source dimensions, dereferenced via `asset.asset->metadata.dimensions`. */
+	dimensions?: { width?: number; height?: number; aspectRatio?: number } | null;
 };
 
 /** Whether an asset may be used in public output (has an uploaded file). */

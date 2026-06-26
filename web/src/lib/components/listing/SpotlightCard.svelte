@@ -94,7 +94,10 @@
 </script>
 
 {#snippet cardBody()}
-	<span class="spotlight-card__media">
+	<span
+		class="spotlight-card__media"
+		style:background-image={card.heroImageLqip ? `url(${card.heroImageLqip})` : undefined}
+	>
 		{#if card.heroImageUrl}
 			<img
 				class="spotlight-card__img"
@@ -103,6 +106,7 @@
 				width={CARD_HERO_IMAGE.width}
 				height={CARD_HERO_IMAGE.height}
 				loading="lazy"
+				decoding="async"
 			/>
 		{:else}
 			<span class="spotlight-card__img spotlight-card__img--placeholder" aria-hidden="true"></span>
@@ -159,6 +163,10 @@
 		display: block;
 		aspect-ratio: 3 / 2;
 		overflow: hidden;
+		/* Blurred LQIP shows through until the photo paints over it. */
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
 	}
 
 	/* Gold hairline frames the photograph on the dark premier band. */

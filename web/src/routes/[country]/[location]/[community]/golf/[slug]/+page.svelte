@@ -30,6 +30,7 @@
 	<PageHero
 		image={courseHero.url}
 		srcset={courseHero.srcset}
+		lqip={courseHero.lqip}
 		alt={courseHero.alt}
 		breadcrumbs={data.breadcrumbs}
 		lead={heroLead}

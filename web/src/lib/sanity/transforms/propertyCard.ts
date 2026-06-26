@@ -1,4 +1,4 @@
-import { buildPublicImageUrl } from '../image';
+import { buildPublicImageUrl, getImagePlaceholder } from '../image';
 import type { PropertyCardsByCommunityQueryResult } from '../types';
 import { resolveListingHeroImage } from './mediaFilter';
 import { filterPublicPricing, type PublicPricing } from './pricingFilter';
@@ -29,6 +29,7 @@ export type PublicPropertyCard = {
 	specs: PublicPropertyCardSpecs;
 	heroImageUrl: string | null;
 	heroImageAlt: string | null;
+	heroImageLqip: string | null;
 };
 
 /** Map a card query row to a privacy-safe, component-ready card payload. */
@@ -52,6 +53,7 @@ export function toPublicPropertyCard(raw: RawPropertyCard): PublicPropertyCard {
 		pricing: filterPublicPricing(raw.pricing),
 		specs: raw.specs,
 		heroImageUrl,
-		heroImageAlt: heroAsset?.altText ?? raw.title ?? null
+		heroImageAlt: heroAsset?.altText ?? raw.title ?? null,
+		heroImageLqip: getImagePlaceholder(heroAsset)
 	};
 }

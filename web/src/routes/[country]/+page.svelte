@@ -52,6 +52,7 @@
 	<PageHero
 		image={countryHero.url}
 		srcset={countryHero.srcset}
+		lqip={countryHero.lqip}
 		alt={countryHero.alt}
 		lead={countryHero.tagline ?? undefined}
 		compact

@@ -7,6 +7,8 @@
 		image: string;
 		alt: string;
 		srcset?: string;
+		/** Base64 LQIP shown behind the photo until it paints (blur-up placeholder). */
+		lqip?: string | null;
 		sizes?: string;
 		lead?: string;
 		/** Breadcrumbs laid over the top of the hero photograph. */
@@ -24,6 +26,7 @@
 		image,
 		alt,
 		srcset,
+		lqip,
 		sizes = '100vw',
 		lead,
 		breadcrumbs,
@@ -36,7 +39,11 @@
 </script>
 
 <section class="page-hero on-dark" class:page-hero--compact={compact}>
-	<div class="page-hero__bg" aria-hidden="true">
+	<div
+		class="page-hero__bg"
+		aria-hidden="true"
+		style:background-image={lqip ? `url(${lqip})` : undefined}
+	>
 		<img
 			src={image}
 			srcset={srcset || undefined}
@@ -45,6 +52,7 @@
 			width="1920"
 			height="1080"
 			{fetchpriority}
+			decoding="async"
 		/>
 	</div>
 	<div class="page-hero__overlay" aria-hidden="true"></div>
@@ -81,6 +89,13 @@
 		position: absolute;
 		inset: 0;
 		z-index: 0;
+	}
+
+	.page-hero__bg {
+		/* Blurred LQIP shows through until the hero photo paints over it. */
+		background-size: cover;
+		background-position: center 40%;
+		background-repeat: no-repeat;
 	}
 
 	.page-hero__bg img {

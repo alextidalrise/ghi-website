@@ -1,4 +1,4 @@
-import { buildImageSrcset, buildPublicImageUrl } from '../image';
+import { buildImageSrcset, buildPublicImageUrl, getImagePlaceholder } from '../image';
 import type { MediaAssetInput } from './mediaFilter';
 
 const HERO_WIDTHS = [960, 1280, 1600, 1920, 2400];
@@ -8,6 +8,7 @@ const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 85
 export type TaxonomyHero = {
 	url: string;
 	srcset: string;
+	lqip: string | null;
 	alt: string;
 	tagline: string | null;
 };
@@ -64,6 +65,7 @@ function buildHeroFromAsset(
 	return {
 		url,
 		srcset: buildImageSrcset(asset, HERO_WIDTHS, PAGE_HERO),
+		lqip: getImagePlaceholder(asset),
 		alt: heroAlt(asset, fallbackName),
 		tagline: tagline?.trim() || null
 	};
@@ -144,6 +146,7 @@ export function toLocationCards(
 export function resolveHomepageHeroImage(hero: HomepageHero): {
 	url: string;
 	srcset: string;
+	lqip: string | null;
 	alt: string;
 } | null {
 	const resolved = resolveHomepageHero(hero);
@@ -152,6 +155,7 @@ export function resolveHomepageHeroImage(hero: HomepageHero): {
 	return {
 		url: resolved.url,
 		srcset: resolved.srcset,
+		lqip: resolved.lqip,
 		alt: resolved.alt
 	};
 }

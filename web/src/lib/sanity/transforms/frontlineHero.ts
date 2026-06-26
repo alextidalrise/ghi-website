@@ -1,4 +1,4 @@
-import { buildImageSrcset, buildPublicImageUrl } from '../image';
+import { buildImageSrcset, buildPublicImageUrl, getImagePlaceholder } from '../image';
 import type { MediaAssetInput } from './mediaFilter';
 
 const HERO_WIDTHS = [720, 960, 1280, 1600, 2000];
@@ -13,6 +13,7 @@ export const FRONTLINE_HERO_DEFAULTS = {
 	image: {
 		url: '/design-system/assets/andalucia-golf-villa.png',
 		srcset: '',
+		lqip: null,
 		alt: 'A golf-course villa overlooking the fairway and mountains at dusk'
 	}
 } as const;
@@ -27,6 +28,7 @@ export type FrontlineHeroInput = {
 export type FrontlineHeroImage = {
 	url: string;
 	srcset: string;
+	lqip: string | null;
 	alt: string;
 };
 
@@ -47,6 +49,7 @@ function resolveImage(
 	return {
 		url,
 		srcset: buildImageSrcset(asset, HERO_WIDTHS, FRONTLINE_HERO_IMAGE),
+		lqip: getImagePlaceholder(asset),
 		alt: asset.altText?.trim() || altFallback
 	};
 }

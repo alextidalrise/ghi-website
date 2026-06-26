@@ -90,6 +90,7 @@
 	<PageHero
 		image={hero.url}
 		srcset={hero.srcset}
+		lqip={hero.lqip}
 		alt={hero.alt}
 		lead={guide.tagline ?? undefined}
 		breadcrumbs={data.breadcrumbs.slice(0, -1)}

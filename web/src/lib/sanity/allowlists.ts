@@ -19,7 +19,9 @@ import {
 export const MEDIA_ASSET_PUBLIC = /* groq */ `{
   asset,
   fileAsset,
-  altText
+  altText,
+  "lqip": asset.asset->metadata.lqip,
+  "dimensions": asset.asset->metadata.dimensions
 }`;
 
 /** Public fields on locationTaxonomy references used in breadcrumbs and stubs. */
@@ -229,6 +231,7 @@ export const GUIDE_SECTION_PUBLIC = /* groq */ `{
       _key,
       asset,
       altText,
+      "lqip": asset.asset->metadata.lqip,
       "dimensions": asset.asset->metadata.dimensions
     },
     _type != "mediaAssetMetadata" => { ... }

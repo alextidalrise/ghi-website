@@ -1,4 +1,4 @@
-import { buildImageSrcset, buildPublicImageUrl } from '../image';
+import { buildImageSrcset, buildPublicImageUrl, getImagePlaceholder } from '../image';
 import type { MediaAssetInput } from './mediaFilter';
 import { filterMediaAsset, filterMediaAssetList } from './mediaFilter';
 import { resolveTaxonomyHero, type TaxonomyHero } from './taxonomyHero';
@@ -111,6 +111,7 @@ export function resolveGolfCourseHero(
 	return {
 		url,
 		srcset: buildImageSrcset(asset, HERO_WIDTHS, PAGE_HERO),
+		lqip: getImagePlaceholder(asset),
 		alt: asset.altText?.trim() || course?.name || 'Golf course',
 		tagline: course?.tagline?.trim() || null
 	};
