@@ -1,0 +1,484 @@
+/**
+ * Shared visual language for every filter selector on the site — the homepage
+ * DiscoveryBar and the listing-grid filter bars. One stylesheet so the two surfaces
+ * can never drift: the tray, the cells, the country chip, the standalone pills and
+ * the dropdown panels are all defined once here and consumed by Select / MultiSelect
+ * / PriceMenu and their host bars.
+ *
+ * Imported (not scoped) by the components that use it. Values trace back to the
+ * original DiscoveryBar so the native baseline reads exactly as it did before.
+ */
+
+/* ============================ THE TRAY ============================ */
+/* A row of equal cells on white, framed in gold with a soft lift and hairline
+   dividers. The home bar IS this tray; the listing bar reuses it for its core
+   single-select filters. */
+/* Gold frame, white cells, 1px stone hairline dividers between them. A trailing
+   non-cell child (e.g. the homepage search button) keeps the last real cell's divider,
+   so the button reads as inside the frame; a tray whose last child IS a cell drops it. */
+.fc-tray {
+	display: flex;
+	align-items: stretch;
+	background: var(--white);
+	border: 1px solid var(--gold);
+	box-shadow: 0 30px 56px -38px oklch(0.18 0.02 165 / 0.5);
+}
+
+.fc-tray > .fc-field {
+	flex: 1;
+	min-width: 0;
+	border-right: 1px solid var(--border);
+	transition: background var(--duration-hover) var(--ease);
+}
+
+.fc-tray > .fc-field:last-child {
+	border-right: 0;
+}
+
+/* Gold underline on the active cell, drawn inside so it never shifts layout. */
+.fc-tray > .fc-field:focus-within {
+	background: oklch(0.985 0.006 90);
+	box-shadow: inset 0 -3px 0 var(--gold);
+}
+
+/* ============================ CELLS ============================ */
+/* A labelled cell: overline label stacked above a serif value. Used inside a tray
+   (home + listing) and as the standalone green country chip. */
+.fc-field {
+	position: relative;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.875rem 1.125rem;
+	min-width: 0;
+}
+
+.fc-field.is-disabled {
+	opacity: 0.42;
+}
+
+.fc-label {
+	font-family: var(--sans);
+	font-weight: 500;
+	font-size: 0.625rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.fc-control {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 0;
+}
+
+/* The country chip: deep-green gradient cell, gold label, ivory serif value. */
+.fc-field--chip {
+	flex: none;
+	min-width: 9.5rem;
+	background:
+		radial-gradient(150% 120% at 8% -10%, oklch(0.37 0.05 165) 0%, transparent 60%),
+		linear-gradient(165deg, oklch(0.29 0.034 165) 0%, oklch(0.22 0.03 165) 100%);
+	box-shadow: 0 30px 56px -38px oklch(0.12 0.02 165 / 0.6);
+}
+
+.fc-field--chip .fc-label {
+	color: var(--gold);
+}
+
+.fc-flag {
+	flex: none;
+	width: 1.375rem;
+	height: 0.9375rem;
+	display: block;
+	border: 1px solid oklch(1 0 0 / 0.4);
+	overflow: hidden;
+}
+
+.fc-flag :global(svg),
+.fc-flag :global(img) {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* ============================ NATIVE BASELINE ============================ */
+/* The real <select> that ships in SSR HTML and stays the control on touch / no-JS.
+   Appearance stripped; the value reads as editorial Playfair with a drawn chevron. */
+.fc-native {
+	appearance: none;
+	width: 100%;
+	min-width: 0;
+	margin: 0;
+	padding: 0 1.25em 0 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	font-family: var(--serif);
+	font-weight: 400;
+	font-size: 1.1875rem;
+	line-height: 1.15;
+	color: var(--charcoal);
+	cursor: pointer;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1.5 7 7l6-5.5' stroke='%236B6B6B' stroke-width='1.5'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0 center;
+	background-size: 0.6em auto;
+}
+
+.fc-field--chip .fc-native {
+	color: var(--on-green);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1.5 7 7l6-5.5' stroke='%23D6C3A3' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+.fc-native option {
+	font-family: var(--sans);
+	font-size: 1rem;
+	color: var(--charcoal);
+}
+
+/* Unselected reads as a quiet italic prompt, not a committed choice. */
+.fc-field.is-empty .fc-native {
+	font-style: italic;
+	color: var(--muted);
+}
+
+.fc-field.is-disabled .fc-native {
+	cursor: not-allowed;
+}
+
+.fc-native:focus-visible {
+	outline: 2px solid var(--green);
+	outline-offset: 4px;
+}
+
+.fc-field--chip .fc-native:focus-visible {
+	outline-color: var(--on-green);
+}
+
+/* ============================ CELL TRIGGER (custom) ============================ */
+/* The pointer-device replacement for a tray/chip native select: same editorial look
+   (serif value + drawn chevron), now a real button that opens the listbox panel. */
+.fc-trigger {
+	font: inherit;
+	color: inherit;
+	background: transparent;
+	border: 0;
+	margin: 0;
+	cursor: pointer;
+}
+
+.fc-trigger--cell {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+	min-width: 0;
+	padding: 0;
+	text-align: left;
+}
+
+.fc-trigger--cell .fc-value {
+	flex: 1;
+	min-width: 0;
+	font-family: var(--serif);
+	font-weight: 400;
+	font-size: 1.1875rem;
+	line-height: 1.15;
+	color: var(--charcoal);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.fc-field--chip .fc-trigger--cell .fc-value {
+	color: var(--on-green);
+}
+
+.fc-field.is-empty .fc-trigger--cell .fc-value {
+	font-style: italic;
+	color: var(--muted);
+}
+
+/* Drawn chevron for the cell trigger, matching the native one's weight + colour. */
+.fc-trigger--cell .fc-chevron {
+	flex: none;
+	width: 0.6em;
+	height: 0.6em;
+	border-right: 1.5px solid var(--muted);
+	border-bottom: 1.5px solid var(--muted);
+	transform: translateY(-0.12em) rotate(45deg);
+	transition: transform var(--duration-hover) var(--ease);
+}
+
+.fc-field--chip .fc-trigger--cell .fc-chevron {
+	border-color: var(--gold);
+}
+
+.fc-trigger--cell[aria-expanded='true'] .fc-chevron {
+	transform: translateY(0.06em) rotate(225deg);
+}
+
+.fc-trigger--cell:focus-visible {
+	outline: 2px solid var(--green);
+	outline-offset: 4px;
+}
+
+.fc-field--chip .fc-trigger--cell:focus-visible {
+	outline-color: var(--on-green);
+}
+
+/* ============================ PILL TRIGGER (custom) ============================ */
+/* Standalone bordered control for filters that sit beside the tray (Golf, Sort).
+   Inline label + value + rotating chevron — the listing bar's secondary register. */
+.fc-pill {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5ch;
+	min-height: 2.75rem;
+	padding: 0.5rem 0.875rem;
+	border: 1px solid var(--border);
+	background: var(--white);
+	color: var(--charcoal);
+	font-family: var(--sans);
+	font-size: var(--text-ui);
+	white-space: nowrap;
+	cursor: pointer;
+	transition:
+		border-color var(--duration-hover) var(--ease),
+		color var(--duration-hover) var(--ease);
+}
+
+.fc-pill:hover,
+.fc-pill:focus-visible,
+.fc-pill[aria-expanded='true'],
+.fc-pill.is-active {
+	border-color: var(--green);
+	color: var(--green);
+}
+
+.fc-pill:focus-visible {
+	outline: 2px solid var(--green);
+	outline-offset: 3px;
+}
+
+.fc-pill .fc-pill__label {
+	color: var(--muted);
+}
+
+.fc-pill.is-active .fc-pill__label {
+	color: var(--muted);
+}
+
+.fc-pill .fc-value {
+	color: var(--green);
+	font-weight: 500;
+}
+
+.fc-pill .fc-chevron {
+	width: 0.5rem;
+	height: 0.5rem;
+	margin-left: 0.25rem;
+	border-right: 1px solid currentColor;
+	border-bottom: 1px solid currentColor;
+	transform: translateY(-1px) rotate(45deg);
+	transition: transform var(--duration-hover) var(--ease);
+}
+
+.fc-pill[aria-expanded='true'] .fc-chevron {
+	transform: translateY(2px) rotate(225deg);
+}
+
+/* ============================ DROPDOWN PANEL ============================ */
+/* The listbox / menu surface. Lives in the top layer (popover) so no ancestor
+   overflow or z-index can clip it; JS sets its fixed position. */
+.fc-panel {
+	margin: 0;
+	padding: var(--space-sm);
+	border: 1px solid var(--green);
+	background: var(--white);
+	box-shadow: 0 16px 40px -24px oklch(0.32 0.04 165 / 0.55);
+	overflow: hidden auto;
+	overscroll-behavior: contain;
+}
+
+.fc-panel:focus-visible {
+	outline: none;
+}
+
+/* Popover default styling reset (border/padding handled above). */
+.fc-panel[popover] {
+	inset: auto;
+}
+
+.fc-panel__list {
+	display: grid;
+	gap: 2px;
+}
+
+.fc-option {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+	padding: 0.4375rem 0.5rem;
+	font-family: var(--sans);
+	font-size: var(--text-ui);
+	color: var(--charcoal);
+	cursor: pointer;
+	user-select: none;
+	scroll-margin: 0.5rem;
+}
+
+.fc-option[aria-disabled='true'] {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+/* Active descendant (keyboard / hover) — faint brand-hue wash. */
+.fc-option[data-active='true'],
+.fc-option:hover {
+	background: var(--surface-tint);
+	color: var(--green);
+}
+
+/* The leading marker: a check for single-select, a box for multi. */
+.fc-option__marker {
+	flex: none;
+	width: 1.05rem;
+	height: 1.05rem;
+	display: grid;
+	place-items: center;
+	color: var(--gold);
+}
+
+.fc-option__marker svg {
+	width: 100%;
+	height: 100%;
+	stroke: currentColor;
+	opacity: 0;
+	transform: scale(0.6);
+	transition:
+		opacity var(--duration-hover) var(--ease),
+		transform var(--duration-hover) var(--ease);
+}
+
+.fc-option[aria-selected='true'] {
+	color: var(--green);
+}
+
+.fc-option[aria-selected='true'] .fc-option__marker svg {
+	opacity: 1;
+	transform: none;
+}
+
+/* Multi-select marker reads as a checkbox box that fills on selection. */
+.fc-panel--multi .fc-option__marker {
+	border: 1px solid var(--border);
+	color: var(--on-green);
+}
+
+.fc-panel--multi .fc-option[data-active='true'] .fc-option__marker,
+.fc-panel--multi .fc-option:hover .fc-option__marker {
+	border-color: var(--green);
+}
+
+.fc-panel--multi .fc-option[aria-selected='true'] .fc-option__marker {
+	background: var(--green);
+	border-color: var(--green);
+}
+
+.fc-option__label {
+	flex: 1;
+	min-width: 0;
+}
+
+/* Real checkbox for the no-JS / touch multi-select path. */
+.fc-check {
+	flex: none;
+	width: 1rem;
+	height: 1rem;
+	accent-color: var(--green);
+	cursor: pointer;
+}
+
+/* ============================ PRICE PANEL ============================ */
+.fc-price {
+	display: flex;
+	gap: var(--space-sm);
+}
+
+.fc-price__field {
+	display: grid;
+	gap: var(--space-xs);
+	font-family: var(--sans);
+	font-size: var(--text-small);
+	color: var(--muted);
+}
+
+.fc-price__field input {
+	width: 100%;
+	padding: 0.5rem 0;
+	border: 0;
+	border-bottom: 1px solid var(--border);
+	background: transparent;
+	color: var(--charcoal);
+	font-family: var(--sans);
+	font-size: var(--text-ui);
+}
+
+.fc-price__field input:focus {
+	outline: 0;
+	border-color: var(--green);
+}
+
+/* ============================ APPLY / ACTIONS ============================ */
+.fc-apply {
+	margin-top: var(--space-xs);
+	padding: 0.625rem 1rem;
+	border: 1px solid var(--green);
+	background: var(--green);
+	color: var(--on-green);
+	font-family: var(--sans);
+	font-size: var(--text-ui);
+	letter-spacing: var(--tracking-wide);
+	cursor: pointer;
+	transition: background-color var(--duration-hover) var(--ease);
+}
+
+.fc-apply:hover,
+.fc-apply:focus-visible {
+	background: var(--charcoal);
+	border-color: var(--charcoal);
+}
+
+/* ============================ A11Y / MOTION ============================ */
+.fc-sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fc-trigger--cell .fc-chevron,
+	.fc-pill,
+	.fc-pill .fc-chevron,
+	.fc-option__marker svg,
+	.fc-tray > .fc-field,
+	.fc-apply {
+		transition: none;
+	}
+}

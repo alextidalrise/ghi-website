@@ -5,6 +5,7 @@
 		DEFAULT_LISTING_SEARCH_PARAMS,
 		serializeListingSearchParams
 	} from '$lib/listing/searchParams';
+	import Select from '$lib/components/ui/Select.svelte';
 
 	type CountryOption = {
 		_id: string;
@@ -96,6 +97,13 @@
 		[selectedCountry?.name, selectedLocationName || 'anywhere'].filter(Boolean).join(' · ')
 	);
 
+	/* Option lists for the shared Select (desktop). */
+	const countryOpts = $derived(countries.map((c) => ({ label: c.name, value: c.slug })));
+	const locationOpts = $derived(filteredLocations.map((l) => ({ label: l.name, value: l.slug })));
+	const communityOpts = $derived(filteredCommunities.map((c) => ({ label: c.name, value: c.slug })));
+	const typeOpts = PROPERTY_TYPES.map((t) => ({ label: t.label, value: t.value }));
+	const budgetOpts = BUDGET_BANDS.map((b) => ({ label: b.label, value: b.value }));
+
 	function handleCountryChange() {
 		locationSlug = '';
 		communitySlug = '';
@@ -174,12 +182,6 @@
 	{/if}
 {/snippet}
 
-{#snippet countryOptions()}
-	{#each countries as country (country._id)}
-		<option value={country.slug}>{country.name}</option>
-	{/each}
-{/snippet}
-
 {#snippet locationOptions()}
 	<option value="">Any location</option>
 	{#each filteredLocations as location (location._id)}
@@ -213,67 +215,52 @@
 
 	<!-- ============ DESKTOP: inline bar (≥ 72rem) ============ -->
 	<form class="bar" aria-label="Find properties by destination" onsubmit={handleSubmit}>
-		<p class="field field--chip">
-			<label class="field__label" for="db-country">Country</label>
-			<span class="field__control">
-				<span class="field__flag">{@render flagStamp(selectedCountry)}</span>
-				<select id="db-country" bind:value={countrySlug} onchange={handleCountryChange}>
-					{@render countryOptions()}
-				</select>
-			</span>
-		</p>
+		<Select
+			variant="chip"
+			label="Country"
+			options={countryOpts}
+			bind:value={countrySlug}
+			onchange={handleCountryChange}
+		>
+			{#snippet flag()}{@render flagStamp(selectedCountry)}{/snippet}
+		</Select>
 
-		<div class="bar__tray">
-			<p class="field" class:is-empty={!locationSlug}>
-				<label class="field__label" for="db-location">Location</label>
-				<select
-					id="db-location"
-					class="field__select"
-					bind:value={locationSlug}
-					onchange={handleLocationChange}
-				>
-					{@render locationOptions()}
-				</select>
-			</p>
-
-			<p class="field" class:is-empty={!communitySlug} class:is-disabled={communityDisabled}>
-				<label class="field__label" for="db-community">Community</label>
-				<select
-					id="db-community"
-					class="field__select"
-					title={communityDisabled ? 'Choose a location first' : undefined}
-					bind:value={communitySlug}
-					disabled={communityDisabled}
-				>
-					{@render communityOptions()}
-				</select>
-			</p>
-
-			<p class="field" class:is-empty={!propertyType} class:is-disabled={!hasLocation}>
-				<label class="field__label" for="db-type">Property type</label>
-				<select
-					id="db-type"
-					class="field__select"
-					title={!hasLocation ? 'Choose a location first' : undefined}
-					bind:value={propertyType}
-					disabled={!hasLocation}
-				>
-					{@render typeOptions()}
-				</select>
-			</p>
-
-			<p class="field" class:is-empty={!budget} class:is-disabled={!hasLocation}>
-				<label class="field__label" for="db-budget">Budget</label>
-				<select
-					id="db-budget"
-					class="field__select"
-					title={!hasLocation ? 'Choose a location first' : undefined}
-					bind:value={budget}
-					disabled={!hasLocation}
-				>
-					{@render budgetOptions()}
-				</select>
-			</p>
+		<div class="bar__tray fc-tray">
+			<Select
+				variant="tray"
+				label="Location"
+				placeholder="Any location"
+				options={locationOpts}
+				bind:value={locationSlug}
+				onchange={handleLocationChange}
+			/>
+			<Select
+				variant="tray"
+				label="Community"
+				placeholder="Any community"
+				options={communityOpts}
+				disabled={communityDisabled}
+				title={communityDisabled ? 'Choose a location first' : undefined}
+				bind:value={communitySlug}
+			/>
+			<Select
+				variant="tray"
+				label="Property type"
+				placeholder="Any type"
+				options={typeOpts}
+				disabled={!hasLocation}
+				title={!hasLocation ? 'Choose a location first' : undefined}
+				bind:value={propertyType}
+			/>
+			<Select
+				variant="tray"
+				label="Budget"
+				placeholder="Any budget"
+				options={budgetOpts}
+				disabled={!hasLocation}
+				title={!hasLocation ? 'Choose a location first' : undefined}
+				bind:value={budget}
+			/>
 
 			<button class="bar__search" type="submit" aria-label="Search homes">
 				<svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -314,7 +301,9 @@
 				<span class="srow__control">
 					<span class="srow__flag">{@render flagStamp(selectedCountry)}</span>
 					<select id="sh-country" bind:value={countrySlug} onchange={handleCountryChange}>
-						{@render countryOptions()}
+						{#each countries as country (country._id)}
+							<option value={country.slug}>{country.name}</option>
+						{/each}
 					</select>
 				</span>
 			</p>
@@ -398,139 +387,9 @@
 
 	.bar__tray {
 		flex: 1;
-		display: flex;
-		align-items: stretch;
-		background: var(--white);
-		border: 1px solid var(--gold);
-		box-shadow: 0 30px 56px -38px oklch(0.18 0.02 165 / 0.5);
 	}
 
-	.field {
-		margin: 0;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		gap: 0.5rem;
-		padding: 0.875rem 1.125rem;
-		min-width: 0;
-	}
-
-	.bar__tray .field {
-		flex: 1;
-		border-right: 1px solid var(--border);
-		transition: background var(--duration-hover) var(--ease);
-	}
-
-	/* Gold underline on the active field, drawn inside so it never shifts layout. */
-	.bar__tray .field:focus-within {
-		background: oklch(0.985 0.006 90);
-		box-shadow: inset 0 -3px 0 var(--gold);
-	}
-
-	.field--chip {
-		flex: none;
-		min-width: 9.5rem;
-		background:
-			radial-gradient(150% 120% at 8% -10%, oklch(0.37 0.05 165) 0%, transparent 60%),
-			linear-gradient(165deg, oklch(0.29 0.034 165) 0%, oklch(0.22 0.03 165) 100%);
-		box-shadow: 0 30px 56px -38px oklch(0.12 0.02 165 / 0.6);
-	}
-
-	.field__label {
-		font-family: var(--sans);
-		font-weight: 500;
-		font-size: 0.625rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--muted);
-	}
-
-	.field--chip .field__label {
-		color: var(--gold);
-	}
-
-	.field__control {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		min-width: 0;
-	}
-
-	.field__flag {
-		flex: none;
-		width: 1.375rem;
-		height: 0.9375rem;
-		display: block;
-		border: 1px solid oklch(1 0 0 / 0.4);
-		overflow: hidden;
-	}
-
-	.field__flag :global(svg),
-	.field__flag :global(img) {
-		display: block;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	/* The native select carries the value text in Playfair; appearance stripped, a gold
-	   chevron drawn as a background so the control reads as editorial type, not a form box. */
-	.field select {
-		appearance: none;
-		width: 100%;
-		min-width: 0;
-		margin: 0;
-		padding: 0 1.25em 0 0;
-		border: 0;
-		border-radius: 0;
-		background: transparent;
-		font-family: var(--serif);
-		font-weight: 400;
-		font-size: 1.1875rem;
-		line-height: 1.15;
-		color: var(--charcoal);
-		cursor: pointer;
-		text-overflow: ellipsis;
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1.5 7 7l6-5.5' stroke='%236B6B6B' stroke-width='1.5'/%3E%3C/svg%3E");
-		background-repeat: no-repeat;
-		background-position: right 0 center;
-		background-size: 0.6em auto;
-	}
-
-	.field--chip select {
-		color: var(--on-green);
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1.5 7 7l6-5.5' stroke='%23D6C3A3' stroke-width='1.5'/%3E%3C/svg%3E");
-	}
-
-	.field select option {
-		font-family: var(--sans);
-		font-size: 1rem;
-		color: var(--charcoal);
-	}
-
-	/* Unselected fields read as a quiet italic prompt, not a committed choice. */
-	.field.is-empty select {
-		font-style: italic;
-		color: var(--muted);
-	}
-
-	.field.is-disabled {
-		opacity: 0.42;
-	}
-
-	.field.is-disabled select {
-		cursor: not-allowed;
-	}
-
-	.field select:focus-visible {
-		outline: 2px solid var(--green);
-		outline-offset: 4px;
-	}
-
-	.field--chip select:focus-visible {
-		outline-color: var(--on-green);
-	}
-
+	/* Round search action, sitting inside the gold tray on the right. */
 	.bar__search {
 		flex: none;
 		align-self: center;
