@@ -1,9 +1,15 @@
 <script lang="ts">
-	import FrontlineHero from '$lib/components/listing/FrontlineHero.svelte';
+	import PageHero from '$lib/components/PageHero.svelte';
 	import ListingResults from '$lib/components/listing/ListingResults.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
+
+	// Wrap a phrase in *asterisks* to render it italic — same convention the
+	// homepage and location heroes use, rendered without dangerouslySetHTML.
+	const headlineParts = $derived(
+		data.hero.headline.split('*').map((text, index) => ({ text, italic: index % 2 === 1 }))
+	);
 </script>
 
 <svelte:head>
@@ -23,15 +29,22 @@
 </svelte:head>
 
 <article class="frontline-page">
-	<FrontlineHero
-		eyebrow={data.hero.eyebrow}
-		headline={data.hero.headline}
+	<PageHero
+		image={data.hero.image?.url ?? ''}
+		srcset={data.hero.image?.srcset || undefined}
+		lqip={data.hero.image?.lqip}
+		alt={data.hero.image?.alt ?? ''}
 		lead={data.hero.lead}
-		image={data.hero.image}
 		breadcrumbs={data.breadcrumbs}
 		ctaHref="#properties"
 		ctaLabel="Browse the collection"
-	/>
+		compact
+		fetchpriority="high"
+	>
+		{#snippet title()}
+			{#each headlineParts as part, i (i)}{#if part.italic}<em>{part.text}</em>{:else}{part.text}{/if}{/each}
+		{/snippet}
+	</PageHero>
 
 	<div id="properties" class="frontline-page__results">
 		<ListingResults
