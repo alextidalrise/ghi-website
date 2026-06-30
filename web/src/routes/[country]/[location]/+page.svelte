@@ -31,13 +31,22 @@
 
 	// Only direct communities (sub-areas whose listings live under this location) can
 	// filter this location's results; associated communities resolve elsewhere.
-	const communityOptions = $derived(
-		data.directCommunities
-			.filter((community): community is typeof community & { slug: string; name: string } =>
-				Boolean(community.slug && community.name)
-			)
-			.map((community) => ({ label: community.name, value: community.slug }))
-	);
+	//
+	// Collapse by slug: a location can surface two community docs sharing one slug
+	// (a stray duplicate in the CMS, or a draft alongside its published twin in
+	// preview). Both filter to the identical ?community= value, so they're the same
+	// option. Left un-deduped, the keyed {#each} in ListingFilters hits a duplicate
+	// key and throws during client-side navigation — SSR skips that check, so a
+	// direct page load still works, which is what makes the bug look like a routing
+	// glitch rather than a data one.
+	const communityOptions = $derived.by(() => {
+		const bySlug = new Map<string, { label: string; value: string }>();
+		for (const community of data.directCommunities) {
+			if (!community.slug || !community.name || bySlug.has(community.slug)) continue;
+			bySlug.set(community.slug, { label: community.name, value: community.slug });
+		}
+		return [...bySlug.values()];
+	});
 
 	// An active community refines the page, so its description leads the overview;
 	// otherwise the location's own editorial copy carries it.
