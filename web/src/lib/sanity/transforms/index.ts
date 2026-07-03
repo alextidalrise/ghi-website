@@ -58,6 +58,11 @@ type GolfCourseRef = {
 	name?: string | null;
 	slug?: string | null;
 	shortDescription?: string | null;
+	/** Short positioning line ("the short line" teased under the course name). */
+	tagline?: string | null;
+	holes?: number | null;
+	par?: number | null;
+	designStyle?: string | null;
 	/** Exact course GPS point, surfaced for area-map pins (see GOLF_PUBLIC). */
 	coordinates?: GeoPoint | null;
 	countrySlug?: string | null;
