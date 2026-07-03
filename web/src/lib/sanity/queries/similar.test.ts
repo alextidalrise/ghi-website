@@ -3,6 +3,7 @@ import { goldenPropertyRaw } from '../verification/fixture-payloads';
 import { isPublicMediaAsset, type MediaAssetInput } from '../transforms/mediaFilter';
 
 vi.mock('../image', () => ({
+	getImagePlaceholder: vi.fn(() => null),
 	buildPublicImageUrl: vi.fn((asset: MediaAssetInput | null | undefined) => {
 		if (!isPublicMediaAsset(asset)) {
 			return null;

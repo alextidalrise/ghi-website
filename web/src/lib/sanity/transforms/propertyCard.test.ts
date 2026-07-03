@@ -8,6 +8,7 @@ import { isPublicMediaAsset, type MediaAssetInput } from './mediaFilter';
 import { toPublicPropertyCard, type RawPropertyCard } from './propertyCard';
 
 vi.mock('../image', () => ({
+	getImagePlaceholder: vi.fn(() => null),
 	buildPublicImageUrl: vi.fn((asset: MediaAssetInput | null | undefined) => {
 		if (!isPublicMediaAsset(asset)) {
 			return null;
