@@ -47,7 +47,6 @@
 			location: card.location
 		});
 	});
-	const locationLine = $derived(card.location?.addressDisplay ?? null);
 	const fallbackName = $derived(kind === 'development' ? 'Development listing' : 'Property listing');
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? fallbackName);
 	const linkLabel = $derived(card.title ?? `View ${fallbackName.toLowerCase()}`);
@@ -110,9 +109,6 @@
 			/>
 		{:else}
 			<span class="spotlight-card__img spotlight-card__img--placeholder" aria-hidden="true"></span>
-		{/if}
-		{#if locationLine && surface !== 'green'}
-			<span class="spotlight-card__chip">{locationLine}</span>
 		{/if}
 	</span>
 
@@ -188,20 +184,6 @@
 
 	.spotlight-card--green .spotlight-card__img--placeholder {
 		background: oklch(0.3 0.03 165);
-	}
-
-	.spotlight-card__chip {
-		position: absolute;
-		bottom: 0.85rem;
-		left: 0.85rem;
-		padding: 0.35rem 0.7rem;
-		font-family: var(--sans);
-		font-size: var(--text-overline);
-		font-weight: 500;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		background: var(--white);
-		color: var(--charcoal);
 	}
 
 	.spotlight-card__body {
