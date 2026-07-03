@@ -2,8 +2,7 @@
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import ContentSection from '$lib/components/property/ContentSection.svelte';
 	import EnquiryRail from '$lib/components/property/EnquiryRail.svelte';
-	import GolfInfo from '$lib/components/property/GolfInfo.svelte';
-	import LocationSection from '$lib/components/property/LocationSection.svelte';
+	import PropertyLocation from '$lib/components/property/PropertyLocation.svelte';
 	import PropertyDetail from '$lib/components/property/PropertyDetail.svelte';
 	import SimilarProperties from '$lib/components/listing/SimilarProperties.svelte';
 	import DevelopmentGallery from '$lib/components/development/Gallery.svelte';
@@ -96,13 +95,12 @@
 
 		<SharedAmenities {development} />
 
-		<LocationSection
+		<PropertyLocation
 			description={development.content?.locationDescription}
 			address={development.location?.addressDisplay}
 			map={development.location?.map}
+			golf={development.golf}
 		/>
-
-		<GolfInfo golf={development.golf} description={development.content?.golfDescription} />
 
 		{#if similarCards.length > 0}
 			<SimilarProperties cards={similarCards} />
