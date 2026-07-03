@@ -97,7 +97,7 @@
 	}
 
 	/* The grid block earns more room than the 1060px editorial column above it:
-	   four cards breathe at ~1280px. Self-centering so it can sit outside the
+	   three cards breathe at ~1280px. Self-centering so it can sit outside the
 	   page's .content-wrap. */
 	.listing-results__inner {
 		max-width: 1280px;
