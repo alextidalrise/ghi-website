@@ -18,7 +18,37 @@ export const locationTaxonomy = defineType({
 			name: 'slug',
 			title: 'Slug',
 			type: 'slug',
-			options: { source: 'name', maxLength: 96 },
+			options: {
+				source: 'name',
+				maxLength: 96,
+				// Sanity's default uniqueness check spans the whole dataset, which
+				// wrongly flags a location and its catch-all community sharing a slug.
+				// URLs resolve each level by (slug + parent), so we only need slugs to
+				// be unique within the same taxonomy level under the same parent.
+				isUnique: async (slug, context) => {
+					const doc = context.document as
+						| { type?: string; parent?: { _ref?: string } }
+						| undefined;
+					const id = (context.document?._id ?? '').replace(/^drafts\./, '');
+					const client = context.getClient({ apiVersion: '2024-01-01' });
+					const conflict = await client.fetch<string | null>(
+						`*[
+							_type == "locationTaxonomy"
+							&& slug.current == $slug
+							&& type == $type
+							&& parent._ref == $parentRef
+							&& !(_id in [$id, "drafts." + $id])
+						][0]._id`,
+						{
+							slug,
+							type: doc?.type ?? null,
+							parentRef: doc?.parent?._ref ?? null,
+							id
+						}
+					);
+					return !conflict;
+				}
+			},
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
