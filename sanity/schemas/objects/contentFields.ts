@@ -65,7 +65,17 @@ export const contentFields = defineType({
 			rows: 3,
 			description:
 				'Required. Brief summary for search results and listing cards. Must be reviewed before going live. Do not include investment or urgency claims unless confirmed from a source.',
-			validation: (Rule) => Rule.required()
+			validation: (Rule) =>
+				Rule.custom((value, context) => {
+					// Content is an optional per-field override on units/unit types (it
+					// ladders up to the development), so short description is only required
+					// where content is the canonical source — the development and elsewhere.
+					const type = context?.document?._type;
+					if (type !== 'unit' && type !== 'unitType' && !value) {
+						return 'Short description is required';
+					}
+					return true;
+				})
 		}),
 		portableTextField(
 			'aboutDescription',

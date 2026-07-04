@@ -262,6 +262,47 @@ function filterContentFields(content: ContentInput | null | undefined): PublicCo
 	return publicContent;
 }
 
+const CONTENT_LADDER_KEYS = [
+	'shortDescription',
+	'aboutDescription',
+	'locationDescription',
+	'golfDescription',
+	'featureHighlights',
+	'amenities'
+] as const;
+
+function contentValuePresent(value: unknown): boolean {
+	if (value == null) return false;
+	if (typeof value === 'string') return value.trim().length > 0;
+	if (Array.isArray(value)) return value.length > 0;
+	return true;
+}
+
+/**
+ * Resolve a unit's editorial copy field-by-field across the inheritance ladder:
+ * the unit's own content wins per field, else the unit type's, else the
+ * development's. An empty string or empty array counts as "not set" so a partly
+ * filled level still falls through for the fields it leaves blank.
+ */
+function mergeContentLadder(
+	...levels: (ContentInput | null | undefined)[]
+): PublicContent | null {
+	const filtered = levels.map((content) => filterContentFields(content));
+	const result: Partial<PublicContent> = {};
+	let any = false;
+	for (const key of CONTENT_LADDER_KEYS) {
+		for (const level of filtered) {
+			const value = level?.[key as keyof PublicContent];
+			if (contentValuePresent(value)) {
+				(result as Record<string, unknown>)[key] = value;
+				any = true;
+				break;
+			}
+		}
+	}
+	return any ? (result as PublicContent) : null;
+}
+
 function transformDevelopmentUnits(units: UnitLike[] | null | undefined) {
 	// Keep reserved/sold-but-visible units so the inventory table can list them in a
 	// locked row; only hidden/internal units are dropped here.
@@ -357,6 +398,7 @@ type RawUnitType = {
 	specs?: Record<string, unknown> | null;
 	gallery?: MediaAssetInput[] | null;
 	floorplans?: MediaAssetInput[] | null;
+	content?: ContentInput | null;
 };
 
 export type RawUnitListing = {
@@ -373,6 +415,7 @@ export type RawUnitListing = {
 	specs?: Record<string, unknown> | null;
 	floorplan?: MediaAssetInput | null;
 	unitGallery?: MediaAssetInput[] | null;
+	content?: ContentInput | null;
 	unitType?: RawUnitType | null;
 	development?: RawUnitDevelopmentContext | null;
 	countrySlug?: string | null;
@@ -457,6 +500,10 @@ export function toPublicUnitListing(
 	const specs = { ...(unitType?.specs ?? {}), ...(raw.specs ?? {}) };
 	if (raw.floor != null) specs.floor = raw.floor;
 
+	// Editorial copy inheritance: resolve each content field from the unit, else
+	// its unit type, else the development.
+	const content = mergeContentLadder(raw.content, unitType?.content, dev.content);
+
 	const devSeo = filterSeoFields(dev.seo);
 	const locationLabel =
 		dev.location?.community?.name ?? dev.location?.location?.name ?? dev.developmentName ?? null;
@@ -469,7 +516,7 @@ export function toPublicUnitListing(
 		...(devSeo ?? { openGraphImage: null }),
 		seoTitle,
 		metaDescription:
-			dev.seo?.metaDescription ?? dev.content?.shortDescription ?? null,
+			dev.seo?.metaDescription ?? content?.shortDescription ?? null,
 		noindex: dev.seo?.noindex ?? false
 	};
 
@@ -490,7 +537,7 @@ export function toPublicUnitListing(
 		seo,
 		ctas: filterCtaFields(dev.ctas),
 		golf: filterGolfFields(dev.golf),
-		content: filterContentFields(dev.content)
+		content
 	};
 
 	const context: UnitCanonicalContext = {

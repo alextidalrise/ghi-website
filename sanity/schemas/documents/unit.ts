@@ -8,6 +8,7 @@ export const unit = defineType({
 	type: 'document',
 	groups: [
 		{ name: 'details', title: 'Details', default: true },
+		{ name: 'content', title: 'Content' },
 		{ name: 'internal', title: 'Internal' }
 	],
 	fields: [
@@ -116,6 +117,14 @@ export const unit = defineType({
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
 			description:
 				"Optional. Photos specific to this unit. Normally left empty — the unit page inherits its unit type's shared gallery. Set this only when this unit genuinely has its own images, which then override the type's."
+		}),
+		defineField({
+			name: 'content',
+			title: 'Website content (override)',
+			type: 'contentFields',
+			group: 'content',
+			description:
+				"Optional. Overrides the development's copy for this unit. Any field left blank falls back to the unit type, then the development."
 		}),
 		statusField('internal'),
 		reviewItemsField('internal'),
