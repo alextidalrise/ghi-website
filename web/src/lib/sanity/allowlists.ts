@@ -549,13 +549,15 @@ export const UNIT_LISTING_PUBLIC = /* groq */ `{
   specs,
   floorplan${MEDIA_ASSET_PUBLIC},
   unitGallery[]${MEDIA_ASSET_PUBLIC},
+  content${CONTENT_PUBLIC},
   "unitType": parentUnitType->{
     _id,
     unitTypeName,
     propertyType,
     specs,
     gallery[]${MEDIA_ASSET_PUBLIC},
-    floorplans[]${MEDIA_ASSET_PUBLIC}
+    floorplans[]${MEDIA_ASSET_PUBLIC},
+    content${CONTENT_PUBLIC}
   },
   "development": parentDevelopment->${DEVELOPMENT_CONTEXT_PUBLIC},
   ${UNIT_CANONICAL_PATH_FIELDS}
