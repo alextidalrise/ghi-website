@@ -32,7 +32,7 @@ function baseRaw(overrides: Partial<RawUnitListing> = {}): RawUnitListing {
 			content: {
 				shortDescription: 'Dev short',
 				aboutDescription: about('Dev about'),
-				amenities: ['Dev pool']
+				featureHighlights: [{ label: 'Dev pool' }]
 			}
 		},
 		...overrides
@@ -45,7 +45,7 @@ describe('toPublicUnitListing content ladder', () => {
 		expect(result).not.toBeNull();
 		expect(result!.listing.content?.aboutDescription).toEqual(about('Dev about'));
 		expect(result!.listing.content?.shortDescription).toBe('Dev short');
-		expect(result!.listing.content?.amenities).toEqual(['Dev pool']);
+		expect(result!.listing.content?.featureHighlights).toEqual([{ label: 'Dev pool' }]);
 		// SEO meta description also honours the ladder.
 		expect(result!.listing.seo?.metaDescription).toBe('Dev short');
 	});
@@ -54,16 +54,16 @@ describe('toPublicUnitListing content ladder', () => {
 		const result = toPublicUnitListing(
 			baseRaw({
 				content: {
-					// Only override the about body; leave short + amenities blank/empty.
+					// Only override the about body; leave short + highlights blank/empty.
 					shortDescription: '   ',
 					aboutDescription: about('Unit about'),
-					amenities: []
+					featureHighlights: []
 				}
 			})
 		);
 		expect(result?.listing.content?.aboutDescription).toEqual(about('Unit about'));
 		expect(result?.listing.content?.shortDescription).toBe('Dev short');
-		expect(result?.listing.content?.amenities).toEqual(['Dev pool']);
+		expect(result?.listing.content?.featureHighlights).toEqual([{ label: 'Dev pool' }]);
 	});
 
 	it('uses the unit type when the unit is blank, over the development', () => {

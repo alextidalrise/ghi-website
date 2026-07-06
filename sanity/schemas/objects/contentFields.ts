@@ -100,13 +100,6 @@ export const contentFields = defineType({
 			description: 'A handpicked list of standout features shown prominently on the listing (e.g. sea view, private pool). Must be reviewed before going live.'
 		}),
 		defineField({
-			name: 'amenities',
-			title: 'Amenities',
-			type: 'array',
-			of: [{ type: 'string' }],
-			description: 'A list of amenity labels shown on the listing (e.g. "Air conditioning", "Private pool").'
-		}),
-		defineField({
 			name: 'humanReviewed',
 			title: 'Human reviewed',
 			type: 'boolean',

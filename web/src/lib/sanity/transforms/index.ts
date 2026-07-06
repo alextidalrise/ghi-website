@@ -81,7 +81,6 @@ type ContentInput = {
 	locationDescription?: PortableTextBlock[] | null;
 	golfDescription?: PortableTextBlock[] | null;
 	featureHighlights?: FeatureHighlight[] | null;
-	amenities?: string[] | null;
 	humanReviewed?: boolean | null;
 	reviewer?: string | null;
 	reviewDate?: string | null;
@@ -267,8 +266,7 @@ const CONTENT_LADDER_KEYS = [
 	'aboutDescription',
 	'locationDescription',
 	'golfDescription',
-	'featureHighlights',
-	'amenities'
+	'featureHighlights'
 ] as const;
 
 function contentValuePresent(value: unknown): boolean {

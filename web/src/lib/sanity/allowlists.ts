@@ -142,8 +142,7 @@ export const CONTENT_PUBLIC = /* groq */ `{
     category,
     isFilterable,
     isHighlighted
-  },
-  amenities
+  }
 }`;
 
 /** Public website content for property pages — location/golf descriptions and amenities removed. */

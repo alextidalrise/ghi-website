@@ -237,9 +237,16 @@ function buildDevelopment(assetId: string, includeChildren = true): IdentifiedSa
 						}
 					]
 				}
-			],
-			amenities: ['Private spa', 'Residents lounge', 'Podium gardens', 'Concierge', 'Underground parking']
+			]
 		},
+		sharedAmenities: ['Private spa', 'Residents lounge', 'Podium gardens', 'Concierge', 'Underground parking'].map(
+			(label, index) => ({
+				_key: `sa${index + 1}`,
+				_type: 'featureHighlight',
+				label,
+				isHighlighted: true
+			})
+		),
 		sharedGallery: [mediaAsset(assetId, 'Epic — riverside facade', 'sg1')],
 		media: {
 			_type: 'mediaFields',
