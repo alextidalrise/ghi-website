@@ -1,8 +1,6 @@
 <script lang="ts">
 	import type { PublicDevelopment } from '$lib/sanity/transforms';
-	import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
 	import { formatListingPrice, formatPropertyType } from '$lib/listing/formatPrice';
-	import { buildPublicImageUrl, buildImageSrcset, getImagePlaceholder } from '$lib/sanity/image';
 
 	type Props = {
 		units: PublicDevelopment['units'];
@@ -51,10 +49,6 @@
 		return typeof value === 'string' && value.trim() ? value.trim() : null;
 	}
 
-	function firstImage(list: unknown): MediaAssetInput | null {
-		return Array.isArray(list) && list.length > 0 ? (list[0] as MediaAssetInput) : null;
-	}
-
 	/** Drop the development-name prefix so "Monte Rei linked villas" reads as "Linked villas". */
 	function shortTypeLabel(name: string): string {
 		let label = name;
@@ -77,18 +71,6 @@
 		const match = value.match(/[\d.]+/);
 		return match ? Number.parseFloat(match[0]) : Number.MAX_SAFE_INTEGER;
 	}
-
-	// First gallery image per unit-type name, so a unit with no own photos can still
-	// borrow its type's hero for the thumbnail and the selector tile.
-	const typeImages = $derived.by(() => {
-		const map = new Map<string, MediaAssetInput>();
-		for (const ut of unitTypes ?? []) {
-			const name = str((ut as Record<string, unknown>).unitTypeName);
-			const img = firstImage((ut as Record<string, unknown>).gallery);
-			if (name && img) map.set(name, img);
-		}
-		return map;
-	});
 
 	const rows = $derived.by((): Row[] =>
 		(units ?? []).map((unit) => {
@@ -155,16 +137,10 @@
 		count: number;
 		availableCount: number;
 		fromPrice: string | null;
-		image: MediaAssetInput | null;
 		memberIds: Set<string>;
 	};
 
-	function buildGroup(
-		key: string,
-		label: string,
-		members: Row[],
-		image: MediaAssetInput | null
-	): Group {
+	function buildGroup(key: string, label: string, members: Row[]): Group {
 		const prices = members.map((m) => m.priceValue).filter((v): v is number => v != null);
 		const fromPrice =
 			hasPrice && prices.length > 0
@@ -176,7 +152,6 @@
 			count: members.length,
 			availableCount: members.filter((m) => m.available).length,
 			fromPrice,
-			image,
 			memberIds: new Set(members.map((m) => m.id))
 		};
 	}
@@ -190,9 +165,7 @@
 			if (!name) continue;
 			const members = rows.filter((r) => r.unitTypeKey === name);
 			if (members.length === 0) continue;
-			out.push(
-				buildGroup(name, shortTypeLabel(name), members, firstImage((ut as Record<string, unknown>).gallery))
-			);
+			out.push(buildGroup(name, shortTypeLabel(name), members));
 		}
 		return out;
 	});
@@ -209,9 +182,7 @@
 			}
 			byKey.get(key)!.push(r);
 		}
-		return order.map((key) =>
-			buildGroup(key, formatPropertyType(key), byKey.get(key)!, typeImages.get(key) ?? null)
-		);
+		return order.map((key) => buildGroup(key, formatPropertyType(key), byKey.get(key)!));
 	});
 
 	const groups = $derived(
@@ -222,7 +193,6 @@
 				: []
 	);
 	const showSelector = $derived(groups.length >= 2);
-	const selectorHasImages = $derived(groups.some((g) => g.image));
 
 	let activeKey = $state<string | null>(null);
 	const activeGroup = $derived(groups.find((g) => g.key === activeKey) ?? null);
@@ -315,14 +285,6 @@
 		expandedId = expandedId === id ? null : id;
 	}
 
-	// Thumbnail (square crop) for selector tiles and mobile cards.
-	function thumbSrc(asset: MediaAssetInput | null, size = 200): string | null {
-		return buildPublicImageUrl(asset, { width: size, height: size, fit: 'crop', quality: 70 });
-	}
-	function thumbSrcset(asset: MediaAssetInput | null, size = 200): string {
-		return buildImageSrcset(asset, [size, size * 2], { height: size, fit: 'crop', quality: 70 });
-	}
-
 	const homesWord = $derived(rows.length === 1 ? 'home' : 'homes');
 	const resultLabel = $derived(
 		activeGroup
@@ -341,7 +303,6 @@
 		{#if showSelector}
 			<div
 				class="units__filters"
-				class:units__filters--photo={selectorHasImages}
 				role="group"
 				aria-label="Filter by property type"
 			>
@@ -352,16 +313,6 @@
 					aria-pressed={activeKey === null}
 					onclick={() => selectType(null)}
 				>
-					{#if selectorHasImages}
-						<span class="tfilter__media tfilter__media--all" aria-hidden="true">
-							<svg viewBox="0 0 24 24" fill="none">
-								<rect x="3" y="3" width="7.5" height="7.5" />
-								<rect x="13.5" y="3" width="7.5" height="7.5" />
-								<rect x="3" y="13.5" width="7.5" height="7.5" />
-								<rect x="13.5" y="13.5" width="7.5" height="7.5" />
-							</svg>
-						</span>
-					{/if}
 					<span class="tfilter__body">
 						<span class="tfilter__label">All homes</span>
 						<span class="tfilter__meta">{rows.length} {homesWord}</span>
@@ -376,34 +327,6 @@
 						aria-pressed={activeKey === group.key}
 						onclick={() => selectType(group.key)}
 					>
-						{#if selectorHasImages}
-							<span
-								class="tfilter__media"
-								aria-hidden="true"
-								style:background-image={group.image && getImagePlaceholder(group.image)
-									? `url(${getImagePlaceholder(group.image)})`
-									: undefined}
-							>
-								{#if group.image}
-									<img
-										src={thumbSrc(group.image, 220)}
-										srcset={thumbSrcset(group.image, 220)}
-										sizes="(max-width: 720px) 2rem, 220px"
-										alt=""
-										width="220"
-										height="220"
-										loading="lazy"
-										decoding="async"
-									/>
-								{:else}
-									<span class="tfilter__media--all">
-										<svg viewBox="0 0 24 24" fill="none">
-											<rect x="4" y="4" width="16" height="16" />
-										</svg>
-									</span>
-								{/if}
-							</span>
-						{/if}
 						<span class="tfilter__body">
 							<span class="tfilter__label">{group.label}</span>
 							<span class="tfilter__meta">
@@ -670,67 +593,6 @@
 
 	.tfilter--active .tfilter__from {
 		color: var(--gold);
-	}
-
-	/* Photo variant: a thumbnail leads each tile. */
-	.units__filters--photo .tfilter {
-		flex-direction: column;
-		align-items: stretch;
-		gap: 0;
-		width: clamp(8.5rem, 22vw, 11rem);
-		padding: 0;
-		overflow: hidden;
-	}
-
-	.tfilter__media {
-		display: block;
-		aspect-ratio: 3 / 2;
-		background: color-mix(in srgb, var(--green) 6%, var(--white));
-		overflow: hidden;
-		/* Blurred LQIP shows through until the thumbnail paints over it. */
-		background-size: cover;
-		background-position: center;
-		background-repeat: no-repeat;
-	}
-
-	.tfilter__media img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		display: block;
-		transition: transform var(--duration-image) var(--ease);
-	}
-
-	.tfilter:hover .tfilter__media img,
-	.tfilter:focus-visible .tfilter__media img {
-		transform: scale(1.04);
-	}
-
-	.tfilter__media--all {
-		display: grid;
-		place-items: center;
-		width: 100%;
-		height: 100%;
-		color: var(--green);
-	}
-
-	.tfilter__media--all svg {
-		width: 38%;
-		height: auto;
-	}
-
-	.tfilter__media--all rect {
-		fill: currentColor;
-		opacity: 0.85;
-	}
-
-	.units__filters--photo .tfilter__body {
-		padding: 0.6rem 0.75rem 0.7rem;
-		gap: 0.2rem;
-	}
-
-	.units__filters--photo .tfilter__meta {
-		white-space: normal;
 	}
 
 	/* ---- Sort bar --------------------------------------------------------- */
@@ -1148,8 +1010,8 @@
 			min-width: 0;
 		}
 
-		/* Type filters: compact photo tiles that share one row — image with a small
-		   label beneath it, count/price dropped to keep them narrow. */
+		/* Type filters: compact text tabs that share one row — label only, with the
+		   count/price meta dropped to keep them narrow. */
 		.units__filters {
 			flex-wrap: nowrap;
 			gap: 0.5rem;
@@ -1163,12 +1025,6 @@
 
 		.tfilter__meta {
 			display: none;
-		}
-
-		.units__filters--photo .tfilter__body {
-			padding: 0.4rem 0.35rem 0.5rem;
-			align-items: center;
-			text-align: center;
 		}
 
 		.tfilter__label {
@@ -1188,7 +1044,6 @@
 			transition: none;
 		}
 
-		.tfilter__media img,
 		.units__view span {
 			transition: none;
 		}

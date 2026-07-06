@@ -26,9 +26,4 @@
 	});
 </script>
 
-<FeatureLattice
-	heading="Shared amenities"
-	headingId="shared-amenities-heading"
-	items={amenities}
-	sectionClass="content-wrap"
-/>
+<FeatureLattice heading="Shared amenities" headingId="shared-amenities-heading" items={amenities} />
