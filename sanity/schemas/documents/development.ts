@@ -186,6 +186,7 @@ export const development = defineType({
 			type: 'array',
 			group: 'content',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' },
 			description: 'Approved images shared across all units in this development.'
 		}),
 		defineField({
