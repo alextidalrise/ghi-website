@@ -115,6 +115,8 @@
 		"migrate:marketing-cleanup:dry-run": "tsx migrations/marketing-cleanup-migrate.ts --dry-run",
 		"migrate:promote-algarve-communities": "tsx migrations/promote-algarve-communities-migrate.ts",
 		"migrate:promote-algarve-communities:dry-run": "tsx migrations/promote-algarve-communities-migrate.ts --dry-run",
+		"migrate:fold-amenities": "tsx migrations/fold-amenities-into-shared-migrate.ts",
+		"migrate:fold-amenities:dry-run": "tsx migrations/fold-amenities-into-shared-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

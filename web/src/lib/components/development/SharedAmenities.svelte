@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PublicDevelopment } from '$lib/sanity/transforms';
+	import FeatureLattice from '$lib/components/property/FeatureLattice.svelte';
 
 	type Props = {
 		development: PublicDevelopment;
@@ -7,68 +8,27 @@
 
 	let { development }: Props = $props();
 
-	const amenities = $derived.by(() => {
-		const shared = (development.sharedAmenities ?? [])
-			.filter((item) => item?.label)
-			.map((item) => ({
-				label: item.label!,
-				value: item.value ?? null
-			}));
-
-		const contentAmenities = (development.content?.amenities ?? []).map((label) => ({
-			label,
-			value: null as string | null
-		}));
-
+	/* Development-wide amenities (spa, restaurant, gym …), authored in the dedicated
+	   `sharedAmenities` field. We surface the `label` only — matching the property
+	   Highlights lattice; `value` carries internal detail and never ships. */
+	const amenities = $derived.by((): string[] => {
 		const seen = new Set<string>();
-		return [...shared, ...contentAmenities].filter((item) => {
-			const key = `${item.label}:${item.value ?? ''}`;
-			if (seen.has(key)) return false;
+		const out: string[] = [];
+		for (const amenity of development.sharedAmenities ?? []) {
+			const label = amenity?.label?.trim();
+			if (!label) continue;
+			const key = label.toLowerCase();
+			if (seen.has(key)) continue;
 			seen.add(key);
-			return true;
-		});
+			out.push(label);
+		}
+		return out;
 	});
 </script>
 
-{#if amenities.length > 0}
-	<section class="amenities content-wrap" aria-labelledby="shared-amenities-heading">
-		<h2 id="shared-amenities-heading">Shared amenities</h2>
-		<ul class="amenities__list">
-			{#each amenities as amenity (`${amenity.label}-${amenity.value ?? ''}`)}
-				<li>
-					{amenity.label}{#if amenity.value}
-						<span class="amenities__value"> — {amenity.value}</span>
-					{/if}
-				</li>
-			{/each}
-		</ul>
-	</section>
-{/if}
-
-<style>
-	.amenities {
-		padding-block: var(--space-xl);
-	}
-
-	.amenities h2 {
-		margin-bottom: var(--space-md);
-	}
-
-	.amenities__list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.65rem;
-		list-style: none;
-	}
-
-	.amenities__list li {
-		font-size: var(--text-ui);
-		padding: 0.45rem 0.85rem;
-		border: 1px solid var(--border);
-		color: var(--green);
-	}
-
-	.amenities__value {
-		color: var(--muted);
-	}
-</style>
+<FeatureLattice
+	heading="Shared amenities"
+	headingId="shared-amenities-heading"
+	items={amenities}
+	sectionClass="content-wrap"
+/>
