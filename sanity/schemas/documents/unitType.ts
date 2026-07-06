@@ -67,6 +67,7 @@ export const unitType = defineType({
 			type: 'array',
 			group: 'details',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' },
 			description: 'Floorplan images for this unit type. Shown on the website once approved.'
 		}),
 		defineField({
@@ -75,6 +76,7 @@ export const unitType = defineType({
 			type: 'array',
 			group: 'details',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' },
 			description: 'Gallery images for this unit type. Shown on the website once approved.'
 		}),
 		defineField({

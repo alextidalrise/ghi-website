@@ -115,6 +115,7 @@ export const unit = defineType({
 			type: 'array',
 			group: 'details',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' },
 			description:
 				"Optional. Photos specific to this unit. Normally left empty — the unit page inherits its unit type's shared gallery. Set this only when this unit genuinely has its own images, which then override the type's."
 		}),

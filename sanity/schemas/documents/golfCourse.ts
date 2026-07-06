@@ -100,6 +100,7 @@ export const golfCourse = defineType({
 			type: 'array',
 			group: 'details',
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
+			options: { layout: 'grid' },
 			description: 'Photos of this golf course. Uploaded images appear on the website once the listing is published.'
 		}),
 		defineField({
