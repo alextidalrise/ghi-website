@@ -74,6 +74,7 @@
 
 		<div class="listing-body content-wrap">
 			<div class="listing-body__main">
+				<SharedAmenities {development} />
 				<ContentSection
 					title="About this development"
 					body={development.content?.aboutDescription}
@@ -92,8 +93,6 @@
 			{developmentPath}
 			showPricing={showInventoryPricing}
 		/>
-
-		<SharedAmenities {development} />
 
 		<PropertyLocation
 			description={development.content?.locationDescription}
@@ -122,6 +121,14 @@
 <style>
 	.listing-page {
 		padding-bottom: 0;
+	}
+
+	/* Match the property/unit pages: drop the 1060px reading cap so the body,
+	   units table, location and similar sections span the near-edge width under
+	   the gallery. Prose blocks keep their own ch-based caps, so line length
+	   stays readable. */
+	.listing-page--development {
+		--content-max: none;
 	}
 
 	/* Transparent until the desktop split kicks in, so gallery + summary join the
@@ -220,6 +227,15 @@
 		.listing-page--development {
 			display: flex;
 			flex-direction: column;
+		}
+
+		/* `.content-wrap` centres itself with margin-inline:auto; inside this flex
+		   column that shrinks each section to its content width instead of filling,
+		   so Location and Similar rendered narrower than the rest. Force full width.
+		   `:global` is required because these sections are rendered by child
+		   components and don't carry this component's scope hash. */
+		.listing-page--development > :global(.content-wrap) {
+			width: 100%;
 		}
 
 		.hero__gallery {
