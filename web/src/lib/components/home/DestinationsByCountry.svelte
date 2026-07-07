@@ -3,6 +3,7 @@
 		CountryFeatureCard,
 		FeaturedLocationCard
 	} from '$lib/sanity/transforms/taxonomyHero';
+	import CountryFlagArt from '$lib/components/CountryFlagArt.svelte';
 
 	type Props = {
 		countries: CountryFeatureCard[];
@@ -63,30 +64,10 @@
 	);
 </script>
 
-<!-- Flag stamp: prefer the SVG linked in Sanity; fall back to a built-in stamp so a
-     country still renders before an editor uploads its flag. Spain and Portugal ship
-     hand-drawn fallbacks (matching the buyer-guide flags); any other country gets a
-     neutral green field until its flag is added in the CMS. The country name carries the
-     meaning, so the flag is decorative (empty alt / aria-hidden). -->
+<!-- Flag stamp resolution (crisp SVG + Spain/Portugal fallbacks + neutral field) is
+     shared with the country hero via CountryFlagArt so the two surfaces never drift. -->
 {#snippet flag(country: CountryFeatureCard)}
-	{#if country.flagUrl}
-		<img src={country.flagUrl} alt="" width="48" height="32" loading="lazy" decoding="async" />
-	{:else if slugOf(country.href) === 'spain'}
-		<svg viewBox="0 0 30 20" aria-hidden="true">
-			<rect width="30" height="20" fill="#AA151B" />
-			<rect y="5" width="30" height="10" fill="#F1BF00" />
-		</svg>
-	{:else if slugOf(country.href) === 'portugal'}
-		<svg viewBox="0 0 30 20" aria-hidden="true">
-			<rect width="30" height="20" fill="#DA291C" />
-			<rect width="12" height="20" fill="#046A38" />
-			<circle cx="12" cy="10" r="3.1" fill="#FFE12C" stroke="#046A38" stroke-width="0.7" />
-		</svg>
-	{:else}
-		<svg viewBox="0 0 30 20" aria-hidden="true">
-			<rect width="30" height="20" fill="#1F3D34" />
-		</svg>
-	{/if}
+	<CountryFlagArt slug={slugOf(country.href)} flagUrl={country.flagUrl} />
 {/snippet}
 
 {#if groups.length > 0}
@@ -214,8 +195,10 @@
 		border: 1px solid var(--border);
 	}
 
+	/* The flag artwork now renders inside CountryFlagArt, so both svg and img need
+	   :global to reach across the component boundary. */
 	.country__flag :global(svg),
-	.country__flag img {
+	.country__flag :global(img) {
 		display: block;
 		width: 100%;
 		height: 100%;

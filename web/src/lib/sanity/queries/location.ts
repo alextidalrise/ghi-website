@@ -1,13 +1,30 @@
 import { defineQuery } from 'groq';
 import { LOCATION_TAXONOMY_PUBLIC, MEDIA_ASSET_PUBLIC } from '../allowlists';
 
-/** Country stub page — minimal public taxonomy fields for v1. */
+/** Country landing page. Mirrors the shared public taxonomy projection, plus the
+    dereferenced `flag` SVG URL — the country hero renders the flag as a framed stamp
+    (country-only field; absent on location/community stubs, hence not in the allowlist). */
 export const countryBySlugQuery = defineQuery(`
   *[
     _type == "locationTaxonomy"
     && type == "country"
     && slug.current == $countrySlug
-  ][0]${LOCATION_TAXONOMY_PUBLIC}
+  ][0]{
+    _id,
+    name,
+    "slug": slug.current,
+    type,
+    breadcrumbLabel,
+    isCatchAll,
+    seoTitle,
+    metaDescription,
+    publicDescription,
+    overviewHeading,
+    heroImage${MEDIA_ASSET_PUBLIC},
+    tagline,
+    coordinates,
+    "flagUrl": flag.asset->url
+  }
 `);
 
 /** Location stub page within a country. */
