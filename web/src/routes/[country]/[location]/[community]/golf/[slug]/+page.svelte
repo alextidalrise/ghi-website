@@ -6,7 +6,7 @@
 	let { data } = $props();
 
 	const courseHero = $derived(data.courseHero);
-	const heroLead = $derived(data.course.tagline ?? data.course.shortDescription ?? undefined);
+	const heroLead = $derived(data.course.tagline ?? undefined);
 </script>
 
 <svelte:head>
