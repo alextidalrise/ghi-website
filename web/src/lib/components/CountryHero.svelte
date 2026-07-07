@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
+	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import CountryFlagArt from './CountryFlagArt.svelte';
 
 	type Props = {
@@ -9,11 +11,13 @@
 		countrySlug: string;
 		/** Dereferenced flag SVG URL from Sanity; null falls back to a built-in stamp. */
 		flagUrl?: string | null;
+		/** Breadcrumb trail laid over the top of the band (matches the location hero). */
+		breadcrumbs?: BreadcrumbItem[];
 		/** Optional lead line beneath the headline. */
 		tagline?: string;
 	};
 
-	let { title, countrySlug, flagUrl, tagline }: Props = $props();
+	let { title, countrySlug, flagUrl, breadcrumbs, tagline }: Props = $props();
 </script>
 
 <!-- Compact deep-green punctuation band — the country page's single arrival moment.
@@ -21,6 +25,12 @@
      sits crisp as a framed passport stamp above the headline, the same stamp vocabulary
      used by the homepage country selector. -->
 <section class="country-hero on-dark">
+	{#if breadcrumbs && breadcrumbs.length > 0}
+		<div class="country-hero__crumbs">
+			<Breadcrumbs items={breadcrumbs} onDark />
+		</div>
+	{/if}
+
 	<div class="country-hero__inner content-wrap">
 		<span class="country-hero__flag">
 			<CountryFlagArt slug={countrySlug} {flagUrl} />
@@ -41,8 +51,10 @@
 		width: 100vw;
 		margin-inline: calc(50% - 50vw);
 		/* Compact: content-driven height, no photo, no forced viewport fill — roughly
-		   half the old photo hero's min-height. */
-		padding-block: clamp(2.75rem, 1.5rem + 4.5vw, 4.5rem);
+		   half the old photo hero's min-height. The breadcrumbs hold the top edge (their
+		   own padding gives the gap under the nav), so top padding is light; the base
+		   keeps the generous band footing. */
+		padding-block: var(--space-sm) clamp(2.75rem, 1.5rem + 4.5vw, 4.5rem);
 		color: var(--on-green);
 		/* Depth, not a flat slab: a soft light off the top-left settling deeper at the
 		   base — the same material as the Frontline band so the page reads as one system. */
