@@ -58,14 +58,6 @@
 </CountryHero>
 
 <article class="country-page">
-	<div class="country-page__intro content-wrap">
-		{#if overviewBody}
-			<AreaOverview heading={overviewHeading} body={overviewBody} />
-		{:else}
-			<p class="country-page__lead">{placeholderBody}</p>
-		{/if}
-	</div>
-
 	<section class="country-page__content content-wrap">
 		{#if countryLocations.length > 0}
 			<FeaturedLocations
@@ -87,16 +79,21 @@
 			summary={`Homes directly on the fairway in ${data.location.name}.`}
 			viewAllHref={data.frontlineViewAllHref}
 		/>
+
+		<!-- Long-form country overview closes the page: the grids lead with the property
+		     inventory buyers came for, and the editorial context sits beneath them. -->
+		<div class="country-page__overview">
+			{#if overviewBody}
+				<AreaOverview heading={overviewHeading} body={overviewBody} />
+			{:else}
+				<p class="country-page__lead">{placeholderBody}</p>
+			{/if}
+		</div>
 	</section>
 </article>
 
 <style>
-	.country-page__intro {
-		padding-block: var(--space-xl) 0;
-	}
-
 	.country-page__lead {
-		margin-top: var(--space-md);
 		max-width: 42rem;
 		color: var(--muted);
 		font-family: var(--sans);
