@@ -14,7 +14,6 @@ import {
 	fetchPublic,
 	locationsByCountryQuery
 } from '$lib/sanity/queries';
-import { resolveTaxonomyHero } from '$lib/sanity/transforms/taxonomyHero';
 import type { CountryBySlugQueryResult } from '$lib/sanity/types';
 
 type LocationTaxonomyPage = LocationTaxonomyRef & {
@@ -61,7 +60,6 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		pageType: 'country' as const,
 		location: country,
 		locations: locations ?? [],
-		countryHero: resolveTaxonomyHero(country),
 		featuredLocations,
 		featuredCards,
 		frontlineCards,

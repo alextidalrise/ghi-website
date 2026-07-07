@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PageHero from '$lib/components/PageHero.svelte';
+	import CountryHero from '$lib/components/CountryHero.svelte';
 	import AreaOverview from '$lib/components/AreaOverview.svelte';
 	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
@@ -10,7 +10,6 @@
 
 	let { data } = $props();
 
-	const countryHero = $derived(data.countryHero);
 	const countryLocations = $derived(data.featuredLocations);
 
 	const overviewBody = $derived(data.location.publicDescription?.trim() || undefined);
@@ -48,29 +47,19 @@
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
 
-{#if countryHero}
-	<PageHero
-		image={countryHero.url}
-		srcset={countryHero.srcset}
-		lqip={countryHero.lqip}
-		alt={countryHero.alt}
-		lead={countryHero.tagline ?? undefined}
-		compact
-		fetchpriority="high"
-	>
-		{#snippet title()}
-			{countryHeadline(data.location.name)}
-		{/snippet}
-	</PageHero>
-{/if}
+<CountryHero
+	countrySlug={data.location.slug}
+	flagUrl={data.location.flagUrl}
+	tagline={data.location.tagline ?? undefined}
+>
+	{#snippet title()}
+		{countryHeadline(data.location.name)}
+	{/snippet}
+</CountryHero>
 
 <article class="country-page">
 	<div class="country-page__intro content-wrap">
 		<Breadcrumbs items={data.breadcrumbs} />
-
-		{#if !countryHero}
-			<h1 class="country-page__title">{countryHeadline(data.location.name)}</h1>
-		{/if}
 
 		{#if overviewBody}
 			<AreaOverview heading={overviewHeading} body={overviewBody} />
@@ -106,10 +95,6 @@
 <style>
 	.country-page__intro {
 		padding-block: var(--space-xl) 0;
-	}
-
-	.country-page__title {
-		margin-top: var(--space-md);
 	}
 
 	.country-page__lead {
