@@ -4,7 +4,6 @@
 	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
-	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import { countryHeadline, countryOverviewHeading } from '$lib/home/headlines';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
@@ -50,6 +49,7 @@
 <CountryHero
 	countrySlug={data.location.slug}
 	flagUrl={data.location.flagUrl}
+	breadcrumbs={data.breadcrumbs}
 	tagline={data.location.tagline ?? undefined}
 >
 	{#snippet title()}
@@ -59,8 +59,6 @@
 
 <article class="country-page">
 	<div class="country-page__intro content-wrap">
-		<Breadcrumbs items={data.breadcrumbs} />
-
 		{#if overviewBody}
 			<AreaOverview heading={overviewHeading} body={overviewBody} />
 		{:else}
