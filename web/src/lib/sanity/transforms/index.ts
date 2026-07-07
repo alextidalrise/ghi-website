@@ -435,22 +435,13 @@ export type UnitCanonicalContext = {
 	developmentTitle: string;
 };
 
-function titleCaseEnum(value: string | null | undefined): string {
-	if (!value) return '';
-	return value.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-/** Compose a unit-page h1: the unit's own name, qualified by its typology when distinct. */
+/** Compose a unit-page h1 from the unit's own name. */
 function composeUnitTitle(unit: RawUnitListing): string {
-	const baseName =
+	return (
 		unit.unitName?.trim() ||
 		(unit.unitNumber ? `Unit ${unit.unitNumber}` : null) ||
-		'Unit';
-	const typeLabel = unit.unitType?.unitTypeName?.trim() || titleCaseEnum(unit.unitType?.propertyType);
-	if (typeLabel && !baseName.toLowerCase().includes(typeLabel.toLowerCase())) {
-		return `${baseName} · ${typeLabel}`;
-	}
-	return baseName;
+		'Unit'
+	);
 }
 
 /**
