@@ -32,6 +32,14 @@
 		locations: FeaturedLocationCard[];
 	};
 
+	// Columns per row on desktop for a country's grid. We fill up to `maxColumns` (4) per
+	// row and let the remainder wrap — so six locations read as 4 + 2. The exception is an
+	// exact count of four: a single flat row of four reads as a thin strip, so we pull it
+	// down to two columns to form a balanced 2×2 block instead.
+	function columnsFor(count: number): number {
+		return count === 4 ? 2 : maxColumns;
+	}
+
 	// The country is the spine: every country renders, with its featured locations slotted
 	// beneath. A country with no featured locations yet (e.g. Portugal before its set is
 	// attached) degrades to a header-only row — preserving the old "Explore by country"
@@ -111,8 +119,9 @@
 
 					{#if group.locations.length > 0}
 						<!-- Auto-filling grid, capped at `maxColumns` per row on desktop; a single
-						     swipeable rail on phones. -->
-						<ul class="tiles" style="--max-cols: {maxColumns}">
+						     swipeable rail on phones. Column count adapts to the location count so
+						     an exact four wraps into a 2×2 (see columnsFor). -->
+						<ul class="tiles" style="--max-cols: {columnsFor(group.locations.length)}">
 							{#each group.locations as location, index (location.href)}
 								<li class="location-tile" style="--reveal-delay: {index * 70}ms">
 									<a class="location-tile__link" href={location.href}>
