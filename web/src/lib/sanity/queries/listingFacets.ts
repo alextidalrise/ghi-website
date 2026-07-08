@@ -7,6 +7,21 @@ import {
 	PUBLIC_LISTING_FILTER
 } from './filters';
 
+function normalizeFacetRows(rows: RawFacetRow[] | null): ListingFacetRow[] {
+	return (rows ?? []).map((row) => ({
+		countrySlug: row.countrySlug ?? null,
+		locationSlug: row.locationSlug ?? null,
+		communitySlug: row.communitySlug ?? null,
+		propertyTypes: (row.propertyTypes ?? []).filter(
+			(value): value is string => typeof value === 'string' && value.length > 0
+		),
+		price: typeof row.price === 'number' ? row.price : null,
+		featureLabels: (row.featureLabels ?? []).filter(
+			(value): value is string => typeof value === 'string'
+		)
+	}));
+}
+
 /**
  * Per-listing facet rows for the homepage search bar. The bar pre-loads these once
  * (like the community list) and narrows Property type / Budget / Features client-side
@@ -41,6 +56,12 @@ const facetRowsQuery = /* groq */ `
   *[${FACET_LISTING_FILTER}]${FACET_ROW_PROJECTION}
 `;
 
+/** Same rows narrowed to a single country — feeds the country page's scoped search bar,
+    so a country page never pulls the whole catalogue's facets. */
+const countryFacetRowsQuery = /* groq */ `
+  *[${FACET_LISTING_FILTER} && ${LISTING_COUNTRY_SLUG} == $countrySlug]${FACET_ROW_PROJECTION}
+`;
+
 export type ListingFacetRow = {
 	countrySlug: string | null;
 	locationSlug: string | null;
@@ -61,17 +82,12 @@ type RawFacetRow = {
 
 /** Facet rows for every public listing — feeds the homepage bar's location-aware menus. */
 export async function fetchListingFacetRows(): Promise<ListingFacetRow[]> {
-	const rows = await fetchPublic<RawFacetRow[]>(facetRowsQuery);
-	return (rows ?? []).map((row) => ({
-		countrySlug: row.countrySlug ?? null,
-		locationSlug: row.locationSlug ?? null,
-		communitySlug: row.communitySlug ?? null,
-		propertyTypes: (row.propertyTypes ?? []).filter(
-			(value): value is string => typeof value === 'string' && value.length > 0
-		),
-		price: typeof row.price === 'number' ? row.price : null,
-		featureLabels: (row.featureLabels ?? []).filter(
-			(value): value is string => typeof value === 'string'
-		)
-	}));
+	return normalizeFacetRows(await fetchPublic<RawFacetRow[]>(facetRowsQuery));
+}
+
+/** Facet rows for one country — feeds the country page's scoped search bar. */
+export async function fetchCountryListingFacetRows(countrySlug: string): Promise<ListingFacetRow[]> {
+	return normalizeFacetRows(
+		await fetchPublic<RawFacetRow[]>(countryFacetRowsQuery, { params: { countrySlug } })
+	);
 }
