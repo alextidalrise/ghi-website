@@ -29,7 +29,8 @@
 			? formatDevelopmentCardPrice(card.pricing)
 			: null
 	);
-	const locationLine = $derived(card.location?.addressDisplay ?? null);
+	// Match PropertyCard: prefer the community name, falling back to the full address.
+	const locationLine = $derived(card.location?.community?.name ?? card.location?.addressDisplay ?? null);
 	const specsLine = $derived(buildDevelopmentMetaParts(card).join(' · ') || null);
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Development');
 </script>
@@ -51,12 +52,12 @@
 	<div class="property-card__body">
 		<p class="property-card__kicker">Development</p>
 
-		{#if locationLine}
-			<p class="property-card__location">{locationLine}</p>
-		{/if}
-
 		{#if card.title}
 			<h3 class="property-card__title">{card.title}</h3>
+		{/if}
+
+		{#if locationLine}
+			<p class="property-card__location">{locationLine}</p>
 		{/if}
 
 		{#if specsLine || price}
@@ -130,14 +131,17 @@
 	}
 
 	.property-card__location {
-		margin-bottom: 0.375rem;
+		margin: 0;
 		font-family: var(--sans);
-		font-size: var(--text-ui);
+		font-size: var(--text-overline);
+		font-weight: 500;
+		letter-spacing: var(--tracking-overline);
+		text-transform: uppercase;
 		color: var(--muted);
 	}
 
 	.property-card__title {
-		margin: 0 0 0.75rem;
+		margin: 0 0 0.375rem;
 		font-family: var(--serif);
 		font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.1875rem);
 		font-weight: 400;
