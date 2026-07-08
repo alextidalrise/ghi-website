@@ -122,6 +122,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		const similarCards = await fetchSimilarListingCards({
 			listingId: development._id!,
 			mode: development.related?.similarPropertiesMode,
+			kind: 'development',
 			location: development.location
 		});
 
@@ -206,9 +207,18 @@ async function loadCatchAllPreview(
 
 	const development = toPublicDevelopment(developmentInitial.data);
 	if (development) {
+		// Fetched separately from the live Presentation query (see the [slug] route note);
+		// renders on load, does not hot-update while editing.
+		const similarCards = await fetchSimilarListingCards({
+			listingId: development._id!,
+			mode: development.related?.similarPropertiesMode,
+			kind: 'development',
+			location: development.location
+		});
 		const detail = buildDevelopmentDetailPageData(development, siteOrigin, pathParams, {
 			preview: true,
-			skipRedirect: true
+			skipRedirect: true,
+			similarCards
 		});
 
 		return {

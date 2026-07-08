@@ -1,7 +1,9 @@
 import { defineQuery } from 'groq';
-import { MEDIA_ASSET_PUBLIC, PRICING_PUBLIC, PROPERTY_CARD_PUBLIC } from '../allowlists';
+import { DEVELOPMENT_CARD_PUBLIC, LISTING_CARD_UNION, PROPERTY_CARD_PUBLIC } from '../allowlists';
 import {
+	toPublicDevelopmentCard,
 	toSimilarListingCards,
+	type RawDevelopmentCard,
 	type RawSimilarListingItem,
 	type SimilarListingCard
 } from '../transforms/similarListingCard';
@@ -24,41 +26,25 @@ const DEVELOPMENT_BASE = /* groq */ `
   && ${PUBLIC_LISTING_FILTER}
 `;
 
-const MANUAL_SIMILAR_DEREF_FILTER = /* groq */ `
-  (_type == "propertyListing" && listingKind in ["property", "unit"] && ${PUBLIC_LISTING_FILTER})
-  || (_type == "development" && ${PUBLIC_LISTING_FILTER})
+// Either listing kind — property/unit listings or whole developments. Tags and manual are
+// explicit editorial signals, so they cross type boundaries (a shared tag or hand-pick can
+// link a property to a development); automatic stays type-scoped by design.
+const ANY_LISTING_BASE = /* groq */ `
+  (
+    (_type == "propertyListing" && listingKind in ["property", "unit"])
+    || _type == "development"
+  )
+  && ${PUBLIC_LISTING_FILTER}
 `;
 
-/** Unified manual deref shape — TypeScript discriminates on `_type`. */
-const MANUAL_SIMILAR_PROJECTION = /* groq */ `{
-  _type,
-  _id,
-  ghiListingId,
-  title,
-  "slug": slug.current,
-  listingKind,
-  propertyType,
-  transactionType,
-  developmentDisplayMode,
-  developmentStatus,
-  location{
-    country->{ name, "slug": slug.current },
-    location->{ name, "slug": slug.current },
-    community->{ name, "slug": slug.current },
-    addressDisplay
-  },
-  pricing${PRICING_PUBLIC},
-  specs{
-    bedrooms,
-    bathrooms,
-    builtArea,
-    builtAreaUnit
-  },
-  media{
-    gallery[0...1]${MEDIA_ASSET_PUBLIC},
-    thumbnailOverride${MEDIA_ASSET_PUBLIC}
-  }
-}`;
+// Gate the referenced picks by type + publish status BEFORE dereferencing. A filter
+// bracket placed after the `->` deref operator (`manualSimilarProperties[]->[...]`)
+// collapses every element to null in GROQ, so the type/publish fields are read off the
+// reference target via `@->` and the deref happens on the surviving refs.
+const MANUAL_SIMILAR_DEREF_FILTER = /* groq */ `
+  (@->_type == "propertyListing" && @->listingKind in ["property", "unit"] && (coalesce(@->status, "") == $publishedStatus || $previewAll))
+  || (@->_type == "development" && (coalesce(@->status, "") == $publishedStatus || $previewAll))
+`;
 
 /** Automatic similar listings — same community and property type. */
 export const automaticSimilarPropertiesQuery = defineQuery(`
@@ -72,21 +58,41 @@ export const automaticSimilarPropertiesQuery = defineQuery(`
   ] | order(_createdAt desc)[0...$limit]${PROPERTY_CARD_PUBLIC}
 `);
 
-/** Tag overlap similar listings — ordered by shared tag count. */
+/**
+ * Automatic similar developments — other published developments in the same country,
+ * ordered by taxonomy proximity: same community first, then same location/area, then
+ * newest. Developments frequently sit alone in their community (e.g. a catch-all that
+ * defines its own location), so the strict same-community match used for properties would
+ * usually return nothing; widening to the country with proximity ordering keeps the rail
+ * populated with the closest available peers.
+ */
+export const automaticSimilarDevelopmentsQuery = defineQuery(`
+  *[
+    ${DEVELOPMENT_BASE}
+    && _id != $excludeId
+    && location.country->slug.current == $countrySlug
+  ] | order(
+    select(location.community->slug.current == $communitySlug => 0, 1) asc,
+    select(location.location->slug.current == $locationSlug => 0, 1) asc,
+    _createdAt desc
+  )[0...$limit]${DEVELOPMENT_CARD_PUBLIC}
+`);
+
+/** Tag overlap similar listings — properties and developments, ordered by shared tag count. */
 export const tagsSimilarPropertiesQuery = defineQuery(`
   *[
-    ${LISTING_BASE}
+    ${ANY_LISTING_BASE}
     && _id != $excludeId
     && count((related.similarityTags)[@ in $tags]) > 0
-  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]${PROPERTY_CARD_PUBLIC}
+  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]${LISTING_CARD_UNION}
 `);
 
 /** Manual similar picks with public gates — editor order preserved. */
 export const manualSimilarPropertiesQuery = defineQuery(`
   *[_id == $listingId][0]{
-    "items": related.manualSimilarProperties[]->[
+    "items": related.manualSimilarProperties[
       ${MANUAL_SIMILAR_DEREF_FILTER}
-    ]${MANUAL_SIMILAR_PROJECTION}
+    ]->${LISTING_CARD_UNION}
   }
 `);
 
@@ -106,6 +112,9 @@ export type SimilarListingLocation = {
 export type FetchSimilarListingCardsInput = {
 	listingId: string;
 	mode?: string | null;
+	/** Subject listing kind — routes automatic matching. Developments match other
+	    developments; anything else falls through to the property matcher. */
+	kind?: 'property' | 'development';
 	propertyType?: string | null;
 	location?: SimilarListingLocation | null;
 };
@@ -151,6 +160,33 @@ async function fetchAutomaticSimilarCards({
 	return (raw ?? []).map((row) => ({ kind: 'property' as const, card: toPublicPropertyCard(row) }));
 }
 
+async function fetchAutomaticSimilarDevelopmentCards({
+	listingId,
+	location
+}: FetchSimilarListingCardsInput): Promise<SimilarListingCard[]> {
+	const countrySlug = location?.country?.slug;
+	if (!countrySlug) {
+		return [];
+	}
+
+	const raw = await fetchPublic<RawDevelopmentCard[]>(automaticSimilarDevelopmentsQuery, {
+		params: {
+			excludeId: listingId,
+			countrySlug,
+			// Proximity tiebreaks — may be absent for sparse taxonomies; a null just never
+			// matches, dropping that development to the newest-first tail.
+			locationSlug: location?.location?.slug ?? null,
+			communitySlug: location?.community?.slug ?? null,
+			limit: SIMILAR_LISTING_LIMIT
+		}
+	});
+
+	return (raw ?? []).map((row) => ({
+		kind: 'development' as const,
+		card: toPublicDevelopmentCard(row)
+	}));
+}
+
 async function fetchTagsSimilarCards({
 	listingId,
 	tags
@@ -162,7 +198,7 @@ async function fetchTagsSimilarCards({
 		return [];
 	}
 
-	const raw = await fetchPublic<RawPropertyCard[]>(tagsSimilarPropertiesQuery, {
+	const raw = await fetchPublic<Array<RawSimilarListingItem | null>>(tagsSimilarPropertiesQuery, {
 		params: {
 			excludeId: listingId,
 			tags,
@@ -170,7 +206,7 @@ async function fetchTagsSimilarCards({
 		}
 	});
 
-	return (raw ?? []).map((row) => ({ kind: 'property' as const, card: toPublicPropertyCard(row) }));
+	return toSimilarListingCards(raw, { excludeId: listingId, limit: SIMILAR_LISTING_LIMIT });
 }
 
 async function fetchManualSimilarCards({
@@ -214,6 +250,10 @@ export async function fetchSimilarListingCards(
 			listingId: input.listingId,
 			tags: (config?.tags ?? []).filter(Boolean)
 		});
+	}
+
+	if (input.kind === 'development') {
+		return fetchAutomaticSimilarDevelopmentCards(input);
 	}
 
 	return fetchAutomaticSimilarCards(input);
