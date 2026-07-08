@@ -276,6 +276,7 @@ export const PARTNER_LOGO_PUBLIC = /* groq */ `{
   _id,
   name,
   "slug": slug.current,
+  "category": category->name,
   logo${MEDIA_ASSET_PUBLIC}
 }`;
 
