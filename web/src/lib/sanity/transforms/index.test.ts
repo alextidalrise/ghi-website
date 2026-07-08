@@ -26,7 +26,6 @@ function baseRaw(overrides: Partial<RawUnitListing> = {}): RawUnitListing {
 		slug: 'villa-12',
 		development: {
 			_id: 'dev-1',
-			developmentName: 'Epic',
 			title: 'Epic',
 			slug: 'epic',
 			content: {

@@ -446,7 +446,6 @@ export const DEVELOPMENT_PUBLIC = /* groq */ `{
   _id,
   _type,
   ghiListingId,
-  developmentName,
   title,
   "slug": slug.current,
   listingKind,
@@ -487,7 +486,6 @@ export const DEVELOPMENT_PUBLIC = /* groq */ `{
 export const DEVELOPMENT_CONTEXT_PUBLIC = /* groq */ `{
   _id,
   ghiListingId,
-  developmentName,
   title,
   "slug": slug.current,
   developmentStatus,
@@ -602,7 +600,6 @@ export const DEVELOPMENT_WITH_CANONICAL = /* groq */ `{
   _id,
   _type,
   ghiListingId,
-  developmentName,
   title,
   "slug": slug.current,
   listingKind,

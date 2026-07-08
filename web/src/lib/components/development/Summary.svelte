@@ -41,7 +41,7 @@
 	}
 
 	const displayTitle = $derived.by(() => {
-		const raw = (development.title ?? development.developmentName ?? '').trim();
+		const raw = (development.title ?? '').trim();
 		if (!raw || locationParts.length === 0) return raw || 'Development';
 
 		let title = raw;
