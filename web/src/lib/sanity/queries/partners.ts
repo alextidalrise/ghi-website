@@ -50,6 +50,7 @@ type RawLogoPartner = {
 	_id: string;
 	name?: string | null;
 	slug?: string | null;
+	category?: string | null;
 	logo?: MediaAssetInput | null;
 };
 
@@ -111,6 +112,7 @@ export async function fetchHomepagePartnerLogos(
 			return {
 				name: partner.name,
 				role: partner.name,
+				category: partner.category?.trim() || undefined,
 				logo: logo.url,
 				srcset: logo.srcset,
 				href: `/partners#partner-${partner.slug}`

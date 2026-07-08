@@ -4,6 +4,8 @@
 		name: string;
 		/** The advisory role this partner fills; shown as the placeholder until a logo lands. */
 		role: string;
+		/** The partner category, shown as a quiet label beneath the logo or placeholder. */
+		category?: string;
 		/** Optional logo image URL. When present the cell renders the logo in place of the role label. */
 		logo?: string;
 		/** Optional responsive candidates for the logo image. */
@@ -21,16 +23,19 @@
 		ctaSupport?: string;
 	};
 
-	// Role placeholders for now; real partner logos slot into `logo`/`href` later
-	// (or move to Sanity) without touching the markup. Empty `partners` omits the
-	// section entirely, mirroring SharedAmenities.
+	// Live partners (with logos and category labels) come from Sanity via the homepage
+	// loader. These category-taxonomy placeholders are the evergreen fallback shown only
+	// when no partner logos are returned. Empty `partners` omits the section entirely,
+	// mirroring SharedAmenities.
 	let {
 		partners = [
-			{ name: 'Legal partner', role: 'Legal partner' },
-			{ name: 'Tax advisor', role: 'Tax advisor' },
-			{ name: 'Mortgage broker', role: 'Mortgage broker' },
-			{ name: 'Currency exchange', role: 'Currency exchange' },
-			{ name: 'Local agent', role: 'Local agent' }
+			{ name: 'Legal & Tax', role: 'Legal & Tax' },
+			{ name: 'Wealth Management', role: 'Wealth Management' },
+			{ name: 'Mortgage', role: 'Mortgage' },
+			{ name: 'Currency Exchange', role: 'Currency Exchange' },
+			{ name: 'Project Management', role: 'Project Management' },
+			{ name: 'Rental & Investment', role: 'Rental & Investment' },
+			{ name: 'Holiday Rentals', role: 'Holiday Rentals' }
 		],
 		heading = 'Trusted Partners',
 		subhead = 'Legal, financial and local expertise across Spain and Portugal.',
@@ -49,36 +54,33 @@
 			{/if}
 		</div>
 
+		{#snippet mark(partner: TrustedPartner)}
+			{#if partner.logo}
+				<img
+					class="partner__logo"
+					src={partner.logo}
+					srcset={partner.srcset}
+					alt={partner.name}
+					loading="lazy"
+				/>
+			{:else}
+				<span class="partner__role">{partner.role}</span>
+			{/if}
+			{#if partner.category}
+				<span class="partner__category">{partner.category}</span>
+			{/if}
+		{/snippet}
+
 		<ul class="partners__wall">
 			{#each partners as partner, index (partner.name)}
 				<li class="partner" style="--reveal-delay: {index * 70}ms">
 					{#if partner.href}
 						<a class="partner__cell partner__cell--link" href={partner.href}>
-							{#if partner.logo}
-								<img
-									class="partner__logo"
-									src={partner.logo}
-									srcset={partner.srcset}
-									alt={partner.name}
-									loading="lazy"
-								/>
-							{:else}
-								<span class="partner__role">{partner.role}</span>
-							{/if}
+							{@render mark(partner)}
 						</a>
 					{:else}
 						<div class="partner__cell">
-							{#if partner.logo}
-								<img
-									class="partner__logo"
-									src={partner.logo}
-									srcset={partner.srcset}
-									alt={partner.name}
-									loading="lazy"
-								/>
-							{:else}
-								<span class="partner__role">{partner.role}</span>
-							{/if}
+							{@render mark(partner)}
 						</div>
 					{/if}
 				</li>
@@ -121,11 +123,15 @@
 		font-size: var(--text-ui);
 	}
 
-	/* Logo wall: five across on desktop, three on tablet, two on phones. Equal-height
-	   hairline cells so the row reads as one band whether it holds logos or labels. */
+	/* Logo wall: five across on desktop, three on tablet, two on phones. Laid out with
+	   flex-wrap so a short final row centres under the one above it rather than hanging
+	   left. Each cell is sized to a fixed column fraction (--cols) so full rows still sit
+	   edge to edge and read as one band, whether they hold logos or labels. */
 	.partners__wall {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		--cols: 2;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
 		gap: var(--space-md);
 		margin: 0;
 		padding: 0;
@@ -134,27 +140,30 @@
 
 	@media (min-width: 560px) {
 		.partners__wall {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+			--cols: 3;
 		}
 	}
 
 	@media (min-width: 900px) {
 		.partners__wall {
-			grid-template-columns: repeat(5, minmax(0, 1fr));
+			--cols: 5;
 		}
 	}
 
 	.partner {
 		min-width: 0;
+		flex: 0 1 calc((100% - (var(--cols) - 1) * var(--space-md)) / var(--cols));
 	}
 
 	.partner__cell {
+		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		height: 100%;
-		min-height: 6.5rem;
-		padding: var(--space-md);
+		min-height: 7rem;
+		/* Extra room at the foot so the centred logo never crowds the corner caption. */
+		padding: var(--space-md) var(--space-md) calc(var(--space-md) + 0.75rem);
 		border: 1px solid var(--border);
 		text-align: center;
 	}
@@ -166,6 +175,28 @@
 		font-weight: 500;
 		letter-spacing: 0.02em;
 		color: var(--muted);
+	}
+
+	/* Category label: a quiet chip hugging the cell's bottom-left corner, clear of the
+	   centred logo so the logo stays the focus. A soft warm-neutral fill (a mix of the
+	   hairline tone with white) reads as a tag, not part of the mark. */
+	.partner__category {
+		position: absolute;
+		left: 0.5rem;
+		bottom: 0.5rem;
+		max-width: calc(100% - 1rem);
+		padding: 0.22rem 0.4rem;
+		background: color-mix(in srgb, var(--border) 55%, var(--white));
+		border-radius: 2px;
+		font-family: var(--sans);
+		font-size: 0.625rem;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		line-height: 1.15;
+		text-align: left;
+		color: var(--charcoal);
+		transition: background var(--duration-hover) var(--ease);
 	}
 
 	/* Real logos sit muted at rest and resolve on hover/focus, the standard
@@ -202,6 +233,11 @@
 	.partner__cell--link:hover .partner__role,
 	.partner__cell--link:focus-visible .partner__role {
 		color: var(--green);
+	}
+
+	.partner__cell--link:hover .partner__category,
+	.partner__cell--link:focus-visible .partner__category {
+		background: color-mix(in srgb, var(--border) 80%, var(--white));
 	}
 
 	.partner__cell--link:focus-visible {
