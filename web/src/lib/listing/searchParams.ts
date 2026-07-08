@@ -20,6 +20,8 @@ export type ListingSearchParams = {
 	golfRelevance: GolfRelevanceValue[];
 	/** Golf course/club slugs the listing must sit on (primary or linked). */
 	golfCourse: string[];
+	/** Feature-highlight keys (auto-derived from live labels); a listing needs any one. */
+	features: string[];
 };
 
 export const DEFAULT_LISTING_SEARCH_PARAMS: ListingSearchParams = {
@@ -31,7 +33,8 @@ export const DEFAULT_LISTING_SEARCH_PARAMS: ListingSearchParams = {
 	minBeds: null,
 	community: null,
 	golfRelevance: [],
-	golfCourse: []
+	golfCourse: [],
+	features: []
 };
 
 export type PaginationMeta = {
@@ -100,6 +103,20 @@ function parseGolfRelevance(values: string[]): GolfRelevanceValue[] {
 	return [...seen].sort();
 }
 
+/**
+ * Parse repeated `features` params — trimmed, lowercased (the match key), de-duplicated,
+ * length-bounded and ordered. Values are free-text-derived keys, so we bound length
+ * rather than validate against a fixed vocabulary; unknown keys simply match nothing.
+ */
+function parseFeatures(values: string[]): string[] {
+	const seen = new Set<string>();
+	for (const value of values) {
+		const key = value.trim().toLowerCase();
+		if (key.length >= 1 && key.length <= 80) seen.add(key);
+	}
+	return [...seen].sort();
+}
+
 /** Parse URL search params into a validated listing search state. */
 export function parseListingSearchParams(url: URL): ListingSearchParams {
 	const pageRaw = parsePositiveInt(url.searchParams.get('page'));
@@ -114,7 +131,8 @@ export function parseListingSearchParams(url: URL): ListingSearchParams {
 		minBeds: parseMinBeds(url.searchParams.get('minBeds')),
 		community: parseCommunity(url.searchParams.get('community')),
 		golfRelevance: parseGolfRelevance(url.searchParams.getAll('golfRelevance')),
-		golfCourse: parseGolfCourse(url.searchParams.getAll('golfCourse'))
+		golfCourse: parseGolfCourse(url.searchParams.getAll('golfCourse')),
+		features: parseFeatures(url.searchParams.getAll('features'))
 	};
 }
 
@@ -147,6 +165,10 @@ export function serializeListingSearchParams(params: ListingSearchParams): URLSe
 
 	for (const value of params.golfCourse) {
 		searchParams.append('golfCourse', value);
+	}
+
+	for (const value of params.features) {
+		searchParams.append('features', value);
 	}
 
 	return searchParams;

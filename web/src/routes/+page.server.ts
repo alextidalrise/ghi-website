@@ -5,6 +5,7 @@ import {
 	fetchHomepageFeaturedLocations,
 	fetchHomepageFrontlineListingCards,
 	fetchHomepagePartnerLogos,
+	fetchListingFacetRows,
 	fetchNavTaxonomy,
 	fetchSiteSettingsHero
 } from '$lib/sanity/queries';
@@ -18,7 +19,8 @@ export const load: PageServerLoad = async () => {
 		homepageHero,
 		featuredCountries,
 		featuredLocations,
-		partnerLogos
+		partnerLogos,
+		facetRows
 	] = await Promise.all([
 		fetchNavTaxonomy(),
 		fetchHomepageFeaturedListingCards(),
@@ -26,13 +28,15 @@ export const load: PageServerLoad = async () => {
 		fetchSiteSettingsHero(),
 		fetchCountriesWithHero(),
 		fetchHomepageFeaturedLocations(),
-		fetchHomepagePartnerLogos()
+		fetchHomepagePartnerLogos(),
+		fetchListingFacetRows()
 	]);
 
 	return {
 		countries: nav.countries,
 		locations: nav.locations,
 		communities: nav.communities,
+		facetRows,
 		featuredCards,
 		frontlineCards,
 		homepageHero: resolveHomepageHeroImage(homepageHero),

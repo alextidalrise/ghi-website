@@ -17,7 +17,7 @@ describe('parseListingSearchParams', () => {
 	it('parses valid filters and normalizes page to at least 1', () => {
 		const params = parseListingSearchParams(
 			new URL(
-				'https://example.com/spain/marbella?page=2&sort=price_asc&propertyType=villa&minPrice=500000&maxPrice=2000000&minBeds=3&community=nueva-andalucia&golfRelevance=frontline_golf&golfRelevance=golf_view&golfCourse=valderrama&golfCourse=la-reserva'
+				'https://example.com/spain/marbella?page=2&sort=price_asc&propertyType=villa&minPrice=500000&maxPrice=2000000&minBeds=3&community=nueva-andalucia&golfRelevance=frontline_golf&golfRelevance=golf_view&golfCourse=valderrama&golfCourse=la-reserva&features=Sea%20view&features=private%20pool'
 			)
 		);
 
@@ -30,8 +30,16 @@ describe('parseListingSearchParams', () => {
 			minBeds: 3,
 			community: 'nueva-andalucia',
 			golfRelevance: ['frontline_golf', 'golf_view'],
-			golfCourse: ['la-reserva', 'valderrama']
+			golfCourse: ['la-reserva', 'valderrama'],
+			features: ['private pool', 'sea view']
 		});
+	});
+
+	it('lowercases and de-duplicates feature keys', () => {
+		const params = parseListingSearchParams(
+			new URL('https://example.com/spain/marbella?features=Sea%20View&features=sea%20view')
+		);
+		expect(params.features).toEqual(['sea view']);
 	});
 
 	it('parses community filter slug', () => {
@@ -97,6 +105,18 @@ describe('serializeListingSearchParams', () => {
 		});
 
 		expect(serialized.getAll('golfRelevance')).toEqual(['golf_view', 'frontline_golf']);
+	});
+
+	it('round-trips repeated feature keys, including labels with spaces', () => {
+		const params = {
+			...DEFAULT_LISTING_SEARCH_PARAMS,
+			features: ['private pool', 'sea view']
+		};
+		const serialized = serializeListingSearchParams(params);
+		expect(serialized.getAll('features')).toEqual(['private pool', 'sea view']);
+		expect(
+			parseListingSearchParams(new URL(`https://example.com/spain/marbella?${serialized}`)).features
+		).toEqual(['private pool', 'sea view']);
 	});
 });
 

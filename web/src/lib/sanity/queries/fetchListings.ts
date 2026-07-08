@@ -44,6 +44,7 @@ export async function fetchListingCards({
 		minBeds: params.minBeds,
 		golfRelevance: params.golfRelevance,
 		golfCourse: params.golfCourse,
+		features: params.features,
 		start,
 		end
 	});

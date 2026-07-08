@@ -51,6 +51,7 @@
 		countries={data.countries}
 		locations={data.locations}
 		communities={data.communities}
+		facetRows={data.facetRows}
 	/>
 </div>
 

@@ -15,6 +15,8 @@
 		name: string;
 		/** 'tray' renders as a tray cell (matching the single-selects); 'pill' stands alone. */
 		variant?: 'tray' | 'pill';
+		/** Inert + dimmed; renders a non-interactive cell (mirrors Select's disabled state). */
+		disabled?: boolean;
 		align?: FloatingAlign;
 		/** Called on apply (panel close on pointer; the submit button drives no-JS/touch). */
 		onchange?: (value: string[]) => void;
@@ -26,6 +28,7 @@
 		label,
 		name,
 		variant = 'pill',
+		disabled = false,
 		align = 'start',
 		onchange
 	}: Props = $props();
@@ -46,7 +49,9 @@
 				? (options.find((option) => option.value === value[0])?.label ?? '1 selected')
 				: `${count} selected`
 	);
-	const showCustom = $derived(pointer.enhanced);
+	// Match Select: the bespoke listbox only on measured fine-pointer devices, and never
+	// when disabled (a disabled field renders an inert static cell instead).
+	const showCustom = $derived(pointer.enhanced && !disabled);
 
 	let open = $state(false);
 	let activeIndex = $state(-1);
@@ -65,7 +70,7 @@
 	}
 
 	async function openPanel() {
-		if (open || !panelEl || !triggerEl) return;
+		if (disabled || open || !panelEl || !triggerEl) return;
 		open = true;
 		dirty = false;
 		activeIndex = 0;
@@ -105,6 +110,13 @@
 		value = isSelected(optionValue)
 			? value.filter((entry) => entry !== optionValue)
 			: [...value, optionValue];
+		dirty = true;
+	}
+
+	/** Clear this filter's selection in place; apply-on-close carries the empty state out. */
+	function clearSelection() {
+		if (value.length === 0) return;
+		value = [];
 		dirty = true;
 	}
 
@@ -192,7 +204,12 @@
 			</div>
 		{/each}
 	</div>
-	<button class="fc-apply" type="button" onclick={() => closePanel()}>Apply</button>
+	<div class="fc-panel__foot">
+		{#if count > 0}
+			<button class="fc-clear" type="button" onclick={clearSelection}>Clear all</button>
+		{/if}
+		<button class="fc-apply" type="button" onclick={() => closePanel()}>Apply</button>
+	</div>
 {/snippet}
 
 {#snippet nativeBody()}
@@ -212,10 +229,34 @@
 			</label>
 		{/each}
 	</div>
-	<button class="fc-apply" type="submit">Apply</button>
+	<div class="fc-panel__foot">
+		{#if count > 0}
+			<button class="fc-clear" type="button" onclick={clearSelection}>Clear all</button>
+		{/if}
+		<button class="fc-apply" type="submit">Apply</button>
+	</div>
 {/snippet}
 
-{#if showCustom}
+{#if disabled}
+	<!-- Inert, dimmed cell: mirrors Select's disabled state so Features can sit greyed-out
+	     from page load (like Property type / Budget) until a location is chosen. -->
+	{#if isCell}
+		<div class="fc-field fc-field--tray fc-field--multi is-empty is-disabled">
+			<span class="fc-label" id={labelId}>{label}</span>
+			<button type="button" class="fc-trigger fc-trigger--cell" disabled aria-labelledby={labelId}>
+				<span class="fc-value">{valueText || 'Any'}</span>
+				<span class="fc-chevron" aria-hidden="true"></span>
+			</button>
+		</div>
+	{:else}
+		<div class="fc-pill-host">
+			<button type="button" class="fc-pill" disabled>
+				<span class="fc-pill__label" id={labelId}>{label}</span>
+				<span class="fc-chevron" aria-hidden="true"></span>
+			</button>
+		</div>
+	{/if}
+{:else if showCustom}
 	{#if isCell}
 		<div class="fc-field fc-field--tray fc-field--multi" class:is-empty={count === 0}>
 			<span class="fc-label" id={labelId}>{label}</span>
