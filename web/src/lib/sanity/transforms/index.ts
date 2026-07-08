@@ -181,6 +181,9 @@ export type PublicPropertyListing = Omit<
 	ctas: PublicCta | null;
 	golf: PublicGolf | null;
 	content: PublicContent | null;
+	/** Parent development's raw title, present only on unit pages. The frontend
+	    uses it (cleaned) as the first segment of the unit's location line. */
+	developmentTitle?: string | null;
 };
 
 export type PublicDevelopment = Omit<
@@ -516,6 +519,7 @@ export function toPublicUnitListing(
 		title: composedTitle,
 		slug: raw.slug ?? undefined,
 		listingKind: 'unit',
+		developmentTitle: dev.title ?? dev.developmentName ?? null,
 		propertyType: unitType?.propertyType ?? undefined,
 		transactionType: 'sale',
 		location: stripInternalLocationFields(dev.location),
