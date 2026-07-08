@@ -69,6 +69,10 @@ export {
 
 export { fetchListingCards, type ListingSearchResult } from './fetchListings';
 
+export { fetchLocationFeatureOptions } from './featureOptions';
+
+export { fetchListingFacetRows, type ListingFacetRow } from './listingFacets';
+
 export {
 	FRONTLINE_LISTING_LIMIT,
 	HOMEPAGE_FEATURED_LIMIT,

@@ -60,3 +60,22 @@ describe('golfCourse facet filter', () => {
 		).toMatchObject({ golfCourse: null });
 	});
 });
+
+describe('features facet filter', () => {
+	it('matches on any selected feature-highlight label (OR)', () => {
+		const query = buildListingCardsCountQuery({ type: 'global' });
+		expect(query).toContain('content.featureHighlights[');
+		expect(query).toContain('lower(label) in $features');
+		// Provenance-suffixed labels still match via the comma-split head.
+		expect(query).toContain('lower(string::split(label, ",")[0]) in $features');
+	});
+
+	it('serializes a populated features facet, nulls an empty one', () => {
+		expect(
+			listingSearchQueryParams({ type: 'global' }, { features: ['sea view'] })
+		).toMatchObject({ features: ['sea view'] });
+		expect(listingSearchQueryParams({ type: 'global' }, { features: [] })).toMatchObject({
+			features: null
+		});
+	});
+});

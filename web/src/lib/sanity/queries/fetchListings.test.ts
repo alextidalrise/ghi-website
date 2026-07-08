@@ -90,7 +90,8 @@ describe('fetchListingCards', () => {
 				minBeds: null,
 				community: null,
 				golfRelevance: [],
-				golfCourse: []
+				golfCourse: [],
+				features: []
 			}
 		});
 
@@ -143,7 +144,8 @@ describe('fetchListingCards', () => {
 				minBeds: null,
 				community: null,
 				golfRelevance: [],
-				golfCourse: []
+				golfCourse: [],
+				features: []
 			}
 		});
 

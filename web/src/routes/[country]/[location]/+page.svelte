@@ -127,6 +127,7 @@
 			pagination={data.listingResults.pagination}
 			heading={`All properties in ${data.location.name}`}
 			{communityOptions}
+			featureOptions={data.featureOptions}
 		/>
 	</div>
 

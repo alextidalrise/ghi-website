@@ -10,6 +10,7 @@ import {
 	countryBySlugQuery,
 	fetchFrontlineListingCards,
 	fetchListingCards,
+	fetchLocationFeatureOptions,
 	fetchMaybePreview,
 	fetchPublic,
 	golfCoursesByLocationQuery,
@@ -107,12 +108,13 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		communityId: activeCommunity?._id ?? null
 	};
 
-	const [listingResults, frontlineCards] = await Promise.all([
+	const [listingResults, frontlineCards, featureOptions] = await Promise.all([
 		fetchListingCards({
 			scope: listingScope,
 			params: searchParams
 		}),
-		fetchFrontlineListingCards({ scope: listingScope })
+		fetchFrontlineListingCards({ scope: listingScope }),
+		fetchLocationFeatureOptions(params.country, locationIds)
 	]);
 
 	const frontlineViewAllHref = FRONTLINE_COLLECTION_PATH;
@@ -148,6 +150,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		canonicalPath,
 		searchParams,
 		listingResults,
+		featureOptions,
 		frontlineCards,
 		frontlineViewAllHref,
 		golfCourseCards,

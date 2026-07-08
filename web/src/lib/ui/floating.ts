@@ -74,12 +74,19 @@ export function autoPosition(
 	options: FloatingOptions = {}
 ): () => void {
 	const update = () => positionFloating(trigger, panel, options);
+	// Capture-phase scroll so we react to any scrolling ancestor, not just the window —
+	// but skip the panel's OWN internal scroll. Repositioning resets maxHeight to remeasure,
+	// which collapses the overflow and snaps scrollTop back to 0, making a long option list
+	// (e.g. Features) impossible to scroll.
+	const onScroll = (event: Event) => {
+		if (event.target instanceof Node && panel.contains(event.target)) return;
+		update();
+	};
 	update();
-	// Capture-phase scroll so we react to any scrolling ancestor, not just the window.
-	window.addEventListener('scroll', update, true);
+	window.addEventListener('scroll', onScroll, true);
 	window.addEventListener('resize', update);
 	return () => {
-		window.removeEventListener('scroll', update, true);
+		window.removeEventListener('scroll', onScroll, true);
 		window.removeEventListener('resize', update);
 	};
 }

@@ -133,6 +133,14 @@ const FACET_FILTERS = /* groq */ `
     || count($golfCourse) == 0
     || count(golf.linkedGolfCourses[@->slug.current in $golfCourse]) > 0
   )
+  && (
+    !defined($features)
+    || count($features) == 0
+    || count(content.featureHighlights[
+      lower(label) in $features
+      || lower(string::split(label, ",")[0]) in $features
+    ]) > 0
+  )
 `;
 
 function listingFilter(scope: ListingSearchScope): string {
@@ -175,6 +183,7 @@ export function listingSearchQueryParams(
 		minBeds?: number | null;
 		golfRelevance?: string[];
 		golfCourse?: string[];
+		features?: string[];
 		start?: number;
 		end?: number;
 	}
@@ -204,6 +213,7 @@ export function listingSearchQueryParams(
 				: null,
 		golfCourse:
 			params.golfCourse && params.golfCourse.length > 0 ? params.golfCourse : null,
+		features: params.features && params.features.length > 0 ? params.features : null,
 		start: params.start,
 		end: params.end
 	};

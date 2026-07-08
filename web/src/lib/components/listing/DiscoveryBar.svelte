@@ -6,6 +6,13 @@
 		serializeListingSearchParams
 	} from '$lib/listing/searchParams';
 	import Select from '$lib/components/ui/Select.svelte';
+	import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
+	import {
+		cleanFeatureLabel,
+		featureLabelKey,
+		toFeatureOptions
+	} from '$lib/listing/featureHighlights';
+	import type { ListingFacetRow } from '$lib/sanity/queries';
 
 	type CountryOption = {
 		_id: string;
@@ -33,9 +40,11 @@
 		countries: CountryOption[];
 		locations: LocationOption[];
 		communities: CommunityOption[];
+		/** Per-listing facet rows; Property type / Budget / Features narrow to the chosen location. */
+		facetRows?: ListingFacetRow[];
 	};
 
-	let { countries, locations, communities }: Props = $props();
+	let { countries, locations, communities, facetRows = [] }: Props = $props();
 
 	/* Budget bands. Each band emits the listing-search price params the destination
 	   location page already understands (minPrice / maxPrice); the band is just a
@@ -59,6 +68,7 @@
 	let communitySlug = $state('');
 	let propertyType = $state('');
 	let budget = $state('');
+	let features = $state<string[]>([]);
 
 	let sheet = $state<HTMLDialogElement>();
 
@@ -85,7 +95,6 @@
 	   index with nothing to filter. So Community, Property type and Budget only become
 	   live once a Location is chosen — Country alone still navigates, as before. */
 	const hasLocation = $derived(Boolean(locationSlug));
-	const communityDisabled = $derived(!hasLocation || filteredCommunities.length === 0);
 
 	const selectedLocationName = $derived(
 		filteredLocations.find((location) => location.slug === locationSlug)?.name ?? ''
@@ -97,25 +106,130 @@
 		[selectedCountry?.name, selectedLocationName || 'anywhere'].filter(Boolean).join(' · ')
 	);
 
+	/* Cross-filtering (faceted search): Community, Property type, Budget and Features all
+	   constrain each other, in any order. Each menu lists only what stays reachable given
+	   every OTHER active selection, so picking a feature (e.g. Sauna) narrows the type/budget/
+	   community menus to sauna listings, exactly as picking a type narrows Budget.
+
+	   Each facet's own value is deliberately excluded from its own predicate set, which keeps
+	   the menu from collapsing to just the chosen value — and guarantees that any option the
+	   user can see still yields a non-empty result, so selections never go stale. */
+	const rowFeatureKeys = (row: ListingFacetRow) =>
+		new Set(row.featureLabels.map((label) => featureLabelKey(cleanFeatureLabel(label))));
+
+	const matchesCommunity = (row: ListingFacetRow) =>
+		!communitySlug || row.communitySlug === communitySlug;
+	const matchesType = (row: ListingFacetRow) =>
+		!propertyType || row.propertyTypes.includes(propertyType);
+	const matchesBudget = (row: ListingFacetRow) => {
+		if (!budget) return true;
+		const band = BUDGET_BANDS.find((b) => b.value === budget);
+		if (!band) return true;
+		return (
+			row.price != null &&
+			(band.min == null || row.price >= band.min) &&
+			(band.max == null || row.price <= band.max)
+		);
+	};
+	const matchesFeatures = (row: ListingFacetRow) => {
+		if (features.length === 0) return true;
+		const keys = rowFeatureKeys(row);
+		// OR semantics — a listing matches if it has ANY of the selected features (as the grid does).
+		return features.some((feature) => keys.has(feature));
+	};
+
+	/* Location scope (or the whole catalogue before a location is picked — the dependent
+	   fields are disabled until then, but stay populated). */
+	const locationRows = $derived(
+		hasLocation
+			? facetRows.filter(
+					(row) => row.countrySlug === countrySlug && row.locationSlug === locationSlug
+				)
+			: facetRows
+	);
+	/* Rows feeding each facet's options: all OTHER facets applied, this facet left open. */
+	const communityScopedRows = $derived(
+		locationRows.filter((r) => matchesType(r) && matchesBudget(r) && matchesFeatures(r))
+	);
+	const typeScopedRows = $derived(
+		locationRows.filter((r) => matchesCommunity(r) && matchesBudget(r) && matchesFeatures(r))
+	);
+	const budgetScopedRows = $derived(
+		locationRows.filter((r) => matchesCommunity(r) && matchesType(r) && matchesFeatures(r))
+	);
+	const featureScopedRows = $derived(
+		locationRows.filter((r) => matchesCommunity(r) && matchesType(r) && matchesBudget(r))
+	);
+
+	const availableCommunitySlugs = $derived(
+		new Set(communityScopedRows.map((row) => row.communitySlug).filter(Boolean))
+	);
+	const availableTypeValues = $derived(new Set(typeScopedRows.flatMap((row) => row.propertyTypes)));
+	const bandHasListing = (band: (typeof BUDGET_BANDS)[number]) =>
+		budgetScopedRows.some(
+			(row) =>
+				row.price != null &&
+				(band.min == null || row.price >= band.min) &&
+				(band.max == null || row.price <= band.max)
+		);
+
+	/* Global Features presence decides whether the field renders at all; the cross-filtered
+	   list feeds its menu once a location is chosen. */
+	const globalFeatureOptions = $derived(
+		toFeatureOptions(facetRows.flatMap((row) => row.featureLabels))
+	);
+	const featureOpts = $derived(
+		toFeatureOptions(featureScopedRows.flatMap((row) => row.featureLabels))
+	);
+
 	/* Option lists for the shared Select (desktop). */
 	const countryOpts = $derived(countries.map((c) => ({ label: c.name, value: c.slug })));
 	const locationOpts = $derived(filteredLocations.map((l) => ({ label: l.name, value: l.slug })));
-	const communityOpts = $derived(filteredCommunities.map((c) => ({ label: c.name, value: c.slug })));
-	const typeOpts = PROPERTY_TYPES.map((t) => ({ label: t.label, value: t.value }));
-	const budgetOpts = BUDGET_BANDS.map((b) => ({ label: b.label, value: b.value }));
+	const communityOpts = $derived(
+		filteredCommunities
+			.filter((c) => availableCommunitySlugs.has(c.slug))
+			.map((c) => ({ label: c.name, value: c.slug }))
+	);
+	const typeOpts = $derived(
+		PROPERTY_TYPES.filter((t) => availableTypeValues.has(t.value)).map((t) => ({
+			label: t.label,
+			value: t.value
+		}))
+	);
+	const budgetOpts = $derived(
+		BUDGET_BANDS.filter(bandHasListing).map((b) => ({ label: b.label, value: b.value }))
+	);
+
+	/* Community is live only once a location is chosen, and greys out if cross-filtering
+	   leaves no community with a matching listing. */
+	const communityDisabled = $derived(!hasLocation || communityOpts.length === 0);
 
 	function handleCountryChange() {
 		locationSlug = '';
 		communitySlug = '';
 		propertyType = '';
 		budget = '';
+		features = [];
 	}
 
 	function handleLocationChange() {
 		communitySlug = '';
 		propertyType = '';
 		budget = '';
+		features = [];
 	}
+
+	/* Cross-filtered menus only ever surface options that keep a non-empty result, so the
+	   facets stay mutually valid without resetting each other. The one gap is the multi-select
+	   Features: changing another facet can drop a still-selected feature out of view (its
+	   checkbox is gone but the value would linger in the URL), so prune features to what the
+	   current menu actually offers. */
+	$effect(() => {
+		const visible = new Set(featureOpts.map((option) => option.value));
+		if (features.some((feature) => !visible.has(feature))) {
+			features = features.filter((feature) => visible.has(feature));
+		}
+	});
 
 	function destinationHref(): string | null {
 		if (!countrySlug) return null;
@@ -133,7 +247,8 @@
 			community: communitySlug || null,
 			propertyType: (propertyType || null) as (typeof DEFAULT_LISTING_SEARCH_PARAMS)['propertyType'],
 			minPrice: band?.min ?? null,
-			maxPrice: band?.max ?? null
+			maxPrice: band?.max ?? null,
+			features: [...features]
 		}).toString();
 
 		return query ? `${path}?${query}` : path;
@@ -191,21 +306,21 @@
 
 {#snippet communityOptions()}
 	<option value="">Any community</option>
-	{#each filteredCommunities as community (community._id)}
-		<option value={community.slug}>{community.name}</option>
+	{#each communityOpts as community (community.value)}
+		<option value={community.value}>{community.label}</option>
 	{/each}
 {/snippet}
 
 {#snippet typeOptions()}
 	<option value="">Any type</option>
-	{#each PROPERTY_TYPES as type (type.value)}
+	{#each typeOpts as type (type.value)}
 		<option value={type.value}>{type.label}</option>
 	{/each}
 {/snippet}
 
 {#snippet budgetOptions()}
 	<option value="">Any budget</option>
-	{#each BUDGET_BANDS as band (band.value)}
+	{#each budgetOpts as band (band.value)}
 		<option value={band.value}>{band.label}</option>
 	{/each}
 {/snippet}
@@ -248,7 +363,7 @@
 				label="Property type"
 				placeholder="Any type"
 				options={typeOpts}
-				disabled={!hasLocation}
+				disabled={!hasLocation || typeOpts.length === 0}
 				title={!hasLocation ? 'Choose a location first' : undefined}
 				bind:value={propertyType}
 			/>
@@ -257,10 +372,22 @@
 				label="Budget"
 				placeholder="Any budget"
 				options={budgetOpts}
-				disabled={!hasLocation}
+				disabled={!hasLocation || budgetOpts.length === 0}
 				title={!hasLocation ? 'Choose a location first' : undefined}
 				bind:value={budget}
 			/>
+			<!-- Features sit greyed-out from load, like Community/Type/Budget, and go live
+			     once a location is chosen. The menu lists only that location's features. -->
+			{#if globalFeatureOptions.length > 0}
+				<MultiSelect
+					variant="tray"
+					label="Features"
+					name="features"
+					options={featureOpts}
+					disabled={!hasLocation || featureOpts.length === 0}
+					bind:value={features}
+				/>
+			{/if}
 
 			<button class="bar__search" type="submit" aria-label="Search homes">
 				<svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -322,22 +449,52 @@
 				</select>
 			</p>
 
-			<p class="srow" class:is-empty={!propertyType} class:is-disabled={!hasLocation}>
+			<p
+				class="srow"
+				class:is-empty={!propertyType}
+				class:is-disabled={!hasLocation || typeOpts.length === 0}
+			>
 				<label class="srow__label" for="sh-type">Property type</label>
-				<select id="sh-type" bind:value={propertyType} disabled={!hasLocation}>
+				<select id="sh-type" bind:value={propertyType} disabled={!hasLocation || typeOpts.length === 0}>
 					{@render typeOptions()}
 				</select>
 			</p>
 
-			<p class="srow" class:is-empty={!budget} class:is-disabled={!hasLocation}>
+			<p
+				class="srow"
+				class:is-empty={!budget}
+				class:is-disabled={!hasLocation || budgetOpts.length === 0}
+			>
 				<label class="srow__label" for="sh-budget">Budget</label>
-				<select id="sh-budget" bind:value={budget} disabled={!hasLocation}>
+				<select id="sh-budget" bind:value={budget} disabled={!hasLocation || budgetOpts.length === 0}>
 					{@render budgetOptions()}
 				</select>
 			</p>
 
+			{#if globalFeatureOptions.length > 0}
+				<fieldset
+					class="srow srow--features"
+					class:is-disabled={!hasLocation || featureOpts.length === 0}
+				>
+					<legend class="srow__label">Features</legend>
+					<span class="srow__checks">
+						{#each featureOpts as option (option.value)}
+							<label class="srow__check">
+								<input
+									type="checkbox"
+									bind:group={features}
+									value={option.value}
+									disabled={!hasLocation || featureOpts.length === 0}
+								/>
+								<span>{option.label}</span>
+							</label>
+						{/each}
+					</span>
+				</fieldset>
+			{/if}
+
 			{#if !hasLocation}
-				<p class="sheet__hint">Choose a location to filter by community, type and budget.</p>
+				<p class="sheet__hint">Choose a location to filter by community, type, budget and features.</p>
 			{/if}
 		</div>
 
@@ -387,6 +544,10 @@
 
 	.bar__tray {
 		flex: 1;
+		/* Nested flex: without this the tray keeps its content's min-content as its
+		   minimum and refuses to shrink, so a 5th cell (Features) shoves the search
+		   button past the edge. min-width:0 lets the inner cells' own min-width:0 win. */
+		min-width: 0;
 	}
 
 	/* Round search action, sitting inside the gold tray on the right. */
@@ -636,6 +797,44 @@
 	.srow select:focus-visible {
 		outline: 2px solid var(--green);
 		outline-offset: 3px;
+	}
+
+	/* Features is multi-select, so it stacks its checkboxes under the label rather than
+	   sitting on one line like the single-select rows. Reset the fieldset's UA chrome. */
+	.srow--features {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.75rem;
+		border: 0;
+		border-top: 1px solid var(--border);
+		min-inline-size: 0;
+	}
+
+	.srow--features .srow__label {
+		padding: 0;
+	}
+
+	.srow__checks {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.25rem;
+	}
+
+	.srow__check {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--sans);
+		font-size: var(--text-body);
+		color: var(--charcoal);
+		cursor: pointer;
+	}
+
+	.srow__check input {
+		flex: none;
+		width: 1.1rem;
+		height: 1.1rem;
+		accent-color: var(--green);
 	}
 
 	.sheet__hint {

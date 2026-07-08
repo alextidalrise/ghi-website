@@ -319,6 +319,13 @@
 	inset: auto;
 }
 
+/* Multi-select panels carry a sticky footer that owns the bottom edge, so drop the
+   panel's own bottom padding — otherwise options scroll into the strip below the
+   footer and show through. The footer replaces that padding (all white). */
+.fc-panel--multi {
+	padding-bottom: 0;
+}
+
 .fc-panel__list {
 	display: grid;
 	gap: 2px;
@@ -440,8 +447,25 @@
 }
 
 /* ============================ APPLY / ACTIONS ============================ */
-.fc-apply {
+/* Footer pinned to the bottom of the (scrolling) panel so Apply + Clear all stay
+   reachable when the option list is long, e.g. Features. Opaque background covers the
+   options scrolling behind it. */
+.fc-panel__foot {
+	position: sticky;
+	bottom: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	gap: var(--space-sm);
 	margin-top: var(--space-xs);
+	/* Owns the panel's bottom edge (padding-bottom removed above): the vertical padding
+	   here is the breathing room, and its solid fill hides options scrolling behind. */
+	padding-block: var(--space-xs) var(--space-sm);
+	background: var(--white);
+}
+
+.fc-apply {
+	flex: 1;
 	padding: 0.625rem 1rem;
 	border: 1px solid var(--green);
 	background: var(--green);
@@ -457,6 +481,24 @@
 .fc-apply:focus-visible {
 	background: var(--charcoal);
 	border-color: var(--charcoal);
+}
+
+.fc-clear {
+	flex: none;
+	padding: 0.625rem 0.25rem;
+	border: 0;
+	background: transparent;
+	color: var(--green);
+	font-family: var(--sans);
+	font-size: var(--text-ui);
+	cursor: pointer;
+	border-bottom: 1px solid transparent;
+	transition: border-color var(--duration-hover) var(--ease);
+}
+
+.fc-clear:hover,
+.fc-clear:focus-visible {
+	border-bottom-color: var(--gold);
 }
 
 /* ============================ A11Y / MOTION ============================ */

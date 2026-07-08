@@ -11,6 +11,7 @@
 
 	type CommunityOption = { label: string; value: string };
 	type CourseOption = { label: string; value: string };
+	type FeatureOption = { label: string; value: string };
 
 	type Props = {
 		basePath: string;
@@ -21,6 +22,8 @@
 		heading?: string;
 		communityOptions?: CommunityOption[];
 		courseOptions?: CourseOption[];
+		/** Auto-derived feature-highlight options; when non-empty, renders the Features filter. */
+		featureOptions?: FeatureOption[];
 		showGolfRelevance?: boolean;
 	};
 
@@ -33,6 +36,7 @@
 		heading = 'Properties',
 		communityOptions = [],
 		courseOptions = [],
+		featureOptions = [],
 		showGolfRelevance = true
 	}: Props = $props();
 
@@ -45,6 +49,7 @@
 			searchParams.minBeds != null ||
 			searchParams.golfRelevance.length > 0 ||
 			searchParams.golfCourse.length > 0 ||
+			searchParams.features.length > 0 ||
 			searchParams.sort !== DEFAULT_LISTING_SEARCH_PARAMS.sort
 	);
 
@@ -68,6 +73,7 @@
 			{searchParams}
 			{communityOptions}
 			{courseOptions}
+			{featureOptions}
 			{showGolfRelevance}
 		/>
 

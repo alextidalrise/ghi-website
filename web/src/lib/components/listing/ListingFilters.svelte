@@ -17,6 +17,7 @@
 
 	type CommunityOption = { label: string; value: string };
 	type CourseOption = { label: string; value: string };
+	type FeatureOption = { label: string; value: string };
 
 	type Props = {
 		basePath: string;
@@ -24,6 +25,8 @@
 		communityOptions?: CommunityOption[];
 		/** Golf course/club options. When non-empty, renders the Course filter. */
 		courseOptions?: CourseOption[];
+		/** Auto-derived feature-highlight options. When non-empty, renders the Features filter. */
+		featureOptions?: FeatureOption[];
 		/** Whether to show the generic golf-relevance filter (hidden on the frontline page). */
 		showGolfRelevance?: boolean;
 	};
@@ -33,6 +36,7 @@
 		searchParams,
 		communityOptions = [],
 		courseOptions = [],
+		featureOptions = [],
 		showGolfRelevance = true
 	}: Props = $props();
 
@@ -59,6 +63,7 @@
 	let maxPrice = $state<number | null>(null);
 	let golfRelevance = $state<string[]>([]);
 	let golfCourse = $state<string[]>([]);
+	let features = $state<string[]>([]);
 
 	function syncFromParams() {
 		propertyType = searchParams.propertyType ?? '';
@@ -69,6 +74,7 @@
 		maxPrice = searchParams.maxPrice;
 		golfRelevance = [...searchParams.golfRelevance];
 		golfCourse = [...searchParams.golfCourse];
+		features = [...searchParams.features];
 	}
 
 	$effect(() => {
@@ -81,6 +87,7 @@
 		searchParams.maxPrice;
 		searchParams.golfRelevance;
 		searchParams.golfCourse;
+		searchParams.features;
 		syncFromParams();
 	});
 
@@ -91,7 +98,8 @@
 			searchParams.minPrice != null ||
 			searchParams.maxPrice != null ||
 			searchParams.golfRelevance.length > 0 ||
-			searchParams.golfCourse.length > 0
+			searchParams.golfCourse.length > 0 ||
+			searchParams.features.length > 0
 	);
 
 	// Active-filter count for the mobile trigger badge (sort isn't a filter).
@@ -101,7 +109,8 @@
 			(searchParams.community ? 1 : 0) +
 			(searchParams.minPrice != null || searchParams.maxPrice != null ? 1 : 0) +
 			searchParams.golfRelevance.length +
-			searchParams.golfCourse.length
+			searchParams.golfCourse.length +
+			searchParams.features.length
 	);
 
 	const sortLabel = $derived(
@@ -118,7 +127,8 @@
 			minBeds: minBeds ? Number(minBeds) : null,
 			community: community || null,
 			golfRelevance: [...golfRelevance] as ListingSearchParams['golfRelevance'],
-			golfCourse: [...golfCourse]
+			golfCourse: [...golfCourse],
+			features: [...features]
 		};
 	}
 
@@ -215,6 +225,18 @@
 					name="golfRelevance"
 					options={[...GOLF_RELEVANCE]}
 					bind:value={golfRelevance}
+					onchange={applyNow}
+				/>
+			{/if}
+
+			<!-- Standout feature highlights (auto-derived from live listings). -->
+			{#if featureOptions.length > 0}
+				<MultiSelect
+					variant="tray"
+					label="Features"
+					name="features"
+					options={featureOptions}
+					bind:value={features}
 					onchange={applyNow}
 				/>
 			{/if}
@@ -349,6 +371,18 @@
 				{#each GOLF_RELEVANCE as option (option.value)}
 					<label class="lf-check">
 						<input type="checkbox" bind:group={golfRelevance} value={option.value} />
+						<span>{option.label}</span>
+					</label>
+				{/each}
+			</fieldset>
+		{/if}
+
+		{#if featureOptions.length > 0}
+			<fieldset class="lf-checks">
+				<legend class="lf-row__label">Features</legend>
+				{#each featureOptions as option (option.value)}
+					<label class="lf-check">
+						<input type="checkbox" bind:group={features} value={option.value} />
 						<span>{option.label}</span>
 					</label>
 				{/each}
