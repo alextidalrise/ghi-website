@@ -18,12 +18,16 @@
 	type Props = {
 		/** 'light' for the white Featured/Similar rail, 'green' for the Frontline band. */
 		surface?: 'light' | 'green';
+		/** Show the community label under the title. Opt-in: the homepage Featured/Frontline
+		    rails mix communities, so it grounds each card; the same-community Similar rail
+		    would just repeat one name, so it stays off there. */
+		showLocation?: boolean;
 	} & (
 		| { kind?: 'property'; card: PublicPropertyCard }
 		| { kind: 'development'; card: PublicDevelopmentCard }
 	);
 
-	let { card, kind = 'property', surface = 'light' }: Props = $props();
+	let { card, kind = 'property', surface = 'light', showLocation = false }: Props = $props();
 
 	const href = $derived.by(() => {
 		if (kind === 'property') {
@@ -50,6 +54,34 @@
 	const fallbackName = $derived(kind === 'development' ? 'Development listing' : 'Property listing');
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? fallbackName);
 	const linkLabel = $derived(card.title ?? `View ${fallbackName.toLowerCase()}`);
+
+	// Community label under the title, matching the location-page property grid. The
+	// homepage has no page context establishing the area, so it grounds each card.
+	// Prefer the community; some developments are titled after their community (e.g.
+	// "Palmares"), so when that would just repeat the title, step up to the parent area
+	// (the "location" taxonomy level), then the address, rather than leaving a blank slot.
+	const locationLine = $derived.by(() => {
+		if (!showLocation) return null;
+		const title = card.title?.trim().toLowerCase() ?? '';
+
+		// Clean a candidate against the title. Area names can be stored as a full path
+		// ("Palmares, Lagos, Western Algarve"); when the leading segment just repeats the
+		// title, drop it so the label adds locality instead of echoing the heading.
+		const clean = (raw: string | null | undefined): string | null => {
+			const value = raw?.trim();
+			if (!value) return null;
+			const [first, ...rest] = value.split(',').map((part) => part.trim());
+			const label = rest.length > 0 && first.toLowerCase() === title ? rest.join(', ') : value;
+			return label.toLowerCase() === title ? null : label;
+		};
+
+		const candidates = [
+			card.location?.community?.name,
+			card.location?.location?.name,
+			card.location?.addressDisplay
+		];
+		return candidates.map(clean).find(Boolean) ?? null;
+	});
 
 	const specs = $derived(
 		kind === 'development'
@@ -121,6 +153,10 @@
 
 		{#if card.title}
 			<h3 class="spotlight-card__title">{card.title}</h3>
+		{/if}
+
+		{#if locationLine}
+			<p class="spotlight-card__location">{locationLine}</p>
 		{/if}
 
 		{#if price}
@@ -243,6 +279,25 @@
 
 	.spotlight-card--green .spotlight-card__title {
 		color: var(--on-green);
+	}
+
+	/* Community label under the title — same overline treatment as the location-page
+	   property grid (PropertyCard), tinted per surface for legibility. */
+	.spotlight-card__location {
+		margin: 0.375rem 0 0;
+		font-family: var(--sans);
+		font-size: var(--text-overline);
+		font-weight: 500;
+		letter-spacing: var(--tracking-overline);
+		text-transform: uppercase;
+	}
+
+	.spotlight-card--light .spotlight-card__location {
+		color: var(--muted);
+	}
+
+	.spotlight-card--green .spotlight-card__location {
+		color: oklch(0.86 0.02 85 / 0.72);
 	}
 
 	/* Anchor the price to the bottom of the body. In an equal-height rail, a card whose

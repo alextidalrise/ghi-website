@@ -57,9 +57,9 @@
 		>
 			{#snippet card(c)}
 				{#if c.kind === 'development'}
-					<SpotlightCard card={c.card} kind="development" surface="green" />
+					<SpotlightCard card={c.card} kind="development" surface="green" showLocation />
 				{:else}
-					<SpotlightCard card={c.card} surface="green" />
+					<SpotlightCard card={c.card} surface="green" showLocation />
 				{/if}
 			{/snippet}
 		</ListingRail>
