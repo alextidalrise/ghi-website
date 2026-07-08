@@ -9,6 +9,8 @@ import {
 	countryBySlugQuery,
 	fetchCountryFeaturedListingCards,
 	fetchCountryFeaturedLocations,
+	fetchCountryListingFacetRows,
+	fetchCountryNavCommunities,
 	fetchFrontlineListingCards,
 	fetchMaybePreview,
 	fetchPublic,
@@ -36,16 +38,34 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 
 	const canonicalPath = `/${country.slug}`;
 
-	const [locations, featuredCards, frontlineCards, featuredLocations] = await Promise.all([
-		fetchPublic<LocationTaxonomyPage[]>(locationsByCountryQuery, {
-			params: { countrySlug: params.country }
-		}),
-		fetchCountryFeaturedListingCards({ countrySlug: params.country }),
-		fetchFrontlineListingCards({
-			scope: { type: 'country', countrySlug: params.country }
-		}),
-		fetchCountryFeaturedLocations({ countrySlug: params.country })
-	]);
+	const [locations, featuredCards, frontlineCards, featuredLocations, communities, facetRows] =
+		await Promise.all([
+			fetchPublic<LocationTaxonomyPage[]>(locationsByCountryQuery, {
+				params: { countrySlug: params.country }
+			}),
+			fetchCountryFeaturedListingCards({ countrySlug: params.country }),
+			fetchFrontlineListingCards({
+				scope: { type: 'country', countrySlug: params.country }
+			}),
+			fetchCountryFeaturedLocations({ countrySlug: params.country }),
+			fetchCountryNavCommunities(params.country),
+			fetchCountryListingFacetRows(params.country)
+		]);
+
+	/* Taxonomy the country-scoped search bar consumes. Locations arrive without a country
+	   slug (they were queried under one already), so stamp it on for the bar's shape. */
+	const searchLocations = (locations ?? []).flatMap((location) =>
+		location._id && location.name && location.slug
+			? [
+					{
+						_id: location._id,
+						name: location.name,
+						slug: location.slug,
+						countrySlug: country.slug
+					}
+				]
+			: []
+	);
 
 	const frontlineViewAllHref = FRONTLINE_COLLECTION_PATH;
 
@@ -64,6 +84,11 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		featuredCards,
 		frontlineCards,
 		frontlineViewAllHref,
+		// Country-scoped taxonomy for the search bar (country selector omitted; the country
+		// is fixed to this page's subject).
+		searchLocations,
+		searchCommunities: communities,
+		searchFacetRows: facetRows,
 		canonicalUrl,
 		breadcrumbs,
 		seo,

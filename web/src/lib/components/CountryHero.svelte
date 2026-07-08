@@ -15,16 +15,22 @@
 		breadcrumbs?: BreadcrumbItem[];
 		/** Optional lead line beneath the headline. */
 		tagline?: string;
+		/**
+		 * Reserve extra footing so the search bar can straddle the band's base (mirroring
+		 * the homepage hero → search bridge). Also drops the band's bottom rule, which the
+		 * overlapping bar would otherwise punch through mid-width.
+		 */
+		bridgeBelow?: boolean;
 	};
 
-	let { title, countrySlug, flagUrl, breadcrumbs, tagline }: Props = $props();
+	let { title, countrySlug, flagUrl, breadcrumbs, tagline, bridgeBelow = false }: Props = $props();
 </script>
 
 <!-- Compact deep-green punctuation band — the country page's single arrival moment.
      No photograph (which was rendering the flag scrimmed and pixelated); the flag now
      sits crisp as a framed passport stamp above the headline, the same stamp vocabulary
      used by the homepage country selector. -->
-<section class="country-hero on-dark">
+<section class="country-hero on-dark" class:country-hero--bridge={bridgeBelow}>
 	{#if breadcrumbs && breadcrumbs.length > 0}
 		<div class="country-hero__crumbs">
 			<Breadcrumbs items={breadcrumbs} onDark />
@@ -63,6 +69,15 @@
 			linear-gradient(180deg, oklch(0.3 0.035 165) 0%, oklch(0.23 0.03 165) 100%);
 		/* Hairline gold rules frame the band crisply against the white page. */
 		border-block: 1px solid oklch(0.82 0.05 85 / 0.28);
+	}
+
+	/* Bridge mode: deepen the base so the search bar overlaps the band's foot (the same
+	   move the homepage hero makes for its search), and drop the bottom rule — the bar
+	   crosses it mid-width, so keeping it would read as a broken line either side of the
+	   bar. The green→white contrast still reads the band's lower edge cleanly. */
+	.country-hero--bridge {
+		padding-bottom: clamp(6.5rem, 4.5rem + 7vw, 9.5rem);
+		border-bottom-color: transparent;
 	}
 
 	.country-hero__inner {

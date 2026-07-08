@@ -71,7 +71,11 @@ export { fetchListingCards, type ListingSearchResult } from './fetchListings';
 
 export { fetchLocationFeatureOptions } from './featureOptions';
 
-export { fetchListingFacetRows, type ListingFacetRow } from './listingFacets';
+export {
+	fetchListingFacetRows,
+	fetchCountryListingFacetRows,
+	type ListingFacetRow
+} from './listingFacets';
 
 export {
 	FRONTLINE_LISTING_LIMIT,
@@ -98,8 +102,10 @@ export {
 
 export {
 	fetchNavTaxonomy,
+	fetchCountryNavCommunities,
 	type NavCountryOption,
 	type NavLocationOption,
+	type NavCommunityOption,
 	type NavTaxonomy
 } from './nav';
 

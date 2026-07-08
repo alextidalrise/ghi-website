@@ -1,6 +1,7 @@
 <script lang="ts">
 	import CountryHero from '$lib/components/CountryHero.svelte';
 	import AreaOverview from '$lib/components/AreaOverview.svelte';
+	import DiscoveryBar from '$lib/components/listing/DiscoveryBar.svelte';
 	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
@@ -10,6 +11,18 @@
 	let { data } = $props();
 
 	const countryLocations = $derived(data.featuredLocations);
+
+	/* The scoped search bar keeps the country selector's shape but with a single, fixed
+	   country — this page's subject. Passed as a one-item list so the bar can still resolve
+	   the country's name (lead) and flag (mobile trigger). */
+	const searchCountries = $derived([
+		{
+			_id: data.location._id,
+			name: data.location.name,
+			slug: data.location.slug,
+			flagUrl: data.location.flagUrl
+		}
+	]);
 
 	const overviewBody = $derived(data.location.publicDescription?.trim() || undefined);
 	const overviewHeading = $derived(
@@ -51,11 +64,26 @@
 	flagUrl={data.location.flagUrl}
 	breadcrumbs={data.breadcrumbs}
 	tagline={data.location.tagline ?? undefined}
+	bridgeBelow
 >
 	{#snippet title()}
 		{countryHeadline(data.location.name)}
 	{/snippet}
 </CountryHero>
+
+<!-- Search bar bridges the green hero and the white page, mirroring the homepage: its
+     upper half (the lead) sits over the band's foot, its tray straddles the seam onto white.
+     A sibling of the hero (not a child) so the band never clips it, and scoped to this
+     country — the visitor refines Location and below, never re-picks the country. -->
+<div class="country-search content-wrap">
+	<DiscoveryBar
+		scopedCountrySlug={data.location.slug}
+		countries={searchCountries}
+		locations={data.searchLocations}
+		communities={data.searchCommunities}
+		facetRows={data.searchFacetRows}
+	/>
+</div>
 
 <article class="country-page">
 	<section class="country-page__content content-wrap">
@@ -93,6 +121,16 @@
 </article>
 
 <style>
+	/* Bridge: pull the search panel up so it straddles the seam between the green hero band
+	   and the white page — the same move the homepage hero → search makes. The hero reserves
+	   the footing (bridgeBelow); this negative margin sets how much of the bar rides on green.
+	   A stacking context above the band keeps the panel and its dropdowns clear of it. */
+	.country-search {
+		position: relative;
+		z-index: 3;
+		margin-top: clamp(-7rem, -8vw, -5rem);
+	}
+
 	.country-page__lead {
 		max-width: 42rem;
 		color: var(--muted);

@@ -42,9 +42,19 @@
 		communities: CommunityOption[];
 		/** Per-listing facet rows; Property type / Budget / Features narrow to the chosen location. */
 		facetRows?: ListingFacetRow[];
+		/**
+		 * When set, the bar is locked to this country: the country selector is removed and
+		 * the country is fixed to this slug. Used on the country page, where the country is
+		 * already the page's subject — the visitor only refines Location and below. The
+		 * country name still surfaces in the lead ("Find your home in Spain") and, on mobile,
+		 * as the collapsed trigger's flag.
+		 */
+		scopedCountrySlug?: string;
 	};
 
-	let { countries, locations, communities, facetRows = [] }: Props = $props();
+	let { countries, locations, communities, facetRows = [], scopedCountrySlug }: Props = $props();
+
+	const isScoped = $derived(Boolean(scopedCountrySlug));
 
 	/* Budget bands. Each band emits the listing-search price params the destination
 	   location page already understands (minPrice / maxPrice); the band is just a
@@ -57,13 +67,23 @@
 		{ value: 'b5', label: '€5M+', min: 5_000_000, max: null }
 	] as const;
 
-	/* Spain is the larger, lead portfolio, so it's the default selection; fall back to the
-	   first country if Spain isn't in the dataset (e.g. a future market reshuffle). */
+	/* When scoped to a country page, that country is fixed. Otherwise Spain is the larger,
+	   lead portfolio, so it's the default selection; fall back to the first country if Spain
+	   isn't in the dataset (e.g. a future market reshuffle). */
 	const initialCountrySlug = $derived(
-		countries.find((country) => country.slug === 'spain')?.slug ?? countries[0]?.slug ?? ''
+		scopedCountrySlug ??
+			countries.find((country) => country.slug === 'spain')?.slug ??
+			countries[0]?.slug ??
+			''
 	);
 
-	let countrySlug = $state('');
+	// Seed the fixed country synchronously (SSR too) when scoped, so the lead reads
+	// "…in Spain" and the location menu is populated on first paint rather than filling
+	// in after hydration. The country is fixed for the page's life, so capturing the
+	// initial prop value is deliberate. The homepage (unscoped) keeps '' and defaults to
+	// Spain via the effect below.
+	// svelte-ignore state_referenced_locally
+	let countrySlug = $state(scopedCountrySlug ?? '');
 	let locationSlug = $state('');
 	let communitySlug = $state('');
 	let propertyType = $state('');
@@ -100,11 +120,28 @@
 		filteredLocations.find((location) => location.slug === locationSlug)?.name ?? ''
 	);
 
-	/* Summary shown on the collapsed mobile trigger, so a returning visitor sees their
-	   current selection rather than a generic prompt. */
-	const compactSummary = $derived(
-		[selectedCountry?.name, selectedLocationName || 'anywhere'].filter(Boolean).join(' · ')
+	/* The country's display name, for the lead line and (mobile) the trigger flag. */
+	const scopedCountryName = $derived(selectedCountry?.name ?? '');
+
+	/* Lead: on a country page the scope is spoken ("… in Spain") rather than shown as a
+	   selector; on the homepage it stays the plain prompt. */
+	const leadText = $derived(
+		isScoped && scopedCountryName ? `Find your home in ${scopedCountryName}` : 'Find your home'
 	);
+
+	/* Summary shown on the collapsed mobile trigger, so a returning visitor sees their
+	   current selection rather than a generic prompt. Scoped to a country, the country name
+	   is already the page — the summary carries the location refinement only. */
+	const compactSummary = $derived(
+		isScoped
+			? selectedLocationName || 'Any location'
+			: [selectedCountry?.name, selectedLocationName || 'anywhere'].filter(Boolean).join(' · ')
+	);
+
+	/* On a country page, country-only "search" would just reload the current page, so the
+	   action waits for a Location — the minimum meaningful refinement here. The homepage,
+	   which navigates country → country page, keeps search always live. */
+	const searchDisabled = $derived(isScoped && !hasLocation);
 
 	/* Cross-filtering (faceted search): Community, Property type, Budget and Features all
 	   constrain each other, in any order. Each menu lists only what stays reachable given
@@ -255,6 +292,7 @@
 	}
 
 	function search() {
+		if (searchDisabled) return;
 		const href = destinationHref();
 		if (href) goto(href);
 	}
@@ -326,19 +364,23 @@
 {/snippet}
 
 <div class="discovery">
-	<p class="discovery__lead">Find your home</p>
+	<p class="discovery__lead">{leadText}</p>
 
 	<!-- ============ DESKTOP: inline bar (≥ 72rem) ============ -->
 	<form class="bar" aria-label="Find properties by destination" onsubmit={handleSubmit}>
-		<Select
-			variant="chip"
-			label="Country"
-			options={countryOpts}
-			bind:value={countrySlug}
-			onchange={handleCountryChange}
-		>
-			{#snippet flag()}{@render flagStamp(selectedCountry)}{/snippet}
-		</Select>
+		<!-- The country chip is dropped when the bar is scoped to a country page: the country
+		     is fixed and already the page's subject, so the tray leads on Location. -->
+		{#if !isScoped}
+			<Select
+				variant="chip"
+				label="Country"
+				options={countryOpts}
+				bind:value={countrySlug}
+				onchange={handleCountryChange}
+			>
+				{#snippet flag()}{@render flagStamp(selectedCountry)}{/snippet}
+			</Select>
+		{/if}
 
 		<div class="bar__tray fc-tray">
 			<Select
@@ -389,7 +431,13 @@
 				/>
 			{/if}
 
-			<button class="bar__search" type="submit" aria-label="Search homes">
+			<button
+				class="bar__search"
+				type="submit"
+				aria-label="Search homes"
+				disabled={searchDisabled}
+				title={searchDisabled ? 'Choose a location to search' : undefined}
+			>
 				<svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
 					<circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6" />
 					<path d="M13 13l5 5" stroke="currentColor" stroke-width="1.6" />
@@ -414,7 +462,7 @@
 	<!-- ============ MOBILE: bottom sheet ============ -->
 	<dialog class="sheet" bind:this={sheet} aria-label="Find properties by destination">
 		<div class="sheet__head">
-			<p class="sheet__title">Find your home</p>
+			<p class="sheet__title">{leadText}</p>
 			<button class="sheet__close" type="button" onclick={closeSheet} aria-label="Close">
 				<svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
 					<path d="M4 4l12 12M16 4 4 16" stroke="currentColor" stroke-width="1.5" />
@@ -423,17 +471,19 @@
 		</div>
 
 		<div class="sheet__fields">
-			<p class="srow">
-				<label class="srow__label" for="sh-country">Country</label>
-				<span class="srow__control">
-					<span class="srow__flag">{@render flagStamp(selectedCountry)}</span>
-					<select id="sh-country" bind:value={countrySlug} onchange={handleCountryChange}>
-						{#each countries as country (country._id)}
-							<option value={country.slug}>{country.name}</option>
-						{/each}
-					</select>
-				</span>
-			</p>
+			{#if !isScoped}
+				<p class="srow">
+					<label class="srow__label" for="sh-country">Country</label>
+					<span class="srow__control">
+						<span class="srow__flag">{@render flagStamp(selectedCountry)}</span>
+						<select id="sh-country" bind:value={countrySlug} onchange={handleCountryChange}>
+							{#each countries as country (country._id)}
+								<option value={country.slug}>{country.name}</option>
+							{/each}
+						</select>
+					</span>
+				</p>
+			{/if}
 
 			<p class="srow" class:is-empty={!locationSlug}>
 				<label class="srow__label" for="sh-location">Location</label>
@@ -498,7 +548,12 @@
 			{/if}
 		</div>
 
-		<button class="sheet__search" type="button" onclick={searchFromSheet}>
+		<button
+			class="sheet__search"
+			type="button"
+			onclick={searchFromSheet}
+			disabled={searchDisabled}
+		>
 			<span>Search homes</span>
 			<svg viewBox="0 0 26 12" fill="none" aria-hidden="true">
 				<path d="M0 6h23M19 1.5 24 6l-5 4.5" stroke="currentColor" stroke-width="1.5" />
@@ -575,7 +630,7 @@
 		height: 1.1875rem;
 	}
 
-	.bar__search:hover {
+	.bar__search:not(:disabled):hover {
 		background: transparent;
 		color: var(--green);
 	}
@@ -583,6 +638,15 @@
 	.bar__search:focus-visible {
 		outline: 2px solid var(--green);
 		outline-offset: 3px;
+	}
+
+	/* Scoped country page: the action waits for a Location. Reads as clearly inert —
+	   the hairline outline of the resting round button with muted ink, no fill. */
+	.bar__search:disabled {
+		background: transparent;
+		border-color: var(--border);
+		color: var(--muted);
+		cursor: not-allowed;
 	}
 
 	/* ===================== MOBILE TRIGGER ===================== */
@@ -864,6 +928,13 @@
 		letter-spacing: var(--tracking-wide);
 		text-transform: uppercase;
 		cursor: pointer;
+	}
+
+	.sheet__search:disabled {
+		background: transparent;
+		border-color: var(--border);
+		color: var(--muted);
+		cursor: not-allowed;
 	}
 
 	.sheet__search svg {
