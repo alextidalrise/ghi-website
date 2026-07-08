@@ -13,6 +13,7 @@
 	import EnquiryRail from './EnquiryRail.svelte';
 	import PropertyLocation from './PropertyLocation.svelte';
 	import SimilarProperties from '$lib/components/listing/SimilarProperties.svelte';
+	import BackToArea from '$lib/components/listing/BackToArea.svelte';
 
 	type Props = {
 		property: PublicPropertyListing;
@@ -66,6 +67,8 @@
 	{#if similarCards.length > 0}
 		<SimilarProperties cards={similarCards} />
 	{/if}
+
+	<BackToArea {breadcrumbs} />
 </article>
 
 <style>
