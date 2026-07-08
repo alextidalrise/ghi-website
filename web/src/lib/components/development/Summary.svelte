@@ -26,11 +26,15 @@
 		].filter((part): part is string => Boolean(part))
 	);
 
-	const locationLine = $derived(
-		locationParts.length > 0
-			? locationParts.join(', ')
-			: (development.location?.addressDisplay ?? null)
-	);
+	/** Drop a segment that repeats the one before it (case-insensitive) so a
+	    development whose community and location share a name renders "Palmares,
+	    Portugal" rather than "Palmares, Palmares, Portugal". */
+	const locationLine = $derived.by(() => {
+		const parts = locationParts.filter(
+			(part, i) => i === 0 || part.toLowerCase() !== locationParts[i - 1].toLowerCase()
+		);
+		return parts.length > 0 ? parts.join(', ') : (development.location?.addressDisplay ?? null);
+	});
 
 	function escapeRegExp(value: string): string {
 		return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

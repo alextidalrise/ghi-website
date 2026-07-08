@@ -18,7 +18,11 @@
 		close_to_golf: 'Close to golf'
 	};
 
-	const locationParts = $derived(
+	const isUnit = $derived(listing.listingKind === 'unit');
+
+	/** This listing's taxonomy place names (community, location, country). Used
+	    to strip location echoes from the title and to de-dupe the location line. */
+	const placeNames = $derived(
 		[
 			listing.location?.community?.name,
 			listing.location?.location?.name,
@@ -26,13 +30,59 @@
 		].filter((part): part is string => Boolean(part))
 	);
 
-	const locationLine = $derived(
-		locationParts.length > 0 ? locationParts.join(', ') : (listing.location?.addressDisplay ?? null)
-	);
-
 	function escapeRegExp(value: string): string {
 		return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	}
+
+	/** Strip any trailing location echo (a separator followed by one of the given
+	    place names) from a string, leaving its own name. Never strips to empty. */
+	function stripTrailingPlaces(raw: string, names: string[]): string {
+		let title = raw.trim();
+		let changed = true;
+		while (changed) {
+			changed = false;
+			for (const name of names) {
+				const re = new RegExp(`\\s*[—–\\-,]\\s*${escapeRegExp(name)}\\s*$`, 'i');
+				const next = title.replace(re, '').trim();
+				if (next && next !== title) {
+					title = next;
+					changed = true;
+				}
+			}
+		}
+		return title || raw.trim();
+	}
+
+	/** Development unit pages build their location line from the parent
+	    development's (cleaned) name plus location and country — e.g. "The Uncommon,
+	    Vilamoura, Portugal" — instead of "community, location, country", which
+	    duplicates when a community and its location share a name ("Vilamoura,
+	    Vilamoura, Portugal"). Segments already echoed in an earlier one are dropped
+	    ("Monte Rei Golf & Country Club, Monte Rei" → …Country Club). Standalone
+	    listings keep the community-led line. */
+	const locationParts = $derived.by(() => {
+		if (isUnit && listing.developmentTitle) {
+			const parts = [stripTrailingPlaces(listing.developmentTitle, placeNames)];
+			for (const name of [listing.location?.location?.name, listing.location?.country?.name]) {
+				const alreadyPresent =
+					name && parts.some((part) => new RegExp(`\\b${escapeRegExp(name)}\\b`, 'i').test(part));
+				if (name && !alreadyPresent) parts.push(name);
+			}
+			return parts;
+		}
+		return placeNames;
+	});
+
+	/** Drop a segment that repeats the one before it (case-insensitive) so a
+	    listing whose community and location share a name renders "Palmares,
+	    Portugal" rather than "Palmares, Palmares, Portugal". Unit lines are already
+	    de-duped above; this is a no-op for them. */
+	const locationLine = $derived.by(() => {
+		const parts = locationParts.filter(
+			(part, i) => i === 0 || part.toLowerCase() !== locationParts[i - 1].toLowerCase()
+		);
+		return parts.length > 0 ? parts.join(', ') : (listing.location?.addressDisplay ?? null);
+	});
 
 	/** CMS titles often append the location ("Arco Iris — Marbella", "Villa
 	    Solstice, Las Brisas, Nueva Andalucia"), which the location line below then
@@ -41,13 +91,13 @@
 	    to empty, so a title that is purely a place name is preserved. */
 	const displayTitle = $derived.by(() => {
 		const raw = (listing.title ?? '').trim();
-		if (!raw || locationParts.length === 0) return raw || 'Property';
+		if (!raw || placeNames.length === 0) return raw || 'Property';
 
 		let title = raw;
 		let changed = true;
 		while (changed) {
 			changed = false;
-			for (const name of locationParts) {
+			for (const name of placeNames) {
 				const re = new RegExp(`\\s*[—–\\-,]\\s*${escapeRegExp(name)}\\s*$`, 'i');
 				const next = title.replace(re, '').trim();
 				if (next && next !== title) {
