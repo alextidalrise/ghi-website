@@ -5,6 +5,7 @@
 	import AreaOverview from '$lib/components/AreaOverview.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import ListingResults from '$lib/components/listing/ListingResults.svelte';
+	import AreaExplore, { type ExploreGroup } from '$lib/components/listing/AreaExplore.svelte';
 	import { locationHeadline, locationOverviewHeading } from '$lib/home/headlines';
 	import { buildListingSearchHref } from '$lib/listing/searchParams';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
@@ -68,6 +69,50 @@
 	function relatedAreaHref(slug: string) {
 		return `/${data.country.slug}/${slug}`;
 	}
+
+	// The closing "explore the area" links, grouped for AreaExplore. Communities filter
+	// this page (the active one is flagged selected); related areas navigate away.
+	const exploreGroups = $derived.by<ExploreGroup[]>(() => {
+		const activeSlug = data.activeCommunity?.slug ?? null;
+		const communityLinks = (communities: typeof data.directCommunities) =>
+			communities
+				.filter((community) => community.slug && community.name)
+				.map((community) => ({
+					key: community._id,
+					label: community.name as string,
+					href: communityFilterHref(community.slug as string),
+					active: community.slug === activeSlug
+				}));
+
+		return [
+			{
+				id: 'communities',
+				heading: 'Communities',
+				kind: 'filter',
+				links: communityLinks(data.directCommunities)
+			},
+			{
+				id: 'associated-communities',
+				heading: 'Also in this area',
+				kind: 'filter',
+				links: communityLinks(data.associatedCommunities)
+			},
+			{
+				id: 'related-areas',
+				heading: 'Related areas',
+				kind: 'nav',
+				links: data.relatedAreaLinks
+					.map((entry) => {
+						const slug = entry.location?.slug;
+						const label = entry.location?.breadcrumbLabel ?? entry.location?.name;
+						return slug && label
+							? { key: entry.location?._id ?? slug, label, href: relatedAreaHref(slug) }
+							: null;
+					})
+					.filter((link): link is NonNullable<typeof link> => link !== null)
+			}
+		];
+	});
 </script>
 
 <svelte:head>
@@ -155,52 +200,7 @@
 				<p class="location-page__intro">{placeholderBody}</p>
 			{/if}
 
-			{#if data.directCommunities.length > 0}
-				<section class="location-page__list" aria-labelledby="communities-heading">
-					<h2 id="communities-heading">Communities</h2>
-					<ul>
-						{#each data.directCommunities as community (community._id)}
-							{#if community.slug && community.name}
-								<li>
-									<a href={communityFilterHref(community.slug)}>{community.name}</a>
-								</li>
-							{/if}
-						{/each}
-					</ul>
-				</section>
-			{/if}
-
-			{#if data.associatedCommunities.length > 0}
-				<section class="location-page__list" aria-labelledby="associated-communities-heading">
-					<h2 id="associated-communities-heading">Also in this area</h2>
-					<ul>
-						{#each data.associatedCommunities as community (community._id)}
-							{#if community.slug && community.name}
-								<li>
-									<a href={communityFilterHref(community.slug)}>{community.name}</a>
-								</li>
-							{/if}
-						{/each}
-					</ul>
-				</section>
-			{/if}
-
-			{#if data.relatedAreaLinks.length > 0}
-				<section class="location-page__list" aria-labelledby="related-areas-heading">
-					<h2 id="related-areas-heading">Related areas</h2>
-					<ul>
-						{#each data.relatedAreaLinks as entry (entry.location?._id)}
-							{@const slug = entry.location?.slug}
-							{@const name = entry.location?.breadcrumbLabel ?? entry.location?.name}
-							{#if slug && name}
-								<li>
-									<a href={relatedAreaHref(slug)}>{name}</a>
-								</li>
-							{/if}
-						{/each}
-					</ul>
-				</section>
-			{/if}
+			<AreaExplore groups={exploreGroups} />
 		</div>
 	{/if}
 </article>
@@ -269,21 +269,5 @@
 	}
 	.location-page__after > :global(.overview + *) {
 		margin-top: var(--section-gap);
-	}
-
-	.location-page__list h2 {
-		margin-bottom: var(--space-sm);
-	}
-
-	.location-page__list ul {
-		list-style: none;
-		display: grid;
-		gap: var(--space-xs);
-	}
-
-	.location-page__list a {
-		color: var(--green);
-		text-decoration: underline;
-		text-underline-offset: 0.15em;
 	}
 </style>
