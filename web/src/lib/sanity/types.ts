@@ -7321,23 +7321,30 @@ export type AutomaticSimilarPropertiesQueryResult = Array<{
 }>;
 
 // Source: ../web/src/lib/sanity/queries/similar.ts
-// Variable: tagsSimilarPropertiesQuery
-// Query: *[      _type == "propertyListing"  && listingKind in ["property", "unit"]  &&   (coalesce(status, "") == $publishedStatus || $previewAll)    && _id != $excludeId    && count((related.similarityTags)[@ in $tags]) > 0  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceDisplay,  currency},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }}
-export type TagsSimilarPropertiesQueryResult = Array<{
+// Variable: automaticSimilarDevelopmentsQuery
+// Query: *[      _type == "development"  &&   (coalesce(status, "") == $publishedStatus || $previewAll)    && _id != $excludeId    && location.country->slug.current == $countrySlug  ] | order(    select(location.community->slug.current == $communitySlug => 0, 1) asc,    select(location.location->slug.current == $locationSlug => 0, 1) asc,    _createdAt desc  )[0...$limit]{  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceConfirmed,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  "unitsAvailable": count((units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ]),  "bedroomsFrom": math::min(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  "bedroomsTo": math::max(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},    thumbnailOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }}
+export type AutomaticSimilarDevelopmentsQueryResult = Array<{
   _id: string;
+  _type: "development";
   ghiListingId: string;
   title: string;
   slug: string;
-  listingKind: "property" | "unit";
-  propertyType:
-    | "apartment"
-    | "development"
-    | "finca"
-    | "penthouse"
-    | "plot"
-    | "townhouse"
-    | "villa";
-  transactionType: "other" | "rent" | "sale" | "short_term";
+  listingKind: string | null;
+  developmentDisplayMode:
+    | "enquiry_led"
+    | "flat_listing"
+    | "price_from_summary"
+    | "unit_types"
+    | "units";
+  developmentStatus:
+    | "completed"
+    | "near_completion"
+    | "off_plan"
+    | "planning"
+    | "sold_out"
+    | "under_construction"
+    | "unknown"
+    | null;
   countrySlug: string | null;
   locationSlug: string | null;
   communitySlug: string | null;
@@ -7361,15 +7368,41 @@ export type TagsSimilarPropertiesQueryResult = Array<{
   } | null;
   pricing: {
     price: number | null;
+    priceFrom: number | null;
+    priceTo: number | null;
     priceDisplay: string | null;
     currency: string | null;
+    priceQualifier:
+      | "enquiry_led"
+      | "exact"
+      | "from"
+      | "guide"
+      | "poa"
+      | "reduced"
+      | null;
+    priceConfirmed: boolean | null;
+    availabilityStatus:
+      | "available"
+      | "coming_soon"
+      | "reserved"
+      | "sold"
+      | "under_offer"
+      | "unknown"
+      | "withdrawn";
+    completionStatus:
+      | "completed"
+      | "key_ready"
+      | "near_completion"
+      | "off_plan"
+      | "under_construction"
+      | "unknown"
+      | null;
+    completionDate: string | null;
+    buildStatus: "completed" | "in_progress" | "not_started" | "unknown" | null;
   } | null;
-  specs: {
-    bedrooms: number | null;
-    bathrooms: number | null;
-    builtArea: number | null;
-    builtAreaUnit: "sqft" | "sqm" | null;
-  } | null;
+  unitsAvailable: number | null;
+  bedroomsFrom: number | null;
+  bedroomsTo: number | null;
   media: {
     gallery: Array<{
       asset: {
@@ -7389,12 +7422,228 @@ export type TagsSimilarPropertiesQueryResult = Array<{
       lqip: string | null;
       dimensions: SanityImageDimensions | null;
     }> | null;
+    thumbnailOverride: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      altText: string | null;
+      lqip: string | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
   } | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries/similar.ts
+// Variable: tagsSimilarPropertiesQuery
+// Query: *[      (    (_type == "propertyListing" && listingKind in ["property", "unit"])    || _type == "development"  )  &&   (coalesce(status, "") == $publishedStatus || $previewAll)    && _id != $excludeId    && count((related.similarityTags)[@ in $tags]) > 0  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{  _type == "development" => {  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceConfirmed,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  "unitsAvailable": count((units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ]),  "bedroomsFrom": math::min(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  "bedroomsTo": math::max(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},    thumbnailOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }},  _type == "propertyListing" => {  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceDisplay,  currency},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }}}
+export type TagsSimilarPropertiesQueryResult = Array<
+  | {
+      _id: string;
+      _type: "development";
+      ghiListingId: string;
+      title: string;
+      slug: string;
+      listingKind: string | null;
+      developmentDisplayMode:
+        | "enquiry_led"
+        | "flat_listing"
+        | "price_from_summary"
+        | "unit_types"
+        | "units";
+      developmentStatus:
+        | "completed"
+        | "near_completion"
+        | "off_plan"
+        | "planning"
+        | "sold_out"
+        | "under_construction"
+        | "unknown"
+        | null;
+      countrySlug: string | null;
+      locationSlug: string | null;
+      communitySlug: string | null;
+      isCatchAll: boolean | false;
+      location: {
+        country: {
+          name: string;
+          slug: string;
+        } | null;
+        location: {
+          name: string;
+          slug: string;
+        } | null;
+        community: {
+          _id: string;
+          name: string;
+          slug: string;
+          isCatchAll: boolean | null;
+        };
+        addressDisplay: string;
+      } | null;
+      pricing: {
+        price: number | null;
+        priceFrom: number | null;
+        priceTo: number | null;
+        priceDisplay: string | null;
+        currency: string | null;
+        priceQualifier:
+          | "enquiry_led"
+          | "exact"
+          | "from"
+          | "guide"
+          | "poa"
+          | "reduced"
+          | null;
+        priceConfirmed: boolean | null;
+        availabilityStatus:
+          | "available"
+          | "coming_soon"
+          | "reserved"
+          | "sold"
+          | "under_offer"
+          | "unknown"
+          | "withdrawn";
+        completionStatus:
+          | "completed"
+          | "key_ready"
+          | "near_completion"
+          | "off_plan"
+          | "under_construction"
+          | "unknown"
+          | null;
+        completionDate: string | null;
+        buildStatus:
+          | "completed"
+          | "in_progress"
+          | "not_started"
+          | "unknown"
+          | null;
+      } | null;
+      unitsAvailable: number | null;
+      bedroomsFrom: number | null;
+      bedroomsTo: number | null;
+      media: {
+        gallery: Array<{
+          asset: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            alt?: string;
+            _type: "image";
+          } | null;
+          fileAsset: {
+            asset?: SanityFileAssetReference;
+            media?: unknown;
+            _type: "file";
+          } | null;
+          altText: string | null;
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        }> | null;
+        thumbnailOverride: {
+          asset: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            alt?: string;
+            _type: "image";
+          } | null;
+          fileAsset: {
+            asset?: SanityFileAssetReference;
+            media?: unknown;
+            _type: "file";
+          } | null;
+          altText: string | null;
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+    }
+  | {
+      _id: string;
+      ghiListingId: string;
+      title: string;
+      slug: string;
+      listingKind: "property" | "unit";
+      propertyType:
+        | "apartment"
+        | "development"
+        | "finca"
+        | "penthouse"
+        | "plot"
+        | "townhouse"
+        | "villa";
+      transactionType: "other" | "rent" | "sale" | "short_term";
+      countrySlug: string | null;
+      locationSlug: string | null;
+      communitySlug: string | null;
+      isCatchAll: boolean | false;
+      location: {
+        country: {
+          name: string;
+          slug: string;
+        } | null;
+        location: {
+          name: string;
+          slug: string;
+        } | null;
+        community: {
+          _id: string;
+          name: string;
+          slug: string;
+          isCatchAll: boolean | null;
+        };
+        addressDisplay: string;
+      } | null;
+      pricing: {
+        price: number | null;
+        priceDisplay: string | null;
+        currency: string | null;
+      } | null;
+      specs: {
+        bedrooms: number | null;
+        bathrooms: number | null;
+        builtArea: number | null;
+        builtAreaUnit: "sqft" | "sqm" | null;
+      } | null;
+      media: {
+        gallery: Array<{
+          asset: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            alt?: string;
+            _type: "image";
+          } | null;
+          fileAsset: {
+            asset?: SanityFileAssetReference;
+            media?: unknown;
+            _type: "file";
+          } | null;
+          altText: string | null;
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        }> | null;
+      } | null;
+    }
+>;
+
+// Source: ../web/src/lib/sanity/queries/similar.ts
 // Variable: manualSimilarPropertiesQuery
-// Query: *[_id == $listingId][0]{    "items": related.manualSimilarProperties[]->[        (_type == "propertyListing" && listingKind in ["property", "unit"] &&   (coalesce(status, "") == $publishedStatus || $previewAll))  || (_type == "development" &&   (coalesce(status, "") == $publishedStatus || $previewAll))    ]{  _type,  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  developmentDisplayMode,  developmentStatus,  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ name, "slug": slug.current },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceConfirmed,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},    thumbnailOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }}  }
+// Query: *[_id == $listingId][0]{    "items": related.manualSimilarProperties[        (@->_type == "propertyListing" && @->listingKind in ["property", "unit"] && (coalesce(@->status, "") == $publishedStatus || $previewAll))  || (@->_type == "development" && (coalesce(@->status, "") == $publishedStatus || $previewAll))    ]->{  _type == "development" => {  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceConfirmed,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  "unitsAvailable": count((units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ]),  "bedroomsFrom": math::min(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  "bedroomsTo": math::max(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},    thumbnailOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }},  _type == "propertyListing" => {  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceDisplay,  currency},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }}}  }
 export type ManualSimilarPropertiesQueryResult =
   | {
       items: null;
@@ -7402,14 +7651,12 @@ export type ManualSimilarPropertiesQueryResult =
   | {
       items: Array<
         | {
-            _type: "development";
             _id: string;
+            _type: "development";
             ghiListingId: string;
             title: string;
             slug: string;
             listingKind: string | null;
-            propertyType: null;
-            transactionType: null;
             developmentDisplayMode:
               | "enquiry_led"
               | "flat_listing"
@@ -7425,6 +7672,10 @@ export type ManualSimilarPropertiesQueryResult =
               | "under_construction"
               | "unknown"
               | null;
+            countrySlug: string | null;
+            locationSlug: string | null;
+            communitySlug: string | null;
+            isCatchAll: boolean | false;
             location: {
               country: {
                 name: string;
@@ -7435,8 +7686,10 @@ export type ManualSimilarPropertiesQueryResult =
                 slug: string;
               } | null;
               community: {
+                _id: string;
                 name: string;
                 slug: string;
+                isCatchAll: boolean | null;
               };
               addressDisplay: string;
             } | null;
@@ -7479,7 +7732,9 @@ export type ManualSimilarPropertiesQueryResult =
                 | "unknown"
                 | null;
             } | null;
-            specs: null;
+            unitsAvailable: number | null;
+            bedroomsFrom: number | null;
+            bedroomsTo: number | null;
             media: {
               gallery: Array<{
                 asset: {
@@ -7520,7 +7775,6 @@ export type ManualSimilarPropertiesQueryResult =
             } | null;
           }
         | {
-            _type: "propertyListing";
             _id: string;
             ghiListingId: string;
             title: string;
@@ -7535,8 +7789,10 @@ export type ManualSimilarPropertiesQueryResult =
               | "townhouse"
               | "villa";
             transactionType: "other" | "rent" | "sale" | "short_term";
-            developmentDisplayMode: null;
-            developmentStatus: null;
+            countrySlug: string | null;
+            locationSlug: string | null;
+            communitySlug: string | null;
+            isCatchAll: boolean | false;
             location: {
               country: {
                 name: string;
@@ -7547,23 +7803,17 @@ export type ManualSimilarPropertiesQueryResult =
                 slug: string;
               } | null;
               community: {
+                _id: string;
                 name: string;
                 slug: string;
+                isCatchAll: boolean | null;
               };
               addressDisplay: string;
             } | null;
             pricing: {
               price: number | null;
-              priceFrom: null;
-              priceTo: null;
               priceDisplay: string | null;
               currency: string | null;
-              priceQualifier: null;
-              priceConfirmed: null;
-              availabilityStatus: null;
-              completionStatus: null;
-              completionDate: null;
-              buildStatus: null;
             } | null;
             specs: {
               bedrooms: number | null;
@@ -7590,7 +7840,6 @@ export type ManualSimilarPropertiesQueryResult =
                 lqip: string | null;
                 dimensions: SanityImageDimensions | null;
               }> | null;
-              thumbnailOverride: null;
             } | null;
           }
       > | null;
@@ -10872,8 +11121,9 @@ declare module "@sanity/client" {
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "country"\n    && defined(slug.current)\n  ] | order(name asc){\n    name,\n    "slug": slug.current,\n    tagline,\n    "flagUrl": flag.asset->url\n  }\n': CountriesWithHeroQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "location"\n    && defined(slug.current)\n    && slug.current in $slugs\n  ]{\n    "slug": slug.current,\n    heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n': LocationHeroesBySlugQueryResult;
     '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n\n    && _id != $excludeId\n    && propertyType == $propertyType\n    && location.country->slug.current == $countrySlug\n    && location.location->slug.current == $locationSlug\n    && location.community->slug.current == $communitySlug\n  ] | order(_createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}\n': AutomaticSimilarPropertiesQueryResult;
-    '\n  *[\n    \n  _type == "propertyListing"\n  && listingKind in ["property", "unit"]\n  && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n\n    && _id != $excludeId\n    && count((related.similarityTags)[@ in $tags]) > 0\n  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}\n': TagsSimilarPropertiesQueryResult;
-    '\n  *[_id == $listingId][0]{\n    "items": related.manualSimilarProperties[]->[\n      \n  (_type == "propertyListing" && listingKind in ["property", "unit"] && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n)\n  || (_type == "development" && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n)\n\n    ]{\n  _type,\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  developmentDisplayMode,\n  developmentStatus,\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ name, "slug": slug.current },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}\n  }\n': ManualSimilarPropertiesQueryResult;
+    '\n  *[\n    \n  _type == "development"\n  && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n\n    && _id != $excludeId\n    && location.country->slug.current == $countrySlug\n  ] | order(\n    select(location.community->slug.current == $communitySlug => 0, 1) asc,\n    select(location.location->slug.current == $locationSlug => 0, 1) asc,\n    _createdAt desc\n  )[0...$limit]{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}\n': AutomaticSimilarDevelopmentsQueryResult;
+    '\n  *[\n    \n  (\n    (_type == "propertyListing" && listingKind in ["property", "unit"])\n    || _type == "development"\n  )\n  && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n\n    && _id != $excludeId\n    && count((related.similarityTags)[@ in $tags]) > 0\n  ] | order(count((related.similarityTags)[@ in $tags]) desc, _createdAt desc)[0...$limit]{\n  _type == "development" => {\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n},\n  _type == "propertyListing" => {\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}\n}\n': TagsSimilarPropertiesQueryResult;
+    '\n  *[_id == $listingId][0]{\n    "items": related.manualSimilarProperties[\n      \n  (@->_type == "propertyListing" && @->listingKind in ["property", "unit"] && (coalesce(@->status, "") == $publishedStatus || $previewAll))\n  || (@->_type == "development" && (coalesce(@->status, "") == $publishedStatus || $previewAll))\n\n    ]->{\n  _type == "development" => {\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n},\n  _type == "propertyListing" => {\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}\n}\n  }\n': ManualSimilarPropertiesQueryResult;
     '\n  *[_id == $listingId][0]{\n    "tags": coalesce(related.similarityTags, [])\n  }\n': SimilarTagsConfigQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && defined(slug.current)\n  ]{\n    type,\n    "slug": slug.current,\n    "countrySlug": select(\n      type == "country" => slug.current,\n      type == "location" => parent->slug.current,\n      type == "community" => parent->parent->slug.current\n    ),\n    "locationSlug": select(\n      type == "location" => slug.current,\n      type == "community" => parent->slug.current,\n      null\n    ),\n    "communitySlug": select(type == "community" => slug.current, null),\n    _updatedAt\n  }\n': SitemapTaxonomyQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && (_type != "propertyListing" || listingKind in ["property", "unit"])\n    && defined(slug.current)\n    && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n    && coalesce(seo.noindex, false) != true\n  ]{\n    "countrySlug": location.country->slug.current,\n    "locationSlug": location.location->slug.current,\n    "communitySlug": location.community->slug.current,\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapListingsQueryResult;

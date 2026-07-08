@@ -91,9 +91,19 @@ async function loadPreviewListing(
 
 	const development = toPublicDevelopment(developmentInitial.data);
 	if (development) {
+		// Similar cards come from a separate public fetch (not the live Presentation query),
+		// so they render on first load but won't hot-update as picks change — parity with the
+		// published path is worth more here than a blank rail while editing.
+		const similarCards = await fetchSimilarListingCards({
+			listingId: development._id!,
+			mode: development.related?.similarPropertiesMode,
+			kind: 'development',
+			location: development.location
+		});
 		const detail = buildDevelopmentDetailPageData(development, siteOrigin, pathParams, {
 			preview: true,
-			skipRedirect: true
+			skipRedirect: true,
+			similarCards
 		});
 
 		return {
@@ -154,6 +164,7 @@ async function loadPublishedListing(pathParams: ListingPathParams, siteOrigin: s
 		const similarCards = await fetchSimilarListingCards({
 			listingId: development._id!,
 			mode: development.related?.similarPropertiesMode,
+			kind: 'development',
 			location: development.location
 		});
 
