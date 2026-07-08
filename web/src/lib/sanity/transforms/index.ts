@@ -135,7 +135,6 @@ export type RawDevelopment = {
 	_id?: string;
 	_type?: 'development';
 	ghiListingId?: string;
-	developmentName?: string;
 	title?: string;
 	slug?: string;
 	listingKind?: string;
@@ -369,7 +368,6 @@ export function toPublicDevelopment(raw: RawDevelopment | null): PublicDevelopme
 type RawUnitDevelopmentContext = {
 	_id?: string;
 	ghiListingId?: string;
-	developmentName?: string | null;
 	title?: string | null;
 	slug?: string | null;
 	developmentStatus?: string | null;
@@ -498,9 +496,9 @@ export function toPublicUnitListing(
 
 	const devSeo = filterSeoFields(dev.seo);
 	const locationLabel =
-		dev.location?.community?.name ?? dev.location?.location?.name ?? dev.developmentName ?? null;
+		dev.location?.community?.name ?? dev.location?.location?.name ?? null;
 	const composedTitle = composeUnitTitle(raw);
-	const seoTitle = [composedTitle, dev.developmentName, locationLabel]
+	const seoTitle = [composedTitle, dev.title, locationLabel]
 		.filter((part): part is string => Boolean(part))
 		.join(', ');
 
@@ -519,7 +517,7 @@ export function toPublicUnitListing(
 		title: composedTitle,
 		slug: raw.slug ?? undefined,
 		listingKind: 'unit',
-		developmentTitle: dev.title ?? dev.developmentName ?? null,
+		developmentTitle: dev.title ?? null,
 		propertyType: unitType?.propertyType ?? undefined,
 		transactionType: 'sale',
 		location: stripInternalLocationFields(dev.location),
@@ -540,7 +538,7 @@ export function toPublicUnitListing(
 		isCatchAll: raw.isCatchAll ?? dev.isCatchAll,
 		developmentSlug: raw.developmentSlug ?? dev.slug,
 		unitSlug: raw.unitSlug ?? raw.slug,
-		developmentTitle: dev.title ?? dev.developmentName ?? 'Development'
+		developmentTitle: dev.title ?? 'Development'
 	};
 
 	return { listing, context };

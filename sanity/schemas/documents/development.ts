@@ -41,19 +41,12 @@ export const development = defineType({
 			validation: (Rule) => ghiListingIdRule(Rule)
 		}),
 		defineField({
-			name: 'developmentName',
-			title: 'Development name',
-			type: 'string',
-			group: 'identity',
-			validation: (Rule) => Rule.required()
-		}),
-		defineField({
 			name: 'title',
 			title: 'Title',
 			type: 'string',
 			group: 'identity',
 			description:
-				'The headline shown on the development page and in search results. Write for buyers — no internal codes, commission notes, or unconfirmed prices.',
+				'The name shown on the development page and in search results. Write for buyers — no internal codes, commission notes, or unconfirmed prices, and no trailing location (the place is shown separately).',
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
@@ -261,19 +254,18 @@ export const development = defineType({
 		}),
 	preview: {
 		select: {
-			developmentName: 'developmentName',
 			title: 'title',
 			ghiId: 'ghiListingId',
 			location: 'location.location.name',
 			displayMode: 'developmentDisplayMode',
 			status: 'status'
 		},
-		prepare({ developmentName, title, ghiId, location: locationName, displayMode, status }) {
+		prepare({ title, ghiId, location: locationName, displayMode, status }) {
 			const subtitle = [status, ghiId, locationName, displayMode?.replace(/_/g, ' ')]
 				.filter(Boolean)
 				.join(' · ');
 			return {
-				title: developmentName || title || 'Development',
+				title: title || 'Development',
 				subtitle: subtitle || undefined
 			};
 		}

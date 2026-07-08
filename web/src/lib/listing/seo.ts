@@ -245,7 +245,7 @@ export function buildDevelopmentSeo(
 	canonicalUrl: string
 ): PropertySeoMeta & { canonicalUrl: string } {
 	const seo = development.seo;
-	const fallbackTitle = development.title ?? development.developmentName ?? 'Development';
+	const fallbackTitle = development.title ?? 'Development';
 	const fallbackDescription = development.content?.shortDescription ?? null;
 
 	return {

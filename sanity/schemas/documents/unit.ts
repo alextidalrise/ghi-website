@@ -154,7 +154,7 @@ export const unit = defineType({
 		select: {
 			title: 'unitName',
 			unitNumber: 'unitNumber',
-			development: 'parentDevelopment.developmentName',
+			development: 'parentDevelopment.title',
 			availability: 'pricing.availabilityStatus',
 			status: 'status'
 		},

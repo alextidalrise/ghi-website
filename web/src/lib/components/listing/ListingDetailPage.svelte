@@ -89,7 +89,7 @@
 		<UnitsInventory
 			units={development.units}
 			unitTypes={development.unitTypes}
-			developmentName={development.developmentName ?? development.title}
+			developmentName={development.title}
 			{developmentPath}
 			showPricing={showInventoryPricing}
 		/>

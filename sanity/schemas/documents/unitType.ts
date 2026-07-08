@@ -113,7 +113,7 @@ export const unitType = defineType({
 	preview: {
 		select: {
 			title: 'unitTypeName',
-			development: 'parentDevelopment.developmentName',
+			development: 'parentDevelopment.title',
 			priceDisplay: 'pricing.priceDisplay',
 			status: 'status'
 		},
