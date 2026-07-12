@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PublicDevelopment } from '$lib/sanity/transforms';
 	import { formatListingPrice, formatPropertyType } from '$lib/listing/formatPrice';
+	import { isUnitAvailable } from '$lib/listing/developmentDisplay';
 
 	type Props = {
 		units: PublicDevelopment['units'];
@@ -84,8 +85,7 @@
 
 			const slug = str(u.slug);
 			const status = pricing?.availabilityStatus ?? 'available';
-			const available =
-				status === 'available' || status === 'coming_soon' || status === 'under_offer';
+			const available = isUnitAvailable(unit);
 
 			const number = str(u.unitNumber) ?? str(u.unitName) ?? str(u.ghiListingId) ?? 'Unit';
 
@@ -294,7 +294,17 @@
 </script>
 
 {#if rows.length > 0}
-	<section bind:this={sectionEl} class="units content-wrap" aria-labelledby="units-heading">
+	<!-- `id` is the anchor target for the hero CTA. `tabindex="-1"` makes the section a
+	     valid focus destination for native fragment navigation: without it the browser
+	     scrolls here but leaves focus on the link, so a keyboard user's next Tab resumes
+	     back up in the hero rather than in the table they just asked for. -->
+	<section
+		bind:this={sectionEl}
+		id="units"
+		tabindex="-1"
+		class="units content-wrap"
+		aria-labelledby="units-heading"
+	>
 		<div class="units__head">
 			<h2 id="units-heading">Properties available</h2>
 			<p class="units__count">{availableCount} of {rows.length} {homesWord} available</p>
@@ -505,6 +515,16 @@
 <style>
 	.units {
 		padding-block: var(--space-xl);
+		/* SiteNav is position:fixed, so an un-margined anchor jump parks the heading
+		   underneath it. Land the section clear of the bar instead. */
+		scroll-margin-top: calc(var(--nav-height) + var(--space-md));
+	}
+
+	/* The section only takes focus programmatically (via the #units anchor), and it is
+	   not an interactive control — the scroll landing is the feedback. A ring here would
+	   read as an error state on a block of content. */
+	.units:focus {
+		outline: none;
 	}
 
 	.units__head {

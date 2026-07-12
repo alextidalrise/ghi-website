@@ -13,7 +13,11 @@
 	import UnitsInventory from '$lib/components/development/UnitsInventory.svelte';
 	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
 	import type { EnquiryFormResult } from '$lib/listing/enquiryAction';
-	import { shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
+	import {
+		shouldShowDevelopmentPricing,
+		unitAvailability,
+		unitsCtaLabel
+	} from '$lib/listing/developmentDisplay';
 	import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
@@ -37,8 +41,16 @@
 
 	const displayMode = $derived(development?.developmentDisplayMode ?? 'flat_listing');
 	const showInventoryPricing = $derived(shouldShowDevelopmentPricing(displayMode));
+
+	// The inventory is the next step of the funnel, so it takes the hero's primary slot.
+	// `null` when there is nothing to anchor to — the same condition that stops
+	// UnitsInventory rendering — in which case enquiry is the only action left and
+	// reclaims the gold fill below.
+	const unitsLabel = $derived(unitsCtaLabel(unitAvailability(development?.units)));
+
 	const enquireLabel = $derived(
-		development?.ctas?.primaryCtaLabel ?? 'Enquire about this development'
+		development?.ctas?.primaryCtaLabel ??
+			(unitsLabel ? 'Enquire' : 'Enquire about this development')
 	);
 
 	// The final breadcrumb is the development itself; its href is the canonical path
@@ -61,7 +73,23 @@
 				<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 				<DevelopmentSummary {development} showPricing={showInventoryPricing} />
 				<DevelopmentKeyFacts {development} />
-				<a class="hero__cta" href="#enquire">{enquireLabel}</a>
+				<!-- Plain anchors: `scroll-behavior: smooth` is already on `html` (and already
+				     switched off under prefers-reduced-motion), so the scroll and its opt-out
+				     both come for free and the buttons work with JS disabled. -->
+				<div class="hero__actions">
+					{#if unitsLabel}
+						<a class="hero__cta hero__cta--gold hero__cta--units" href="#units">
+							{unitsLabel}
+							<span class="hero__cta-arrow" aria-hidden="true">↓</span>
+						</a>
+					{/if}
+					<a
+						class="hero__cta"
+						class:hero__cta--gold={!unitsLabel}
+						class:hero__cta--outline={unitsLabel}
+						href="#enquire">{enquireLabel}</a
+					>
+				</div>
 			</div>
 		</section>
 
@@ -125,24 +153,48 @@
 		padding: var(--space-lg) var(--content-padding) 0;
 	}
 
+	/* Wraps rather than overflows: at the summary column's 21rem floor the two labels
+	   cannot sit side by side, so they stack to full width instead of being squeezed.
+	   An editor-set `primaryCtaLabel` that runs long degrades the same way. */
+	.hero__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+		margin-top: var(--space-lg);
+	}
+
 	.hero__cta {
+		flex: 1 1 auto;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		margin-top: var(--space-lg);
+		gap: 0.6rem;
 		padding: 0.85rem 2rem;
-		background: var(--gold);
-		color: var(--green);
 		font-family: var(--sans);
 		font-size: var(--text-ui);
 		font-weight: 500;
 		letter-spacing: var(--tracking-wide);
 		text-transform: uppercase;
 		text-decoration: none;
-		border: 1px solid var(--gold);
+		border: 1px solid;
 		transition:
 			background var(--duration-hover) var(--ease),
+			color var(--duration-hover) var(--ease),
 			border-color var(--duration-hover) var(--ease);
+	}
+
+	/* DESIGN.md's Gold and Outline button tiers, unchanged. Both invert to green on
+	   hover, so the pair reads as one system. */
+	.hero__cta--gold {
+		background: var(--gold);
+		color: var(--green);
+		border-color: var(--gold);
+	}
+
+	.hero__cta--outline {
+		background: transparent;
+		color: var(--green);
+		border-color: var(--green);
 	}
 
 	.hero__cta:hover,
@@ -150,6 +202,28 @@
 		background: var(--green);
 		color: var(--white);
 		border-color: var(--green);
+	}
+
+	/* The site's text links slide their arrow right 3px on hover; this one travels down,
+	   because that is where it takes you. Signals "further down this page", not "away". */
+	.hero__cta-arrow {
+		transition: transform var(--duration-hover) var(--ease);
+	}
+
+	.hero__cta--units:hover .hero__cta-arrow,
+	.hero__cta--units:focus-visible .hero__cta-arrow {
+		transform: translateY(3px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero__cta-arrow {
+			transition: none;
+		}
+
+		.hero__cta--units:hover .hero__cta-arrow,
+		.hero__cta--units:focus-visible .hero__cta-arrow {
+			transform: none;
+		}
 	}
 
 	@media (min-width: 1024px) {
@@ -224,6 +298,21 @@
 
 		.hero__gallery {
 			order: -1;
+		}
+
+		.hero__summary {
+			display: flex;
+			flex-direction: column;
+		}
+
+		/* The gallery comes first on phones, so the actions would otherwise land the best
+		   part of a screen below the fold. Drop the key-facts strip beneath them: the buyer
+		   reads the price, then immediately meets the way into the inventory.
+
+		   Reordering visually is safe here specifically because the strip is a <dl> with no
+		   focusable content — there is no DOM-vs-visual tab-order mismatch to create. */
+		.hero__summary > :global(.key-facts) {
+			order: 1;
 		}
 	}
 </style>
