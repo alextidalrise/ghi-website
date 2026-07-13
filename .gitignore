@@ -4,6 +4,7 @@
 .gstack/
 .claude/
 .cursor/
+.agents/
 
 node_modules
 .pnpm-store
