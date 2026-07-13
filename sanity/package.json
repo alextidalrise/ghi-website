@@ -15,6 +15,7 @@
 		"fixtures:seed:dry-run": "tsx fixtures/verification/seed.ts --dry-run",
 		"headernav:seed": "tsx migrations/seed-header-nav.ts",
 		"headernav:seed:dry-run": "tsx migrations/seed-header-nav.ts --dry-run",
+		"headernav:restore": "tsx migrations/seed-header-nav.ts --force",
 		"headernav:delete": "tsx migrations/seed-header-nav.ts --delete",
 		"footer:seed": "tsx migrations/seed-footer.ts",
 		"footer:seed:dry-run": "tsx migrations/seed-footer.ts --dry-run",
