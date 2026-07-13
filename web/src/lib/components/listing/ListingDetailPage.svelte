@@ -178,6 +178,21 @@
 		margin-top: var(--space-lg);
 	}
 
+	/* Where the row follows the key-facts strip, that strip's own padding-bottom is
+	   already the gap under its closing hairline — the row's margin stacked on top of it
+	   made the space below the rule more than twice the space above. Drop it, so the rule
+	   sits symmetrically between the facts and the button.
+
+	   Keyed off the sibling so a development with no key facts (the strip doesn't render)
+	   keeps the row's separation from the badges above it. Scoped above the mobile
+	   breakpoint because below it the row is reordered *above* the strip, where its own
+	   top margin is what separates it from the price. */
+	@media (min-width: 761px) {
+		:global(.key-facts) + .hero__actions {
+			margin-top: 0;
+		}
+	}
+
 	/* DESIGN.md's Gold button tier, unchanged. */
 	.hero__cta {
 		display: inline-flex;
