@@ -7,6 +7,11 @@
 	/* Colour */
 	--green: #1f3d34;
 	--green-deep: #1f3d34;
+	/* Green softened toward white for the display italic (hero taglines, pull quotes —
+	   the "select display moments" DESIGN.md reserves the italic cut for). Sitting a step
+	   back from --green is what lets the italic phrase read as a change of voice rather
+	   than a second shout. ~7:1 on white, so it clears AA for body, not just display. */
+	--green-soft: color-mix(in srgb, var(--green) 82%, var(--white));
 	/* Light ink for text/icons on green surfaces only. NOT a page/panel surface. */
 	--on-green: #f5f1e8;
 	--gold: #d6c3a3;
@@ -38,6 +43,10 @@
 
 	/* Tracking */
 	--tracking-tight: -0.015em;
+	/* Playfair needs more negative tracking the larger it gets: -0.015em is right for a
+	   page title, but leaves the 60px+ article headline looking gappy. Reserved for the
+	   largest display setting. Floor is -0.04em; past that the letters start to touch. */
+	--tracking-display: -0.03em;
 	--tracking-wide: 0.04em;
 	--tracking-overline: 0.12em;
 

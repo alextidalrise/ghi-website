@@ -144,6 +144,8 @@ export { sitemapListingsQuery, sitemapTaxonomyQuery } from './sitemap';
 
 export { guideBySlugQuery, guidesHubQuery, sitemapGuidesQuery } from './guide';
 
+export { insightsHubQuery, insightBySlugQuery, sitemapInsightsQuery } from './insight';
+
 export {
 	partnerCategoriesQuery,
 	homepagePartnerLogosQuery,

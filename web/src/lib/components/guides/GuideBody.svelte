@@ -35,11 +35,12 @@
 		text-wrap: pretty;
 	}
 
-	.guide-body :global(p) {
+	/* Prose paragraphs only — direct children. Custom blocks own their internal paragraphs. */
+	.guide-body > :global(p) {
 		margin-block: 0;
 	}
 
-	.guide-body :global(p + p) {
+	.guide-body > :global(p + p) {
 		margin-top: var(--space-md);
 	}
 
@@ -58,18 +59,26 @@
 		margin-block: var(--space-md) var(--space-xs);
 	}
 
-	.guide-body :global(ul),
-	.guide-body :global(ol) {
+	/* Prose lists only — see the matching note in InsightBody. Keep these scoped to the body's
+	   own lists so they can't reach into custom blocks that render their own. */
+	.guide-body > :global(ul),
+	.guide-body > :global(ol),
+	.guide-body > :global(ul ul),
+	.guide-body > :global(ul ol),
+	.guide-body > :global(ol ul),
+	.guide-body > :global(ol ol) {
 		margin-block: var(--space-sm);
 		padding-left: 1.35rem;
 	}
 
-	.guide-body :global(li) {
+	.guide-body > :global(ul li),
+	.guide-body > :global(ol li) {
 		margin-bottom: 0.4rem;
 		padding-left: 0.25rem;
 	}
 
-	.guide-body :global(li::marker) {
+	.guide-body > :global(ul li::marker),
+	.guide-body > :global(ol li::marker) {
 		color: var(--gold);
 	}
 

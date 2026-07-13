@@ -30,9 +30,15 @@
 		background: var(--white);
 	}
 
-	/* Full-width top rule in gold for the heavier tone. A top accent, never a side stripe. */
+	/* Full-width top rule in gold for the heavier tone. A top accent, never a side stripe.
+	   1px per the system's hairline rule — the gold is what marks it, not the weight. */
 	.guide-callout--important {
-		border-block-start: 2px solid var(--gold);
+		border-block-start: 1px solid var(--gold);
+	}
+
+	/* Own our paragraph margins rather than inheriting the body's prose reset. */
+	.guide-callout p {
+		margin: 0;
 	}
 
 	.guide-callout__label {

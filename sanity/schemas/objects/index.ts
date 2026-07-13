@@ -2,6 +2,19 @@ import type { SchemaTypeDefinition } from 'sanity';
 
 import { contentFields, featureHighlight } from './contentFields';
 import { guideCallout, guideKeyFigures, guideSection } from './guideContent';
+import {
+	insightCardGrid,
+	insightCardGridItem,
+	insightCtaCallout,
+	insightFaq,
+	insightFaqItem,
+	insightFigure,
+	insightHeroNote,
+	insightPullQuote,
+	insightSection,
+	insightTakeaways,
+	insightTakeawayItem
+} from './insightContent';
 import { footerColumn, socialLink } from './footerNav';
 import { navLink, navMenuChild, navMenuItem } from './headerNav';
 import { marketingFields } from './marketingFields';
@@ -39,6 +52,18 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	guideCallout,
 	guideKeyFigures,
 	guideSection,
+	// Insight content objects (blocks registered before the insightSection that nests them)
+	insightHeroNote,
+	insightFigure,
+	insightCardGridItem,
+	insightCardGrid,
+	insightPullQuote,
+	insightTakeawayItem,
+	insightTakeaways,
+	insightFaqItem,
+	insightFaq,
+	insightCtaCallout,
+	insightSection,
 	// Header navigation (navLink registered before the items that nest it)
 	navLink,
 	navMenuChild,
@@ -73,6 +98,17 @@ export {
 	guideCallout,
 	guideKeyFigures,
 	guideSection,
+	insightHeroNote,
+	insightFigure,
+	insightCardGridItem,
+	insightCardGrid,
+	insightPullQuote,
+	insightTakeawayItem,
+	insightTakeaways,
+	insightFaqItem,
+	insightFaq,
+	insightCtaCallout,
+	insightSection,
 	footerColumn,
 	socialLink,
 	golfFields,

@@ -4,7 +4,7 @@
  * with before navigation moved into Sanity. This reproduces the previous hardcoded
  * set one-to-one, using internal paths so it does not depend on any other document:
  *
- *   Spain · Portugal · Front Line Collection · Buying Guide · About Us   [ Contact ]
+ *   Spain · Portugal · Front Line Collection · Buying Guide · Insights · About Us   [ Contact ]
  *
  * Editors can later swap any internal path for a reference (so the URL tracks the
  * slug) or add a second-level dropdown — this just establishes the starting point.
@@ -61,6 +61,7 @@ const HEADER_NAV = [
 	item('portugal', 'Portugal', '/portugal'),
 	item('front-line-collection', 'Front Line Collection', '/front-line-collection'),
 	item('buying-guide', 'Buying Guide', '/guides'),
+	item('insights', 'Insights', '/insights'),
 	item('about-us', 'About Us', '/about')
 ];
 

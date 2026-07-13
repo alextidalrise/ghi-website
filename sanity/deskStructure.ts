@@ -11,6 +11,7 @@ import {
 	WarningOutlineIcon
 } from '@sanity/icons';
 import type { StructureResolver } from 'sanity/structure';
+import { INSIGHT_CATEGORIES } from './schemas/constants/enums';
 
 /**
  * Status-driven desk views. Each lifecycle stage gets its own list so the
@@ -179,6 +180,52 @@ export const deskStructure: StructureResolver = (S) =>
 								.id('guides-all')
 								.schemaType('guide')
 								.child(S.documentTypeList('guide').title('All guides'))
+						])
+				),
+			S.listItem()
+				.title('Insights')
+				.icon(EditIcon)
+				.child(
+					S.list()
+						.title('Insights')
+						.items([
+							...INSIGHT_CATEGORIES.map((category) =>
+								S.listItem()
+									.title(category.title)
+									.id(`insights-${category.value}`)
+									.schemaType('insight')
+									.child(
+										S.documentList()
+											.id(`insights-${category.value}-list`)
+											.title(category.title)
+											.schemaType('insight')
+											.apiVersion('2025-01-01')
+											.filter('_type == $schemaType && insightCategory == $category')
+											.params({ schemaType: 'insight', category: category.value })
+											.defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+											.initialValueTemplates([])
+									)
+							),
+							S.divider(),
+							S.listItem()
+								.title('All insights')
+								.id('insights-all')
+								.schemaType('insight')
+								.child(
+									S.documentTypeList('insight')
+										.title('All insights')
+										.defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+								),
+							S.listItem()
+								.title('Authors')
+								.id('insights-authors')
+								.icon(UsersIcon)
+								.schemaType('author')
+								.child(
+									S.documentTypeList('author')
+										.title('Authors')
+										.defaultOrdering([{ field: 'name', direction: 'asc' }])
+								)
 						])
 				),
 			S.listItem()

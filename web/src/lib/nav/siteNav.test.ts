@@ -10,6 +10,7 @@ describe('buildSiteNav', () => {
 			'Portugal',
 			'Front Line Collection',
 			'Buying Guide',
+			'Insights',
 			'About Us'
 		]);
 		expect(cta).toEqual({ label: 'Contact', href: '/contact', external: false });
@@ -17,7 +18,7 @@ describe('buildSiteNav', () => {
 
 	it('falls back when Sanity returns an empty item list', () => {
 		const { items } = buildSiteNav({ items: [], cta: null });
-		expect(items).toHaveLength(5);
+		expect(items).toHaveLength(6);
 	});
 
 	it('uses the Sanity nav when present, preserving children and CTA', () => {
