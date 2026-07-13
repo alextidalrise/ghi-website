@@ -42,15 +42,13 @@
 	const displayMode = $derived(development?.developmentDisplayMode ?? 'flat_listing');
 	const showInventoryPricing = $derived(shouldShowDevelopmentPricing(displayMode));
 
-	// The inventory is the next step of the funnel, so it takes the hero's primary slot.
+	// The inventory is the next step of the funnel, so it owns the hero's one CTA.
 	// `null` when there is nothing to anchor to — the same condition that stops
-	// UnitsInventory rendering — in which case enquiry is the only action left and
-	// reclaims the gold fill below.
+	// UnitsInventory rendering — and enquiry takes the slot instead.
 	const unitsLabel = $derived(unitsCtaLabel(unitAvailability(development?.units)));
 
 	const enquireLabel = $derived(
-		development?.ctas?.primaryCtaLabel ??
-			(unitsLabel ? 'Enquire' : 'Enquire about this development')
+		development?.ctas?.primaryCtaLabel ?? 'Enquire about this development'
 	);
 
 	// The final breadcrumb is the development itself; its href is the canonical path
@@ -94,25 +92,21 @@
 				<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 				<DevelopmentSummary {development} showPricing={showInventoryPricing} />
 				<DevelopmentKeyFacts {development} />
-				<!-- Real anchors, so both buttons work with JS disabled. `scrollToUnits` only
-				     enhances the units one, to keep repeat activations landing consistently. -->
+				<!-- One CTA, never two. Where there is inventory, browsing it is the next step
+				     and enquiry is already carried below (sticky rail + fixed mobile console).
+				     Most developments are single villas with no units at all, though, and there
+				     the hero would otherwise have no action — so enquiry stands in.
+				     Real anchors, so both work with JS disabled; `scrollToUnits` only enhances
+				     the units one, to keep repeat activations landing consistently. -->
 				<div class="hero__actions">
 					{#if unitsLabel}
-						<a
-							class="hero__cta hero__cta--gold hero__cta--units"
-							href="#units"
-							onclick={scrollToUnits}
-						>
+						<a class="hero__cta hero__cta--units" href="#units" onclick={scrollToUnits}>
 							{unitsLabel}
 							<span class="hero__cta-arrow" aria-hidden="true">↓</span>
 						</a>
+					{:else}
+						<a class="hero__cta" href="#enquire">{enquireLabel}</a>
 					{/if}
-					<a
-						class="hero__cta"
-						class:hero__cta--gold={!unitsLabel}
-						class:hero__cta--outline={unitsLabel}
-						href="#enquire">{enquireLabel}</a
-					>
 				</div>
 			</div>
 		</section>
@@ -177,48 +171,33 @@
 		padding: var(--space-lg) var(--content-padding) 0;
 	}
 
-	/* Wraps rather than overflows: at the summary column's 21rem floor the two labels
-	   cannot sit side by side, so they stack to full width instead of being squeezed.
-	   An editor-set `primaryCtaLabel` that runs long degrades the same way. */
+	/* A row rather than a bare link, so the mobile reorder below has a stable hook and
+	   the button hugs its label instead of stretching across the column. */
 	.hero__actions {
 		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-sm);
 		margin-top: var(--space-lg);
 	}
 
+	/* DESIGN.md's Gold button tier, unchanged. */
 	.hero__cta {
-		flex: 1 1 auto;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0.6rem;
 		padding: 0.85rem 2rem;
+		background: var(--gold);
+		color: var(--green);
 		font-family: var(--sans);
 		font-size: var(--text-ui);
 		font-weight: 500;
 		letter-spacing: var(--tracking-wide);
 		text-transform: uppercase;
 		text-decoration: none;
-		border: 1px solid;
+		border: 1px solid var(--gold);
 		transition:
 			background var(--duration-hover) var(--ease),
 			color var(--duration-hover) var(--ease),
 			border-color var(--duration-hover) var(--ease);
-	}
-
-	/* DESIGN.md's Gold and Outline button tiers, unchanged. Both invert to green on
-	   hover, so the pair reads as one system. */
-	.hero__cta--gold {
-		background: var(--gold);
-		color: var(--green);
-		border-color: var(--gold);
-	}
-
-	.hero__cta--outline {
-		background: transparent;
-		color: var(--green);
-		border-color: var(--green);
 	}
 
 	.hero__cta:hover,
@@ -337,6 +316,11 @@
 		   focusable content — there is no DOM-vs-visual tab-order mismatch to create. */
 		.hero__summary > :global(.key-facts) {
 			order: 1;
+		}
+
+		/* Fill the column on phones: a comfortable thumb target, not a minimal one. */
+		.hero__cta {
+			flex: 1 1 auto;
 		}
 	}
 </style>
