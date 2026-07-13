@@ -227,3 +227,17 @@ export const GUIDE_CALLOUT_TONES = [
 	{ title: 'Note', value: 'note' },
 	{ title: 'Important', value: 'important' }
 ] as const;
+
+/**
+ * Insight (editorial "Insights" / journal) categories. A single `insight` document
+ * branches on this field, exactly as `guide` branches on `guideCategory`. The value
+ * doubles as the article kicker and the filter chip on the /insights index. New
+ * topics slot in here without a schema or route change; keep the list tight so the
+ * filter bar stays scannable.
+ */
+export const INSIGHT_CATEGORIES = [
+	{ title: 'Market & Investment', value: 'market' },
+	{ title: 'Lifestyle', value: 'lifestyle' },
+	{ title: 'Golf', value: 'golf' },
+	{ title: 'Relocation', value: 'relocation' }
+] as const;

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
+	import TalkToUsBand from '$lib/components/TalkToUsBand.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
@@ -50,13 +51,6 @@
 		}
 	];
 
-	// WhatsApp stays a styled-but-inert placeholder until the GHI number is wired,
-	// matching the EnquiryRail convention (see EnquiryRail.svelte whatsAppHref).
-	const whatsAppHref: string | null = null;
-
-	function launchWhatsApp() {
-		if (whatsAppHref) window.open(whatsAppHref, '_blank', 'noopener');
-	}
 </script>
 
 <svelte:head>
@@ -222,32 +216,7 @@
 	</div>
 
 	<!-- Talk to us — the page's single green band. -->
-	<section class="talk on-dark" aria-labelledby="talk-heading">
-		<div class="talk__inner content-wrap">
-			<div class="talk__copy">
-				<h2 id="talk-heading" class="talk__heading">Talk to us</h2>
-				<p class="talk__body">
-					No pressure and no obligation. Whether you are ready to view or just starting to think
-					about it, we are happy to help.
-				</p>
-			</div>
-			<div class="talk__actions">
-				<a class="talk__btn talk__btn--primary" href="/contact">Get in touch</a>
-				<a class="talk__btn talk__btn--outline" href="/front-line-collection">Browse properties</a>
-				<button type="button" class="talk__btn talk__btn--whatsapp" onclick={launchWhatsApp}>
-					<svg viewBox="0 0 32 32" aria-hidden="true">
-						<path
-							d="M16 3C8.82 3 3 8.82 3 16c0 2.29.6 4.44 1.64 6.3L3 29l6.86-1.8A12.9 12.9 0 0 0 16 29c7.18 0 13-5.82 13-13S23.18 3 16 3zm0 23.8c-2.04 0-3.94-.58-5.55-1.58l-.4-.24-4.07 1.07 1.08-3.97-.26-.41A10.74 10.74 0 0 1 5.2 16C5.2 10.04 10.04 5.2 16 5.2S26.8 10.04 26.8 16 21.96 26.8 16 26.8z"
-						/>
-						<path
-							d="M21.6 18.86c-.3-.16-1.78-.92-2.06-1.02-.28-.1-.48-.16-.68.15-.2.3-.78.96-.96 1.16-.18.2-.36.22-.66.07-.3-.15-1.27-.49-2.41-1.55-.89-.83-1.49-1.85-1.66-2.16-.18-.3-.02-.47.13-.62.14-.14.3-.36.46-.54.15-.18.2-.3.3-.51.1-.2.05-.38-.02-.54-.07-.15-.68-1.7-.93-2.32-.24-.6-.49-.52-.68-.53l-.58-.01c-.2 0-.53.08-.81.38-.28.3-1.06 1.06-1.06 2.58s1.09 3 1.24 3.2c.15.21 2.13 3.4 5.18 4.77.72.32 1.29.51 1.73.65.73.24 1.39.2 1.91.12.58-.09 1.78-.74 2.04-1.46.25-.71.25-1.32.18-1.45-.07-.13-.27-.21-.57-.36z"
-						/>
-					</svg>
-					<span>WhatsApp</span>
-				</button>
-			</div>
-		</div>
-	</section>
+	<TalkToUsBand />
 </article>
 
 <style>
@@ -570,124 +539,6 @@
 			grid-template-columns: 9rem 1fr;
 			gap: var(--space-xl);
 			align-items: start;
-		}
-	}
-
-	/* ---- Talk to us — single green band ------------------------------------- */
-	.talk {
-		width: 100vw;
-		margin-inline: calc(50% - 50vw);
-		margin-top: var(--section-gap);
-		padding-block: clamp(3rem, 4.5vw, 4.25rem) clamp(3.5rem, 5vw, 5rem);
-		/* Gradient settles to the footer's exact green so the band flows into the
-		   footer with no seam; the radial glow keeps the CTA distinct up top. */
-		background:
-			radial-gradient(120% 90% at 14% -20%, oklch(0.37 0.05 165) 0%, transparent 52%),
-			linear-gradient(180deg, oklch(0.31 0.035 165) 0%, var(--green) 100%);
-		/* Top gold hairline divides the band from the white team section above; no
-		   bottom rule, since the dark footer (not white content) follows it. */
-		border-top: 1px solid oklch(0.82 0.05 85 / 0.28);
-	}
-
-	.talk__inner {
-		display: grid;
-		gap: var(--space-xl);
-		align-items: end;
-	}
-
-	.talk__heading {
-		color: var(--on-green);
-	}
-
-	.talk__body {
-		margin-top: var(--space-md);
-		font-family: var(--sans);
-		font-size: var(--text-body);
-		color: var(--on-green);
-		max-width: 46ch;
-	}
-
-	.talk__actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-sm);
-	}
-
-	.talk__btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.55rem;
-		padding: 0.9rem 1.85rem;
-		font-family: var(--sans);
-		font-size: var(--text-ui);
-		font-weight: 500;
-		letter-spacing: var(--tracking-wide);
-		text-transform: uppercase;
-		text-decoration: none;
-		cursor: pointer;
-		border: 1px solid transparent;
-		transition:
-			background var(--duration-hover) var(--ease),
-			color var(--duration-hover) var(--ease),
-			border-color var(--duration-hover) var(--ease);
-	}
-
-	.talk__btn:focus-visible {
-		outline: 2px solid var(--gold);
-		outline-offset: 3px;
-	}
-
-	/* Gold primary — the lead action, matching the EnquiryRail WhatsApp weighting. */
-	.talk__btn--primary {
-		background: var(--gold);
-		color: var(--green);
-		border-color: var(--gold);
-	}
-
-	.talk__btn--primary:hover,
-	.talk__btn--primary:focus-visible {
-		background: transparent;
-		color: var(--on-green);
-		border-color: rgba(245, 241, 232, 0.65);
-	}
-
-	.talk__btn--outline {
-		background: transparent;
-		color: var(--on-green);
-		border-color: rgba(245, 241, 232, 0.4);
-	}
-
-	.talk__btn--outline:hover,
-	.talk__btn--outline:focus-visible {
-		background: var(--on-green);
-		color: var(--green);
-		border-color: var(--on-green);
-	}
-
-	.talk__btn--whatsapp {
-		background: transparent;
-		color: var(--on-green);
-		border-color: rgba(245, 241, 232, 0.4);
-	}
-
-	.talk__btn--whatsapp svg {
-		width: 1.1rem;
-		height: 1.1rem;
-		fill: currentColor;
-	}
-
-	.talk__btn--whatsapp:hover,
-	.talk__btn--whatsapp:focus-visible {
-		background: var(--on-green);
-		color: var(--green);
-		border-color: var(--on-green);
-	}
-
-	@media (min-width: 760px) {
-		.talk__inner {
-			grid-template-columns: 1fr auto;
-			gap: var(--space-2xl);
 		}
 	}
 

@@ -291,6 +291,91 @@ export const GUIDE_CARD_PUBLIC = /* groq */ `{
   heroImage${MEDIA_ASSET_PUBLIC}
 }`;
 
+/** Public author projection — the byline on an Insights card, the article, and the bio. */
+export const AUTHOR_PUBLIC = /* groq */ `{
+  _id,
+  name,
+  "slug": slug.current,
+  role,
+  bio,
+  avatar${MEDIA_ASSET_PUBLIC}
+}`;
+
+/**
+ * Insight card projection — the /insights index (featured lead, grid, filter counts)
+ * and the related rail. The body is NOT shipped; `bodyChars` carries the flattened
+ * character count across every section so reading time is derived without the payload.
+ * `author` is dereferenced inline to its public byline fields.
+ */
+export const INSIGHT_CARD_PUBLIC = /* groq */ `{
+  _id,
+  title,
+  "slug": slug.current,
+  insightCategory,
+  subhead,
+  publishedAt,
+  featured,
+  readingTimeOverride,
+  "bodyChars": length(pt::text(sections[].body[])),
+  heroImage${MEDIA_ASSET_PUBLIC},
+  author->${AUTHOR_PUBLIC}
+}`;
+
+/**
+ * Insight section body. Image members are reshaped to the public media projection (as in
+ * GUIDE_SECTION_PUBLIC); every other member — prose, callouts, key figures, pull quotes,
+ * takeaways, FAQ, inline CTA — passes through in full (none carry sensitive fields).
+ */
+export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
+  heading,
+  "anchor": anchor.current,
+  body[]{
+    _type == "mediaAssetMetadata" => {
+      _type,
+      _key,
+      asset,
+      altText,
+      "lqip": asset.asset->metadata.lqip,
+      "dimensions": asset.asset->metadata.dimensions
+    },
+    _type == "insightFigure" => {
+      _type,
+      _key,
+      caption,
+      "image": image{
+        asset,
+        altText,
+        "lqip": asset.asset->metadata.lqip,
+        "dimensions": asset.asset->metadata.dimensions
+      }
+    },
+    _type != "mediaAssetMetadata" && _type != "insightFigure" => { ... }
+  }
+}`;
+
+/** Full insight article fields (no wrapping braces, so the by-slug query can add related). */
+export const INSIGHT_DETAIL_FIELDS = /* groq */ `
+  _id,
+  _type,
+  title,
+  titleEmphasis,
+  "slug": slug.current,
+  insightCategory,
+  subhead,
+  publishedAt,
+  featured,
+  readingTimeOverride,
+  "bodyChars": length(pt::text(sections[].body[])),
+  heroImage${MEDIA_ASSET_PUBLIC},
+  heroCaption,
+  heroNote{ heading, body },
+  author->${AUTHOR_PUBLIC},
+  sections[]${INSIGHT_SECTION_PUBLIC},
+  ctaHeading,
+  ctaBody,
+  seo${SEO_PUBLIC}
+`;
+
 /** Full guide page fields (no wrapping braces, so the by-slug query can add siblings). */
 export const GUIDE_DETAIL_FIELDS = /* groq */ `
   _id,

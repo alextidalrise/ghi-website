@@ -28,6 +28,7 @@ const FALLBACK_ITEMS: SiteNavItem[] = [
 	{ label: 'Portugal', href: '/portugal', external: false, children: [] },
 	{ label: 'Front Line Collection', href: FRONTLINE_COLLECTION_PATH, external: false, children: [] },
 	{ label: 'Buying Guide', href: '/guides', external: false, children: [] },
+	{ label: 'Insights', href: '/insights', external: false, children: [] },
 	{ label: 'About Us', href: '/about', external: false, children: [] }
 ];
 

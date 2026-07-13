@@ -25,6 +25,11 @@ export type SitemapGuideRow = {
 	_updatedAt?: string | null;
 };
 
+export type SitemapInsightRow = {
+	slug?: string | null;
+	_updatedAt?: string | null;
+};
+
 export type SitemapEntry = {
 	path: string;
 	lastmod?: string | null;
@@ -66,11 +71,20 @@ export function buildGuidePath(row: SitemapGuideRow): string | null {
 	return `/guides/${row.slug}`;
 }
 
+export function buildInsightPath(row: SitemapInsightRow): string | null {
+	if (!row.slug) {
+		return null;
+	}
+
+	return `/insights/${row.slug}`;
+}
+
 export function collectSitemapEntries(
 	taxonomyRows: SitemapTaxonomyRow[],
 	listingRows: SitemapListingRow[],
 	golfCourseRows: SitemapGolfCourseRow[] = [],
-	guideRows: SitemapGuideRow[] = []
+	guideRows: SitemapGuideRow[] = [],
+	insightRows: SitemapInsightRow[] = []
 ): SitemapEntry[] {
 	const byPath = new Map<string, SitemapEntry>();
 
@@ -111,6 +125,15 @@ export function collectSitemapEntries(
 
 	for (const row of guideRows) {
 		add(buildGuidePath(row), row._updatedAt);
+	}
+
+	// The Insights index is a real page; include it whenever at least one insight exists.
+	if (insightRows.length > 0) {
+		add('/insights', null);
+	}
+
+	for (const row of insightRows) {
+		add(buildInsightPath(row), row._updatedAt);
 	}
 
 	return [...byPath.values()].sort((a, b) => a.path.localeCompare(b.path));
