@@ -5,6 +5,7 @@
 	import FeaturedLocations from '$lib/components/home/FeaturedLocations.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
+	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import { countryHeadline, countryOverviewHeading } from '$lib/home/headlines';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
@@ -117,6 +118,11 @@
 				<p class="country-page__lead">{placeholderBody}</p>
 			{/if}
 		</div>
+
+		<!-- Trust closes the page. The reader has seen the inventory and read the country
+		     context; the last word before the footer is other buyers'. Compact by design —
+		     a country page's job is to send people into listings, not to hold them here. -->
+		<GoogleReviewsCompact data={data.reviews} />
 	</section>
 </article>
 

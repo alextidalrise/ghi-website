@@ -4,6 +4,7 @@
 	import DestinationsByCountry from '$lib/components/home/DestinationsByCountry.svelte';
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
+	import GoogleReviews from '$lib/components/reviews/GoogleReviews.svelte';
 	import TrustedPartners from '$lib/components/home/TrustedPartners.svelte';
 	import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 	let { data } = $props();
@@ -78,6 +79,14 @@
 		summary="Homes directly on the fairway, in Spain and Portugal."
 		viewAllHref={FRONTLINE_COLLECTION_PATH}
 	/>
+
+	<!-- Buyer voice, then the professional network behind it: the two trust bands read as a
+	     pair, and the human proof comes first. Renders nothing until there are at least
+	     three real reviews on the Google profile.
+
+	     flushTop: this band butts straight onto the green Frontline band above it, per the
+	     stacking rule — no section-gap, no top rule. -->
+	<GoogleReviews data={data.reviews} flushTop />
 
 	<TrustedPartners
 		partners={data.partnerLogos.length ? data.partnerLogos : undefined}
@@ -197,6 +206,15 @@
 	   can be reused elsewhere. This outranks any band's own margin-top. */
 	.home-content > :global(*) {
 		margin-block: 0;
+	}
+
+	/* …with one deliberate exception. Two full-bleed bands stack flush: the green Frontline
+	   band's own padding is already the breathing room and its bottom edge is the divider,
+	   so the reviews band sits straight on it. Left to the grid's row-gap, the band's top
+	   rule ends up marooned in a section-gap of dead white — a hairline belonging to
+	   nothing. The band drops that rule itself (flushTop); the page closes the gap. */
+	.home-content > :global(.reviews) {
+		margin-top: calc(-1 * var(--section-gap));
 	}
 
 	.home-intro {

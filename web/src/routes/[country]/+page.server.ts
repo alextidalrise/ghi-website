@@ -5,6 +5,7 @@ import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
 import { withPreviewLocationSeo } from '$lib/listing/detailPage';
 import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 import { buildLocationSeo } from '$lib/listing/seo';
+import { loadReviews } from '$lib/reviews';
 import {
 	countryBySlugQuery,
 	fetchCountryFeaturedListingCards,
@@ -24,7 +25,12 @@ type LocationTaxonomyPage = LocationTaxonomyRef & {
 	publicDescription?: string | null;
 };
 
-export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
+export const load: PageServerLoad = async ({
+	params,
+	url,
+	fetch,
+	locals: { preview, loadQuery }
+}) => {
 	const country = await fetchMaybePreview<CountryBySlugQueryResult>(
 		countryBySlugQuery,
 		{ countrySlug: params.country },
@@ -76,6 +82,8 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		: buildLocationSeo(country, canonicalUrl);
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, url.origin);
 
+	const reviews = await loadReviews(fetch);
+
 	return {
 		pageType: 'country' as const,
 		location: country,
@@ -84,6 +92,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		featuredCards,
 		frontlineCards,
 		frontlineViewAllHref,
+		reviews,
 		// Country-scoped taxonomy for the search bar (country selector omitted; the country
 		// is fixed to this page's subject).
 		searchLocations,

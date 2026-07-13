@@ -1,5 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
+import { loadReviews } from '$lib/reviews';
 import { fetchLocationHeroesBySlug } from '$lib/sanity/queries/settings';
 import { buildImageSrcset, buildPublicImageUrl } from '$lib/sanity/image';
 
@@ -33,7 +34,7 @@ const DESTINATIONS = [
 	}
 ];
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, fetch }) => {
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
 
 	const breadcrumbs: BreadcrumbItem[] = [
@@ -41,7 +42,10 @@ export const load: PageServerLoad = async ({ url }) => {
 		{ label: 'About', href: BASE_PATH }
 	];
 
-	const heroes = await fetchLocationHeroesBySlug(DESTINATIONS.map((d) => d.slug));
+	const [heroes, reviews] = await Promise.all([
+		fetchLocationHeroesBySlug(DESTINATIONS.map((d) => d.slug)),
+		loadReviews(fetch)
+	]);
 	const heroBySlug = new Map(heroes.map((h) => [h.slug, h.heroImage]));
 
 	const destinations = DESTINATIONS.map((d) => {
@@ -67,6 +71,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		breadcrumbs,
 		seo,
 		destinations,
+		reviews,
 		breadcrumbJsonLd: breadcrumbListJsonLd(breadcrumbs, url.origin)
 	};
 };

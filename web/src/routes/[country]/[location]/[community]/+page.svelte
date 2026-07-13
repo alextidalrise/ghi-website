@@ -51,5 +51,6 @@
 		{development}
 		breadcrumbs={data.breadcrumbs}
 		similarCards={data.similarCards}
+		reviews={data.reviews}
 	/>
 {/if}

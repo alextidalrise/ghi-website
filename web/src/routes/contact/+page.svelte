@@ -3,6 +3,7 @@
 	import { untrack } from 'svelte';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
+	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import TrustedPartners from '$lib/components/home/TrustedPartners.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
@@ -306,6 +307,13 @@
 			</div>
 		</div>
 	</section>
+
+	<!-- Reassurance directly beneath the form, where the hesitation actually is. Quiet by
+	     construction: a hairline, two quotes, no rail. It answers "are these people real?"
+	     for someone whose cursor is already in the message field. -->
+	<div class="content-wrap contact-reviews">
+		<GoogleReviewsCompact data={data.reviews} />
+	</div>
 
 	<!-- The advisor network — tier 2: full-bleed white, hairline-bracketed. Real partner
 	     logo wall (shared with the homepage), linking through to the directory. -->
@@ -783,6 +791,15 @@
 		line-height: 1.6;
 		color: rgba(245, 241, 232, 0.82);
 		max-width: 42ch;
+	}
+
+	/* The advisor band below is full-bleed and opens with a hairline sitting flush at its
+	   own edge, so contained content flowing into it has to bring its own clearance —
+	   otherwise "Read all reviews" lands directly on the rule. Targeted at the section
+	   rather than the wrapper so that a null reviews payload (the normal state until the
+	   Google profile has three reviews) leaves no phantom gap behind. */
+	.contact-reviews :global(.compact) {
+		margin-bottom: var(--section-gap);
 	}
 
 	/* ---- Advisor network — full-bleed white, hairline-bracketed -------------- */

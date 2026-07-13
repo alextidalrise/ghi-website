@@ -14,15 +14,25 @@
 	import PropertyLocation from './PropertyLocation.svelte';
 	import SimilarProperties from '$lib/components/listing/SimilarProperties.svelte';
 	import BackToArea from '$lib/components/listing/BackToArea.svelte';
+	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
+	import type { ReviewsData } from '$lib/reviews';
 
 	type Props = {
 		property: PublicPropertyListing;
 		breadcrumbs: BreadcrumbItem[];
 		similarCards?: SimilarListingCard[];
 		form?: EnquiryFormResult | null;
+		/** Null until the Google profile has enough reviews; the section then omits itself. */
+		reviews?: ReviewsData | null;
 	};
 
-	let { property, breadcrumbs, similarCards = [], form = null }: Props = $props();
+	let {
+		property,
+		breadcrumbs,
+		similarCards = [],
+		form = null,
+		reviews = null
+	}: Props = $props();
 
 	// Floorplans are gated: the CTA in the hero column routes the visitor down to the
 	// enquiry rail in floorplan-request mode. Incrementing a counter (rather than a bool)
@@ -63,6 +73,14 @@
 		map={property.location?.map}
 		golf={property.golf}
 	/>
+
+	<!-- Reassurance sits after the enquiry rail and the location, and *before* similar
+	     properties: it should catch a reader who is weighing this house, not one who has
+	     already been sent off to look at another. Omits itself entirely when the Google
+	     profile has fewer than three reviews. -->
+	<div class="content-wrap">
+		<GoogleReviewsCompact data={reviews} heading="What our buyers say" />
+	</div>
 
 	{#if similarCards.length > 0}
 		<SimilarProperties cards={similarCards} />

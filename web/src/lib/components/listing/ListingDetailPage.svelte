@@ -11,6 +11,7 @@
 	import DevelopmentSummary from '$lib/components/development/Summary.svelte';
 	import SharedAmenities from '$lib/components/development/SharedAmenities.svelte';
 	import UnitsInventory from '$lib/components/development/UnitsInventory.svelte';
+	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
 	import type { EnquiryFormResult } from '$lib/listing/enquiryAction';
 	import {
@@ -18,6 +19,7 @@
 		unitAvailability,
 		unitsCtaLabel
 	} from '$lib/listing/developmentDisplay';
+	import type { ReviewsData } from '$lib/reviews';
 	import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
@@ -28,6 +30,8 @@
 		breadcrumbs: BreadcrumbItem[];
 		similarCards?: SimilarListingCard[];
 		form?: EnquiryFormResult | null;
+		/** Null until the Google profile has enough reviews; the section then omits itself. */
+		reviews?: ReviewsData | null;
 	};
 
 	let {
@@ -36,7 +40,8 @@
 		development = null,
 		breadcrumbs,
 		similarCards = [],
-		form = null
+		form = null,
+		reviews = null
 	}: Props = $props();
 
 	const displayMode = $derived(development?.developmentDisplayMode ?? 'flat_listing');
@@ -78,7 +83,7 @@
 </script>
 
 {#if pageType === 'property' && property}
-	<PropertyDetail {property} {breadcrumbs} {similarCards} {form} />
+	<PropertyDetail {property} {breadcrumbs} {similarCards} {form} {reviews} />
 {:else if pageType === 'development' && development}
 	<article class="listing-page listing-page--development">
 		<!-- Mirrors the property page: a full-bleed gallery beside the headline facts,
@@ -139,6 +144,12 @@
 			map={development.location?.map}
 			golf={development.golf}
 		/>
+
+		<!-- Same placement as the property page: reassurance before the reader is offered
+		     somewhere else to go. -->
+		<div class="content-wrap">
+			<GoogleReviewsCompact data={reviews} heading="What our buyers say" />
+		</div>
 
 		{#if similarCards.length > 0}
 			<SimilarProperties cards={similarCards} />

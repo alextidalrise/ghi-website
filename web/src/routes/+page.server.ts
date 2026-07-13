@@ -9,9 +9,10 @@ import {
 	fetchNavTaxonomy,
 	fetchSiteSettingsHero
 } from '$lib/sanity/queries';
+import { loadReviews } from '$lib/reviews';
 import { resolveHomepageHeroImage } from '$lib/sanity/transforms/taxonomyHero';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ fetch }) => {
 	const [
 		nav,
 		featuredCards,
@@ -20,7 +21,8 @@ export const load: PageServerLoad = async () => {
 		featuredCountries,
 		featuredLocations,
 		partnerLogos,
-		facetRows
+		facetRows,
+		reviews
 	] = await Promise.all([
 		fetchNavTaxonomy(),
 		fetchHomepageFeaturedListingCards(),
@@ -29,7 +31,8 @@ export const load: PageServerLoad = async () => {
 		fetchCountriesWithHero(),
 		fetchHomepageFeaturedLocations(),
 		fetchHomepagePartnerLogos(),
-		fetchListingFacetRows()
+		fetchListingFacetRows(),
+		loadReviews(fetch)
 	]);
 
 	return {
@@ -43,6 +46,7 @@ export const load: PageServerLoad = async () => {
 		homepageHeroTagline: homepageHero?.tagline ?? null,
 		featuredCountries,
 		featuredLocations,
-		partnerLogos
+		partnerLogos,
+		reviews
 	};
 };

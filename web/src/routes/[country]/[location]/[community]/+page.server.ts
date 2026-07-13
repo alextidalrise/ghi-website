@@ -6,6 +6,7 @@ import {
 	type ListingPathParams
 } from '$lib/listing/detailPage';
 import { buildCanonicalPath } from '$lib/listing/canonicalPath';
+import { loadReviews } from '$lib/reviews';
 import {
 	catchAllCommunityInLocationQuery,
 	communitiesByLocationQuery,
@@ -48,7 +49,25 @@ function catchAllPathParams(
 }
 
 /** Resolve community redirects, catch-all listings, and legacy listing fallbacks at 3 segments. */
-export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
+/**
+ * Reviews load alongside the listing, never after it — a separate origin must not add its
+ * latency to the page's. A failure resolves to null and the section omits itself, so the
+ * listing is never held hostage to a reviews outage.
+ *
+ * This wraps the listing loader rather than threading `reviews` through its many return
+ * points (property / development / preview / catch-all), which is how the development page
+ * got missed the first time round.
+ */
+export const load: PageServerLoad = async (event) => {
+	const [listing, reviews] = await Promise.all([loadListing(event), loadReviews(event.fetch)]);
+	return { ...listing, reviews };
+};
+
+const loadListing = async ({
+	params,
+	url,
+	locals: { preview, loadQuery }
+}: Parameters<PageServerLoad>[0]) => {
 	const location = await fetchPublic<{ _id?: string; slug?: string | null } | null>(
 		locationBySlugQuery,
 		{
