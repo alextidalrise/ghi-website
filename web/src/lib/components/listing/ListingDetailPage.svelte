@@ -56,6 +56,27 @@
 	// The final breadcrumb is the development itself; its href is the canonical path
 	// that unit rows nest under.
 	const developmentPath = $derived(breadcrumbs[breadcrumbs.length - 1]?.href ?? '');
+
+	/** Repeat activation is where the native anchor breaks down. With `#units` already in
+	    the URL the browser performs no fragment navigation, so it skips the fragment scroll
+	    that honours `scroll-margin-top` — and the only scroll left is the one `focus()`
+	    triggers, which on a section taller than the viewport overshoots the heading by
+	    exactly the scroll-margin. Drive both ourselves so the first, second and tenth
+	    activation land identically. The plain `href` remains the no-JS path. */
+	function scrollToUnits(event: MouseEvent) {
+		const target = document.getElementById('units');
+		if (!target) return; // Nothing to enhance — let the href do its job.
+		event.preventDefault();
+
+		// Keep the shareable deep link without re-triggering fragment navigation.
+		if (location.hash !== '#units') history.pushState(null, '', '#units');
+
+		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+		// `preventScroll` is the point: focus must move for keyboard users without adding
+		// the second, conflicting scroll that causes the overshoot.
+		target.focus({ preventScroll: true });
+	}
 </script>
 
 {#if pageType === 'property' && property}
@@ -73,12 +94,15 @@
 				<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 				<DevelopmentSummary {development} showPricing={showInventoryPricing} />
 				<DevelopmentKeyFacts {development} />
-				<!-- Plain anchors: `scroll-behavior: smooth` is already on `html` (and already
-				     switched off under prefers-reduced-motion), so the scroll and its opt-out
-				     both come for free and the buttons work with JS disabled. -->
+				<!-- Real anchors, so both buttons work with JS disabled. `scrollToUnits` only
+				     enhances the units one, to keep repeat activations landing consistently. -->
 				<div class="hero__actions">
 					{#if unitsLabel}
-						<a class="hero__cta hero__cta--gold hero__cta--units" href="#units">
+						<a
+							class="hero__cta hero__cta--gold hero__cta--units"
+							href="#units"
+							onclick={scrollToUnits}
+						>
 							{unitsLabel}
 							<span class="hero__cta-arrow" aria-hidden="true">↓</span>
 						</a>
