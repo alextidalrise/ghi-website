@@ -508,6 +508,7 @@ export const UNIT_PUBLIC = /* groq */ `{
   listingKind,
   floor,
   phase,
+  "unitTypeId": parentUnitType->_id,
   "unitTypeName": parentUnitType->unitTypeName,
   "propertyType": parentUnitType->propertyType,
   pricing${PRICING_PUBLIC},

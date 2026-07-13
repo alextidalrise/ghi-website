@@ -36,6 +36,7 @@
 		sizeLabel: string | null;
 		floor: number | null;
 		typeLabel: string | null;
+		unitTypeId: string | null;
 		unitTypeKey: string | null;
 		propertyTypeKey: string | null;
 		phase: string | null;
@@ -92,6 +93,7 @@
 			const builtArea = num(specs?.builtArea);
 			const areaUnit = (str(specs?.builtAreaUnit) ?? 'sqm') === 'sqft' ? 'sq ft' : 'm²';
 
+			const unitTypeId = str(u.unitTypeId);
 			const unitTypeKey = str(u.unitTypeName);
 			const propertyTypeKey = str(u.propertyType);
 
@@ -109,6 +111,7 @@
 				sizeLabel: builtArea != null ? `${builtArea.toLocaleString('en-GB')} ${areaUnit}` : null,
 				floor: num(u.floor),
 				typeLabel: propertyTypeKey ? formatPropertyType(propertyTypeKey) : unitTypeKey,
+				unitTypeId,
 				unitTypeKey,
 				propertyTypeKey,
 				phase: str(u.phase),
@@ -158,14 +161,46 @@
 
 	// Prefer typed groups (each carries its own photo + from-price). Fall back to the
 	// coarser property-type split for developments modelled without unit types.
+	//
+	// Groups are built from the development's own `unitTypes[]` and each unit is bound
+	// to one of them by its `parentUnitType` reference id (`unitTypeId`). Matching on the
+	// id — not the label — keeps the selector correct when a development is re-split or a
+	// type is renamed: the units still resolve to the right group. Name matching is kept
+	// only as a fallback for legacy/mid-migration data where the id is missing or points
+	// at a type that is no longer in the array (e.g. a duplicate created by a re-split).
 	const unitTypeGroups = $derived.by((): Group[] => {
+		const types = (unitTypes ?? [])
+			.map((ut) => ut as Record<string, unknown>)
+			.map((ut) => ({ id: str(ut._id), name: str(ut.unitTypeName) }))
+			// A buyer-facing card needs a label, so a type without a name can't head one.
+			.filter((t): t is { id: string | null; name: string } => t.name != null);
+		if (types.length === 0) return [];
+
+		const byId = new Map(types.filter((t) => t.id).map((t) => [t.id as string, t]));
+		const byName = new Map(types.map((t) => [t.name, t]));
+		const keyOf = (t: { id: string | null; name: string }) => t.id ?? t.name;
+
+		// Assign each row to exactly one type — id first, name second — so a unit is never
+		// double-counted, even if two types happen to share a name.
+		const members = new Map<string, Row[]>();
+		for (const r of rows) {
+			const type =
+				(r.unitTypeId ? byId.get(r.unitTypeId) : undefined) ??
+				(r.unitTypeKey ? byName.get(r.unitTypeKey) : undefined);
+			if (!type) continue;
+			const key = keyOf(type);
+			const bucket = members.get(key);
+			if (bucket) bucket.push(r);
+			else members.set(key, [r]);
+		}
+
+		// Emit in `unitTypes[]` order, dropping any type that ended up with no units.
 		const out: Group[] = [];
-		for (const ut of unitTypes ?? []) {
-			const name = str((ut as Record<string, unknown>).unitTypeName);
-			if (!name) continue;
-			const members = rows.filter((r) => r.unitTypeKey === name);
-			if (members.length === 0) continue;
-			out.push(buildGroup(name, shortTypeLabel(name), members));
+		for (const t of types) {
+			const key = keyOf(t);
+			const mem = members.get(key);
+			if (!mem || mem.length === 0) continue;
+			out.push(buildGroup(key, shortTypeLabel(t.name), mem));
 		}
 		return out;
 	});
