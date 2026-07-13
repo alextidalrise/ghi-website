@@ -41,5 +41,6 @@
 	property={data.property}
 	breadcrumbs={data.breadcrumbs}
 	similarCards={data.similarCards}
+	reviews={data.reviews}
 	{form}
 />

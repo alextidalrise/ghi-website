@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { handleListingEnquiry } from '$lib/listing/enquiryAction';
+import { loadReviews } from '$lib/reviews';
 import {
 	buildDevelopmentDetailPageData,
 	buildPropertyDetailPageData,
@@ -42,7 +43,7 @@ export const actions: Actions = {
 	enquire: (event) => handleListingEnquiry(event)
 };
 
-export const load: PageServerLoad = async ({ params, url, locals }) => {
+export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 	const pathParams: ListingPathParams = {
 		countrySlug: params.country,
 		locationSlug: params.location,
@@ -50,11 +51,17 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 		slug: params.slug
 	};
 
-	if (locals.preview) {
-		return loadPreviewListing(pathParams, url.origin, locals.loadQuery);
-	}
+	// Reviews are fetched alongside the listing rather than after it: they're a separate
+	// origin and must never add their latency to the page's. A failure resolves to null and
+	// the section omits itself, so the listing is never held hostage to a reviews outage.
+	const [listing, reviews] = await Promise.all([
+		locals.preview
+			? loadPreviewListing(pathParams, url.origin, locals.loadQuery)
+			: loadPublishedListing(pathParams, url.origin),
+		loadReviews(fetch)
+	]);
 
-	return loadPublishedListing(pathParams, url.origin);
+	return { ...listing, reviews };
 };
 
 async function loadPreviewListing(

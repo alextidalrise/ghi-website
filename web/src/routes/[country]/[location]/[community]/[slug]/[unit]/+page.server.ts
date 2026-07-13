@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { handleListingEnquiry } from '$lib/listing/enquiryAction';
 import { buildUnitDetailPageData, type UnitPathParams } from '$lib/listing/detailPage';
+import { loadReviews } from '$lib/reviews';
 import {
 	fetchPublicUnit,
 	fetchSimilarListingCards,
@@ -15,7 +16,13 @@ export const actions: Actions = {
 	enquire: (event) => handleListingEnquiry(event)
 };
 
-export const load: PageServerLoad = async ({ params, url, locals }) => {
+/** Reviews fetched in parallel with the unit; see the sibling routes for the reasoning. */
+export const load: PageServerLoad = async (event) => {
+	const [listing, reviews] = await Promise.all([loadListing(event), loadReviews(event.fetch)]);
+	return { ...listing, reviews };
+};
+
+const loadListing = async ({ params, url, locals }: Parameters<PageServerLoad>[0]) => {
 	const queryParams = {
 		countrySlug: params.country,
 		locationSlug: params.location,

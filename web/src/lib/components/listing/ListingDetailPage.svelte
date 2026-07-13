@@ -11,9 +11,15 @@
 	import DevelopmentSummary from '$lib/components/development/Summary.svelte';
 	import SharedAmenities from '$lib/components/development/SharedAmenities.svelte';
 	import UnitsInventory from '$lib/components/development/UnitsInventory.svelte';
+	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
 	import type { EnquiryFormResult } from '$lib/listing/enquiryAction';
-	import { shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
+	import {
+		shouldShowDevelopmentPricing,
+		unitAvailability,
+		unitsCtaLabel
+	} from '$lib/listing/developmentDisplay';
+	import type { ReviewsData } from '$lib/reviews';
 	import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
@@ -24,6 +30,8 @@
 		breadcrumbs: BreadcrumbItem[];
 		similarCards?: SimilarListingCard[];
 		form?: EnquiryFormResult | null;
+		/** Null until the Google profile has enough reviews; the section then omits itself. */
+		reviews?: ReviewsData | null;
 	};
 
 	let {
@@ -32,11 +40,18 @@
 		development = null,
 		breadcrumbs,
 		similarCards = [],
-		form = null
+		form = null,
+		reviews = null
 	}: Props = $props();
 
 	const displayMode = $derived(development?.developmentDisplayMode ?? 'flat_listing');
 	const showInventoryPricing = $derived(shouldShowDevelopmentPricing(displayMode));
+
+	// The inventory is the next step of the funnel, so it owns the hero's one CTA.
+	// `null` when there is nothing to anchor to — the same condition that stops
+	// UnitsInventory rendering — and enquiry takes the slot instead.
+	const unitsLabel = $derived(unitsCtaLabel(unitAvailability(development?.units)));
+
 	const enquireLabel = $derived(
 		development?.ctas?.primaryCtaLabel ?? 'Enquire about this development'
 	);
@@ -44,10 +59,31 @@
 	// The final breadcrumb is the development itself; its href is the canonical path
 	// that unit rows nest under.
 	const developmentPath = $derived(breadcrumbs[breadcrumbs.length - 1]?.href ?? '');
+
+	/** Repeat activation is where the native anchor breaks down. With `#units` already in
+	    the URL the browser performs no fragment navigation, so it skips the fragment scroll
+	    that honours `scroll-margin-top` — and the only scroll left is the one `focus()`
+	    triggers, which on a section taller than the viewport overshoots the heading by
+	    exactly the scroll-margin. Drive both ourselves so the first, second and tenth
+	    activation land identically. The plain `href` remains the no-JS path. */
+	function scrollToUnits(event: MouseEvent) {
+		const target = document.getElementById('units');
+		if (!target) return; // Nothing to enhance — let the href do its job.
+		event.preventDefault();
+
+		// Keep the shareable deep link without re-triggering fragment navigation.
+		if (location.hash !== '#units') history.pushState(null, '', '#units');
+
+		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+		// `preventScroll` is the point: focus must move for keyboard users without adding
+		// the second, conflicting scroll that causes the overshoot.
+		target.focus({ preventScroll: true });
+	}
 </script>
 
 {#if pageType === 'property' && property}
-	<PropertyDetail {property} {breadcrumbs} {similarCards} {form} />
+	<PropertyDetail {property} {breadcrumbs} {similarCards} {form} {reviews} />
 {:else if pageType === 'development' && development}
 	<article class="listing-page listing-page--development">
 		<!-- Mirrors the property page: a full-bleed gallery beside the headline facts,
@@ -61,7 +97,22 @@
 				<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 				<DevelopmentSummary {development} showPricing={showInventoryPricing} />
 				<DevelopmentKeyFacts {development} />
-				<a class="hero__cta" href="#enquire">{enquireLabel}</a>
+				<!-- One CTA, never two. Where there is inventory, browsing it is the next step
+				     and enquiry is already carried below (sticky rail + fixed mobile console).
+				     Most developments are single villas with no units at all, though, and there
+				     the hero would otherwise have no action — so enquiry stands in.
+				     Real anchors, so both work with JS disabled; `scrollToUnits` only enhances
+				     the units one, to keep repeat activations landing consistently. -->
+				<div class="hero__actions">
+					{#if unitsLabel}
+						<a class="hero__cta hero__cta--units" href="#units" onclick={scrollToUnits}>
+							{unitsLabel}
+							<span class="hero__cta-arrow" aria-hidden="true">↓</span>
+						</a>
+					{:else}
+						<a class="hero__cta" href="#enquire">{enquireLabel}</a>
+					{/if}
+				</div>
 			</div>
 		</section>
 
@@ -94,6 +145,12 @@
 			golf={development.golf}
 		/>
 
+		<!-- Same placement as the property page: reassurance before the reader is offered
+		     somewhere else to go. -->
+		<div class="content-wrap">
+			<GoogleReviewsCompact data={reviews} heading="What our buyers say" />
+		</div>
+
 		{#if similarCards.length > 0}
 			<SimilarProperties cards={similarCards} />
 		{/if}
@@ -125,11 +182,34 @@
 		padding: var(--space-lg) var(--content-padding) 0;
 	}
 
+	/* A row rather than a bare link, so the mobile reorder below has a stable hook and
+	   the button hugs its label instead of stretching across the column. */
+	.hero__actions {
+		display: flex;
+		margin-top: var(--space-lg);
+	}
+
+	/* Where the row follows the key-facts strip, that strip's own padding-bottom is
+	   already the gap under its closing hairline — the row's margin stacked on top of it
+	   made the space below the rule more than twice the space above. Drop it, so the rule
+	   sits symmetrically between the facts and the button.
+
+	   Keyed off the sibling so a development with no key facts (the strip doesn't render)
+	   keeps the row's separation from the badges above it. Scoped above the mobile
+	   breakpoint because below it the row is reordered *above* the strip, where its own
+	   top margin is what separates it from the price. */
+	@media (min-width: 761px) {
+		:global(.key-facts) + .hero__actions {
+			margin-top: 0;
+		}
+	}
+
+	/* DESIGN.md's Gold button tier, unchanged. */
 	.hero__cta {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		margin-top: var(--space-lg);
+		gap: 0.6rem;
 		padding: 0.85rem 2rem;
 		background: var(--gold);
 		color: var(--green);
@@ -142,6 +222,7 @@
 		border: 1px solid var(--gold);
 		transition:
 			background var(--duration-hover) var(--ease),
+			color var(--duration-hover) var(--ease),
 			border-color var(--duration-hover) var(--ease);
 	}
 
@@ -150,6 +231,28 @@
 		background: var(--green);
 		color: var(--white);
 		border-color: var(--green);
+	}
+
+	/* The site's text links slide their arrow right 3px on hover; this one travels down,
+	   because that is where it takes you. Signals "further down this page", not "away". */
+	.hero__cta-arrow {
+		transition: transform var(--duration-hover) var(--ease);
+	}
+
+	.hero__cta--units:hover .hero__cta-arrow,
+	.hero__cta--units:focus-visible .hero__cta-arrow {
+		transform: translateY(3px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero__cta-arrow {
+			transition: none;
+		}
+
+		.hero__cta--units:hover .hero__cta-arrow,
+		.hero__cta--units:focus-visible .hero__cta-arrow {
+			transform: none;
+		}
 	}
 
 	@media (min-width: 1024px) {
@@ -224,6 +327,26 @@
 
 		.hero__gallery {
 			order: -1;
+		}
+
+		.hero__summary {
+			display: flex;
+			flex-direction: column;
+		}
+
+		/* The gallery comes first on phones, so the actions would otherwise land the best
+		   part of a screen below the fold. Drop the key-facts strip beneath them: the buyer
+		   reads the price, then immediately meets the way into the inventory.
+
+		   Reordering visually is safe here specifically because the strip is a <dl> with no
+		   focusable content — there is no DOM-vs-visual tab-order mismatch to create. */
+		.hero__summary > :global(.key-facts) {
+			order: 1;
+		}
+
+		/* Fill the column on phones: a comfortable thumb target, not a minimal one. */
+		.hero__cta {
+			flex: 1 1 auto;
 		}
 	}
 </style>

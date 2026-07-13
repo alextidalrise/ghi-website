@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
+	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
@@ -208,6 +209,17 @@
 			{/each}
 		</ul>
 	</section>
+
+	<!-- The page has spent the whole scroll saying who we are; buyers get the last word
+	     before the CTA. Sits contained: `.talk` below already carries its own section-gap,
+	     so no extra clearance is needed here.
+
+	     divider={false}: the team list above deliberately closes on a hairline (its rows are
+	     bracketed masthead rows). That rule is the divider — a second one here would just be
+	     two lines with a gap between them. -->
+	<div class="content-wrap">
+		<GoogleReviewsCompact data={data.reviews} heading="What our buyers say" divider={false} />
+	</div>
 
 	<!-- Talk to us — the page's single green band. -->
 	<section class="talk on-dark" aria-labelledby="talk-heading">

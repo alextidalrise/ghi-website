@@ -2,6 +2,7 @@ import { fail } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { Actions, PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
+import { loadReviews } from '$lib/reviews';
 import { fetchHomepagePartnerLogos } from '$lib/sanity/queries/partners';
 
 const BASE_PATH = '/contact';
@@ -13,7 +14,7 @@ export const prerender = false;
 // the source of truth; the client revalidates only to skip an obvious-typo round-trip.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, fetch }) => {
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
 
 	const breadcrumbs: BreadcrumbItem[] = [
@@ -24,7 +25,10 @@ export const load: PageServerLoad = async ({ url }) => {
 	// The advisor network, rendered as the real partner logo wall (shared with the
 	// homepage). Empty in datasets without logos; the component falls back to labelled
 	// cells, so the section never renders broken images or an empty grid.
-	const partnerLogos = await fetchHomepagePartnerLogos();
+	const [partnerLogos, reviews] = await Promise.all([
+		fetchHomepagePartnerLogos(),
+		loadReviews(fetch)
+	]);
 
 	const seo = {
 		title: 'Contact | Golf Homes International',
@@ -38,6 +42,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		breadcrumbs,
 		seo,
 		partnerLogos,
+		reviews,
 		breadcrumbJsonLd: breadcrumbListJsonLd(breadcrumbs, url.origin)
 	};
 };
