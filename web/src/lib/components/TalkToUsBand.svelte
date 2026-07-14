@@ -14,6 +14,8 @@
 	 *
 	 * Emphasis Ladder: this is a page's single green band. Never two.
 	 */
+	import { GENERAL_WHATSAPP_MESSAGE, whatsAppHref } from '$lib/contact/contact';
+
 	type Action = { label: string; href: string };
 
 	type Props = {
@@ -31,13 +33,7 @@
 		secondary = { label: 'Browse properties', href: '/front-line-collection' }
 	}: Props = $props();
 
-	// WhatsApp stays a styled-but-inert placeholder until the GHI number is wired,
-	// matching the EnquiryRail convention (see EnquiryRail.svelte whatsAppHref).
-	const whatsAppHref: string | null = null;
-
-	function launchWhatsApp() {
-		if (whatsAppHref) window.open(whatsAppHref, '_blank', 'noopener');
-	}
+	const whatsApp = whatsAppHref(GENERAL_WHATSAPP_MESSAGE);
 </script>
 
 <section class="talk on-dark" aria-labelledby="talk-heading">
@@ -54,7 +50,12 @@
 		-->
 		<div class="talk__actions">
 			<a class="talk__btn talk__btn--primary" href={primary.href}>{primary.label}</a>
-			<button type="button" class="talk__btn talk__btn--whatsapp" onclick={launchWhatsApp}>
+			<a
+				class="talk__btn talk__btn--whatsapp"
+				href={whatsApp}
+				target="_blank"
+				rel="noopener"
+			>
 				<svg viewBox="0 0 32 32" aria-hidden="true">
 					<path
 						d="M16 3C8.82 3 3 8.82 3 16c0 2.29.6 4.44 1.64 6.3L3 29l6.86-1.8A12.9 12.9 0 0 0 16 29c7.18 0 13-5.82 13-13S23.18 3 16 3zm0 23.8c-2.04 0-3.94-.58-5.55-1.58l-.4-.24-4.07 1.07 1.08-3.97-.26-.41A10.74 10.74 0 0 1 5.2 16C5.2 10.04 10.04 5.2 16 5.2S26.8 10.04 26.8 16 21.96 26.8 16 26.8z"
@@ -64,7 +65,7 @@
 					/>
 				</svg>
 				<span>WhatsApp</span>
-			</button>
+			</a>
 			{#if secondary}
 				<a class="talk__btn talk__btn--outline" href={secondary.href}>{secondary.label}</a>
 			{/if}

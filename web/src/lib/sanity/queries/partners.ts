@@ -3,7 +3,12 @@ import { PARTNER_CATEGORY_PUBLIC, PARTNER_LOGO_PUBLIC } from '../allowlists';
 import { buildImageSrcset, buildPublicImageUrl } from '../image';
 import { fetchPublic } from './fetch';
 import type { MediaAssetInput } from '../transforms/mediaFilter';
-import type { Partner, PartnerCategory, PartnerLogo } from '$lib/partners/partners';
+import type {
+	Partner,
+	PartnerCategory,
+	PartnerIntroduction,
+	PartnerLogo
+} from '$lib/partners/partners';
 import type { TrustedPartner } from '$lib/components/home/TrustedPartners.svelte';
 
 /** Widths the logo CDN crops are generated at; the cell caps the rendered height. */
@@ -25,6 +30,15 @@ export const homepagePartnerLogosQuery = defineQuery(`
     && defined(slug.current)
     && defined(logo.asset)
   ] | order(coalesce(order, 999) asc, name asc)[0...$limit] ${PARTNER_LOGO_PUBLIC}
+`);
+
+/** One partner by slug — resolves the `?partner=` introduction request on /contact. */
+export const partnerBySlugQuery = defineQuery(`
+  *[_type == "partner" && slug.current == $slug][0]{
+    name,
+    "slug": slug.current,
+    "category": category->name
+  }
 `);
 
 export const HOMEPAGE_PARTNER_LOGOS_LIMIT = 10;
@@ -97,6 +111,32 @@ export async function fetchPartnerCategories(): Promise<PartnerCategory[]> {
 	return (raw ?? [])
 		.map(toCategory)
 		.filter((category): category is PartnerCategory => category != null);
+}
+
+/**
+ * Resolve a `?partner=<slug>` introduction request to the partner being asked for.
+ *
+ * Returns null for an unknown or stale slug: /contact then falls back to the generic
+ * form rather than erroring. A bad link should never punish the buyer holding it.
+ */
+export async function fetchPartnerIntroduction(
+	slug: string | null | undefined
+): Promise<PartnerIntroduction | null> {
+	if (!slug) return null;
+
+	const raw = await fetchPublic<{
+		name?: string | null;
+		slug?: string | null;
+		category?: string | null;
+	} | null>(partnerBySlugQuery, { params: { slug } });
+
+	if (!raw?.name || !raw.slug) return null;
+
+	return {
+		name: raw.name,
+		slug: raw.slug,
+		category: raw.category?.trim() || null
+	};
 }
 
 /** Fetch partners that have a logo, shaped for the homepage Trusted Partners wall. */

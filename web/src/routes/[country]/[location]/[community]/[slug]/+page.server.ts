@@ -10,6 +10,8 @@ import {
 	type UnitPathParams
 } from '$lib/listing/detailPage';
 import {
+	attachEnquiryShelf,
+	fetchEnquiryShelfDefaults,
 	developmentByPathPreviewQuery,
 	developmentByPathQuery,
 	developmentStalePathQuery,
@@ -54,14 +56,20 @@ export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 	// Reviews are fetched alongside the listing rather than after it: they're a separate
 	// origin and must never add their latency to the page's. A failure resolves to null and
 	// the section omits itself, so the listing is never held hostage to a reviews outage.
-	const [listing, reviews] = await Promise.all([
+	//
+	// The enquiry shelf's defaults key off the country slug alone — a route param — so they
+	// ride the same round trip rather than waiting on the listing. Any per-listing override
+	// arrives with the listing itself (CTA_PUBLIC dereferences it), so resolving the two is
+	// pure local work.
+	const [listing, reviews, shelfDefaults] = await Promise.all([
 		locals.preview
 			? loadPreviewListing(pathParams, url.origin, locals.loadQuery)
 			: loadPublishedListing(pathParams, url.origin),
-		loadReviews(fetch)
+		loadReviews(fetch),
+		fetchEnquiryShelfDefaults(params.country)
 	]);
 
-	return { ...listing, reviews };
+	return { ...attachEnquiryShelf(listing, shelfDefaults), reviews };
 };
 
 async function loadPreviewListing(

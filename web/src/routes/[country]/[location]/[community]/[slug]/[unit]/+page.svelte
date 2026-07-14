@@ -42,5 +42,6 @@
 	breadcrumbs={data.breadcrumbs}
 	similarCards={data.similarCards}
 	reviews={data.reviews}
+	shelf={data.shelf}
 	{form}
 />

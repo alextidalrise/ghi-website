@@ -8,10 +8,12 @@ import {
 import { buildCanonicalPath } from '$lib/listing/canonicalPath';
 import { loadReviews } from '$lib/reviews';
 import {
+	attachEnquiryShelf,
 	catchAllCommunityInLocationQuery,
 	communitiesByLocationQuery,
 	developmentByCatchAllPathPreviewQuery,
 	developmentByCatchAllPathQuery,
+	fetchEnquiryShelfDefaults,
 	fetchPublic,
 	fetchPublicDevelopment,
 	fetchPublicProperty,
@@ -56,11 +58,17 @@ function catchAllPathParams(
  *
  * This wraps the listing loader rather than threading `reviews` through its many return
  * points (property / development / preview / catch-all), which is how the development page
- * got missed the first time round.
+ * got missed the first time round. The enquiry shelf rides the same wrapper for the same
+ * reason: its defaults need only the country slug, so they never wait on the listing.
  */
 export const load: PageServerLoad = async (event) => {
-	const [listing, reviews] = await Promise.all([loadListing(event), loadReviews(event.fetch)]);
-	return { ...listing, reviews };
+	const [listing, reviews, shelfDefaults] = await Promise.all([
+		loadListing(event),
+		loadReviews(event.fetch),
+		fetchEnquiryShelfDefaults(event.params.country)
+	]);
+
+	return { ...attachEnquiryShelf(listing, shelfDefaults), reviews };
 };
 
 const loadListing = async ({

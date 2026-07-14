@@ -49,3 +49,22 @@ export type PartnerCategory = {
 export function partnerIntroHref(partner: Pick<Partner, 'slug'>): string {
 	return `/contact?partner=${encodeURIComponent(partner.slug)}`;
 }
+
+/** The query-param key `partnerIntroHref` writes and /contact reads. */
+export const PARTNER_INTRO_PARAM = 'partner';
+
+/**
+ * A partner resolved from `?partner=<slug>` on /contact, so the form can name the
+ * introduction the buyer actually asked for instead of opening blank.
+ */
+export type PartnerIntroduction = {
+	slug: string;
+	name: string;
+	/** Category display name, e.g. "Mortgage". Null when the category is missing. */
+	category: string | null;
+};
+
+/** The message the enquiry form opens with when an introduction was requested. */
+export function partnerIntroMessage(partner: PartnerIntroduction): string {
+	return `Please introduce me to ${partner.name}.`;
+}

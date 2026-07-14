@@ -4,6 +4,8 @@ import { handleListingEnquiry } from '$lib/listing/enquiryAction';
 import { buildUnitDetailPageData, type UnitPathParams } from '$lib/listing/detailPage';
 import { loadReviews } from '$lib/reviews';
 import {
+	attachEnquiryShelf,
+	fetchEnquiryShelfDefaults,
 	fetchPublicUnit,
 	fetchSimilarListingCards,
 	unitByDevPathPreviewQuery,
@@ -16,10 +18,19 @@ export const actions: Actions = {
 	enquire: (event) => handleListingEnquiry(event)
 };
 
-/** Reviews fetched in parallel with the unit; see the sibling routes for the reasoning. */
+/**
+ * Reviews and the enquiry-shelf defaults are fetched in parallel with the unit; see the
+ * sibling routes for the reasoning. A unit inherits its development's shelf overrides,
+ * which ride along on the unit's own `ctas`.
+ */
 export const load: PageServerLoad = async (event) => {
-	const [listing, reviews] = await Promise.all([loadListing(event), loadReviews(event.fetch)]);
-	return { ...listing, reviews };
+	const [listing, reviews, shelfDefaults] = await Promise.all([
+		loadListing(event),
+		loadReviews(event.fetch),
+		fetchEnquiryShelfDefaults(event.params.country)
+	]);
+
+	return { ...attachEnquiryShelf(listing, shelfDefaults), reviews };
 };
 
 const loadListing = async ({ params, url, locals }: Parameters<PageServerLoad>[0]) => {

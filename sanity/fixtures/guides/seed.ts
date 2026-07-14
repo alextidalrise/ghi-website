@@ -182,6 +182,7 @@ function buildUkGuide(assetId: string): IdentifiedSanityDocumentStub {
 		title: 'How to Buy Property in Spain as a UK Buyer',
 		slug: { _type: 'slug', current: 'buying-property-in-spain-uk-buyers' },
 		guideCategory: 'buying',
+		country: 'spain',
 		audienceLabel: 'For UK buyers',
 		order: 1,
 		tagline:
@@ -373,6 +374,7 @@ function buildIntlGuide(): IdentifiedSanityDocumentStub {
 		title: 'How to Buy Property in Spain as an International Buyer',
 		slug: { _type: 'slug', current: 'buying-property-in-spain-international-buyers' },
 		guideCategory: 'buying',
+		country: 'spain',
 		audienceLabel: 'For international buyers',
 		order: 2,
 		tagline:
@@ -752,6 +754,7 @@ function buildPtUkGuide(): IdentifiedSanityDocumentStub {
 		title: 'How to Buy Property in Portugal as a UK Buyer',
 		slug: { _type: 'slug', current: 'buying-property-in-portugal-uk-buyers' },
 		guideCategory: 'buying',
+		country: 'portugal',
 		audienceLabel: 'For UK buyers',
 		order: 3,
 		tagline:
@@ -899,6 +902,7 @@ function buildPtIntlGuide(): IdentifiedSanityDocumentStub {
 		title: 'How to Buy Property in Portugal as an International Buyer',
 		slug: { _type: 'slug', current: 'buying-property-in-portugal-international-buyers' },
 		guideCategory: 'buying',
+		country: 'portugal',
 		audienceLabel: 'For international buyers',
 		order: 4,
 		tagline:

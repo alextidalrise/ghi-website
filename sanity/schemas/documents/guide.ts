@@ -41,6 +41,21 @@ export const guide = defineType({
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
+			name: 'country',
+			title: 'Country',
+			type: 'string',
+			group: 'content',
+			options: {
+				list: [
+					{ title: 'Spain', value: 'spain' },
+					{ title: 'Portugal', value: 'portugal' }
+				],
+				layout: 'radio'
+			},
+			description:
+				'Which market this guide covers. Listings use it to surface the right buying guide in the enquiry shelf; leave blank for a guide that is not country-specific.'
+		}),
+		defineField({
 			name: 'audienceLabel',
 			title: 'Audience label',
 			type: 'string',
@@ -53,7 +68,8 @@ export const guide = defineType({
 			title: 'Order',
 			type: 'number',
 			group: 'content',
-			description: 'Manual ordering within the category on the Guides hub. Lower numbers appear first.',
+			description:
+				'Manual ordering within the category on the Guides hub. Lower numbers appear first. Note that this also picks the default: the lowest-numbered buying guide for a country is the one shown on every listing in that country, so reordering the hub changes the listings too. To pin a different guide to a listing regardless, set it on the listing itself under Enquiry shelf: guide.',
 			validation: (Rule) => Rule.min(0).integer()
 		}),
 		defineField({

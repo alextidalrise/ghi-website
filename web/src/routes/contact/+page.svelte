@@ -6,6 +6,13 @@
 	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import TrustedPartners from '$lib/components/home/TrustedPartners.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
+	import { PARTNER_INTRO_PARAM, partnerIntroMessage } from '$lib/partners/partners';
+	import {
+		GENERAL_WHATSAPP_MESSAGE,
+		PHONE_DISPLAY,
+		PHONE_HREF,
+		whatsAppHref
+	} from '$lib/contact/contact';
 
 	let { data, form } = $props();
 
@@ -19,17 +26,11 @@
 		role: 'James leads the day to day and is the person you will speak to when you enquire.'
 	};
 
-	// Real, reachable line — the same number /soon uses for its advisor path. WhatsApp
-	// opens with context prefilled; the tel: link calls or texts the same number.
-	const phoneDisplay = '+44 7496 443109';
-	const phoneHref = 'tel:+447496443109';
-	const whatsAppHref =
-		'https://wa.me/447496443109?text=' +
-		encodeURIComponent("Hello, I'd like to enquire about a property with Golf Homes International.");
-
-	function launchWhatsApp() {
-		window.open(whatsAppHref, '_blank', 'noopener');
-	}
+	// One line, one module ($lib/contact/contact) — shared with /soon, the enquiry rail and
+	// the closing band, so the number can never drift between surfaces.
+	const phoneDisplay = PHONE_DISPLAY;
+	const phoneHref = PHONE_HREF;
+	const whatsApp = whatsAppHref(GENERAL_WHATSAPP_MESSAGE);
 
 	// What happens after an enquiry lands. Specific, not aphoristic; reassurance for an
 	// audience that buys abroad once or twice in a lifetime.
@@ -39,12 +40,27 @@
 		'No pressure and no obligation. Your details stay with us and never go to a sales list.'
 	];
 
+	// An introduction request, arriving as ?partner=<slug> from a partner card or a listing's
+	// enquiry shelf. Null for a direct visit or an unknown slug — the form is then the plain
+	// enquiry it has always been.
+	const partnerIntro = $derived(data.partnerIntro ?? null);
+
 	// Form state. Initialised from the server action's echoed values so a no-JS submit
 	// repopulates after a failed post; with JS, use:enhance keeps these across a retry.
+	//
+	// The message opens pre-written when an introduction was requested: the buyer clicked a
+	// button that said "request an introduction", so making them type that sentence again is
+	// the site asking twice. It stays editable, and an echoed value from a failed post wins.
 	let name = $state(untrack(() => form?.values?.name ?? ''));
 	let email = $state(untrack(() => form?.values?.email ?? ''));
 	let phone = $state(untrack(() => form?.values?.phone ?? ''));
-	let message = $state(untrack(() => form?.values?.message ?? ''));
+	let message = $state(
+		untrack(
+			() =>
+				form?.values?.message ??
+				(data.partnerIntro ? partnerIntroMessage(data.partnerIntro) : '')
+		)
+	);
 
 	let submitting = $state(false);
 	let clientErrors = $state<Record<string, string>>({});
@@ -168,7 +184,7 @@
 				<!-- Direct paths -->
 				<div class="reach__direct">
 					<h3 class="reach__subhead">Or reach us directly</h3>
-					<button type="button" class="reach__whatsapp" onclick={launchWhatsApp}>
+					<a class="reach__whatsapp" href={whatsApp} target="_blank" rel="noopener">
 						<svg class="reach__whatsapp-glyph" viewBox="0 0 32 32" aria-hidden="true">
 							<path
 								d="M16 3C8.82 3 3 8.82 3 16c0 2.29.6 4.44 1.64 6.3L3 29l6.86-1.8A12.9 12.9 0 0 0 16 29c7.18 0 13-5.82 13-13S23.18 3 16 3zm0 23.8c-2.04 0-3.94-.58-5.55-1.58l-.4-.24-4.07 1.07 1.08-3.97-.26-.41A10.74 10.74 0 0 1 5.2 16C5.2 10.04 10.04 5.2 16 5.2S26.8 10.04 26.8 16 21.96 26.8 16 26.8z"
@@ -178,7 +194,7 @@
 							/>
 						</svg>
 						<span>Message us on WhatsApp</span>
-					</button>
+					</a>
 					<a class="reach__phone" href={phoneHref}>
 						<span class="reach__phone-label">Call or text</span>
 						<span class="reach__phone-number tabular-nums">{phoneDisplay}</span>
@@ -208,15 +224,28 @@
 							<svg class="panel__check" viewBox="0 0 24 24" aria-hidden="true">
 								<path d="M4 12.5 9.5 18 20 6" fill="none" stroke="currentColor" stroke-width="2" />
 							</svg>
-							<h3 class="panel__confirm-head">Thank you, your enquiry is with us</h3>
+							<h3 class="panel__confirm-head">
+								{partnerIntro
+									? 'Thank you, we will make the introduction'
+									: 'Thank you, your enquiry is with us'}
+							</h3>
 							<p class="panel__confirm-note">
 								{lead.name.split(' ')[0]} will reply within one working day. If you would rather not wait,
 								message us on WhatsApp and we will pick it up right away.
 							</p>
 						</div>
 					{:else}
-						<h3 class="panel__heading">Send an enquiry</h3>
-						<p class="panel__intro">A few details and {lead.name.split(' ')[0]} will take it from there.</p>
+						{#if partnerIntro}
+							<h3 class="panel__heading">Request an introduction</h3>
+							<p class="panel__intro">
+								To <strong class="panel__partner">{partnerIntro.name}</strong>{#if partnerIntro.category}, our {partnerIntro.category.toLowerCase()} specialist{/if}. {lead.name.split(
+									' '
+								)[0]} will make the introduction personally.
+							</p>
+						{:else}
+							<h3 class="panel__heading">Send an enquiry</h3>
+							<p class="panel__intro">A few details and {lead.name.split(' ')[0]} will take it from there.</p>
+						{/if}
 
 						<form
 							class="panel__form"
@@ -225,6 +254,12 @@
 							use:enhance={handleEnquire}
 							novalidate
 						>
+							<!-- The slug, not the name: the server re-resolves it so the introduction that
+							     reaches the team is the one Sanity holds, not whatever was posted. -->
+							{#if partnerIntro}
+								<input type="hidden" name={PARTNER_INTRO_PARAM} value={partnerIntro.slug} />
+							{/if}
+
 							{#if shownTopError}
 								<p class="panel__alert" role="alert">{shownTopError}</p>
 							{/if}
@@ -471,6 +506,7 @@
 		font-weight: 500;
 		letter-spacing: var(--tracking-wide);
 		text-transform: uppercase;
+		text-decoration: none;
 		cursor: pointer;
 		transition:
 			background var(--duration-hover) var(--ease),
@@ -619,6 +655,13 @@
 		margin-top: var(--space-sm);
 		font-size: var(--text-ui);
 		color: rgba(245, 241, 232, 0.82);
+	}
+
+	/* The named specialist, lifted out of the muted intro line to full light ink. Gold is
+	   the panel's action colour (the submit button), so it stays reserved for that. */
+	.panel__partner {
+		font-weight: 500;
+		color: var(--on-green);
 	}
 
 	.panel__form {
