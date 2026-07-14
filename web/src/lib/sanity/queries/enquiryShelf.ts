@@ -1,16 +1,18 @@
 import { defineQuery } from 'groq';
 import { SHELF_GUIDE_PUBLIC, SHELF_PARTNER_PUBLIC } from '../allowlists';
 import { fetchPublic } from './fetch';
-import { toPartnerLogo } from './partners';
 import {
 	EMPTY_ENQUIRY_SHELF,
 	SHELF_PARTNER_CATEGORIES,
 	SHELF_PARTNER_LIMIT,
-	partnerIntroHref,
+	disciplineFor,
+	shelfOverrideFor,
+	withoutShelfOverrides,
 	type EnquiryShelf,
 	type RawShelfGuide,
 	type RawShelfPartner,
 	type ShelfGuide,
+	type ShelfHost,
 	type ShelfOverride,
 	type ShelfPartner
 } from '$lib/listing/enquiryShelf';
@@ -36,7 +38,6 @@ export const enquiryShelfDefaultsQuery = defineQuery(`
     "partners": *[
       _type == "partner"
       && defined(slug.current)
-      && defined(logo.asset)
       && category->slug.current in $partnerCategories
     ] | order(coalesce(order, 999) asc, name asc) ${SHELF_PARTNER_PUBLIC}
   }
@@ -60,11 +61,7 @@ function toShelfPartner(raw: RawShelfPartner | null | undefined): ShelfPartner |
 	return {
 		slug: raw.slug,
 		name: raw.name,
-		category: raw.category?.trim() || null,
-		// A partner with no logo still renders: the cell shows the name as text, matching
-		// the TrustedPartners placeholder. Only the *default* query requires a logo.
-		logo: toPartnerLogo(raw.logo, raw.name),
-		introHref: partnerIntroHref({ slug: raw.slug })
+		discipline: disciplineFor(raw)
 	};
 }
 
@@ -108,6 +105,23 @@ export function resolveEnquiryShelf(
 		guide: overrideGuide ?? defaults.guide,
 		partners: overridePartners.length > 0 ? overridePartners : defaults.partners
 	};
+}
+
+/**
+ * The one call a listing route makes: resolve the shelf from the listing's overrides and
+ * the country defaults, hang it on the page data, and scrub the raw overrides back out.
+ *
+ * Resolve and scrub are a single step on purpose. Split across the three listing routes,
+ * the scrub is the half that gets forgotten — and forgetting it is invisible, because the
+ * shelf still renders correctly while the dereferenced documents ride to the browser
+ * unread beside it.
+ */
+export function attachEnquiryShelf<T extends ShelfHost>(
+	listing: T,
+	defaults: EnquiryShelf
+): T & { shelf: EnquiryShelf } {
+	const shelf = resolveEnquiryShelf(defaults, shelfOverrideFor(listing));
+	return { ...withoutShelfOverrides(listing), shelf };
 }
 
 /**

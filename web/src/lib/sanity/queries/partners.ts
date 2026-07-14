@@ -14,8 +14,6 @@ import type { TrustedPartner } from '$lib/components/home/TrustedPartners.svelte
 /** Widths the logo CDN crops are generated at; the cell caps the rendered height. */
 const LOGO_WIDTHS = [160, 240, 320, 480];
 
-export { toPartnerLogo };
-
 /** All partner categories that have at least one partner, in display order. */
 export const partnerCategoriesQuery = defineQuery(`
   *[

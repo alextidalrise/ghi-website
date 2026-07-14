@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveEnquiryShelf, toDefaultShelfPartners } from './enquiryShelf';
+import { attachEnquiryShelf, resolveEnquiryShelf, toDefaultShelfPartners } from './enquiryShelf';
 import { EMPTY_ENQUIRY_SHELF, type EnquiryShelf } from '$lib/listing/enquiryShelf';
 
 const guide = (title: string, slug: string) => ({
@@ -13,8 +13,7 @@ const partner = (name: string, slug: string, categorySlug: string, category: str
 	name,
 	slug,
 	category,
-	categorySlug,
-	logo: null
+	categorySlug
 });
 
 const MORTGAGE = partner('Foxes Finance', 'foxes-finance', 'mortgage', 'Mortgage');
@@ -49,19 +48,13 @@ describe('toDefaultShelfPartners', () => {
 	it('skips a category with no partner rather than leaving a hole', () => {
 		const partners = toDefaultShelfPartners([MORTGAGE, LEGAL]);
 
-		expect(partners.map((p) => p.category)).toEqual(['Mortgage', 'Legal & Tax']);
+		expect(partners.map((p) => p.discipline)).toEqual(['Mortgage', 'Legal & Tax']);
 	});
 
 	it('ignores categories that are not shelf disciplines', () => {
 		const partners = toDefaultShelfPartners([WEALTH]);
 
 		expect(partners).toEqual([]);
-	});
-
-	it('routes every partner through a GHI introduction, never to the partner', () => {
-		const [first] = toDefaultShelfPartners([MORTGAGE]);
-
-		expect(first.introHref).toBe('/contact?partner=foxes-finance');
 	});
 
 	it('drops a partner with no slug', () => {
@@ -119,5 +112,59 @@ describe('resolveEnquiryShelf', () => {
 
 		expect(shelf.guide).toBeNull();
 		expect(shelf.partners).toEqual([]);
+	});
+});
+
+describe('attachEnquiryShelf', () => {
+	const overriddenListing = () => ({
+		pageType: 'property' as const,
+		property: {
+			title: 'La Casa Blanca',
+			ctas: {
+				primaryCtaLabel: 'Send enquiry',
+				railGuide: guide('Buying in the Algarve', 'algarve'),
+				railPartners: [WEALTH]
+			}
+		}
+	});
+
+	it('resolves the shelf onto the page data', () => {
+		const data = attachEnquiryShelf(overriddenListing(), defaults);
+
+		expect(data.shelf.guide?.href).toBe('/guides/algarve');
+		expect(data.shelf.partners.map((p) => p.slug)).toEqual(['atlas-bridge']);
+	});
+
+	// The overrides are a server-side input to the resolution above. Once it has run, the
+	// browser needs the resolved shelf and nothing else — leaving the dereferenced guide and
+	// partner documents on `ctas` ships the same picks twice, in the shape nothing renders.
+	it('scrubs the raw overrides off the listing it hands back', () => {
+		const data = attachEnquiryShelf(overriddenListing(), defaults);
+
+		expect(data.property.ctas).not.toHaveProperty('railGuide');
+		expect(data.property.ctas).not.toHaveProperty('railPartners');
+	});
+
+	it('leaves the rest of the CTA fields alone', () => {
+		const data = attachEnquiryShelf(overriddenListing(), defaults);
+
+		expect(data.property.ctas.primaryCtaLabel).toBe('Send enquiry');
+		expect(data.property.title).toBe('La Casa Blanca');
+	});
+
+	it('falls back to the country defaults for a listing that overrides nothing', () => {
+		const data = attachEnquiryShelf({ property: { ctas: null } }, defaults);
+
+		expect(data.shelf).toEqual(defaults);
+	});
+
+	it('reads a unit page through the development context it inherits its CTAs from', () => {
+		const data = attachEnquiryShelf(
+			{ development: { ctas: { railPartners: [WEALTH] } } },
+			defaults
+		);
+
+		expect(data.shelf.partners.map((p) => p.slug)).toEqual(['atlas-bridge']);
+		expect(data.development.ctas).not.toHaveProperty('railPartners');
 	});
 });

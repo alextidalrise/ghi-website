@@ -196,16 +196,16 @@ export const SHELF_GUIDE_PUBLIC = /* groq */ `{
 }`;
 
 /**
- * Partner projection carrying just enough to render a logo and request an introduction.
- * Shared by the enquiry shelf and the homepage logo wall (PARTNER_LOGO_PUBLIC).
+ * Partner projection for the listing enquiry shelf. No logo: the shelf sets its
+ * specialists as type, so the logo would be fetched and never rendered. The logo wall
+ * (PARTNER_LOGO_PUBLIC) is the projection that wants one.
  */
 export const SHELF_PARTNER_PUBLIC = /* groq */ `{
   _id,
   name,
   "slug": slug.current,
   "category": category->name,
-  "categorySlug": category->slug.current,
-  logo${MEDIA_ASSET_PUBLIC}
+  "categorySlug": category->slug.current
 }`;
 
 /**
@@ -302,7 +302,13 @@ export const PARTNER_CATEGORY_PUBLIC = /* groq */ `{
 }`;
 
 /** Minimal partner projection for the homepage logo wall — only those with a logo. */
-export const PARTNER_LOGO_PUBLIC = SHELF_PARTNER_PUBLIC;
+export const PARTNER_LOGO_PUBLIC = /* groq */ `{
+  _id,
+  name,
+  "slug": slug.current,
+  "category": category->name,
+  logo${MEDIA_ASSET_PUBLIC}
+}`;
 
 /** Guide card projection — hub grid and related-guides cross-links. */
 export const GUIDE_CARD_PUBLIC = /* groq */ `{

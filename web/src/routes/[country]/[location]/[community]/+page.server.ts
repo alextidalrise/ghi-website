@@ -7,8 +7,8 @@ import {
 } from '$lib/listing/detailPage';
 import { buildCanonicalPath } from '$lib/listing/canonicalPath';
 import { loadReviews } from '$lib/reviews';
-import { shelfOverrideFor } from '$lib/listing/enquiryShelf';
 import {
+	attachEnquiryShelf,
 	catchAllCommunityInLocationQuery,
 	communitiesByLocationQuery,
 	developmentByCatchAllPathPreviewQuery,
@@ -21,8 +21,7 @@ import {
 	listingLegacyThreeSegmentPathQuery,
 	locationBySlugQuery,
 	propertyByCatchAllPathPreviewQuery,
-	propertyByCatchAllPathQuery,
-	resolveEnquiryShelf
+	propertyByCatchAllPathQuery
 } from '$lib/sanity/queries';
 import {
 	toPublicDevelopment,
@@ -69,11 +68,7 @@ export const load: PageServerLoad = async (event) => {
 		fetchEnquiryShelfDefaults(event.params.country)
 	]);
 
-	return {
-		...listing,
-		reviews,
-		shelf: resolveEnquiryShelf(shelfDefaults, shelfOverrideFor(listing))
-	};
+	return { ...attachEnquiryShelf(listing, shelfDefaults), reviews };
 };
 
 const loadListing = async ({

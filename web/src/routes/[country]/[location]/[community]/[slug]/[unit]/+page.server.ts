@@ -3,12 +3,11 @@ import type { Actions, PageServerLoad } from './$types';
 import { handleListingEnquiry } from '$lib/listing/enquiryAction';
 import { buildUnitDetailPageData, type UnitPathParams } from '$lib/listing/detailPage';
 import { loadReviews } from '$lib/reviews';
-import { shelfOverrideFor } from '$lib/listing/enquiryShelf';
 import {
+	attachEnquiryShelf,
 	fetchEnquiryShelfDefaults,
 	fetchPublicUnit,
 	fetchSimilarListingCards,
-	resolveEnquiryShelf,
 	unitByDevPathPreviewQuery,
 	unitByDevPathQuery
 } from '$lib/sanity/queries';
@@ -31,11 +30,7 @@ export const load: PageServerLoad = async (event) => {
 		fetchEnquiryShelfDefaults(event.params.country)
 	]);
 
-	return {
-		...listing,
-		reviews,
-		shelf: resolveEnquiryShelf(shelfDefaults, shelfOverrideFor(listing))
-	};
+	return { ...attachEnquiryShelf(listing, shelfDefaults), reviews };
 };
 
 const loadListing = async ({ params, url, locals }: Parameters<PageServerLoad>[0]) => {

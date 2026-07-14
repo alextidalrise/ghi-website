@@ -2,7 +2,6 @@ import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { handleListingEnquiry } from '$lib/listing/enquiryAction';
 import { loadReviews } from '$lib/reviews';
-import { shelfOverrideFor } from '$lib/listing/enquiryShelf';
 import {
 	buildDevelopmentDetailPageData,
 	buildPropertyDetailPageData,
@@ -11,8 +10,8 @@ import {
 	type UnitPathParams
 } from '$lib/listing/detailPage';
 import {
+	attachEnquiryShelf,
 	fetchEnquiryShelfDefaults,
-	resolveEnquiryShelf,
 	developmentByPathPreviewQuery,
 	developmentByPathQuery,
 	developmentStalePathQuery,
@@ -70,11 +69,7 @@ export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 		fetchEnquiryShelfDefaults(params.country)
 	]);
 
-	return {
-		...listing,
-		reviews,
-		shelf: resolveEnquiryShelf(shelfDefaults, shelfOverrideFor(listing))
-	};
+	return { ...attachEnquiryShelf(listing, shelfDefaults), reviews };
 };
 
 async function loadPreviewListing(

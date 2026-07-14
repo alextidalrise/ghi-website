@@ -155,6 +155,7 @@ export {
 } from './partners';
 
 export {
+	attachEnquiryShelf,
 	enquiryShelfDefaultsQuery,
 	fetchEnquiryShelfDefaults,
 	resolveEnquiryShelf

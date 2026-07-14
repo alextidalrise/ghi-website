@@ -68,7 +68,8 @@ export const guide = defineType({
 			title: 'Order',
 			type: 'number',
 			group: 'content',
-			description: 'Manual ordering within the category on the Guides hub. Lower numbers appear first.',
+			description:
+				'Manual ordering within the category on the Guides hub. Lower numbers appear first. Note that this also picks the default: the lowest-numbered buying guide for a country is the one shown on every listing in that country, so reordering the hub changes the listings too. To pin a different guide to a listing regardless, set it on the listing itself under Enquiry shelf: guide.',
 			validation: (Rule) => Rule.min(0).integer()
 		}),
 		defineField({
