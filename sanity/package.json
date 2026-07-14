@@ -123,6 +123,8 @@
 		"migrate:fold-amenities:dry-run": "tsx migrations/fold-amenities-into-shared-migrate.ts --dry-run",
 		"migrate:collapse-dev-name": "tsx migrations/collapse-development-name-migrate.ts",
 		"migrate:collapse-dev-name:dry-run": "tsx migrations/collapse-development-name-migrate.ts --dry-run",
+		"migrate:guide-country": "tsx migrations/guide-country-migrate.ts",
+		"migrate:guide-country:dry-run": "tsx migrations/guide-country-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

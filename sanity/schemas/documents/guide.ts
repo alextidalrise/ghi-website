@@ -41,6 +41,21 @@ export const guide = defineType({
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
+			name: 'country',
+			title: 'Country',
+			type: 'string',
+			group: 'content',
+			options: {
+				list: [
+					{ title: 'Spain', value: 'spain' },
+					{ title: 'Portugal', value: 'portugal' }
+				],
+				layout: 'radio'
+			},
+			description:
+				'Which market this guide covers. Listings use it to surface the right buying guide in the enquiry shelf; leave blank for a guide that is not country-specific.'
+		}),
+		defineField({
 			name: 'audienceLabel',
 			title: 'Audience label',
 			type: 'string',

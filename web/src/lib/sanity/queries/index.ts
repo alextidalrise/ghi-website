@@ -155,6 +155,12 @@ export {
 } from './partners';
 
 export {
+	enquiryShelfDefaultsQuery,
+	fetchEnquiryShelfDefaults,
+	resolveEnquiryShelf
+} from './enquiryShelf';
+
+export {
 	SIMILAR_LISTING_LIMIT,
 	fetchSimilarListingCards,
 	type FetchSimilarListingCardsInput,

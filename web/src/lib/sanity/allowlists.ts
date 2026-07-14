@@ -188,14 +188,44 @@ export const GOLF_PUBLIC = /* groq */ `{
   }
 }`;
 
-/** Public CTA fields — routing and internal templates excluded. */
+/** Guide link projection for the listing enquiry shelf. */
+export const SHELF_GUIDE_PUBLIC = /* groq */ `{
+  _id,
+  title,
+  "slug": slug.current
+}`;
+
+/**
+ * Partner projection carrying just enough to render a logo and request an introduction.
+ * Shared by the enquiry shelf and the homepage logo wall (PARTNER_LOGO_PUBLIC).
+ */
+export const SHELF_PARTNER_PUBLIC = /* groq */ `{
+  _id,
+  name,
+  "slug": slug.current,
+  "category": category->name,
+  "categorySlug": category->slug.current,
+  logo${MEDIA_ASSET_PUBLIC}
+}`;
+
+/**
+ * Public CTA fields — routing and internal templates excluded.
+ *
+ * `railGuide` / `railPartners` are the enquiry shelf's optional overrides. They are
+ * dereferenced here rather than fetched separately so they arrive with the listing, and
+ * so a unit inherits its development's picks for free (DEVELOPMENT_CONTEXT_PUBLIC
+ * projects `ctas` through this same fragment). Null/empty is the normal case: the shelf
+ * then resolves its own defaults from the listing's country.
+ */
 export const CTA_PUBLIC = /* groq */ `{
   primaryCtaLabel,
   secondaryCtaLabel,
   formIntroText,
   responseTimeText,
   brochureCtaText,
-  brochureCtaEnabled
+  brochureCtaEnabled,
+  railGuide->${SHELF_GUIDE_PUBLIC},
+  railPartners[]->${SHELF_PARTNER_PUBLIC}
 }`;
 
 /** Public SEO fields — workflow keywords and internal clustering excluded. */
@@ -272,13 +302,7 @@ export const PARTNER_CATEGORY_PUBLIC = /* groq */ `{
 }`;
 
 /** Minimal partner projection for the homepage logo wall — only those with a logo. */
-export const PARTNER_LOGO_PUBLIC = /* groq */ `{
-  _id,
-  name,
-  "slug": slug.current,
-  "category": category->name,
-  logo${MEDIA_ASSET_PUBLIC}
-}`;
+export const PARTNER_LOGO_PUBLIC = SHELF_PARTNER_PUBLIC;
 
 /** Guide card projection — hub grid and related-guides cross-links. */
 export const GUIDE_CARD_PUBLIC = /* groq */ `{

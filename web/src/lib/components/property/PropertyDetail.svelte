@@ -11,11 +11,13 @@
 	import ContentSection from './ContentSection.svelte';
 	import Highlights from './Highlights.svelte';
 	import EnquiryRail from './EnquiryRail.svelte';
+	import EnquiryShelf from './EnquiryShelf.svelte';
 	import PropertyLocation from './PropertyLocation.svelte';
 	import SimilarProperties from '$lib/components/listing/SimilarProperties.svelte';
 	import BackToArea from '$lib/components/listing/BackToArea.svelte';
 	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import type { ReviewsData } from '$lib/reviews';
+	import type { EnquiryShelf as EnquiryShelfData } from '$lib/listing/enquiryShelf';
 
 	type Props = {
 		property: PublicPropertyListing;
@@ -24,6 +26,8 @@
 		form?: EnquiryFormResult | null;
 		/** Null until the Google profile has enough reviews; the section then omits itself. */
 		reviews?: ReviewsData | null;
+		/** The buying guide + specialists shown under the enquiry panel; omits itself when empty. */
+		shelf?: EnquiryShelfData | null;
 	};
 
 	let {
@@ -31,7 +35,8 @@
 		breadcrumbs,
 		similarCards = [],
 		form = null,
-		reviews = null
+		reviews = null,
+		shelf = null
 	}: Props = $props();
 
 	// Floorplans are gated: the CTA in the hero column routes the visitor down to the
@@ -65,6 +70,7 @@
 		</div>
 		<aside class="property-body__rail">
 			<EnquiryRail listing={property} {form} floorplanSignal={floorplanRequest} />
+			<EnquiryShelf {shelf} />
 		</aside>
 	</div>
 

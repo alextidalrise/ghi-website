@@ -2,6 +2,7 @@
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import ContentSection from '$lib/components/property/ContentSection.svelte';
 	import EnquiryRail from '$lib/components/property/EnquiryRail.svelte';
+	import EnquiryShelf from '$lib/components/property/EnquiryShelf.svelte';
 	import PropertyLocation from '$lib/components/property/PropertyLocation.svelte';
 	import PropertyDetail from '$lib/components/property/PropertyDetail.svelte';
 	import BackToArea from '$lib/components/listing/BackToArea.svelte';
@@ -22,6 +23,7 @@
 	import type { ReviewsData } from '$lib/reviews';
 	import type { PublicDevelopment, PublicPropertyListing } from '$lib/sanity/transforms';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
+	import type { EnquiryShelf as EnquiryShelfData } from '$lib/listing/enquiryShelf';
 
 	type Props = {
 		pageType: 'property' | 'development';
@@ -32,6 +34,8 @@
 		form?: EnquiryFormResult | null;
 		/** Null until the Google profile has enough reviews; the section then omits itself. */
 		reviews?: ReviewsData | null;
+		/** The buying guide + specialists shown under the enquiry panel; omits itself when empty. */
+		shelf?: EnquiryShelfData | null;
 	};
 
 	let {
@@ -41,7 +45,8 @@
 		breadcrumbs,
 		similarCards = [],
 		form = null,
-		reviews = null
+		reviews = null,
+		shelf = null
 	}: Props = $props();
 
 	const displayMode = $derived(development?.developmentDisplayMode ?? 'flat_listing');
@@ -83,7 +88,7 @@
 </script>
 
 {#if pageType === 'property' && property}
-	<PropertyDetail {property} {breadcrumbs} {similarCards} {form} {reviews} />
+	<PropertyDetail {property} {breadcrumbs} {similarCards} {form} {reviews} {shelf} />
 {:else if pageType === 'development' && development}
 	<article class="listing-page listing-page--development">
 		<!-- Mirrors the property page: a full-bleed gallery beside the headline facts,
@@ -127,6 +132,7 @@
 			</div>
 			<aside class="listing-body__rail">
 				<EnquiryRail listing={development} heading="Enquire about this development" {form} />
+				<EnquiryShelf {shelf} />
 			</aside>
 		</div>
 

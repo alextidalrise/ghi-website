@@ -3,7 +3,8 @@ import { env } from '$env/dynamic/private';
 import type { Actions, PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
 import { loadReviews } from '$lib/reviews';
-import { fetchHomepagePartnerLogos } from '$lib/sanity/queries/partners';
+import { fetchHomepagePartnerLogos, fetchPartnerIntroduction } from '$lib/sanity/queries/partners';
+import { PARTNER_INTRO_PARAM } from '$lib/partners/partners';
 
 const BASE_PATH = '/contact';
 
@@ -25,9 +26,15 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 	// The advisor network, rendered as the real partner logo wall (shared with the
 	// homepage). Empty in datasets without logos; the component falls back to labelled
 	// cells, so the section never renders broken images or an empty grid.
-	const [partnerLogos, reviews] = await Promise.all([
+	//
+	// `?partner=<slug>` is an introduction request, written by partnerIntroHref from the
+	// partner cards and the listing enquiry shelf. Resolving it here is what makes the CTA
+	// keep its promise: the form names the specialist instead of opening blank. An unknown
+	// or stale slug resolves to null and the page falls back to the generic form.
+	const [partnerLogos, reviews, partnerIntro] = await Promise.all([
 		fetchHomepagePartnerLogos(),
-		loadReviews(fetch)
+		loadReviews(fetch),
+		fetchPartnerIntroduction(url.searchParams.get(PARTNER_INTRO_PARAM))
 	]);
 
 	const seo = {
@@ -42,6 +49,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 		breadcrumbs,
 		seo,
 		partnerLogos,
+		partnerIntro,
 		reviews,
 		breadcrumbJsonLd: breadcrumbListJsonLd(breadcrumbs, url.origin)
 	};
@@ -59,8 +67,10 @@ export const actions: Actions = {
 		const email = String(data.get('email') ?? '').trim();
 		const phone = String(data.get('phone') ?? '').trim();
 		const message = String(data.get('message') ?? '').trim();
+		const partnerSlug = String(data.get(PARTNER_INTRO_PARAM) ?? '').trim();
 
-		// Echo the submitted values back so the form repopulates on any failure.
+		// Echo the submitted values back so the form repopulates on any failure. The partner
+		// is not echoed: it lives in the URL, which survives a failed post.
 		const values = { name, email, phone, message };
 
 		const fieldErrors: Record<string, string> = {};
@@ -88,10 +98,19 @@ export const actions: Actions = {
 
 		const endpoint = `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formGuid}`;
 
+		// An introduction request is re-resolved from the slug rather than trusted from a
+		// hidden field, so the name that reaches the team is the one Sanity holds. The HubSpot
+		// form exposes only firstname/email/phone/message, so it rides in the message body: no
+		// new HubSpot field to provision, and the enquiry arrives with its context intact.
+		const partner = await fetchPartnerIntroduction(partnerSlug);
+		const submittedMessage = partner
+			? `Introduction requested: ${partner.name}${partner.category ? ` (${partner.category})` : ''}\n\n${message}`
+			: message;
+
 		const fields = [
 			{ objectTypeId: '0-1', name: 'firstname', value: name },
 			{ objectTypeId: '0-1', name: 'email', value: email },
-			{ objectTypeId: '0-1', name: 'message', value: message }
+			{ objectTypeId: '0-1', name: 'message', value: submittedMessage }
 		];
 		if (phone) fields.push({ objectTypeId: '0-1', name: 'phone', value: phone });
 

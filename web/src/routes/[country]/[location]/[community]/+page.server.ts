@@ -7,11 +7,13 @@ import {
 } from '$lib/listing/detailPage';
 import { buildCanonicalPath } from '$lib/listing/canonicalPath';
 import { loadReviews } from '$lib/reviews';
+import { shelfOverrideFor } from '$lib/listing/enquiryShelf';
 import {
 	catchAllCommunityInLocationQuery,
 	communitiesByLocationQuery,
 	developmentByCatchAllPathPreviewQuery,
 	developmentByCatchAllPathQuery,
+	fetchEnquiryShelfDefaults,
 	fetchPublic,
 	fetchPublicDevelopment,
 	fetchPublicProperty,
@@ -19,7 +21,8 @@ import {
 	listingLegacyThreeSegmentPathQuery,
 	locationBySlugQuery,
 	propertyByCatchAllPathPreviewQuery,
-	propertyByCatchAllPathQuery
+	propertyByCatchAllPathQuery,
+	resolveEnquiryShelf
 } from '$lib/sanity/queries';
 import {
 	toPublicDevelopment,
@@ -56,11 +59,21 @@ function catchAllPathParams(
  *
  * This wraps the listing loader rather than threading `reviews` through its many return
  * points (property / development / preview / catch-all), which is how the development page
- * got missed the first time round.
+ * got missed the first time round. The enquiry shelf rides the same wrapper for the same
+ * reason: its defaults need only the country slug, so they never wait on the listing.
  */
 export const load: PageServerLoad = async (event) => {
-	const [listing, reviews] = await Promise.all([loadListing(event), loadReviews(event.fetch)]);
-	return { ...listing, reviews };
+	const [listing, reviews, shelfDefaults] = await Promise.all([
+		loadListing(event),
+		loadReviews(event.fetch),
+		fetchEnquiryShelfDefaults(event.params.country)
+	]);
+
+	return {
+		...listing,
+		reviews,
+		shelf: resolveEnquiryShelf(shelfDefaults, shelfOverrideFor(listing))
+	};
 };
 
 const loadListing = async ({

@@ -14,6 +14,7 @@ import {
 	type UnitLike
 } from './reservedFilter';
 import type { PortableTextBlock } from '@portabletext/types';
+import type { RawShelfGuide, RawShelfPartner } from '$lib/listing/enquiryShelf';
 
 type FeatureHighlight = {
 	label?: string | null;
@@ -51,6 +52,10 @@ type CtaInput = {
 	responseTimeText?: string | null;
 	brochureCtaText?: string | null;
 	brochureCtaEnabled?: boolean | null;
+	// Enquiry-shelf overrides, dereferenced by CTA_PUBLIC. Public by design: both are
+	// buyer-facing picks, unlike the partner's `referralUrl`, which is never projected.
+	railGuide?: RawShelfGuide | null;
+	railPartners?: RawShelfPartner[] | null;
 };
 
 type GolfCourseRef = {
