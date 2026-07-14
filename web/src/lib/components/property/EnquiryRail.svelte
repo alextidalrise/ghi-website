@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { EnquiryFormResult } from '$lib/listing/enquiryAction';
+	import { listingWhatsAppMessage, whatsAppHref } from '$lib/contact/contact';
 
 	/** Minimal structural shape — satisfied by both property listings and developments,
 	    so the rail can serve either without coupling to a specific document type. */
@@ -59,11 +60,9 @@
 		floorplanMode ? 'Request floorplan' : (ctas?.primaryCtaLabel ?? 'Send enquiry')
 	);
 
-	// TODO(whatsapp): point this at the GHI WhatsApp deep link once the number is
-	// confirmed, e.g. `https://wa.me/<number>?text=${encodeURIComponent(message)}`
-	// with the listing reference from `listing.ghiListingId`. While null, the
-	// WhatsApp buttons render fully styled but inert (placeholder).
-	const whatsAppHref: string | null = null;
+	// The chat opens with the listing's GHI reference already typed, so the team knows which
+	// property is being asked about before the first reply.
+	const whatsApp = $derived(whatsAppHref(listingWhatsAppMessage(listing.ghiListingId)));
 
 	// Form state. Initialised from the server action's echoed values so a no-JS submit
 	// repopulates after a failed post; with JS, use:enhance keeps these across a retry.
@@ -108,11 +107,6 @@
 			typeof window !== 'undefined' &&
 			window.matchMedia('(prefers-reduced-motion: reduce)').matches
 		);
-	}
-
-	function launchWhatsApp() {
-		// Placeholder until a destination is wired (see whatsAppHref above).
-		if (whatsAppHref) window.open(whatsAppHref, '_blank', 'noopener');
 	}
 
 	// Reveal the form, then bring it into view ready to type.
@@ -206,7 +200,14 @@
 		{/if}
 
 		<div class="rail__primary">
-			<button type="button" class="rail__whatsapp" onclick={launchWhatsApp}>
+			<!-- An anchor, not a button: it navigates. That also means it works with JS off,
+			     opens in a new tab on middle-click, and is announced as a link. -->
+			<a
+				class="rail__whatsapp"
+				href={whatsApp}
+				target="_blank"
+				rel="noopener"
+			>
 				<svg class="rail__whatsapp-glyph" viewBox="0 0 32 32" aria-hidden="true">
 					<path
 						d="M16 3C8.82 3 3 8.82 3 16c0 2.29.6 4.44 1.64 6.3L3 29l6.86-1.8A12.9 12.9 0 0 0 16 29c7.18 0 13-5.82 13-13S23.18 3 16 3zm0 23.8c-2.04 0-3.94-.58-5.55-1.58l-.4-.24-4.07 1.07 1.08-3.97-.26-.41A10.74 10.74 0 0 1 5.2 16C5.2 10.04 10.04 5.2 16 5.2S26.8 10.04 26.8 16 21.96 26.8 16 26.8z"
@@ -216,7 +217,7 @@
 					/>
 				</svg>
 				<span>Message us on WhatsApp</span>
-			</button>
+			</a>
 			<p class="rail__primary-note">{responseLine}</p>
 		</div>
 
@@ -338,7 +339,12 @@
 <!-- Persistent reach on phones: WhatsApp one tap away, email scrolls to the rail
      with the form already expanded. -->
 <div class="enquire-bar">
-	<button type="button" class="enquire-bar__action enquire-bar__action--whatsapp" onclick={launchWhatsApp}>
+	<a
+		class="enquire-bar__action enquire-bar__action--whatsapp"
+		href={whatsApp}
+		target="_blank"
+		rel="noopener"
+	>
 		<svg viewBox="0 0 32 32" aria-hidden="true">
 			<path
 				d="M16 3C8.82 3 3 8.82 3 16c0 2.29.6 4.44 1.64 6.3L3 29l6.86-1.8A12.9 12.9 0 0 0 16 29c7.18 0 13-5.82 13-13S23.18 3 16 3zm0 23.8c-2.04 0-3.94-.58-5.55-1.58l-.4-.24-4.07 1.07 1.08-3.97-.26-.41A10.74 10.74 0 0 1 5.2 16C5.2 10.04 10.04 5.2 16 5.2S26.8 10.04 26.8 16 21.96 26.8 16 26.8z"
@@ -348,7 +354,7 @@
 			/>
 		</svg>
 		<span>WhatsApp</span>
-	</button>
+	</a>
 	<button type="button" class="enquire-bar__action enquire-bar__action--email" onclick={revealEmail}>
 		Email us
 	</button>
@@ -424,6 +430,7 @@
 		font-weight: 500;
 		letter-spacing: var(--tracking-wide);
 		text-transform: uppercase;
+		text-decoration: none;
 		cursor: pointer;
 		transition:
 			background var(--duration-hover) var(--ease),
