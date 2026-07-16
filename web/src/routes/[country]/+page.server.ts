@@ -12,6 +12,7 @@ import {
 	fetchCountryFeaturedLocations,
 	fetchCountryListingFacetRows,
 	fetchCountryNavCommunities,
+	fetchFeatureFilterSettings,
 	fetchFrontlineListingCards,
 	fetchMaybePreview,
 	fetchPublic,
@@ -44,19 +45,27 @@ export const load: PageServerLoad = async ({
 
 	const canonicalPath = `/${country.slug}`;
 
-	const [locations, featuredCards, frontlineCards, featuredLocations, communities, facetRows] =
-		await Promise.all([
-			fetchPublic<LocationTaxonomyPage[]>(locationsByCountryQuery, {
-				params: { countrySlug: params.country }
-			}),
-			fetchCountryFeaturedListingCards({ countrySlug: params.country }),
-			fetchFrontlineListingCards({
-				scope: { type: 'country', countrySlug: params.country }
-			}),
-			fetchCountryFeaturedLocations({ countrySlug: params.country }),
-			fetchCountryNavCommunities(params.country),
-			fetchCountryListingFacetRows(params.country)
-		]);
+	const [
+		locations,
+		featuredCards,
+		frontlineCards,
+		featuredLocations,
+		communities,
+		facetRows,
+		featureFilter
+	] = await Promise.all([
+		fetchPublic<LocationTaxonomyPage[]>(locationsByCountryQuery, {
+			params: { countrySlug: params.country }
+		}),
+		fetchCountryFeaturedListingCards({ countrySlug: params.country }),
+		fetchFrontlineListingCards({
+			scope: { type: 'country', countrySlug: params.country }
+		}),
+		fetchCountryFeaturedLocations({ countrySlug: params.country }),
+		fetchCountryNavCommunities(params.country),
+		fetchCountryListingFacetRows(params.country),
+		fetchFeatureFilterSettings()
+	]);
 
 	/* Taxonomy the country-scoped search bar consumes. Locations arrive without a country
 	   slug (they were queried under one already), so stamp it on for the bar's shape. */
@@ -98,6 +107,7 @@ export const load: PageServerLoad = async ({
 		searchLocations,
 		searchCommunities: communities,
 		searchFacetRows: facetRows,
+		featureFilter,
 		canonicalUrl,
 		breadcrumbs,
 		seo,

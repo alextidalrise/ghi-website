@@ -83,6 +83,7 @@
 		locations={data.searchLocations}
 		communities={data.searchCommunities}
 		facetRows={data.searchFacetRows}
+		featureFilter={data.featureFilter}
 	/>
 </div>
 

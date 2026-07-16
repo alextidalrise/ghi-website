@@ -165,6 +165,52 @@ export const siteSettings = defineType({
 			description:
 				'Hand-picked locations for the homepage featured grid (up to 10). Order here is preserved on the site.',
 			validation: (Rule) => Rule.max(10).custom(noDuplicateLocations)
+		}),
+		defineField({
+			name: 'featureFilter',
+			title: 'Features filter',
+			type: 'object',
+			description:
+				'Controls the "Features" options in the property search (home + country pages, and the location results filter). Options are built automatically from live listings; these settings keep the list to genuine, useful features. Leave a field empty to use its default.',
+			options: { collapsible: true, collapsed: true },
+			fields: [
+				defineField({
+					name: 'minCount',
+					title: 'Minimum listings',
+					type: 'number',
+					description:
+						'A feature only appears once at least this many listings mention it. Raise it to hide one-off, listing-specific wording; lower it to surface rarer features. Default: 2.',
+					initialValue: 2,
+					validation: (Rule) => Rule.min(1).integer()
+				}),
+				defineField({
+					name: 'optionsLimit',
+					title: 'Maximum options',
+					type: 'number',
+					description:
+						'The most feature options ever shown (most common first). Default: 40.',
+					initialValue: 40,
+					validation: (Rule) => Rule.min(1).integer()
+				}),
+				defineField({
+					name: 'blocklist',
+					title: 'Always hide',
+					type: 'array',
+					of: [{ type: 'string' }],
+					description:
+						'Labels to always keep out of the Features filter, however often they appear — for generic or junk wording that slips in (e.g. "Amenities", "Price range", "Apartments and Penthouses"). Case-insensitive; match the label exactly as it reads on a listing.',
+					options: { layout: 'tags' }
+				}),
+				defineField({
+					name: 'allowlist',
+					title: 'Always show',
+					type: 'array',
+					of: [{ type: 'string' }],
+					description:
+						'Labels to always keep in the Features filter, even if fewer than "Minimum listings" carry them — for a rare but genuine feature you want buyers to be able to filter by. Case-insensitive; the label must still appear on at least one live listing.',
+					options: { layout: 'tags' }
+				})
+			]
 		})
 	],
 	preview: {

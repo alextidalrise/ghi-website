@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import {
 	fetchCountriesWithHero,
+	fetchFeatureFilterSettings,
 	fetchHomepageFeaturedListingCards,
 	fetchHomepageFeaturedLocations,
 	fetchHomepageFrontlineListingCards,
@@ -22,7 +23,8 @@ export const load: PageServerLoad = async ({ fetch }) => {
 		featuredLocations,
 		partnerLogos,
 		facetRows,
-		reviews
+		reviews,
+		featureFilter
 	] = await Promise.all([
 		fetchNavTaxonomy(),
 		fetchHomepageFeaturedListingCards(),
@@ -32,7 +34,8 @@ export const load: PageServerLoad = async ({ fetch }) => {
 		fetchHomepageFeaturedLocations(),
 		fetchHomepagePartnerLogos(),
 		fetchListingFacetRows(),
-		loadReviews(fetch)
+		loadReviews(fetch),
+		fetchFeatureFilterSettings()
 	]);
 
 	return {
@@ -40,6 +43,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
 		locations: nav.locations,
 		communities: nav.communities,
 		facetRows,
+		featureFilter,
 		featuredCards,
 		frontlineCards,
 		homepageHero: resolveHomepageHeroImage(homepageHero),
