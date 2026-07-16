@@ -65,6 +65,22 @@
 	let golfCourse = $state<string[]>([]);
 	let features = $state<string[]>([]);
 
+	// Mobile sheet: the multi-select groups collapse like the single-select rows above them,
+	// hidden until opened, mirroring the homepage DiscoveryBar's Features disclosure.
+	let golfCourseOpen = $state(false);
+	let golfRelevanceOpen = $state(false);
+	let featuresOpen = $state(false);
+
+	// Collapsed-disclosure summary for a multi-select group, echoing the select rows'
+	// displayed value: the single choice's label, a count when several, else "Any".
+	function summarise(selected: string[], options: { label: string; value: string }[]): string {
+		if (selected.length === 0) return 'Any';
+		if (selected.length === 1) {
+			return options.find((option) => option.value === selected[0])?.label ?? '1 selected';
+		}
+		return `${selected.length} selected`;
+	}
+
 	function syncFromParams() {
 		propertyType = searchParams.propertyType ?? '';
 		minBeds = searchParams.minBeds != null ? String(searchParams.minBeds) : '';
@@ -145,6 +161,10 @@
 	}
 
 	function openSheet() {
+		// Start every group collapsed so the sheet opens as a calm, scannable list.
+		golfCourseOpen = false;
+		golfRelevanceOpen = false;
+		featuresOpen = false;
 		sheet?.showModal();
 	}
 
@@ -353,40 +373,105 @@
 			</label>
 		{/if}
 
+		<!-- Multi-select groups collapse like the select rows above: hidden by default,
+		     revealed on tap, options laid out two-up. Mirrors the homepage DiscoveryBar. -->
 		{#if courseOptions.length > 0}
-			<fieldset class="lf-checks">
-				<legend class="lf-row__label">Golf course</legend>
-				{#each courseOptions as option (option.value)}
-					<label class="lf-check">
-						<input type="checkbox" bind:group={golfCourse} value={option.value} />
-						<span>{option.label}</span>
-					</label>
-				{/each}
-			</fieldset>
+			<div class="lf-disclosure-row">
+				<button
+					type="button"
+					class="lf-disclosure"
+					aria-expanded={golfCourseOpen}
+					aria-controls="lf-golf-course-panel"
+					onclick={() => (golfCourseOpen = !golfCourseOpen)}
+				>
+					<span class="lf-row__label">Golf course</span>
+					<span class="lf-disclosure__value" class:is-empty={golfCourse.length === 0}>
+						{summarise(golfCourse, courseOptions)}
+					</span>
+					<span class="lf-disclosure__chev" class:is-open={golfCourseOpen} aria-hidden="true">
+						<svg viewBox="0 0 14 9" fill="none">
+							<path d="M1 1.5 7 7l6-5.5" stroke="currentColor" stroke-width="1.5" />
+						</svg>
+					</span>
+				</button>
+				{#if golfCourseOpen}
+					<fieldset id="lf-golf-course-panel" class="lf-checks">
+						<legend class="sr-only">Golf course</legend>
+						{#each courseOptions as option (option.value)}
+							<label class="lf-check">
+								<input type="checkbox" bind:group={golfCourse} value={option.value} />
+								<span>{option.label}</span>
+							</label>
+						{/each}
+					</fieldset>
+				{/if}
+			</div>
 		{/if}
 
 		{#if showGolfRelevance}
-			<fieldset class="lf-checks">
-				<legend class="lf-row__label">Golf</legend>
-				{#each GOLF_RELEVANCE as option (option.value)}
-					<label class="lf-check">
-						<input type="checkbox" bind:group={golfRelevance} value={option.value} />
-						<span>{option.label}</span>
-					</label>
-				{/each}
-			</fieldset>
+			<div class="lf-disclosure-row">
+				<button
+					type="button"
+					class="lf-disclosure"
+					aria-expanded={golfRelevanceOpen}
+					aria-controls="lf-golf-panel"
+					onclick={() => (golfRelevanceOpen = !golfRelevanceOpen)}
+				>
+					<span class="lf-row__label">Golf</span>
+					<span class="lf-disclosure__value" class:is-empty={golfRelevance.length === 0}>
+						{summarise(golfRelevance, [...GOLF_RELEVANCE])}
+					</span>
+					<span class="lf-disclosure__chev" class:is-open={golfRelevanceOpen} aria-hidden="true">
+						<svg viewBox="0 0 14 9" fill="none">
+							<path d="M1 1.5 7 7l6-5.5" stroke="currentColor" stroke-width="1.5" />
+						</svg>
+					</span>
+				</button>
+				{#if golfRelevanceOpen}
+					<fieldset id="lf-golf-panel" class="lf-checks">
+						<legend class="sr-only">Golf</legend>
+						{#each GOLF_RELEVANCE as option (option.value)}
+							<label class="lf-check">
+								<input type="checkbox" bind:group={golfRelevance} value={option.value} />
+								<span>{option.label}</span>
+							</label>
+						{/each}
+					</fieldset>
+				{/if}
+			</div>
 		{/if}
 
 		{#if featureOptions.length > 0}
-			<fieldset class="lf-checks">
-				<legend class="lf-row__label">Features</legend>
-				{#each featureOptions as option (option.value)}
-					<label class="lf-check">
-						<input type="checkbox" bind:group={features} value={option.value} />
-						<span>{option.label}</span>
-					</label>
-				{/each}
-			</fieldset>
+			<div class="lf-disclosure-row">
+				<button
+					type="button"
+					class="lf-disclosure"
+					aria-expanded={featuresOpen}
+					aria-controls="lf-features-panel"
+					onclick={() => (featuresOpen = !featuresOpen)}
+				>
+					<span class="lf-row__label">Features</span>
+					<span class="lf-disclosure__value" class:is-empty={features.length === 0}>
+						{summarise(features, featureOptions)}
+					</span>
+					<span class="lf-disclosure__chev" class:is-open={featuresOpen} aria-hidden="true">
+						<svg viewBox="0 0 14 9" fill="none">
+							<path d="M1 1.5 7 7l6-5.5" stroke="currentColor" stroke-width="1.5" />
+						</svg>
+					</span>
+				</button>
+				{#if featuresOpen}
+					<fieldset id="lf-features-panel" class="lf-checks">
+						<legend class="sr-only">Features</legend>
+						{#each featureOptions as option (option.value)}
+							<label class="lf-check">
+								<input type="checkbox" bind:group={features} value={option.value} />
+								<span>{option.label}</span>
+							</label>
+						{/each}
+					</fieldset>
+				{/if}
+			</div>
 		{/if}
 
 		<label class="lf-row lf-row--sort">
@@ -614,8 +699,20 @@
 	}
 
 	.lf-sheet__body > .lf-row:first-child,
-	.lf-sheet__body > .lf-checks:first-child {
+	.lf-sheet__body > .lf-disclosure-row:first-child {
 		border-top: 0;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	.lf-row__label {
@@ -691,25 +788,86 @@
 		border-color: var(--green);
 	}
 
-	.lf-checks {
-		margin: 0;
-		padding: 1rem 0;
-		border: 0;
+	/* Each multi-select group is a disclosure: a header row (label + value + chevron, matching
+	   the select rows) over a checkbox grid that renders only when opened. The wrapper carries
+	   the row divider so a closed group is indistinguishable from the select rows above it. */
+	.lf-disclosure-row {
 		border-top: 1px solid var(--border);
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
 	}
 
-	.lf-checks legend {
-		padding: 0;
-		margin-bottom: 0.25rem;
+	.lf-disclosure {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		width: 100%;
+		padding: 1rem 0;
+		border: 0;
+		background: transparent;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	.lf-disclosure:focus-visible {
+		outline: 2px solid var(--green);
+		outline-offset: 3px;
+	}
+
+	/* Current value, right-aligned before the chevron — the multi-select echo of the native
+	   selects' displayed value. Italic-muted when nothing is chosen, like .lf-select.is-empty. */
+	.lf-disclosure__value {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		text-align: right;
+		font-family: var(--serif);
+		font-size: 1.1875rem;
+		color: var(--charcoal);
+	}
+
+	.lf-disclosure__value.is-empty {
+		font-style: italic;
+		color: var(--muted);
+	}
+
+	.lf-disclosure__chev {
+		flex: none;
+		display: flex;
+		align-items: center;
+		color: var(--muted);
+		transition: transform var(--duration-hover) var(--ease);
+	}
+
+	.lf-disclosure__chev svg {
+		width: 0.75rem;
+		height: auto;
+	}
+
+	.lf-disclosure__chev.is-open {
+		transform: rotate(180deg);
+	}
+
+	/* Options two-up, reflowing with the sheet width, matching the DiscoveryBar. Resets the
+	   fieldset's UA chrome; the header above already carries the row padding. */
+	.lf-checks {
+		margin: 0;
+		padding: 0 0 1rem;
+		border: 0;
+		min-inline-size: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+		gap: 0 1.25rem;
 	}
 
 	.lf-check {
 		display: flex;
 		align-items: center;
 		gap: 0.625rem;
+		/* 44px min row keeps each option a comfortable touch target and puts the columns'
+		   rows on a shared baseline. */
+		min-height: 2.75rem;
 		font-family: var(--sans);
 		font-size: var(--text-body);
 		color: var(--charcoal);
@@ -828,6 +986,18 @@
 
 		.lf-sheet[open]::backdrop {
 			animation: lf-backdrop-fade 0.34s var(--ease);
+		}
+
+		/* Each group's grid unfolds rather than snapping in when its disclosure opens. */
+		.lf-checks {
+			animation: lf-unfold 0.24s var(--ease);
+		}
+
+		@keyframes lf-unfold {
+			from {
+				opacity: 0;
+				transform: translateY(-4px);
+			}
 		}
 
 		@keyframes lf-sheet-rise {
