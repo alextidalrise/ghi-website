@@ -197,10 +197,17 @@
 			grid-template-columns: none;
 			grid-auto-columns: clamp(14rem, 72vw, 18.5rem);
 			gap: var(--space-md);
-			margin-inline: calc(-1 * var(--content-padding));
+			/* True full-bleed to the viewport edges (mirrors Featured properties): break out
+			   of the content column with a 100vw width so the rail reaches both screen edges
+			   and the next tile is only clipped at the edge itself. A plain
+			   `margin-inline: -content-padding` with `max-width: 100%` fell 2×content-padding
+			   short on the right, because the cap resolves to the narrower column width. The
+			   page-level `overflow-x: clip` on .site-main absorbs the breakout. */
+			width: 100vw;
+			margin-inline: calc(50% - 50vw);
 			padding-inline: var(--content-padding);
 			min-width: 0;
-			max-width: 100%;
+			max-width: 100vw;
 			overflow-x: auto;
 			overflow-y: hidden;
 			scroll-snap-type: x mandatory;
