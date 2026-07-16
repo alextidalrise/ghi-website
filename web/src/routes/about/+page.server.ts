@@ -12,22 +12,27 @@ const DESTINATION_WIDTHS = [600, 900, 1200];
 
 // Destinations strip — the places named in the copy. Editorial labels (name/region/alt)
 // live here; the imagery now comes from each location's Sanity heroImage (auto AVIF/WebP
-// + responsive srcset) instead of raw static JPEGs, keyed by location slug.
+// + responsive srcset) instead of raw static JPEGs, keyed by `heroSlug`.
+//
+// `heroSlug` decouples the image source from the label: "The Algarve" is a region, not a
+// location doc, so it borrows an actual Algarve location's hero (Quinta do Lago — pine-lined,
+// on the Atlantic, matching the alt text) instead of resolving to nothing. The others key
+// off their own slug.
 const DESTINATIONS = [
 	{
-		slug: 'marbella',
+		heroSlug: 'marbella',
 		name: 'Marbella',
 		region: 'Costa del Sol, Spain',
 		alt: 'Golf fairways running down to the Mediterranean above Marbella on the Costa del Sol'
 	},
 	{
-		slug: 'sotogrande',
+		heroSlug: 'sotogrande',
 		name: 'Sotogrande',
 		region: 'Cádiz, Spain',
 		alt: 'Manicured championship course and low villas in the resort of Sotogrande'
 	},
 	{
-		slug: 'algarve',
+		heroSlug: 'quinta-do-lago',
 		name: 'The Algarve',
 		region: 'Southern Portugal',
 		alt: 'Pine-lined Algarve golf course above the Atlantic coastline in southern Portugal'
@@ -43,13 +48,13 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 	];
 
 	const [heroes, reviews] = await Promise.all([
-		fetchLocationHeroesBySlug(DESTINATIONS.map((d) => d.slug)),
+		fetchLocationHeroesBySlug(DESTINATIONS.map((d) => d.heroSlug)),
 		loadReviews(fetch)
 	]);
 	const heroBySlug = new Map(heroes.map((h) => [h.slug, h.heroImage]));
 
 	const destinations = DESTINATIONS.map((d) => {
-		const asset = heroBySlug.get(d.slug);
+		const asset = heroBySlug.get(d.heroSlug);
 		return {
 			name: d.name,
 			region: d.region,
