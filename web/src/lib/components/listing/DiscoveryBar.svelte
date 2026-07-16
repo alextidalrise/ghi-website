@@ -102,6 +102,9 @@
 	let features = $state<string[]>([]);
 
 	let sheet = $state<HTMLDialogElement>();
+	/* The sheet's Features row is a disclosure, collapsed by default like the native-select
+	   rows above it — its options stay hidden until the visitor opens it. */
+	let featuresOpen = $state(false);
 
 	$effect(() => {
 		if (!countrySlug && initialCountrySlug) {
@@ -239,6 +242,20 @@
 		)
 	);
 
+	/* Features go live once a location is chosen and its cross-filtered menu is non-empty —
+	   the same gate the desktop bar and the sheet's disclosure share. */
+	const featuresDisabled = $derived(!hasLocation || featureOpts.length === 0);
+
+	/* Right-hand summary on the collapsed Features row, mirroring how the select rows show
+	   their current value: the single feature's label, a count when several, else "Any". */
+	const featuresSummary = $derived(
+		features.length === 0
+			? 'Any'
+			: features.length === 1
+				? (featureOpts.find((option) => option.value === features[0])?.label ?? '1 selected')
+				: `${features.length} selected`
+	);
+
 	/* Option lists for the shared Select (desktop). */
 	const countryOpts = $derived(countries.map((c) => ({ label: c.name, value: c.slug })));
 	const locationOpts = $derived(filteredLocations.map((l) => ({ label: l.name, value: l.slug })));
@@ -267,6 +284,7 @@
 		propertyType = '';
 		budget = '';
 		features = [];
+		featuresOpen = false;
 	}
 
 	function handleLocationChange() {
@@ -274,6 +292,7 @@
 		propertyType = '';
 		budget = '';
 		features = [];
+		featuresOpen = false;
 	}
 
 	/* Cross-filtered menus only ever surface options that keep a non-empty result, so the
@@ -446,7 +465,7 @@
 					label="Features"
 					name="features"
 					options={featureOpts}
-					disabled={!hasLocation || featureOpts.length === 0}
+					disabled={featuresDisabled}
 					bind:value={features}
 				/>
 			{/if}
@@ -542,25 +561,40 @@
 			</p>
 
 			{#if globalFeatureOptions.length > 0}
-				<fieldset
-					class="srow srow--features"
-					class:is-disabled={!hasLocation || featureOpts.length === 0}
-				>
-					<legend class="srow__label">Features</legend>
-					<span class="srow__checks">
-						{#each featureOpts as option (option.value)}
-							<label class="srow__check">
-								<input
-									type="checkbox"
-									bind:group={features}
-									value={option.value}
-									disabled={!hasLocation || featureOpts.length === 0}
-								/>
-								<span>{option.label}</span>
-							</label>
-						{/each}
-					</span>
-				</fieldset>
+				<!-- Features collapses like the select rows above: hidden by default, revealed on
+				     tap. The disclosure header mirrors a select row (label + current value + chevron);
+				     the checkbox grid unfolds beneath only when opened. -->
+				<div class="srow srow--features" class:is-disabled={featuresDisabled}>
+					<button
+						type="button"
+						class="srow__disclosure"
+						aria-expanded={featuresOpen}
+						aria-controls="sh-features-panel"
+						disabled={featuresDisabled}
+						onclick={() => (featuresOpen = !featuresOpen)}
+					>
+						<span class="srow__label">Features</span>
+						<span class="srow__value" class:is-empty={features.length === 0}>
+							{featuresSummary}
+						</span>
+						<span class="srow__chevron" class:is-open={featuresOpen} aria-hidden="true">
+							<svg viewBox="0 0 14 9" fill="none">
+								<path d="M1 1.5 7 7l6-5.5" stroke="currentColor" stroke-width="1.5" />
+							</svg>
+						</span>
+					</button>
+					{#if featuresOpen && !featuresDisabled}
+						<fieldset id="sh-features-panel" class="srow__checks">
+							<legend class="sr-only">Features</legend>
+							{#each featureOpts as option (option.value)}
+								<label class="srow__check">
+									<input type="checkbox" bind:group={features} value={option.value} />
+									<span>{option.label}</span>
+								</label>
+							{/each}
+						</fieldset>
+					{/if}
+				</div>
 			{/if}
 
 			{#if !hasLocation}
@@ -883,29 +917,90 @@
 		outline-offset: 3px;
 	}
 
-	/* Features is multi-select, so it stacks its checkboxes under the label rather than
-	   sitting on one line like the single-select rows. Reset the fieldset's UA chrome. */
+	/* Features is a collapsible disclosure, not an always-open list: it stacks a header row
+	   (label + value + chevron, matching the select rows) above a checkbox grid that only
+	   renders when opened. Column layout so the grid can unfold beneath the header. */
 	.srow--features {
 		flex-direction: column;
 		align-items: stretch;
-		gap: 0.75rem;
-		border: 0;
-		border-top: 1px solid var(--border);
+		gap: 0;
 		min-inline-size: 0;
-		padding-block: 1.125rem;
+		/* The disclosure button carries the row padding so the whole header is a tap target. */
+		padding-block: 0;
 	}
 
-	.srow--features .srow__label {
-		padding: 0;
+	/* Header row: reuses .srow's label/value/chevron rhythm so a closed Features row is
+	   indistinguishable from the Location/Budget select rows above it. */
+	.srow__disclosure {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		width: 100%;
+		padding: 1rem 0;
+		border: 0;
+		background: transparent;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	.srow--features.is-disabled .srow__disclosure {
+		cursor: not-allowed;
+	}
+
+	.srow__disclosure:focus-visible {
+		outline: 2px solid var(--green);
+		outline-offset: 3px;
+	}
+
+	/* Current value, right-aligned before the chevron — the multi-select echo of the native
+	   selects' displayed value. Italic-muted when nothing is chosen, like .srow.is-empty. */
+	.srow__value {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		text-align: right;
+		font-family: var(--serif);
+		font-size: 1.1875rem;
+		color: var(--charcoal);
+	}
+
+	.srow__value.is-empty {
+		font-style: italic;
+		color: var(--muted);
+	}
+
+	.srow__chevron {
+		flex: none;
+		display: flex;
+		align-items: center;
+		color: var(--muted);
+		transition: transform var(--duration-hover) var(--ease);
+	}
+
+	.srow__chevron svg {
+		width: 0.75rem;
+		height: auto;
+	}
+
+	.srow__chevron.is-open {
+		transform: rotate(180deg);
 	}
 
 	/* A tidy checklist rather than a ragged wrap: even columns that reflow with the sheet
 	   width (2 up on a phone, 3+ on a wide sheet), rows on a shared baseline. Curated
-	   labels (junk + per-listing measurements filtered upstream) keep it calm. */
+	   labels (junk + per-listing measurements filtered upstream) keep it calm. Also resets
+	   the fieldset's UA chrome (margin/padding/border). */
 	.srow__checks {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
 		gap: 0 1.25rem;
+		margin: 0;
+		padding: 0 0 0.5rem;
+		border: 0;
+		min-inline-size: 0;
 	}
 
 	.srow__check {
@@ -1005,6 +1100,18 @@
 
 		.sheet[open] {
 			animation: sheet-rise 0.34s var(--ease);
+		}
+
+		/* The Features grid unfolds rather than snapping in when the disclosure opens. */
+		.srow--features .srow__checks {
+			animation: features-unfold 0.24s var(--ease);
+		}
+
+		@keyframes features-unfold {
+			from {
+				opacity: 0;
+				transform: translateY(-4px);
+			}
 		}
 
 		.sheet[open]::backdrop {
