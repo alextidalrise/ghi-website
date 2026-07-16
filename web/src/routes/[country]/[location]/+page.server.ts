@@ -8,6 +8,7 @@ import { buildFilteredLocationSeo, buildLocationSeo } from '$lib/listing/seo';
 import {
 	communitiesByLocationQuery,
 	countryBySlugQuery,
+	fetchFeatureFilterSettings,
 	fetchFrontlineListingCards,
 	fetchListingCards,
 	fetchLocationFeatureOptions,
@@ -108,14 +109,22 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		communityId: activeCommunity?._id ?? null
 	};
 
-	const [listingResults, frontlineCards, featureOptions] = await Promise.all([
+	const [listingResults, frontlineCards, featureFilter] = await Promise.all([
 		fetchListingCards({
 			scope: listingScope,
 			params: searchParams
 		}),
 		fetchFrontlineListingCards({ scope: listingScope }),
-		fetchLocationFeatureOptions(params.country, locationIds)
+		fetchFeatureFilterSettings()
 	]);
+
+	// Runs after the settings resolve so the location filter applies the same block/allow
+	// lists and thresholds as the DiscoveryBar.
+	const featureOptions = await fetchLocationFeatureOptions(
+		params.country,
+		locationIds,
+		featureFilter
+	);
 
 	const frontlineViewAllHref = FRONTLINE_COLLECTION_PATH;
 

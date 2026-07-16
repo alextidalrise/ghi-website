@@ -97,7 +97,8 @@ export {
 	countriesWithHeroQuery,
 	fetchSiteSettingsHero,
 	fetchHomepageFeaturedLocations,
-	fetchCountriesWithHero
+	fetchCountriesWithHero,
+	fetchFeatureFilterSettings
 } from './settings';
 
 export {

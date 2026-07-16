@@ -59,6 +59,19 @@
 	opacity: 0.42;
 }
 
+/* Tray cells share their row five-ways (home bar: Location / Community / Property type /
+   Budget / Features), so their serif value runs a touch smaller and with tighter side
+   padding than a standalone cell — enough that "Any community" / "Any location" read in
+   full rather than clipping to "Any co…". The chip keeps the larger value (short names). */
+.fc-field--tray {
+	padding-inline: 0.9375rem;
+}
+
+.fc-field--tray .fc-native,
+.fc-field--tray .fc-trigger--cell .fc-value {
+	font-size: 1.0625rem;
+}
+
 .fc-label {
 	font-family: var(--sans);
 	font-weight: 500;

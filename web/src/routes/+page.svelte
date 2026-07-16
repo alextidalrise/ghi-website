@@ -53,6 +53,7 @@
 		locations={data.locations}
 		communities={data.communities}
 		facetRows={data.facetRows}
+		featureFilter={data.featureFilter}
 	/>
 </div>
 

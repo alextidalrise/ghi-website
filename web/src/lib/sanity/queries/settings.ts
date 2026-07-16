@@ -5,6 +5,10 @@ import {
 	MEDIA_ASSET_PUBLIC
 } from '../allowlists';
 import { fetchPublic } from './fetch';
+import {
+	DEFAULT_FEATURE_FILTER,
+	type FeatureFilterSettings
+} from '$lib/listing/featureHighlights';
 import type { MediaAssetInput } from '../transforms/mediaFilter';
 import {
 	toCountryCards,
@@ -51,6 +55,46 @@ export const countriesWithHeroQuery = defineQuery(`
 export async function fetchSiteSettingsHero(): Promise<HomepageHero | null> {
 	const result = await fetchPublic<{ homepageHero?: HomepageHero | null }>(siteSettingsHeroQuery);
 	return result?.homepageHero ?? null;
+}
+
+export const featureFilterSettingsQuery = defineQuery(`
+  *[_type == "siteSettings" && _id == "siteSettings"][0].featureFilter{
+    minCount,
+    optionsLimit,
+    blocklist,
+    allowlist
+  }
+`);
+
+type FeatureFilterSettingsRaw = {
+	minCount?: number | null;
+	optionsLimit?: number | null;
+	blocklist?: Array<string | null> | null;
+	allowlist?: Array<string | null> | null;
+} | null;
+
+const cleanLabelList = (list: Array<string | null> | null | undefined): string[] =>
+	(list ?? []).filter((entry): entry is string => typeof entry === 'string' && entry.trim() !== '');
+
+/**
+ * Editor-managed controls for the Features search facet (Sanity site settings). Any field
+ * left unset falls back to its built-in default, so the filter always has sane behaviour
+ * before an editor ever touches these settings.
+ */
+export async function fetchFeatureFilterSettings(): Promise<FeatureFilterSettings> {
+	const raw = await fetchPublic<FeatureFilterSettingsRaw>(featureFilterSettingsQuery);
+	return {
+		minCount:
+			typeof raw?.minCount === 'number' && raw.minCount >= 1
+				? Math.floor(raw.minCount)
+				: DEFAULT_FEATURE_FILTER.minCount,
+		optionsLimit:
+			typeof raw?.optionsLimit === 'number' && raw.optionsLimit >= 1
+				? Math.floor(raw.optionsLimit)
+				: DEFAULT_FEATURE_FILTER.optionsLimit,
+		blocklist: cleanLabelList(raw?.blocklist),
+		allowlist: cleanLabelList(raw?.allowlist)
+	};
 }
 
 export async function fetchHomepageFeaturedLocations(): Promise<FeaturedLocationCard[]> {

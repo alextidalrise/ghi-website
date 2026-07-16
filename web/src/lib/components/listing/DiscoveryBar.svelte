@@ -9,8 +9,10 @@
 	import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
 	import {
 		cleanFeatureLabel,
+		DEFAULT_FEATURE_FILTER,
 		featureLabelKey,
-		toFeatureOptions
+		toFeatureOptions,
+		type FeatureFilterSettings
 	} from '$lib/listing/featureHighlights';
 	import type { ListingFacetRow } from '$lib/sanity/queries';
 
@@ -50,9 +52,18 @@
 		 * as the collapsed trigger's flag.
 		 */
 		scopedCountrySlug?: string;
+		/** Editor-managed Features-filter controls (Sanity site settings). */
+		featureFilter?: FeatureFilterSettings;
 	};
 
-	let { countries, locations, communities, facetRows = [], scopedCountrySlug }: Props = $props();
+	let {
+		countries,
+		locations,
+		communities,
+		facetRows = [],
+		scopedCountrySlug,
+		featureFilter = DEFAULT_FEATURE_FILTER
+	}: Props = $props();
 
 	const isScoped = $derived(Boolean(scopedCountrySlug));
 
@@ -211,12 +222,21 @@
 		);
 
 	/* Global Features presence decides whether the field renders at all; the cross-filtered
-	   list feeds its menu once a location is chosen. */
+	   list feeds its menu once a location is chosen. Both apply the editor-managed
+	   Features-filter controls (min listings, cap, block/allow lists) so the menu stays a
+	   curated set of genuine, shared traits rather than the enrichment pipeline's one-off
+	   free-text ("Architecture by …", "92 Fully Furnished Apartments"). */
 	const globalFeatureOptions = $derived(
-		toFeatureOptions(facetRows.flatMap((row) => row.featureLabels))
+		toFeatureOptions(
+			facetRows.flatMap((row) => row.featureLabels),
+			featureFilter
+		)
 	);
 	const featureOpts = $derived(
-		toFeatureOptions(featureScopedRows.flatMap((row) => row.featureLabels))
+		toFeatureOptions(
+			featureScopedRows.flatMap((row) => row.featureLabels),
+			featureFilter
+		)
 	);
 
 	/* Option lists for the shared Select (desktop). */
@@ -386,7 +406,7 @@
 			<Select
 				variant="tray"
 				label="Location"
-				placeholder="Any location"
+				placeholder="Anywhere"
 				options={locationOpts}
 				bind:value={locationSlug}
 				onchange={handleLocationChange}
@@ -394,7 +414,7 @@
 			<Select
 				variant="tray"
 				label="Community"
-				placeholder="Any community"
+				placeholder="Any"
 				options={communityOpts}
 				disabled={communityDisabled}
 				title={communityDisabled ? 'Choose a location first' : undefined}
@@ -872,33 +892,46 @@
 		border: 0;
 		border-top: 1px solid var(--border);
 		min-inline-size: 0;
+		padding-block: 1.125rem;
 	}
 
 	.srow--features .srow__label {
 		padding: 0;
 	}
 
+	/* A tidy checklist rather than a ragged wrap: even columns that reflow with the sheet
+	   width (2 up on a phone, 3+ on a wide sheet), rows on a shared baseline. Curated
+	   labels (junk + per-listing measurements filtered upstream) keep it calm. */
 	.srow__checks {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem 1.25rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+		gap: 0 1.25rem;
 	}
 
 	.srow__check {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.625rem;
+		/* 44px min row keeps each option a comfortable touch target even when its label
+		   is a single short word. */
+		min-height: 2.75rem;
 		font-family: var(--sans);
-		font-size: var(--text-body);
+		font-size: 0.9375rem;
+		line-height: 1.3;
 		color: var(--charcoal);
 		cursor: pointer;
 	}
 
 	.srow__check input {
 		flex: none;
-		width: 1.1rem;
-		height: 1.1rem;
+		width: 1.125rem;
+		height: 1.125rem;
 		accent-color: var(--green);
+		cursor: pointer;
+	}
+
+	.srow--features.is-disabled .srow__check {
+		cursor: not-allowed;
 	}
 
 	.sheet__hint {
