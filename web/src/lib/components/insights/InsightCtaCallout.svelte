@@ -69,7 +69,10 @@
 		max-width: 52ch;
 	}
 
-	.inline-cta__button {
+	/* Scope with the container class so these win over the article body's
+	   `.insight-body :global(a)` prose-link rule (0,2,1), which would otherwise
+	   paint the label green-on-green and add an underline. */
+	.inline-cta .inline-cta__button {
 		flex-shrink: 0;
 		display: inline-flex;
 		align-items: center;
@@ -89,14 +92,14 @@
 			border-color var(--duration-hover) var(--ease);
 	}
 
-	.inline-cta__button:hover,
-	.inline-cta__button:focus-visible {
+	.inline-cta .inline-cta__button:hover,
+	.inline-cta .inline-cta__button:focus-visible {
 		background: var(--charcoal);
 		border-color: var(--charcoal);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.inline-cta__button {
+		.inline-cta .inline-cta__button {
 			transition: none;
 		}
 	}
