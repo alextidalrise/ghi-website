@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity';
+import { COUNTRY_OPTIONS } from '../constants/enums';
 
 /**
  * A single vetted partner shown on /partners (and, where a logo is supplied, on the
@@ -33,6 +34,16 @@ export const partner = defineType({
 			to: [{ type: 'partnerCategory' }],
 			description: 'Which section of the Partners page this partner appears under.',
 			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'countries',
+			title: 'Countries',
+			type: 'array',
+			of: [{ type: 'string' }],
+			options: { list: [...COUNTRY_OPTIONS], layout: 'grid' },
+			description:
+				'Which markets this partner covers. A listing shows this partner in its enquiry shelf only when the listing sits in one of these countries — so a partner with no country here appears on no listing. This is the structured filter; "Coverage" below is the human-readable label.',
+			validation: (Rule) => Rule.required().min(1).unique()
 		}),
 		defineField({
 			name: 'coverage',

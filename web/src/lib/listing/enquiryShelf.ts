@@ -3,9 +3,9 @@
  * on a listing page — the buying guide for the listing's country, and the specialists
  * behind the purchase.
  *
- * Both default from the listing itself (country → guide; three fixed categories →
- * partners) and are optionally overridden per listing in Sanity via `ctas.railGuide` /
- * `ctas.railPartners`. This module holds only the buyer-facing shapes and the resolution
+ * Both default from the listing itself (country → guide; country + three fixed categories →
+ * partners, one specialist per category that covers the listing's country) and are
+ * optionally overridden per listing in Sanity via `ctas.railGuide` / `ctas.railPartners`. This module holds only the buyer-facing shapes and the resolution
  * rule; the fetching lives in $lib/sanity/queries/enquiryShelf.
  *
  * The specialists carry one CTA between them, and it goes to /partners — the vetted network,
