@@ -60,6 +60,8 @@ type CategorySeed = {
 	partners: Array<{
 		slug: string;
 		name: string;
+		/** Taxonomy country slugs this partner covers — drives the listing enquiry shelf. */
+		countries: string[];
 		coverage: string;
 		description: string;
 		referralUrl?: string;
@@ -77,6 +79,7 @@ const CATEGORIES: CategorySeed[] = [
 			{
 				slug: 'franke-de-la-fuente',
 				name: 'Franke de la Fuente',
+				countries: ['spain'],
 				coverage: 'Spain · Costa del Sol',
 				description:
 					'A law firm guiding international clients through property purchases, relocation and Spanish taxation. Technical depth paired with clear, accessible advice, delivered by a multilingual team with offices in Marbella, Estepona and Fuengirola.'
@@ -92,6 +95,7 @@ const CATEGORIES: CategorySeed[] = [
 			{
 				slug: 'atlas-bridge-wealth',
 				name: 'Atlas Bridge Wealth',
+				countries: ['spain', 'portugal'],
 				coverage: 'Spain & Portugal',
 				description:
 					'A boutique, fee-based financial planning firm based in Portugal, advising internationally minded families on pensions, investments, retirement and long-term wealth structuring across multiple jurisdictions.',
@@ -108,6 +112,7 @@ const CATEGORIES: CategorySeed[] = [
 			{
 				slug: 'foxes-finance-legal',
 				name: 'Foxes Finance & Legal',
+				countries: ['spain', 'portugal'],
 				coverage: 'Spain · Portugal on referral',
 				description:
 					'A Spanish mortgage brokerage helping international buyers secure finance for property in Spain, from affordability and lender eligibility through to mortgage offers and the key stages of completion.',
@@ -124,6 +129,7 @@ const CATEGORIES: CategorySeed[] = [
 			{
 				slug: 'fiberpay',
 				name: 'Fiberpay',
+				countries: ['spain', 'portugal'],
 				coverage: 'Spain & Portugal',
 				description:
 					'Specialist currency transfers for property buyers moving money internationally. Competitive rates and guided, high-value transactions, with a more personal alternative to the high-street banks.',
@@ -141,6 +147,7 @@ const CATEGORIES: CategorySeed[] = [
 			{
 				slug: 'nueva-vida-group',
 				name: 'Nueva Vida Group',
+				countries: ['spain', 'portugal'],
 				coverage: 'Spain & Portugal',
 				description:
 					'A full project management service acting as your representative from first concept to final handover. The team coordinates designers, contractors and specialists across design, construction, procurement and delivery.'
@@ -156,6 +163,7 @@ const CATEGORIES: CategorySeed[] = [
 			{
 				slug: 'olive-grove-partners',
 				name: 'Olive Grove Partners',
+				countries: ['spain'],
 				coverage: 'Marbella & Nueva Andalucía',
 				description:
 					'A vertically integrated rental investment platform across Marbella and Nueva Andalucía. Owning and managing the whole chain, from acquisition and marketing to operations and exit, for short and long-term lets.'
@@ -171,6 +179,7 @@ const CATEGORIES: CategorySeed[] = [
 			{
 				slug: 'albany-global-property',
 				name: 'Albany Global Property',
+				countries: ['spain', 'portugal'],
 				coverage: 'Spain & Portugal',
 				description:
 					'A curated collection of holiday homes in sought-after destinations. Standout architecture and rare settings, with a signature service that manages every stay from arrival to departure.'
@@ -198,6 +207,7 @@ function buildDocuments(): IdentifiedSanityDocumentStub[] {
 				name: partner.name,
 				slug: { _type: 'slug', current: partner.slug },
 				category: { _type: 'reference', _ref: categoryId(category.slug) },
+				countries: partner.countries,
 				coverage: partner.coverage,
 				description: partner.description,
 				order: partnerIndex,

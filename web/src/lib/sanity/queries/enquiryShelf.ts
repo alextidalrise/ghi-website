@@ -24,8 +24,9 @@ import {
  *
  * The guide is the lowest-`order` buying guide for the country, which makes the UK-buyer
  * guide the default in both markets. Partners are fetched across the three shelf
- * categories and narrowed to one-per-category in `toShelfPartners` below, where the
- * category priority is explicit and testable.
+ * categories, scoped to those that cover the listing's country, and narrowed to
+ * one-per-category in `toDefaultShelfPartners` below, where the category priority is
+ * explicit and testable. A category with no partner for the country is simply skipped.
  */
 export const enquiryShelfDefaultsQuery = defineQuery(`
   {
@@ -39,6 +40,7 @@ export const enquiryShelfDefaultsQuery = defineQuery(`
       _type == "partner"
       && defined(slug.current)
       && category->slug.current in $partnerCategories
+      && $countrySlug in countries
     ] | order(coalesce(order, 999) asc, name asc) ${SHELF_PARTNER_PUBLIC}
   }
 `);

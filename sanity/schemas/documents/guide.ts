@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity';
-import { GUIDE_CATEGORIES } from '../constants/enums';
+import { COUNTRY_OPTIONS, GUIDE_CATEGORIES } from '../constants/enums';
 
 /**
  * A long-form editorial guide. One document type serves every guide kind: the
@@ -46,10 +46,7 @@ export const guide = defineType({
 			type: 'string',
 			group: 'content',
 			options: {
-				list: [
-					{ title: 'Spain', value: 'spain' },
-					{ title: 'Portugal', value: 'portugal' }
-				],
+				list: [...COUNTRY_OPTIONS],
 				layout: 'radio'
 			},
 			description:

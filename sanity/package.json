@@ -125,6 +125,8 @@
 		"migrate:collapse-dev-name:dry-run": "tsx migrations/collapse-development-name-migrate.ts --dry-run",
 		"migrate:guide-country": "tsx migrations/guide-country-migrate.ts",
 		"migrate:guide-country:dry-run": "tsx migrations/guide-country-migrate.ts --dry-run",
+		"migrate:partner-countries": "tsx migrations/partner-countries-migrate.ts",
+		"migrate:partner-countries:dry-run": "tsx migrations/partner-countries-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

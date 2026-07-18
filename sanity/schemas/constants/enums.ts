@@ -186,6 +186,17 @@ export const LOCATION_TAXONOMY_TYPES = [
 	{ title: 'Community', value: 'community' }
 ] as const;
 
+/**
+ * The markets GHI operates in. The `value` is the country's taxonomy slug (the `[country]`
+ * URL segment), so a document tagged here filters against a listing's country directly.
+ * Guides key their single buying market off this list; partners tag every market they cover.
+ * Keep values in step with the seeded `locationTaxonomy` country slugs.
+ */
+export const COUNTRY_OPTIONS = [
+	{ title: 'Spain', value: 'spain' },
+	{ title: 'Portugal', value: 'portugal' }
+] as const;
+
 export const DEVELOPMENT_DISPLAY_MODES = [
 	{ title: 'Flat listing', value: 'flat_listing' },
 	{ title: 'Unit types', value: 'unit_types' },
