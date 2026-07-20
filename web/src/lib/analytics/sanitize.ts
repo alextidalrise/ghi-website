@@ -49,7 +49,6 @@ export const ALLOWED_KEYS: ReadonlySet<string> = new Set([
 	'sort',
 	'selected_features',
 	'golf_relevance',
-	'result_count',
 	// lists
 	'item_list_id',
 	'item_list_name',

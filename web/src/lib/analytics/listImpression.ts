@@ -31,6 +31,35 @@ export type ListImpressionParams = {
 	items: AnalyticsItem[];
 };
 
+/** Share of the list itself that counts as seen, for lists shorter than the viewport. */
+const VISIBLE_RATIO = 0.3;
+
+/** Share of the viewport that counts as seen, for lists taller than it. */
+const VIEWPORT_RATIO = 0.25;
+
+/**
+ * How much of a list must be on screen to count as an impression.
+ *
+ * A ratio alone does not work: a full results grid is 24 cards, which on a phone is
+ * several viewports tall, so 30% of the *element* can be more than the screen can ever
+ * show and the impression would never fire. Taking the smaller of "30% of the list" and
+ * "25% of the viewport" means short rails still need to be meaningfully visible, while a
+ * tall grid only needs to genuinely occupy the screen.
+ */
+export function impressionThreshold(elementHeight: number, viewportHeight: number): number {
+	return Math.min(elementHeight * VISIBLE_RATIO, viewportHeight * VIEWPORT_RATIO);
+}
+
+/** Whether the currently visible slice of an element is enough to report. */
+export function isSufficientlyVisible(
+	rect: { top: number; bottom: number; height: number },
+	viewportHeight: number
+): boolean {
+	const visible = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
+	if (visible <= 0) return false;
+	return visible >= impressionThreshold(rect.height, viewportHeight);
+}
+
 /**
  * Report a list once it is meaningfully on screen.
  *
@@ -48,35 +77,34 @@ export function listImpression(node: HTMLElement, params?: ListImpressionParams)
 		return { update: (next?: ListImpressionParams) => (current = next), destroy: () => {} };
 	}
 
-	const report = () => {
+	/** Single gate for both the observer and the update path, so they cannot disagree. */
+	const reportIfVisible = () => {
 		if (!current || current.items.length === 0) return;
+		if (!isSufficientlyVisible(node.getBoundingClientRect(), window.innerHeight)) return;
+
 		const key = impressionKey(current.list.list_id, current.items);
 		if (fired.has(key)) return;
 		fired.add(key);
 		trackListViewed(current.list, current.items);
 	};
 
-	const observer = new IntersectionObserver(
-		(entries) => {
-			for (const entry of entries) {
-				if (entry.isIntersecting) report();
-			}
-		},
-		// Enough of the list on screen to count as seen, but reachable for a tall rail
-		// that can never be 100% visible on a phone.
-		{ threshold: 0.3 }
-	);
+	const observer = new IntersectionObserver(reportIfVisible, {
+		// Several thresholds rather than one: a list taller than the viewport never
+		// crosses a high ratio, and one that fills the screen never crosses a low one
+		// again after entry. Each crossing re-runs the pixel check above, which is the
+		// real decision.
+		threshold: [0, 0.1, 0.25, 0.5, 0.75, 1]
+	});
 
 	observer.observe(node);
 
 	return {
 		update(next?: ListImpressionParams) {
 			current = next;
-			// Contents may have changed while the list is already on screen (pagination
-			// keeps the grid in view), so re-check rather than waiting for a scroll.
-			const rect = node.getBoundingClientRect();
-			const onScreen = rect.top < window.innerHeight && rect.bottom > 0;
-			if (onScreen) report();
+			// Contents can change while the list is already on screen — paginating keeps
+			// the grid in view — so re-check rather than waiting for a scroll that may
+			// never come.
+			reportIfVisible();
 		},
 		destroy() {
 			observer.disconnect();

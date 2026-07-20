@@ -1,4 +1,4 @@
-import { push, resetSession } from './dataLayer';
+import { push } from './dataLayer';
 import { trackListingViewed } from './events';
 import { pageTypeFor } from './pageType';
 import type { AnalyticsItem, ListingKind } from './types';
@@ -12,33 +12,61 @@ import type { AnalyticsItem, ListingKind } from './types';
  * in a SPA.
  */
 
-/** Query parameters that are safe to keep on `page_location`. */
-const SAFE_PARAMS = new Set([
-	'page',
-	'sort',
-	'propertyType',
-	'minPrice',
-	'maxPrice',
-	'minBeds',
-	'community',
-	'golfRelevance',
-	'golfCourse',
-	'features'
-]);
+/**
+ * Query parameters that may survive onto `page_location`, and what each value must look
+ * like to be kept.
+ *
+ * Validating the *name* is not enough. Anyone can craft a link with
+ * `?community=someone@example.com`, and a visitor who follows it would hand that address
+ * to GA4 through the page URL. Every one of these parameters is written by our own filter
+ * UI from a closed vocabulary, so the values are legitimately constrained: numbers where
+ * we emit numbers, slugs where we emit slugs. Anything that does not fit was not put
+ * there by us and is dropped.
+ */
+const NUMERIC = /^\d{1,12}$/;
+/** Matches the slugs the taxonomy and filter options emit — no spaces, no punctuation. */
+const SLUG = /^[a-z0-9][a-z0-9-]{0,63}$/;
+/** Repeatable filters arrive as comma-joined slugs. */
+const SLUG_LIST = /^[a-z0-9][a-z0-9-]{0,63}(,[a-z0-9][a-z0-9-]{0,63}){0,19}$/;
+
+const SAFE_PARAMS: Record<string, RegExp> = {
+	page: NUMERIC,
+	minPrice: NUMERIC,
+	maxPrice: NUMERIC,
+	minBeds: NUMERIC,
+	sort: SLUG,
+	propertyType: SLUG,
+	community: SLUG,
+	golfRelevance: SLUG_LIST,
+	golfCourse: SLUG_LIST,
+	features: SLUG_LIST
+};
 
 /**
- * Rebuild a URL with only known-safe query parameters.
+ * Rebuild a URL with only known-safe query parameters, keeping each only if its value
+ * matches the shape we would have written.
  *
- * Anything we did not put in the URL ourselves is dropped — an email in a `?ref=` from a
- * campaign, a token, a preview secret. Prohibited data must not reach GA4 even by way of
- * the page address.
+ * Drops the fragment too: it never carries anything we measure, and it is another place
+ * arbitrary text can ride along.
  */
 export function safePageLocation(url: URL): string {
 	const safe = new URL(url.href);
 	safe.hash = '';
+
 	for (const key of [...safe.searchParams.keys()]) {
-		if (!SAFE_PARAMS.has(key)) safe.searchParams.delete(key);
+		const pattern = SAFE_PARAMS[key];
+		if (!pattern) {
+			safe.searchParams.delete(key);
+			continue;
+		}
+		// A repeated key returns its first value here; drop the whole key unless every
+		// value passes, rather than silently reporting a partial filter set.
+		const values = safe.searchParams.getAll(key);
+		if (!values.every((value) => pattern.test(value))) {
+			safe.searchParams.delete(key);
+		}
 	}
+
 	return safe.href;
 }
 
@@ -81,8 +109,10 @@ export function trackPageView(params: {
 	if (key === lastKey) return;
 	lastKey = key;
 
-	// New page: impression and lead dedupe state from the previous one no longer applies.
-	resetSession();
+	// Note the per-page dedupe state (impressions, leads) is NOT cleared here. It is
+	// cleared in `beforeNavigate`, because a list container's `update()` runs as the new
+	// DOM commits — before afterNavigate — so clearing here would wipe the impression it
+	// had just recorded and let the same grid report a second time on the next scroll.
 
 	push({
 		event: 'ghi_virtual_page_view',

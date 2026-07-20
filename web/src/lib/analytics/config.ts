@@ -45,19 +45,26 @@ export const PRODUCTION_HOSTS: readonly string[] = [
 	'www.golfhomesinternational.com'
 ];
 
-/** Internal tooling (the design system) must never appear in analytics. */
-export function isInternalRoute(routeId: string | null): boolean {
-	return routeId?.startsWith('/internal') ?? false;
+/**
+ * Routes that are never measured.
+ *
+ * `/internal` is tooling. `/soon` is the pre-launch holding page: while LAUNCH_MODE is on
+ * it absorbs the entire site's traffic, which would swamp the property with page views
+ * that say nothing about how the real site is used.
+ */
+export function isExcludedRoute(routeId: string | null): boolean {
+	if (!routeId) return false;
+	return routeId.startsWith('/internal') || routeId === '/soon';
 }
 
 /**
  * Resolve whether — and how — analytics runs for this request. First match wins.
  *
- * Note the ordering of the debug check: it sits *after* the internal-route and Sanity
+ * Note the ordering of the debug check: it sits *after* the excluded-route and Sanity
  * preview guards but *before* the enabled flag and host check. That is what lets QA
  * exercise GTM Preview on a Vercel preview URL without touching a production
  * environment variable, while guaranteeing that no debug token can ever switch
- * analytics on inside the design system or a draft preview session.
+ * analytics on inside the design system, the holding page, or a draft preview session.
  */
 export function resolveAnalyticsConfig(input: AnalyticsConfigInput): AnalyticsConfig {
 	const gtmId = input.gtmId?.trim() || null;
@@ -66,8 +73,8 @@ export function resolveAnalyticsConfig(input: AnalyticsConfigInput): AnalyticsCo
 		return { mode: 'off', gtmId: null, reason: 'no PUBLIC_GTM_ID' };
 	}
 
-	if (isInternalRoute(input.routeId)) {
-		return { mode: 'off', gtmId, reason: 'internal route' };
+	if (isExcludedRoute(input.routeId)) {
+		return { mode: 'off', gtmId, reason: 'excluded route' };
 	}
 
 	if (input.isPreview) {

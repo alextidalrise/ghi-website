@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { impressionKey } from './listImpression';
+import { impressionKey, impressionThreshold, isSufficientlyVisible } from './listImpression';
 import type { AnalyticsItem } from './types';
+
+const VIEWPORT = 800;
+
+/** A rect as getBoundingClientRect would report it, positioned relative to the viewport. */
+const rect = (top: number, height: number) => ({ top, height, bottom: top + height });
 
 const items = (...ids: string[]): AnalyticsItem[] => ids.map((item_id) => ({ item_id }));
 
@@ -37,5 +42,44 @@ describe('impressionKey', () => {
 
 	it('handles an empty list', () => {
 		expect(impressionKey('featured', [])).toBe('featured|');
+	});
+});
+
+describe('impressionThreshold', () => {
+	it('asks for 30% of a list shorter than the viewport', () => {
+		expect(impressionThreshold(400, VIEWPORT)).toBe(120);
+	});
+
+	it('caps at a quarter of the viewport for a list taller than the screen', () => {
+		// A 24-card results grid on a phone is several viewports tall. Requiring 30% of
+		// the element would demand more pixels than the screen has, so it could never
+		// fire — the bug this cap exists to prevent.
+		expect(impressionThreshold(4000, VIEWPORT)).toBe(200);
+	});
+});
+
+describe('isSufficientlyVisible', () => {
+	it('reports a short rail once enough of it is on screen', () => {
+		expect(isSufficientlyVisible(rect(600, 400), VIEWPORT)).toBe(true); // 200px of 400
+		expect(isSufficientlyVisible(rect(750, 400), VIEWPORT)).toBe(false); // 50px of 400
+	});
+
+	it('reports a very tall grid that genuinely fills the screen', () => {
+		// 4000px grid scrolled so it covers the whole viewport: impossible to reach 30%
+		// of the element, but unmistakably being looked at.
+		expect(isSufficientlyVisible(rect(-1000, 4000), VIEWPORT)).toBe(true);
+	});
+
+	it('does not report a tall grid that has only just appeared', () => {
+		expect(isSufficientlyVisible(rect(700, 4000), VIEWPORT)).toBe(false); // 100px showing
+	});
+
+	it('does not report a list that is off screen entirely', () => {
+		expect(isSufficientlyVisible(rect(900, 400), VIEWPORT)).toBe(false); // below the fold
+		expect(isSufficientlyVisible(rect(-500, 400), VIEWPORT)).toBe(false); // scrolled past
+	});
+
+	it('does not report a zero-height list', () => {
+		expect(isSufficientlyVisible(rect(100, 0), VIEWPORT)).toBe(false);
 	});
 });

@@ -35,18 +35,9 @@ export { listImpression } from './listImpression';
 
 export { trackPageView, type PageAnalytics } from './pageView';
 
-export { configureAnalytics } from './dataLayer';
+export { configureAnalytics, resetSession as resetAnalyticsSession } from './dataLayer';
 
-export {
-	acceptAll,
-	closePreferences,
-	consent,
-	initConsent,
-	openPreferences,
-	rejectAll,
-	saveConsent,
-	withdrawConsent
-} from './consent.svelte';
+export { ConsentStore, createConsentContext, getConsent } from './consent.svelte';
 
 export type {
 	AnalyticsItem,

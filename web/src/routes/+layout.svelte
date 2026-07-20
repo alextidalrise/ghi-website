@@ -6,9 +6,9 @@
 	import { enableVisualEditing } from '@sanity/visual-editing';
 	import { env as publicEnv } from '$env/dynamic/public';
 	import { onMount, tick, untrack } from 'svelte';
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import { configureAnalytics, initConsent, trackPageView } from '$lib/analytics';
+	import { configureAnalytics, createConsentContext, resetAnalyticsSession, trackPageView } from '$lib/analytics';
 	import '$lib/styles/global.css';
 
 	let { children, data } = $props();
@@ -20,7 +20,16 @@
 	// point are owned by the consent module, not by layout data.
 	const initialAnalytics = untrack(() => data.analytics);
 	configureAnalytics(initialAnalytics?.mode ?? 'off');
-	initConsent(initialAnalytics?.consent ?? null);
+
+	// Request-scoped: the store must not be module-level, or on the server one visitor's
+	// decision would render for everyone who followed. Consent UI reads it via getConsent().
+	createConsentContext(initialAnalytics?.consent ?? null);
+
+	// Clear per-page dedupe state before the new DOM commits. It has to happen here rather
+	// than alongside the page view: a list container's `update()` runs as the new page
+	// renders, which is before afterNavigate, so resetting later would discard the
+	// impression just recorded and allow a duplicate on the next scroll.
+	beforeNavigate(() => resetAnalyticsSession());
 
 	// The single source of page views — the GTM Google Tag has send_page_view disabled.
 	// afterNavigate fires once on initial load and once per completed navigation

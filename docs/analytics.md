@@ -21,8 +21,9 @@ hooks.server.ts
 
 +layout.svelte
   ├─ configureAnalytics(mode)         gate, from server data
-  ├─ initConsent(consent)             decision, from server data
-  └─ afterNavigate → trackPageView    exactly one page view per navigation
+  ├─ createConsentContext(consent)    decision, from server data (request-scoped)
+  ├─ beforeNavigate → resetSession    clears per-page dedupe before the new DOM commits
+  └─ afterNavigate  → trackPageView   exactly one page view per navigation
 
 components → $lib/analytics (events.ts) → sanitize.ts → window.dataLayer → GTM → GA4
 ```
@@ -47,7 +48,7 @@ environment and see why it is silent.
 | # | Condition | Result |
 |---|---|---|
 | 1 | `PUBLIC_GTM_ID` missing | off |
-| 2 | route under `/internal` | off |
+| 2 | route under `/internal`, or `/soon` | off |
 | 3 | Sanity draft preview session | off |
 | 4 | valid debug token | **debug** |
 | 5 | `PUBLIC_ANALYTICS_ENABLED` is not exactly `"true"` | off |
@@ -58,8 +59,8 @@ environment and see why it is silent.
 Gating on hostname rather than `VERCEL_ENV` means a preview promoted to production starts
 reporting automatically, and a production build served anywhere else stays silent.
 
-Note the debug check sits *after* the internal-route and preview guards: no token can
-switch tracking on inside the design system or a draft session.
+Note the debug check sits *after* the excluded-route and preview guards: no token can
+switch tracking on inside the design system, the holding page, or a draft session.
 
 ### Debug sessions
 
@@ -94,21 +95,38 @@ separate piece of work. **Until they ship, nobody can grant consent**, so produc
 sit permanently in the denied state and GA4 reports will be sparse. That is the correct
 legal position, not a bug.
 
-The UI drives `$lib/analytics`:
+The store is **request-scoped, held in Svelte context** — not module state. On the server
+a module is shared by every request in the process, so module-level consent would let the
+first visitor's decision render for everyone who followed. The root layout already calls
+`createConsentContext()` with the server-read cookie, so the banner can render correctly in
+the first paint with no flash for a returning visitor.
 
-```ts
-consent.needsPrompt      // show the banner
-consent.preferencesOpen  // show the preference panel
-consent.analytics / consent.marketing / consent.decided / consent.ready
+Read it during component initialisation, like any context:
 
-acceptAll() / rejectAll() / saveConsent({ analytics, marketing })
-withdrawConsent({ reload })     // reloads by default
-openPreferences() / closePreferences()
-onConsentChange(fn)
+```svelte
+<script lang="ts">
+  import { getConsent } from '$lib/analytics';
+  const consent = getConsent();
+</script>
+
+{#if consent.needsPrompt}
+  <!-- banner -->
+{/if}
+{#if consent.preferencesOpen}
+  <!-- preference panel -->
+{/if}
 ```
 
-`initConsent()` is already called by the root layout with the server-read cookie, so the
-banner can render correctly in the first paint with no flash for a returning visitor.
+```ts
+consent.needsPrompt / decided / analytics / marketing / preferencesOpen / timestamp
+consent.acceptAll() / rejectAll() / save({ analytics, marketing })
+consent.withdraw({ reload })     // reloads by default
+consent.openPreferences() / closePreferences()
+consent.onChange(fn)
+```
+
+`getConsent()` throws outside the context rather than returning a detached instance: a
+consent UI silently driving a store nobody renders would be worse than a loud failure.
 
 Withdrawing consent deletes the Google cookies **and reloads**. The reload is deliberate:
 deleting `_ga` does not clear the client id the loaded gtag holds in memory, which would
@@ -128,7 +146,7 @@ renaming a GA4 event never requires a code change here.
 |---|---|---|---|
 | `ghi_virtual_page_view` | `page_view` | Every completed navigation, incl. first load | `+layout.svelte` |
 | `ghi_search_submitted` | `search` | Filters applied (debounced 600ms) or discovery bar submitted | `ListingFilters`, `DiscoveryBar` |
-| `ghi_listing_list_viewed` | `view_item_list` | A listing collection scrolls into view (30%) | `ListingGrid`, `ListingRail` |
+| `ghi_listing_list_viewed` | `view_item_list` | A listing collection is meaningfully on screen | `ListingGrid`, `ListingRail` |
 | `ghi_listing_selected` | `select_item` | A listing card is clicked | `PropertyCard`, `DevelopmentCard`, `SpotlightCard` |
 | `ghi_listing_viewed` | `view_item` | A listing detail page is viewed | `pageView.ts`, from page data |
 | `ghi_gallery_opened` | `gallery_open` | The lightbox opens | `property/Gallery.svelte` |
@@ -144,17 +162,25 @@ renaming a GA4 event never requires a code change here.
 
 `page_type` is one of: `home`, `country`, `location`, `community`, `listing`, `unit`,
 `golf_course`, `collection`, `guide_index`, `guide`, `insight_index`, `insight`, `about`,
-`contact`, `partners`, `legal`, `holding`, `internal`, `not_found`.
+`contact`, `partners`, `legal`, `not_found`. (`holding` and `internal` are mapped but never
+emitted — those routes are gated off before any event fires.)
 
 `listing` covers property, development and catch-all detail pages alike; `listing_kind`
 carries the distinction, because the route id cannot.
 
 **Search** — `search_placement` (`results_filters` | `discovery_bar`), `country`,
 `location`, `community`, `property_type`, `price_band`, `min_beds`, `sort`,
-`selected_features` (max 10), `golf_relevance`, `result_count`.
+`selected_features` (max 10), `golf_relevance`.
 
-There is **no `search_term`**. The site has no free-text search box — every filter draws on
-a closed vocabulary — so there is nothing to send.
+Two parameters from the original brief are deliberately absent:
+
+- **`search_term`** — the site has no free-text search box; every filter draws on a closed
+  vocabulary, so there is nothing to send.
+- **`result_count`** — a search here *is* a navigation, so the count is not known until the
+  results page has loaded, by which time the event has fired. The only number available at
+  submit time describes the *previous* result set, and a plausible wrong number is worse
+  than an absent one. Analyse result volume from the listing page views and their
+  `view_item_list` payloads instead.
 
 **Items** — `item_id` (the GHI id), `item_name`, `item_brand`, `item_category` (listing
 kind), `item_category2` (property type), `item_category3` (country slug), `item_category4`
@@ -220,8 +246,17 @@ In development a violation **throws**, so a leak breaks the page at the call sit
 production the offending key is dropped and the rest of the event is sent: losing a
 dimension is a much smaller loss than losing a conversion count.
 
-`page_location` is rebuilt with only known-safe query parameters, so a campaign link
-carrying `?email=` cannot leak an address into GA4 by way of the page URL.
+`page_location` is rebuilt with only known-safe query parameters, **and each value is
+checked against the shape we would have written** — numbers where we emit numbers, slugs
+where we emit slugs. Filtering names alone is not enough: a crafted link like
+`?community=someone@example.com` uses an allowed key, so only value validation stops it.
+Anything that does not fit is dropped, along with the fragment.
+
+One residual exposure worth naming: **listing titles reach GA4 through both `item_name` and
+`page_title`**, so suppressing `item_name` alone would not help. If a title contained a
+street address it would still arrive via the page title. The control here is editorial —
+listing titles must not contain exact addresses — backed by the email and phone value
+checks, which do apply to `page_title`.
 
 ---
 
@@ -260,7 +295,7 @@ Tag - GA4 - Contact click
 - [ ] Register event-scoped custom dimensions: `page_type`, `listing_id`, `listing_kind`,
       `country`, `location`, `community`, `property_type`, `price_band`, `lead_type`,
       `form_location`, `contact_method`, `search_placement`, `navigation_method`,
-      `gallery_surface`, `result_count`.
+      `gallery_surface`.
 - [ ] Mark **`generate_lead`** as a key event.
 - [ ] Leave `contact_click`, `floorplan_request_started`, `gallery_open` and `search` as
       supporting events, **not** key events.
@@ -308,6 +343,7 @@ browser can confirm — run them in GTM Preview on a preview deployment via `?gh
 - [ ] Preview deployment without a token: silent
 - [ ] Preview deployment with `?ghi_debug=<token>`: GTM Preview connects
 - [ ] `/internal/design-system` stays silent even with a valid token
+- [ ] `/soon` stays silent even with a valid token
 - [ ] A Sanity draft preview session stays silent
 
 **Consent**
@@ -327,8 +363,11 @@ browser can confirm — run them in GTM Preview on a preview deployment via `?gh
 
 **Events**
 - [ ] Scroll to a rail: `view_item_list` fires on visibility, not on page load
-- [ ] Paginate: fires again with the new listings
-- [ ] Scroll away and back: does **not** fire again
+- [ ] **A full 24-card results grid on a phone reports** — it is several viewports tall, so
+      a naive percentage threshold would never be reached
+- [ ] Paginate: fires exactly once more with the new listings, and scrolling away and back
+      afterwards does **not** produce a second
+- [ ] Scroll away and back without paginating: does **not** fire again
 - [ ] Card click: `select_item` with the same `index` as the impression
 - [ ] A POA listing carries **no `price` key at all**
 - [ ] Gallery: open, arrows, thumbnails, swipe and keyboard all report the right method
@@ -343,6 +382,9 @@ browser can confirm — run them in GTM Preview on a preview deployment via `?gh
 
 **Privacy**
 - [ ] Visit a page with `?email=someone@example.com`: it does not appear in `page_location`
+- [ ] Visit `?community=someone@example.com`: the allowed key is dropped, not preserved
+- [ ] Two browsers with different consent states get correctly different SSR output
+      (guards the request-scoping of the consent store)
 - [ ] Read every DebugView payload and confirm no prohibited field appears
 
 **Presentation**

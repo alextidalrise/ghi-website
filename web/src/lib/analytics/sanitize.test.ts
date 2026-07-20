@@ -118,8 +118,8 @@ describe('sanitizeEvent', () => {
 	});
 
 	it('keeps a zero, which is a real value rather than an absent one', () => {
-		const { event } = sanitizeEvent(pageView({ result_count: 0 }));
-		expect(event?.result_count).toBe(0);
+		const { event } = sanitizeEvent(pageView({ min_beds: 0 }));
+		expect(event?.min_beds).toBe(0);
 	});
 
 	describe('items', () => {

@@ -49,15 +49,21 @@ export type SearchParams = {
 	sort?: string | null;
 	selectedFeatures?: readonly string[];
 	golfRelevance?: readonly string[];
-	resultCount?: number | null;
 };
 
 /**
  * A property search was applied.
  *
- * Note there is no `search_term`: the site has no free-text search box — every filter
- * draws on a closed vocabulary — so there is nothing to send, and inventing an
- * approximation would be worse than omitting it.
+ * Two parameters from the original brief are deliberately absent:
+ *
+ * `search_term`, because the site has no free-text search box — every filter draws on a
+ * closed vocabulary, so there is nothing to send.
+ *
+ * `result_count`, because a search here *is* a navigation: the count is not known until
+ * the results page has loaded, by which time this event has already fired. The only
+ * number available at submit time describes the previous result set, and a plausible
+ * wrong number is worse than an absent one. Result volume is analysable from the listing
+ * page views and their `view_item_list` payloads instead.
  */
 export function trackSearchSubmitted(params: SearchParams): void {
 	push({
@@ -71,8 +77,7 @@ export function trackSearchSubmitted(params: SearchParams): void {
 		min_beds: params.minBeds ?? undefined,
 		sort: params.sort ?? undefined,
 		selected_features: params.selectedFeatures?.slice(0, MAX_FEATURES),
-		golf_relevance: params.golfRelevance?.slice(0, MAX_FEATURES),
-		result_count: params.resultCount ?? undefined
+		golf_relevance: params.golfRelevance?.slice(0, MAX_FEATURES)
 	});
 }
 

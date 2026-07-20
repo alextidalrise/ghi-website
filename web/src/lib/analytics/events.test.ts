@@ -44,8 +44,7 @@ describe('trackSearchSubmitted', () => {
 			priceBand: '500000-1000000',
 			minBeds: 3,
 			sort: 'newest',
-			selectedFeatures: ['sea-view', 'pool'],
-			resultCount: 42
+			selectedFeatures: ['sea-view', 'pool']
 		});
 
 		expect(last()).toMatchObject({
@@ -55,7 +54,6 @@ describe('trackSearchSubmitted', () => {
 			property_type: 'villa',
 			price_band: '500000-1000000',
 			min_beds: 3,
-			result_count: 42,
 			selected_features: ['sea-view', 'pool']
 		});
 	});
@@ -65,17 +63,16 @@ describe('trackSearchSubmitted', () => {
 		expect(last()).not.toHaveProperty('search_term');
 	});
 
+	it('never sends a result count, which is unknowable until the results have loaded', () => {
+		trackSearchSubmitted({ placement: 'results_filters', country: 'spain' });
+		expect(last()).not.toHaveProperty('result_count');
+	});
+
 	it('omits filters that were not applied', () => {
 		trackSearchSubmitted({ placement: 'discovery_bar', country: 'spain' });
 		const event = last();
 		expect(event).not.toHaveProperty('property_type');
 		expect(event).not.toHaveProperty('selected_features');
-		expect(event).not.toHaveProperty('result_count');
-	});
-
-	it('reports a zero result count, which is a meaningful outcome', () => {
-		trackSearchSubmitted({ placement: 'results_filters', resultCount: 0 });
-		expect(last().result_count).toBe(0);
 	});
 
 	it('caps the feature list so payloads stay bounded', () => {

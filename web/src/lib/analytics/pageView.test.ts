@@ -12,6 +12,46 @@ describe('safePageLocation', () => {
 		expect(safe.searchParams.get('page')).toBe('2');
 	});
 
+	it('drops an allowed parameter whose value is not one we would have written', () => {
+		// Filtering names alone is not enough: anyone can craft a link putting prose or
+		// an address inside a key that is on the allowlist.
+		const url = new URL(
+			'https://golfhomesinternational.com/spain/marbella' +
+				'?community=someone@example.com&features=Call+me+on+07700+900123&propertyType=villa'
+		);
+		const safe = safePageLocation(url);
+		expect(safe).not.toContain('someone');
+		expect(safe).not.toContain('900123');
+		// The legitimate filter beside them survives.
+		expect(safe).toContain('propertyType=villa');
+	});
+
+	it('rejects a non-numeric value in a numeric parameter', () => {
+		const url = new URL('https://golfhomesinternational.com/spain?page=2&minPrice=ring+me');
+		const safe = safePageLocation(url);
+		expect(safe).toContain('page=2');
+		expect(safe).not.toContain('minPrice');
+	});
+
+	it('keeps a comma-joined slug list but rejects one containing prose', () => {
+		const ok = safePageLocation(
+			new URL('https://golfhomesinternational.com/spain?features=sea-view,pool')
+		);
+		expect(ok).toContain('sea-view');
+
+		const bad = safePageLocation(
+			new URL('https://golfhomesinternational.com/spain?features=sea-view,my+home+address')
+		);
+		expect(bad).not.toContain('features');
+	});
+
+	it('drops the whole parameter when any repeated value fails', () => {
+		const url = new URL(
+			'https://golfhomesinternational.com/spain?golfCourse=valderrama&golfCourse=hello%20there'
+		);
+		expect(safePageLocation(url)).not.toContain('golfCourse');
+	});
+
 	it('drops parameters we did not put there, which may carry personal data', () => {
 		const url = new URL(
 			'https://golfhomesinternational.com/contact?email=buyer@example.com&ref=abc&utm_source=x'

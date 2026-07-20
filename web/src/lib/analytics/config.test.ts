@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isInternalRoute, resolveAnalyticsConfig, type AnalyticsConfigInput } from './config';
+import { isExcludedRoute, resolveAnalyticsConfig, type AnalyticsConfigInput } from './config';
 
 /** A request that would resolve to `live`; each test perturbs one field. */
 function liveInput(overrides: Partial<AnalyticsConfigInput> = {}): AnalyticsConfigInput {
@@ -84,7 +84,12 @@ describe('resolveAnalyticsConfig', () => {
 				liveInput({ routeId: '/internal/design-system', debugGranted: true })
 			);
 			expect(config.mode).toBe('off');
-			expect(config.reason).toBe('internal route');
+			expect(config.reason).toBe('excluded route');
+		});
+
+		it('cannot switch analytics on for the holding page', () => {
+			const config = resolveAnalyticsConfig(liveInput({ routeId: '/soon', debugGranted: true }));
+			expect(config.mode).toBe('off');
 		});
 
 		it('cannot switch analytics on inside a Sanity draft preview', () => {
@@ -102,11 +107,11 @@ describe('resolveAnalyticsConfig', () => {
 			expect(config.reason).toBe('no PUBLIC_GTM_ID');
 		});
 
-		it('reports the internal route ahead of the preview session', () => {
+		it('reports the excluded route ahead of the preview session', () => {
 			const config = resolveAnalyticsConfig(
 				liveInput({ routeId: '/internal/design-system', isPreview: true })
 			);
-			expect(config.reason).toBe('internal route');
+			expect(config.reason).toBe('excluded route');
 		});
 	});
 
@@ -114,17 +119,24 @@ describe('resolveAnalyticsConfig', () => {
 		expect(resolveAnalyticsConfig(liveInput({ routeId: '/internal/design-system' })).mode).toBe('off');
 	});
 
+	it('is off on the pre-launch holding page', () => {
+		// During a launch takeover /soon absorbs the whole site's traffic; measuring it
+		// would swamp the property with page views that say nothing about the real site.
+		expect(resolveAnalyticsConfig(liveInput({ routeId: '/soon' })).mode).toBe('off');
+	});
+
 	it('still resolves for an unmatched route (404)', () => {
 		expect(resolveAnalyticsConfig(liveInput({ routeId: null })).mode).toBe('live');
 	});
 });
 
-describe('isInternalRoute', () => {
-	it('matches the internal tree and nothing else', () => {
-		expect(isInternalRoute('/internal')).toBe(true);
-		expect(isInternalRoute('/internal/design-system')).toBe(true);
-		expect(isInternalRoute('/')).toBe(false);
-		expect(isInternalRoute('/insights/[slug]')).toBe(false);
-		expect(isInternalRoute(null)).toBe(false);
+describe('isExcludedRoute', () => {
+	it('matches internal tooling and the holding page, and nothing else', () => {
+		expect(isExcludedRoute('/internal')).toBe(true);
+		expect(isExcludedRoute('/internal/design-system')).toBe(true);
+		expect(isExcludedRoute('/soon')).toBe(true);
+		expect(isExcludedRoute('/')).toBe(false);
+		expect(isExcludedRoute('/insights/[slug]')).toBe(false);
+		expect(isExcludedRoute(null)).toBe(false);
 	});
 });
