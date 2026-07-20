@@ -4,6 +4,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { EnquiryFormResult } from '$lib/listing/enquiryAction';
 	import { listingWhatsAppMessage, whatsAppHref } from '$lib/contact/contact';
+	import { trackContactClicked, trackLeadSubmitted, type ContactMethod } from '$lib/analytics';
 
 	/** Minimal structural shape — satisfied by both property listings and developments,
 	    so the rail can serve either without coupling to a specific document type. */
@@ -98,8 +99,15 @@
 	// closed so it leaves the tab order and is hidden from assistive tech.
 	let emailOpen = $state(false);
 
+	function reportContact(method: ContactMethod, placement: string) {
+		trackContactClicked({ method, placement, listingId: listing.ghiListingId });
+	}
+
 	function toggleEmail() {
 		emailOpen = !emailOpen;
+		// Only the disclosure *opening* is intent; collapsing it again is not. WhatsApp is
+		// the primary CTA here, so choosing the email form is a meaningful signal.
+		if (emailOpen) reportContact('email', 'listing_rail');
 	}
 
 	function prefersReducedMotion() {
@@ -158,6 +166,18 @@
 		return async ({ result, update }) => {
 			submitting = false;
 			if (result.type === 'success') {
+				// The one safe place to report a lead. `succeeded` is derived from the
+				// persistent `form` prop, which re-evaluates true on any remount or
+				// client-side navigation back to this page — reporting from there would
+				// double-count. This branch runs exactly once per accepted submission,
+				// and the server only returns success after HubSpot has accepted it.
+				const payload = result.data as EnquiryFormResult | undefined;
+				trackLeadSubmitted({
+					leadType: payload?.floorplanRequested ? 'floorplan_request' : 'listing_enquiry',
+					formLocation: 'listing_rail',
+					listingId: listing.ghiListingId
+				});
+
 				// Let the `form` prop update so the confirmation renders in place.
 				await update();
 			} else if (result.type === 'failure') {
@@ -207,6 +227,7 @@
 				href={whatsApp}
 				target="_blank"
 				rel="noopener"
+				onclick={() => reportContact('whatsapp', 'listing_rail')}
 			>
 				<svg class="rail__whatsapp-glyph" viewBox="0 0 32 32" aria-hidden="true">
 					<path
@@ -344,6 +365,7 @@
 		href={whatsApp}
 		target="_blank"
 		rel="noopener"
+		onclick={() => reportContact('whatsapp', 'listing_mobile_bar')}
 	>
 		<svg viewBox="0 0 32 32" aria-hidden="true">
 			<path
@@ -355,7 +377,14 @@
 		</svg>
 		<span>WhatsApp</span>
 	</a>
-	<button type="button" class="enquire-bar__action enquire-bar__action--email" onclick={revealEmail}>
+	<button
+		type="button"
+		class="enquire-bar__action enquire-bar__action--email"
+		onclick={() => {
+			reportContact('email', 'listing_mobile_bar');
+			revealEmail();
+		}}
+	>
 		Email us
 	</button>
 </div>

@@ -15,6 +15,7 @@
 	 * Emphasis Ladder: this is a page's single green band. Never two.
 	 */
 	import { GENERAL_WHATSAPP_MESSAGE, whatsAppHref } from '$lib/contact/contact';
+	import { trackContactClicked } from '$lib/analytics';
 
 	type Action = { label: string; href: string };
 
@@ -55,6 +56,7 @@
 				href={whatsApp}
 				target="_blank"
 				rel="noopener"
+				onclick={() => trackContactClicked({ method: 'whatsapp', placement: 'talk_to_us_band' })}
 			>
 				<svg viewBox="0 0 32 32" aria-hidden="true">
 					<path

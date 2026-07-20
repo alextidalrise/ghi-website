@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { priceBandLabel, trackSearchSubmitted } from '$lib/analytics';
 	import { PROPERTY_TYPES } from '$lib/listing/filterOptions';
 	import {
 		DEFAULT_LISTING_SEARCH_PARAMS,
@@ -333,7 +334,22 @@
 	function search() {
 		if (searchDisabled) return;
 		const href = destinationHref();
-		if (href) goto(href);
+		if (!href) return;
+
+		// Single chokepoint: the bar's own button and the mobile sheet both land here.
+		const band = BUDGET_BANDS.find((option) => option.value === budget);
+		const allowedFeatures = new Set(featureOpts.map((option) => option.value));
+		trackSearchSubmitted({
+			placement: 'discovery_bar',
+			country: countrySlug || null,
+			location: locationSlug || null,
+			community: communitySlug || null,
+			propertyType: propertyType || null,
+			priceBand: priceBandLabel(band?.min ?? null, band?.max ?? null),
+			selectedFeatures: features.filter((feature) => allowedFeatures.has(feature))
+		});
+
+		goto(href);
 	}
 
 	function handleSubmit(event: SubmitEvent) {

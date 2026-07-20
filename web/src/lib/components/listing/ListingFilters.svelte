@@ -2,6 +2,11 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { priceBandLabel, trackSearchSubmitted } from '$lib/analytics';
+
+	/** Long enough to coalesce a burst of facet changes into one reported search. */
+	const SEARCH_REPORT_DELAY = 600;
 	import { buildListingSearchHref, type ListingSearchParams } from '$lib/listing/searchParams';
 	import {
 		GOLF_RELEVANCE,
@@ -148,9 +153,38 @@
 		};
 	}
 
+	/**
+	 * Report the applied filter set.
+	 *
+	 * Debounced because every control applies on change: setting a type, then a price,
+	 * then a bedroom count is one search in the visitor's mind, and reporting three would
+	 * make the GA4 search count useless as a funnel metric.
+	 */
+	let searchReportTimer: ReturnType<typeof setTimeout> | undefined;
+	function reportSearch() {
+		clearTimeout(searchReportTimer);
+		searchReportTimer = setTimeout(() => {
+			const applied = nextParams();
+			const allowedFeatures = new Set(featureOptions.map((option) => option.value));
+			trackSearchSubmitted({
+				placement: 'results_filters',
+				country: page.params.country,
+				location: page.params.location,
+				community: applied.community ?? page.params.community,
+				propertyType: applied.propertyType,
+				priceBand: priceBandLabel(applied.minPrice, applied.maxPrice),
+				minBeds: applied.minBeds,
+				sort: applied.sort,
+				selectedFeatures: applied.features.filter((feature) => allowedFeatures.has(feature)),
+				golfRelevance: applied.golfRelevance
+			});
+		}, SEARCH_REPORT_DELAY);
+	}
+
 	/** JS path: build a clean href from local state and SPA-navigate. */
 	function applyNow() {
 		if (!browser) return;
+		reportSearch();
 		goto(buildListingSearchHref(basePath, nextParams()), { noScroll: true, keepFocus: true });
 	}
 
@@ -179,7 +213,14 @@
 
 	function clearAll() {
 		closeSheet();
-		if (browser) goto(basePath, { noScroll: true, keepFocus: true });
+		if (!browser) return;
+		// Clearing is itself a search — the unfiltered area result set.
+		trackSearchSubmitted({
+			placement: 'results_filters',
+			country: page.params.country,
+			location: page.params.location
+		});
+		goto(basePath, { noScroll: true, keepFocus: true });
 	}
 </script>
 

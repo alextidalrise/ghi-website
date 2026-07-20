@@ -12,6 +12,11 @@
 			href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Libre+Franklin:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap"
 			rel="stylesheet"
 		/>
+		<!-- Consent defaults + GTM, injected server-side so they run before any Google
+		     tag. Replaced by analyticsHandle in hooks.server.ts (an HTML comment when
+		     analytics is gated off). Must stay in <head>: the hook does a plain string
+		     replace, which relies on this landing in the first streamed chunk. -->
+		%ghi.analytics%
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

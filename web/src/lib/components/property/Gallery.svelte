@@ -1,4 +1,10 @@
 <script lang="ts">
+	import {
+		trackGalleryImageViewed,
+		trackGalleryOpened,
+		type GalleryNavigation,
+		type GallerySurface
+	} from '$lib/analytics';
 	import { buildPublicImageUrl, getImagePlaceholder, getImageDimensions } from '$lib/sanity/image';
 	import BlurImage from '$lib/components/media/BlurImage.svelte';
 	import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
@@ -15,9 +21,12 @@
 	type Props = {
 		media: PublicMediaBundle | null | undefined;
 		title: string;
+		/** Listing this gallery belongs to, for engagement reporting. */
+		listingId?: string | null;
+		surface?: GallerySurface;
 	};
 
-	let { media, title }: Props = $props();
+	let { media, title, listingId = null, surface = 'property' }: Props = $props();
 
 	let activeIndex = $state(0);
 	let lightboxOpen = $state(false);
@@ -164,24 +173,44 @@
 		}
 	});
 
-	function select(index: number) {
-		activeIndex = index;
+	/**
+	 * Report deliberate image navigation.
+	 *
+	 * Every path — arrows, thumbnails, keyboard and swipe — funnels through `select`,
+	 * so the method is passed in rather than inferred, which would lose the distinction.
+	 */
+	function reportImageView(method: GalleryNavigation) {
+		trackGalleryImageViewed({
+			listingId,
+			position: activeIndex,
+			total,
+			surface,
+			method
+		});
 	}
 
-	function prev() {
+	function select(index: number, method: GalleryNavigation = 'thumbnail') {
+		activeIndex = index;
+		reportImageView(method);
+	}
+
+	function prev(method: GalleryNavigation = 'arrow') {
 		if (total === 0) return;
 		activeIndex = (activeIndex - 1 + total) % total;
+		reportImageView(method);
 	}
 
-	function next() {
+	function next(method: GalleryNavigation = 'arrow') {
 		if (total === 0) return;
 		activeIndex = (activeIndex + 1) % total;
+		reportImageView(method);
 	}
 
 	function openLightbox(index: number) {
 		activeIndex = index;
 		lightboxOpen = true;
 		dialogEl?.showModal();
+		trackGalleryOpened({ listingId, position: index, total, surface });
 	}
 
 	function closeLightbox() {
@@ -195,10 +224,10 @@
 	function onDialogKeydown(event: KeyboardEvent) {
 		if (event.key === 'ArrowRight') {
 			event.preventDefault();
-			next();
+			next('keyboard');
 		} else if (event.key === 'ArrowLeft') {
 			event.preventDefault();
-			prev();
+			prev('keyboard');
 		}
 	}
 
@@ -226,8 +255,8 @@
 		const dx = event.clientX - pointerStartX;
 		if (Math.abs(dx) < 40) return;
 		swipedAway = true;
-		if (dx < 0) next();
-		else prev();
+		if (dx < 0) next('swipe');
+		else prev('swipe');
 	}
 
 	// On a real device a horizontal drag can be aborted by the browser's
@@ -309,10 +338,10 @@
 			</button>
 
 			{#if total > 1}
-				<button type="button" class="gallery__nav gallery__nav--prev" onclick={prev} aria-label="Previous photo">
+				<button type="button" class="gallery__nav gallery__nav--prev" onclick={() => prev()} aria-label="Previous photo">
 					{@render chevron('left')}
 				</button>
-				<button type="button" class="gallery__nav gallery__nav--next" onclick={next} aria-label="Next photo">
+				<button type="button" class="gallery__nav gallery__nav--next" onclick={() => next()} aria-label="Next photo">
 					{@render chevron('right')}
 				</button>
 				<span class="gallery__counter tabular-nums" aria-hidden="true">{activeIndex + 1} / {total}</span>
@@ -374,10 +403,10 @@
 				</figure>
 
 				{#if total > 1}
-					<button type="button" class="lightbox__nav lightbox__nav--prev" onclick={prev} aria-label="Previous photo">
+					<button type="button" class="lightbox__nav lightbox__nav--prev" onclick={() => prev()} aria-label="Previous photo">
 						{@render chevron('left')}
 					</button>
-					<button type="button" class="lightbox__nav lightbox__nav--next" onclick={next} aria-label="Next photo">
+					<button type="button" class="lightbox__nav lightbox__nav--next" onclick={() => next()} aria-label="Next photo">
 						{@render chevron('right')}
 					</button>
 					<span class="lightbox__counter tabular-nums">{activeIndex + 1} / {total}</span>

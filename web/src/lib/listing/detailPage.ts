@@ -1,4 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
+import { toAnalyticsItem } from '$lib/analytics/item';
+import type { PageAnalytics } from '$lib/analytics/pageView';
 import {
 	buildDevelopmentBreadcrumbs,
 	buildPropertyBreadcrumbs,
@@ -37,6 +39,8 @@ export type PropertyDetailPageData = {
 	breadcrumbJsonLd: Record<string, unknown>;
 	listingJsonLd: Record<string, unknown> | null;
 	similarCards: SimilarListingCard[];
+	/** Read by the root layout's afterNavigate to emit view_item alongside the page view. */
+	pageAnalytics: PageAnalytics;
 };
 
 export type DevelopmentDetailPageData = {
@@ -48,6 +52,7 @@ export type DevelopmentDetailPageData = {
 	breadcrumbJsonLd: Record<string, unknown>;
 	listingJsonLd: null;
 	similarCards: SimilarListingCard[];
+	pageAnalytics: PageAnalytics;
 };
 
 function applyPreviewSeo(seo: PropertySeoMeta & { canonicalUrl: string }) {
@@ -131,7 +136,11 @@ export function buildPropertyDetailPageData(
 		seo,
 		breadcrumbJsonLd,
 		listingJsonLd,
-		similarCards: options.similarCards ?? []
+		similarCards: options.similarCards ?? [],
+		pageAnalytics: {
+			listingKind: 'property' as const,
+			item: toAnalyticsItem(property, { kind: 'property' })
+		}
 	};
 }
 
@@ -187,7 +196,11 @@ export function buildDevelopmentDetailPageData(
 		seo,
 		breadcrumbJsonLd,
 		listingJsonLd: null,
-		similarCards: options.similarCards ?? []
+		similarCards: options.similarCards ?? [],
+		pageAnalytics: {
+			listingKind: 'development' as const,
+			item: toAnalyticsItem(development, { kind: 'development' })
+		}
 	};
 }
 
@@ -273,7 +286,13 @@ export function buildUnitDetailPageData(
 		seo,
 		breadcrumbJsonLd,
 		listingJsonLd,
-		similarCards: options.similarCards ?? []
+		similarCards: options.similarCards ?? [],
+		// A unit is stored as a property but is its own page type for reporting, so the
+		// kind is set explicitly here rather than inferred from the document.
+		pageAnalytics: {
+			listingKind: 'unit' as const,
+			item: toAnalyticsItem(listing, { kind: 'unit' })
+		}
 	};
 }
 

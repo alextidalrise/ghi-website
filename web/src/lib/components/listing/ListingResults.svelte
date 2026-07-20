@@ -2,6 +2,7 @@
 	import ListingFilters from './ListingFilters.svelte';
 	import ListingGrid from './ListingGrid.svelte';
 	import Pagination from './Pagination.svelte';
+	import type { ListContext } from '$lib/analytics';
 	import {
 		DEFAULT_LISTING_SEARCH_PARAMS,
 		type ListingSearchParams,
@@ -41,6 +42,7 @@
 	}: Props = $props();
 
 	const summary = $derived(formatSummary(total, pagination));
+	const resultsList = $derived<ListContext>({ list_id: 'search_results', list_name: heading });
 	const hasActiveFilters = $derived(
 		searchParams.propertyType != null ||
 			searchParams.community != null ||
@@ -79,7 +81,7 @@
 
 		{#if cards.length > 0}
 			<div class="listing-results__grid">
-				<ListingGrid {cards} />
+				<ListingGrid {cards} list={resultsList} />
 			</div>
 			<Pagination {basePath} {searchParams} {pagination} />
 		{:else}

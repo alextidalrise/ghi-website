@@ -1,7 +1,10 @@
 <script lang="ts">
 	import ListingRail from './ListingRail.svelte';
 	import SpotlightCard from './SpotlightCard.svelte';
+	import { toAnalyticsItemsByPosition, type ListContext } from '$lib/analytics';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
+
+	const FEATURED_LIST: ListContext = { list_id: 'featured', list_name: 'Featured listings' };
 
 	type Props = {
 		cards: SimilarListingCard[];
@@ -15,6 +18,10 @@
 	const summaryLine = $derived(
 		summary ?? (cards.length === 1 ? '1 property' : `${cards.length} properties`)
 	);
+
+	// Position-aligned with `cards`, so a card can be handed its own item by index.
+	const analyticsItems = $derived(toAnalyticsItemsByPosition(cards, FEATURED_LIST));
+	const impressionItems = $derived(analyticsItems.filter((item) => item !== null));
 </script>
 
 {#if cards.length > 0}
@@ -40,12 +47,25 @@
 			getKey={(c, i) => `${c.card._id}-${i}`}
 			bleed
 			labelledby="featured-heading"
+			list={FEATURED_LIST}
+			analyticsItems={impressionItems}
 		>
-			{#snippet card(c)}
+			{#snippet card(c, i)}
 				{#if c.kind === 'development'}
-					<SpotlightCard card={c.card} kind="development" surface="light" showLocation />
+					<SpotlightCard
+						card={c.card}
+						kind="development"
+						surface="light"
+						showLocation
+						item={analyticsItems[i] ?? null}
+					/>
 				{:else}
-					<SpotlightCard card={c.card} surface="light" showLocation />
+					<SpotlightCard
+						card={c.card}
+						surface="light"
+						showLocation
+						item={analyticsItems[i] ?? null}
+					/>
 				{/if}
 			{/snippet}
 		</ListingRail>

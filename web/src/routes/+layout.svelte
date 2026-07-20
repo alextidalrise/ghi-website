@@ -5,11 +5,45 @@
 	import { isPreviewing, useLiveMode } from '@sanity/svelte-loader';
 	import { enableVisualEditing } from '@sanity/visual-editing';
 	import { env as publicEnv } from '$env/dynamic/public';
-	import { onMount } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
+	import { configureAnalytics, createConsentContext, resetAnalyticsSession, trackPageView } from '$lib/analytics';
 	import '$lib/styles/global.css';
 
 	let { children, data } = $props();
+
+	// Both come from the server: the gate was resolved in analyticsHandle, and the consent
+	// cookie was read there too, so the first client render already agrees with the markup
+	// and the consent UI can render without a flash. Read untracked and once — the root
+	// layout never remounts, both calls are idempotent, and consent changes after this
+	// point are owned by the consent module, not by layout data.
+	const initialAnalytics = untrack(() => data.analytics);
+	configureAnalytics(initialAnalytics?.mode ?? 'off');
+
+	// Request-scoped: the store must not be module-level, or on the server one visitor's
+	// decision would render for everyone who followed. Consent UI reads it via getConsent().
+	createConsentContext(initialAnalytics?.consent ?? null);
+
+	// Clear per-page dedupe state before the new DOM commits. It has to happen here rather
+	// than alongside the page view: a list container's `update()` runs as the new page
+	// renders, which is before afterNavigate, so resetting later would discard the
+	// impression just recorded and allow a duplicate on the next scroll.
+	beforeNavigate(() => resetAnalyticsSession());
+
+	// The single source of page views — the GTM Google Tag has send_page_view disabled.
+	// afterNavigate fires once on initial load and once per completed navigation
+	// (including back/forward), so this is exactly one page view per navigation.
+	afterNavigate(async () => {
+		// Titles are set by each page's <svelte:head>; let that flush before reading it.
+		await tick();
+		trackPageView({
+			url: page.url,
+			routeId: page.route.id,
+			title: document.title,
+			pageAnalytics: page.data.pageAnalytics
+		});
+	});
 
 	const studioUrl = publicEnv.PUBLIC_SANITY_STUDIO_URL ?? 'http://localhost:3333/development';
 

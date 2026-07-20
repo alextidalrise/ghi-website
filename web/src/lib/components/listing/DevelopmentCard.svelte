@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { trackListingSelected, type AnalyticsItem } from '$lib/analytics';
 	import { buildListingHref } from '$lib/listing/canonicalPath';
 	import {
 		buildDevelopmentMetaParts,
@@ -10,9 +11,11 @@
 
 	type Props = {
 		card: PublicDevelopmentCard;
+		/** Supplied by the list container, which knows the card's list and position. */
+		item?: AnalyticsItem | null;
 	};
 
-	let { card }: Props = $props();
+	let { card, item = null }: Props = $props();
 
 	const href = $derived(
 		buildListingHref({
@@ -74,7 +77,12 @@
 {/snippet}
 
 {#if href}
-	<a class="property-card" {href} aria-label={card.title ?? 'View development'}>
+	<a
+		class="property-card"
+		{href}
+		aria-label={card.title ?? 'View development'}
+		onclick={() => trackListingSelected(item)}
+	>
 		{@render cardBody()}
 	</a>
 {:else}

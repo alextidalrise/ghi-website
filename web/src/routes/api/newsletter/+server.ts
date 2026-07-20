@@ -7,6 +7,18 @@ import type { RequestHandler } from './$types';
 // ready, replace the body of the `try` block with the HubSpot Forms API call
 // (POST to https://api.hsforms.com/submissions/v3/integration/submit/{portalId}/{formGuid})
 // and keep the same JSON success/error contract so the clients need no changes.
+//
+// ANALYTICS: deliberately silent. Because this endpoint returns `{ok:true}` without
+// contacting HubSpot, neither the footer newsletter nor the buyer-guide cards emit any
+// event — reporting a conversion for a subscription that was never delivered would be
+// worse than reporting nothing. `buyer_guide_request` is likewise absent from `LeadType`
+// in $lib/analytics/types.ts for the same reason.
+//
+// When this is wired up for real, add — in the same change:
+//   • `sign_up` (NOT generate_lead) from Footer.svelte on a confirmed newsletter success
+//   • `buyer_guide_request` to LeadType, and generate_lead from BuyerGuideCard.svelte
+// Emit from the client's success branch only, never from a derived success state, and
+// update docs/analytics.md's event dictionary to match.
 
 // Deliberately forgiving: catches the obvious typos without rejecting the long
 // tail of valid addresses a stricter regex would.
