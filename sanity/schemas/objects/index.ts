@@ -17,6 +17,7 @@ import {
 } from './insightContent';
 import { footerColumn, socialLink } from './footerNav';
 import { navLink, navMenuChild, navMenuItem } from './headerNav';
+import { instagramPost, instagramPostImage } from './instagramPost';
 import { marketingFields } from './marketingFields';
 import { ctaFields } from './ctaFields';
 import { golfFields } from './golfFields';
@@ -48,6 +49,9 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	internalSourceEntry,
 	internalCommission,
 	internalFeesTax,
+	// Instagram post selection (image member registered before the parent object)
+	instagramPostImage,
+	instagramPost,
 	// Guide content objects (registered before the guideSection that nests them)
 	guideCallout,
 	guideKeyFigures,
@@ -112,6 +116,8 @@ export {
 	footerColumn,
 	socialLink,
 	golfFields,
+	instagramPost,
+	instagramPostImage,
 	internalCommission,
 	internalFeesTax,
 	internalFields,

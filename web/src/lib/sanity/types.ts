@@ -336,6 +336,7 @@ export type MarketingFields = {
     _key: string;
   }>;
   keyHooks?: Array<string>;
+  instagramPost?: InstagramPost;
 };
 
 export type PropertyContentFields = {
@@ -478,6 +479,7 @@ export type Unit = {
     } & MediaAssetMetadata
   >;
   content?: ContentFields;
+  marketing?: MarketingFields;
   status: "draft" | "in_review" | "published" | "unpublished" | "archived";
   reviewItems?: Array<
     {
@@ -618,6 +620,7 @@ export type UnitType = {
     } & MediaAssetMetadata
   >;
   content?: ContentFields;
+  marketing?: MarketingFields;
   status: "draft" | "in_review" | "published" | "unpublished" | "archived";
   reviewItems?: Array<
     {
@@ -859,6 +862,15 @@ export type InternalCommission = {
   currency?: string;
   notes?: string;
   source?: string;
+};
+
+export type InstagramPost = {
+  _type: "instagramPost";
+  images?: Array<
+    {
+      _key: string;
+    } & InstagramPostImage
+  >;
 };
 
 export type SocialLink = {
@@ -1147,6 +1159,14 @@ export type GuideCallout = {
   body: string;
 };
 
+export type InstagramPostImage = {
+  _type: "instagramPostImage";
+  assetRef: string;
+  sourceKey?: string;
+  sourcePath?: string;
+  altText?: string;
+};
+
 export type InternalSourceEntry = {
   _type: "internalSourceEntry";
   factField?: string;
@@ -1335,6 +1355,7 @@ export type AllSanitySchemaTypes =
   | NavLink
   | InternalFeesTax
   | InternalCommission
+  | InstagramPost
   | SocialLink
   | FooterColumn
   | NavMenuItem
@@ -1355,6 +1376,7 @@ export type AllSanitySchemaTypes =
   | GuideSection
   | GuideKeyFigures
   | GuideCallout
+  | InstagramPostImage
   | InternalSourceEntry
   | ReviewItem
   | GalleryGroup
