@@ -200,10 +200,13 @@
 		color: var(--white);
 	}
 
+	/* Each button darkens its own hue on hover rather than trading colours with the
+	   other: a crossover reads as playful, which is wrong for a compliance control.
+	   Derived shades of the existing tokens, in the same idiom as --green-soft. */
 	.consent-banner__button--accept:hover,
 	.consent-banner__button--accept:focus-visible {
-		background: var(--charcoal);
-		border-color: var(--charcoal);
+		background: color-mix(in srgb, var(--green) 80%, black);
+		border-color: color-mix(in srgb, var(--green) 80%, black);
 	}
 
 	/* Charcoal rather than green: a solid fill of equal weight that stays clearly a
@@ -216,8 +219,8 @@
 
 	.consent-banner__button--reject:hover,
 	.consent-banner__button--reject:focus-visible {
-		background: var(--green);
-		border-color: var(--green);
+		background: color-mix(in srgb, var(--charcoal) 80%, black);
+		border-color: color-mix(in srgb, var(--charcoal) 80%, black);
 	}
 
 	.consent-banner__manage {
