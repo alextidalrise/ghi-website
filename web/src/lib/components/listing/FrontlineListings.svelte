@@ -1,7 +1,13 @@
 <script lang="ts">
 	import ListingRail from './ListingRail.svelte';
 	import SpotlightCard from './SpotlightCard.svelte';
+	import { toAnalyticsItemsByPosition, type ListContext } from '$lib/analytics';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
+
+	const FRONTLINE_LIST: ListContext = {
+		list_id: 'frontline',
+		list_name: 'Front-line collection'
+	};
 
 	type Props = {
 		cards: SimilarListingCard[];
@@ -17,6 +23,10 @@
 		summary ??
 			(cards.length === 1 ? '1 property on the golf course' : `${cards.length} properties on the golf course`)
 	);
+
+	// Position-aligned with `cards`, so a card can be handed its own item by index.
+	const analyticsItems = $derived(toAnalyticsItemsByPosition(cards, FRONTLINE_LIST));
+	const impressionItems = $derived(analyticsItems.filter((item) => item !== null));
 </script>
 
 {#if cards.length > 0}
@@ -54,12 +64,25 @@
 			getKey={(c, i) => `${c.card._id}-${i}`}
 			bleed
 			labelledby="frontline-heading"
+			list={FRONTLINE_LIST}
+			analyticsItems={impressionItems}
 		>
-			{#snippet card(c)}
+			{#snippet card(c, i)}
 				{#if c.kind === 'development'}
-					<SpotlightCard card={c.card} kind="development" surface="green" showLocation />
+					<SpotlightCard
+						card={c.card}
+						kind="development"
+						surface="green"
+						showLocation
+						item={analyticsItems[i] ?? null}
+					/>
 				{:else}
-					<SpotlightCard card={c.card} surface="green" showLocation />
+					<SpotlightCard
+						card={c.card}
+						surface="green"
+						showLocation
+						item={analyticsItems[i] ?? null}
+					/>
 				{/if}
 			{/snippet}
 		</ListingRail>

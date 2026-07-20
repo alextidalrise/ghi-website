@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ListingRail from './ListingRail.svelte';
 	import SpotlightCard from './SpotlightCard.svelte';
+	import { toAnalyticsItemsByPosition, type ListContext } from '$lib/analytics';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 	type Props = {
@@ -11,6 +12,12 @@
 	let { cards, heading = 'Similar properties' }: Props = $props();
 
 	const summaryLine = $derived(cards.length === 1 ? '1 listing' : `${cards.length} listings`);
+
+	// The heading is configurable, so it carries into the list name rather than being
+	// hardcoded — the same rail is reused with different framing on some pages.
+	const similarList = $derived<ListContext>({ list_id: 'similar', list_name: heading });
+	const analyticsItems = $derived(toAnalyticsItemsByPosition(cards, similarList));
+	const impressionItems = $derived(analyticsItems.filter((item) => item !== null));
 </script>
 
 {#if cards.length > 0}
@@ -29,12 +36,25 @@
 			items={cards}
 			getKey={(item, i) => `${item.card._id}-${i}`}
 			labelledby="similar-properties-heading"
+			list={similarList}
+			analyticsItems={impressionItems}
 		>
-			{#snippet card(item)}
+			{#snippet card(item, i)}
 				{#if item.kind === 'development'}
-					<SpotlightCard card={item.card} kind="development" surface="light" showLocation />
+					<SpotlightCard
+						card={item.card}
+						kind="development"
+						surface="light"
+						showLocation
+						item={analyticsItems[i] ?? null}
+					/>
 				{:else}
-					<SpotlightCard card={item.card} surface="light" showLocation />
+					<SpotlightCard
+						card={item.card}
+						surface="light"
+						showLocation
+						item={analyticsItems[i] ?? null}
+					/>
 				{/if}
 			{/snippet}
 		</ListingRail>

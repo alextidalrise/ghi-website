@@ -5,11 +5,36 @@
 	import { isPreviewing, useLiveMode } from '@sanity/svelte-loader';
 	import { enableVisualEditing } from '@sanity/visual-editing';
 	import { env as publicEnv } from '$env/dynamic/public';
-	import { onMount } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
+	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
+	import { configureAnalytics, initConsent, trackPageView } from '$lib/analytics';
 	import '$lib/styles/global.css';
 
 	let { children, data } = $props();
+
+	// Both come from the server: the gate was resolved in analyticsHandle, and the consent
+	// cookie was read there too, so the first client render already agrees with the markup
+	// and the consent UI can render without a flash. Read untracked and once — the root
+	// layout never remounts, both calls are idempotent, and consent changes after this
+	// point are owned by the consent module, not by layout data.
+	const initialAnalytics = untrack(() => data.analytics);
+	configureAnalytics(initialAnalytics?.mode ?? 'off');
+	initConsent(initialAnalytics?.consent ?? null);
+
+	// The single source of page views — the GTM Google Tag has send_page_view disabled.
+	// afterNavigate fires once on initial load and once per completed navigation
+	// (including back/forward), so this is exactly one page view per navigation.
+	afterNavigate(async () => {
+		// Titles are set by each page's <svelte:head>; let that flush before reading it.
+		await tick();
+		trackPageView({
+			url: page.url,
+			routeId: page.route.id,
+			title: document.title,
+			pageAnalytics: page.data.pageAnalytics
+		});
+	});
 
 	const studioUrl = publicEnv.PUBLIC_SANITY_STUDIO_URL ?? 'http://localhost:3333/development';
 

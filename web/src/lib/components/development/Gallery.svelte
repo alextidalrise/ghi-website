@@ -30,4 +30,9 @@
 	});
 </script>
 
-<Gallery media={media} title={development.title ?? 'Development'} />
+<Gallery
+	media={media}
+	title={development.title ?? 'Development'}
+	listingId={development.ghiListingId}
+	surface="development"
+/>

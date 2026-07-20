@@ -1,23 +1,37 @@
 <script lang="ts">
 	import DevelopmentCard from './DevelopmentCard.svelte';
 	import PropertyCard from './PropertyCard.svelte';
+	import { listImpression, toAnalyticsItems, type ListContext } from '$lib/analytics';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 	type Props = {
 		cards: SimilarListingCard[];
+		/** Opt in to analytics by naming the list; omit and the grid behaves as before. */
+		list?: ListContext;
 	};
 
-	let { cards }: Props = $props();
+	let { cards, list }: Props = $props();
+
+	// Built once here rather than per card: the grid owns the ordering, so this is the
+	// only place that can give impressions and clicks a consistent position.
+	const items = $derived(list ? toAnalyticsItems(cards, list) : []);
+	const itemById = $derived(new Map(items.map((entry) => [entry.item_id, entry])));
+
+	const analyticsFor = (card: { ghiListingId?: string | null }) =>
+		card.ghiListingId ? (itemById.get(card.ghiListingId) ?? null) : null;
 </script>
 
 {#if cards.length > 0}
-	<div class="listing-grid">
+	<div
+		class="listing-grid"
+		use:listImpression={list ? { list, items } : undefined}
+	>
 		{#each cards as item (item.card._id)}
 			<div class="listing-grid__cell" class:listing-grid__cell--wide={item.kind === 'development'}>
 				{#if item.kind === 'development'}
-					<DevelopmentCard card={item.card} />
+					<DevelopmentCard card={item.card} item={analyticsFor(item.card)} />
 				{:else}
-					<PropertyCard card={item.card} />
+					<PropertyCard card={item.card} item={analyticsFor(item.card)} />
 				{/if}
 			</div>
 		{/each}

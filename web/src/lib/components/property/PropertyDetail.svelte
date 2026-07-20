@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { trackFloorplanRequestStarted } from '$lib/analytics';
 	import type { PublicPropertyListing } from '$lib/sanity/transforms';
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
@@ -53,13 +54,24 @@
 	     photo-first stack: the gallery jumps above the breadcrumbs + summary. -->
 	<section class="hero">
 		<div class="hero__gallery">
-			<Gallery media={property.media} title={property.title ?? 'Property'} />
+			<Gallery
+				media={property.media}
+				title={property.title ?? 'Property'}
+				listingId={property.ghiListingId}
+			/>
 		</div>
 		<div class="hero__summary">
 			<Breadcrumbs items={breadcrumbs} inline hideCurrent />
 			<PropertySummary listing={property} />
 			<KeyFacts listing={property} />
-			<Floorplan onRequest={() => (floorplanRequest += 1)} />
+			<!-- Reported here, at the click, rather than in EnquiryRail's floorplanSignal
+			     effect — that effect is a state derivation and may re-run. -->
+			<Floorplan
+				onRequest={() => {
+					trackFloorplanRequestStarted(property.ghiListingId);
+					floorplanRequest += 1;
+				}}
+			/>
 		</div>
 	</section>
 

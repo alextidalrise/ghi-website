@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { trackListingSelected, type AnalyticsItem } from '$lib/analytics';
 	import { buildListingHref } from '$lib/listing/canonicalPath';
 	import {
 		buildDevelopmentMetaParts,
@@ -22,12 +23,20 @@
 		    rails mix communities, so it grounds each card; the same-community Similar rail
 		    would just repeat one name, so it stays off there. */
 		showLocation?: boolean;
+		/** Supplied by the list container, which knows the card's list and position. */
+		item?: AnalyticsItem | null;
 	} & (
 		| { kind?: 'property'; card: PublicPropertyCard }
 		| { kind: 'development'; card: PublicDevelopmentCard }
 	);
 
-	let { card, kind = 'property', surface = 'light', showLocation = false }: Props = $props();
+	let {
+		card,
+		kind = 'property',
+		surface = 'light',
+		showLocation = false,
+		item = null
+	}: Props = $props();
 
 	const href = $derived.by(() => {
 		if (kind === 'property') {
@@ -166,7 +175,12 @@
 {/snippet}
 
 {#if href}
-	<a class="spotlight-card spotlight-card--{surface}" {href} aria-label={linkLabel}>
+	<a
+		class="spotlight-card spotlight-card--{surface}"
+		{href}
+		aria-label={linkLabel}
+		onclick={() => trackListingSelected(item)}
+	>
 		{@render cardBody()}
 	</a>
 {:else}

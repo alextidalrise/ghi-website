@@ -2,6 +2,7 @@ import { redirect, type Cookies } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
 import { fetchHeaderNav, fetchFooter } from '$lib/sanity/queries';
+import { readConsent } from '$lib/analytics/server';
 
 // Paths that must stay reachable even during a launch takeover: the holding page
 // itself, plus internal tooling, the API, and the Sanity preview entry points.
@@ -38,11 +39,24 @@ function hasLaunchBypass(url: URL, cookies: Cookies): boolean {
 	return cookieValue === token;
 }
 
-export const load: LayoutServerLoad = async ({ locals: { preview }, url, route, cookies }) => {
+export const load: LayoutServerLoad = async ({
+	locals: { preview, analytics },
+	url,
+	route,
+	cookies
+}) => {
+	// Reading consent server-side lets the (future) banner render correctly in the very
+	// first paint, with no flash for a visitor who already decided. The gate itself was
+	// resolved once in analyticsHandle; reuse it rather than recomputing.
+	const analyticsState = {
+		mode: analytics?.mode ?? 'off',
+		consent: readConsent(cookies)
+	};
+
 	// The holding route renders bare (no nav/footer), so it needs no taxonomy — and
 	// skipping the Sanity call keeps it standing even if the dataset is empty/unreachable.
 	if (route.id === '/soon') {
-		return { preview, footer: null, headerNav: null };
+		return { preview, footer: null, headerNav: null, analytics: analyticsState };
 	}
 
 	// LAUNCH_MODE flips the whole site to the holding page while keeping every real
@@ -59,5 +73,5 @@ export const load: LayoutServerLoad = async ({ locals: { preview }, url, route, 
 
 	const [footer, headerNav] = await Promise.all([fetchFooter(), fetchHeaderNav()]);
 
-	return { preview, footer, headerNav };
+	return { preview, footer, headerNav, analytics: analyticsState };
 };

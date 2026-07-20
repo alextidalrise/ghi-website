@@ -1,13 +1,21 @@
 <script lang="ts" generics="Item">
 	import type { Snippet } from 'svelte';
+	import { listImpression, type AnalyticsItem, type ListContext } from '$lib/analytics';
 
 	type Props = {
 		items: Item[];
 		/** Stable key per item. Index is included because an editor can pick the same
 		    listing twice in a featured array, and duplicate keys break the keyed each. */
 		getKey: (item: Item, index: number) => string;
-		/** Renders one card from an item; the rail owns only the scroll container. */
-		card: Snippet<[Item]>;
+		/** Renders one card from an item; the rail owns only the scroll container. The
+		    index is passed so callers can attach analytics without re-deriving position. */
+		card: Snippet<[Item, number]>;
+		/**
+		 * Opt in to list-impression tracking. Omit both and the rail behaves exactly as
+		 * before — non-listing rails (reviews, golf courses) pass nothing.
+		 */
+		list?: ListContext;
+		analyticsItems?: AnalyticsItem[];
 		/** id of the section heading this rail belongs to, for the list's accessible name. */
 		labelledby?: string;
 		/**
@@ -18,13 +26,26 @@
 		bleed?: boolean;
 	};
 
-	let { items, getKey, card, labelledby, bleed = false }: Props = $props();
+	let {
+		items,
+		getKey,
+		card,
+		labelledby,
+		bleed = false,
+		list,
+		analyticsItems = []
+	}: Props = $props();
 </script>
 
-<ul class="rail" class:rail--bleed={bleed} aria-labelledby={labelledby}>
+<ul
+	class="rail"
+	class:rail--bleed={bleed}
+	aria-labelledby={labelledby}
+	use:listImpression={list ? { list, items: analyticsItems } : undefined}
+>
 	{#each items as item, index (getKey(item, index))}
 		<li class="rail__item" style="--reveal-delay: {index * 70}ms">
-			{@render card(item)}
+			{@render card(item, index)}
 		</li>
 	{/each}
 </ul>

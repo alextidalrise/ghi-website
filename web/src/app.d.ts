@@ -6,6 +6,8 @@ declare global {
 		interface Locals {
 			preview: boolean;
 			loadQuery: import('@sanity/svelte-loader').LoadQuery;
+			/** Resolved once per request by analyticsHandle; reused by +layout.server.ts. */
+			analytics?: import('$lib/analytics/config').AnalyticsConfig;
 		}
 		// interface PageData {}
 		// interface PageState {}
