@@ -2,6 +2,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import SiteNav from '$lib/components/SiteNav.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import ConsentUi from '$lib/components/consent/ConsentUi.svelte';
 	import { isPreviewing, useLiveMode } from '@sanity/svelte-loader';
 	import { enableVisualEditing } from '@sanity/visual-editing';
 	import { env as publicEnv } from '$env/dynamic/public';
@@ -78,6 +79,13 @@
 		</a>
 	</div>
 {/if}
+
+<!-- Early in the document on purpose: it is fixed to a corner visually, but a keyboard or
+     screen-reader user meets the consent choice as soon as they start tabbing, without a
+     focus trap holding them there. Rendered outside the `bare` branch too — a cookie
+     notice is a legal control, not part of the site shell, so the holding page gets it
+     as well. -->
+<ConsentUi />
 
 {#if bare}
 	{@render children()}

@@ -708,10 +708,12 @@
 
 	@media (max-width: 760px) {
 		/* Reserve room so the fixed console never sits over the footer's last row, and
-		   clear the iOS home indicator. The class is toggled by onMount, so the
-		   padding applies only on pages that render the rail. */
+		   clear the iOS home indicator. The class is toggled by onMount, so this applies
+		   only on pages that render the rail. Published as an inset variable that
+		   global.css adds up — the consent banner stacks on top of this console and
+		   needs to know how tall it is, and both need room reserved, not just one. */
 		:global(body.has-enquire-bar) {
-			padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+			--bottom-inset-enquire: calc(4.25rem + env(safe-area-inset-bottom));
 		}
 
 		/* A white console the page rests on, not an edge-to-edge colour strip. A crisp
