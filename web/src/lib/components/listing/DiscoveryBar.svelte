@@ -338,6 +338,7 @@
 
 		// Single chokepoint: the bar's own button and the mobile sheet both land here.
 		const band = BUDGET_BANDS.find((option) => option.value === budget);
+		const allowedFeatures = new Set(featureOpts.map((option) => option.value));
 		trackSearchSubmitted({
 			placement: 'discovery_bar',
 			country: countrySlug || null,
@@ -345,7 +346,7 @@
 			community: communitySlug || null,
 			propertyType: propertyType || null,
 			priceBand: priceBandLabel(band?.min ?? null, band?.max ?? null),
-			selectedFeatures: [...features]
+			selectedFeatures: features.filter((feature) => allowedFeatures.has(feature))
 		});
 
 		goto(href);

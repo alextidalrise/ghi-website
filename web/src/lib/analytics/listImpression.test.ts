@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { impressionKey, impressionThreshold, isSufficientlyVisible } from './listImpression';
+import {
+	impressionKey,
+	impressionObserverThreshold,
+	impressionThreshold,
+	isSufficientlyVisible
+} from './listImpression';
 import type { AnalyticsItem } from './types';
 
 const VIEWPORT = 800;
@@ -55,6 +60,23 @@ describe('impressionThreshold', () => {
 		// the element would demand more pixels than the screen has, so it could never
 		// fire — the bug this cap exists to prevent.
 		expect(impressionThreshold(4000, VIEWPORT)).toBe(200);
+	});
+});
+
+describe('impressionObserverThreshold', () => {
+	it('uses the 30% element ratio for a short list', () => {
+		expect(impressionObserverThreshold(400, VIEWPORT)).toBe(0.3);
+	});
+
+	it('derives a reachable ratio for a grid taller than ten viewports', () => {
+		// Only 200px must be visible. A fixed 0.1 observer threshold would require 960px
+		// and can never be crossed in an 800px viewport.
+		expect(impressionObserverThreshold(9600, VIEWPORT)).toBeCloseTo(200 / 9600);
+		expect(impressionObserverThreshold(9600, VIEWPORT)).toBeLessThan(0.1);
+	});
+
+	it('uses a valid inert threshold for a zero-height list', () => {
+		expect(impressionObserverThreshold(0, VIEWPORT)).toBe(1);
 	});
 });
 

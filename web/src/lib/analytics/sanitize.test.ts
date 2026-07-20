@@ -107,6 +107,32 @@ describe('sanitizeEvent', () => {
 		expect(violations).toHaveLength(1);
 	});
 
+	it('drops a string-array dimension containing contact details', () => {
+		const email = sanitizeEvent(
+			pageView({ selected_features: ['private-pool', 'buyer@example.com'] })
+		);
+		expect(email.event).not.toHaveProperty('selected_features');
+		expect(email.violations).toEqual([
+			{ key: 'selected_features', kind: 'email_value' }
+		]);
+
+		const phone = sanitizeEvent(
+			pageView({ selected_features: ['sea-view', '+34 612 345 678'] })
+		);
+		expect(phone.event).not.toHaveProperty('selected_features');
+		expect(phone.violations).toEqual([
+			{ key: 'selected_features', kind: 'phone_value' }
+		]);
+	});
+
+	it('keeps a clean string-array dimension', () => {
+		const { event, violations } = sanitizeEvent(
+			pageView({ selected_features: ['private-pool', 'sea-view'] })
+		);
+		expect(event?.selected_features).toEqual(['private-pool', 'sea-view']);
+		expect(violations).toEqual([]);
+	});
+
 	it('removes empty values so GTM never sees a blank dimension', () => {
 		const { event } = sanitizeEvent(
 			pageView({ country: undefined, community: null, sort: '', selected_features: [] })

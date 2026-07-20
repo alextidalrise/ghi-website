@@ -150,10 +150,14 @@ export function findViolation(key: string, value: unknown): Violation | null {
 		return { key, kind: 'unknown_key' };
 	}
 
-	if (typeof value === 'string') {
-		if (EMAIL_VALUE.test(value)) return { key, kind: 'email_value' };
-		if (!PHONE_EXEMPT.has(key) && PHONE_VALUE.test(value)) return { key, kind: 'phone_value' };
-		if (!LENGTH_EXEMPT.has(key) && value.length > MAX_VALUE_LENGTH) {
+	const strings = typeof value === 'string' ? [value] : Array.isArray(value) ? value : [];
+	for (const candidate of strings) {
+		if (typeof candidate !== 'string') continue;
+		if (EMAIL_VALUE.test(candidate)) return { key, kind: 'email_value' };
+		if (!PHONE_EXEMPT.has(key) && PHONE_VALUE.test(candidate)) {
+			return { key, kind: 'phone_value' };
+		}
+		if (!LENGTH_EXEMPT.has(key) && candidate.length > MAX_VALUE_LENGTH) {
 			return { key, kind: 'freetext_value' };
 		}
 	}

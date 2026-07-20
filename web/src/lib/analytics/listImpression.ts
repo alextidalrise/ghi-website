@@ -50,6 +50,19 @@ export function impressionThreshold(elementHeight: number, viewportHeight: numbe
 	return Math.min(elementHeight * VISIBLE_RATIO, viewportHeight * VIEWPORT_RATIO);
 }
 
+/**
+ * IntersectionObserver works in ratios, while our reporting rule is expressed in
+ * visible pixels. Derive the exact ratio for this element rather than relying on a
+ * fixed threshold that a very tall grid may never be able to reach.
+ */
+export function impressionObserverThreshold(
+	elementHeight: number,
+	viewportHeight: number
+): number {
+	if (elementHeight <= 0) return 1;
+	return impressionThreshold(elementHeight, viewportHeight) / elementHeight;
+}
+
 /** Whether the currently visible slice of an element is enough to report. */
 export function isSufficientlyVisible(
 	rect: { top: number; bottom: number; height: number },
@@ -88,15 +101,36 @@ export function listImpression(node: HTMLElement, params?: ListImpressionParams)
 		trackListViewed(current.list, current.items);
 	};
 
-	const observer = new IntersectionObserver(reportIfVisible, {
-		// Several thresholds rather than one: a list taller than the viewport never
-		// crosses a high ratio, and one that fills the screen never crosses a low one
-		// again after entry. Each crossing re-runs the pixel check above, which is the
-		// real decision.
-		threshold: [0, 0.1, 0.25, 0.5, 0.75, 1]
-	});
+	let observer: IntersectionObserver | undefined;
+	let currentObserverThreshold: number | undefined;
 
-	observer.observe(node);
+	/** Rebuild when layout changes because IntersectionObserver thresholds are immutable. */
+	const rebuildObserver = () => {
+		const threshold = impressionObserverThreshold(
+			node.getBoundingClientRect().height,
+			window.innerHeight
+		);
+		if (observer && threshold === currentObserverThreshold) return;
+
+		observer?.disconnect();
+		currentObserverThreshold = threshold;
+		observer = new IntersectionObserver(reportIfVisible, { threshold });
+		observer.observe(node);
+	};
+
+	rebuildObserver();
+
+	// A responsive layout can change either the list height or the viewport cap. Keep
+	// the observer's derived ratio in sync and immediately re-check an already-visible
+	// list rather than waiting for another scroll.
+	const onResize = () => {
+		rebuildObserver();
+		reportIfVisible();
+	};
+	window.addEventListener('resize', onResize);
+	const resizeObserver =
+		typeof ResizeObserver !== 'undefined' ? new ResizeObserver(onResize) : undefined;
+	resizeObserver?.observe(node);
 
 	return {
 		update(next?: ListImpressionParams) {
@@ -107,7 +141,9 @@ export function listImpression(node: HTMLElement, params?: ListImpressionParams)
 			reportIfVisible();
 		},
 		destroy() {
-			observer.disconnect();
+			observer?.disconnect();
+			resizeObserver?.disconnect();
+			window.removeEventListener('resize', onResize);
 		}
 	};
 }

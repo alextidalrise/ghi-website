@@ -165,6 +165,7 @@
 		clearTimeout(searchReportTimer);
 		searchReportTimer = setTimeout(() => {
 			const applied = nextParams();
+			const allowedFeatures = new Set(featureOptions.map((option) => option.value));
 			trackSearchSubmitted({
 				placement: 'results_filters',
 				country: page.params.country,
@@ -174,7 +175,7 @@
 				priceBand: priceBandLabel(applied.minPrice, applied.maxPrice),
 				minBeds: applied.minBeds,
 				sort: applied.sort,
-				selectedFeatures: applied.features,
+				selectedFeatures: applied.features.filter((feature) => allowedFeatures.has(feature)),
 				golfRelevance: applied.golfRelevance
 			});
 		}, SEARCH_REPORT_DELAY);
