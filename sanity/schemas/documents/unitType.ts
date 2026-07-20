@@ -10,6 +10,7 @@ export const unitType = defineType({
 	groups: [
 		{ name: 'details', title: 'Details', default: true },
 		{ name: 'content', title: 'Content' },
+		{ name: 'marketing', title: 'Marketing source' },
 		{ name: 'internal', title: 'Internal' }
 	],
 	fields: [
@@ -86,6 +87,12 @@ export const unitType = defineType({
 			group: 'content',
 			description:
 				"Optional. Overrides the development's copy for units of this type. Any field left blank falls back to the development; a unit can override this again."
+		}),
+		defineField({
+			name: 'marketing',
+			title: 'Marketing source',
+			type: 'marketingFields',
+			group: 'marketing'
 		}),
 		statusField('internal'),
 		reviewItemsField('internal'),

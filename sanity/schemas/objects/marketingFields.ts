@@ -27,15 +27,27 @@ export const marketingFields = defineType({
 			type: 'array',
 			of: [{ type: 'string' }],
 			description: 'Short bullet hooks for ads, social captions, and email subject lines.'
+		}),
+		defineField({
+			name: 'instagramPost',
+			title: 'Instagram post',
+			type: 'instagramPost'
 		})
 	],
 	preview: {
-		select: { hooks: 'keyHooks' },
-		prepare({ hooks }) {
+		select: { hooks: 'keyHooks', postImages: 'instagramPost.images' },
+		prepare({ hooks, postImages }) {
 			const hookCount = Array.isArray(hooks) ? hooks.length : 0;
+			const imageCount = Array.isArray(postImages) ? postImages.length : 0;
+			const subtitle = [
+				hookCount > 0 ? `${hookCount} key hook(s)` : 'No hooks yet',
+				imageCount > 0 ? `${imageCount} Instagram image(s)` : null
+			]
+				.filter(Boolean)
+				.join(' · ');
 			return {
 				title: 'Marketing source',
-				subtitle: hookCount > 0 ? `${hookCount} key hook(s)` : 'No hooks yet'
+				subtitle
 			};
 		}
 	}
