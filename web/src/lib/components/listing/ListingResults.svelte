@@ -61,7 +61,7 @@
 	}
 </script>
 
-<section class="listing-results" aria-labelledby="listing-results-heading">
+<section id="listing-results" class="listing-results" aria-labelledby="listing-results-heading">
 	<div class="listing-results__inner">
 		<div class="listing-results__head">
 			<h2 id="listing-results-heading">{heading}</h2>
@@ -100,6 +100,8 @@
 <style>
 	.listing-results {
 		margin-top: var(--section-gap);
+		/* Pagination links back to #listing-results, so land below the sticky nav. */
+		scroll-margin-top: calc(var(--nav-height) + var(--space-md));
 	}
 
 	/* The grid block earns more room than the 1060px editorial column above it:

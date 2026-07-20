@@ -19,8 +19,10 @@
 		return [...pages].filter((page) => page >= 1 && page <= totalPages).sort((a, b) => a - b);
 	}
 
+	/* Anchor every page link at the results section: without the hash, navigation
+	   lands at the top of the page and the reader loses the grid they were in. */
 	function pageHref(page: number): string {
-		return buildListingSearchHref(basePath, searchParams, { page });
+		return `${buildListingSearchHref(basePath, searchParams, { page })}#listing-results`;
 	}
 </script>
 
