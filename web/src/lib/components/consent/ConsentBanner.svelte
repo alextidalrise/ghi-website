@@ -80,14 +80,14 @@
 			<div class="consent-banner__actions">
 				<button
 					type="button"
-					class="consent-banner__button"
+					class="consent-banner__button consent-banner__button--accept"
 					onclick={() => decide({ analytics: true, marketing: true })}
 				>
 					Accept all
 				</button>
 				<button
 					type="button"
-					class="consent-banner__button"
+					class="consent-banner__button consent-banner__button--reject"
 					onclick={() => decide({ analytics: false, marketing: false })}
 				>
 					Reject all
@@ -173,15 +173,15 @@
 		margin-top: var(--space-md);
 	}
 
-	/* Both decisions share this class outright. Rejecting must be exactly as easy as
-	   accepting: same weight, same size, same one click. Do not give either a fill. */
+	/* Shared geometry: both decisions are the same size, the same shape and one click.
+	   They differ in hue only — never in weight. Rejecting must stay exactly as easy as
+	   accepting, so neither may become an outline, a text link or a smaller target while
+	   the other is filled: that asymmetry is the standard cookie-banner audit finding. */
 	.consent-banner__button {
 		flex: 1 1 0;
 		min-height: 3rem;
 		padding: 0.875rem 1rem;
-		background: transparent;
-		border: 1px solid var(--green);
-		color: var(--green);
+		border: 1px solid transparent;
 		font-family: var(--sans);
 		font-size: 0.85rem;
 		font-weight: 400;
@@ -190,13 +190,34 @@
 		cursor: pointer;
 		transition:
 			background var(--duration-hover) var(--ease),
+			border-color var(--duration-hover) var(--ease),
 			color var(--duration-hover) var(--ease);
 	}
 
-	.consent-banner__button:hover,
-	.consent-banner__button:focus-visible {
+	.consent-banner__button--accept {
 		background: var(--green);
+		border-color: var(--green);
 		color: var(--white);
+	}
+
+	.consent-banner__button--accept:hover,
+	.consent-banner__button--accept:focus-visible {
+		background: var(--charcoal);
+		border-color: var(--charcoal);
+	}
+
+	/* Charcoal rather than green: a solid fill of equal weight that stays clearly a
+	   second, distinct choice instead of reading as a duplicate of Accept. */
+	.consent-banner__button--reject {
+		background: var(--charcoal);
+		border-color: var(--charcoal);
+		color: var(--white);
+	}
+
+	.consent-banner__button--reject:hover,
+	.consent-banner__button--reject:focus-visible {
+		background: var(--green);
+		border-color: var(--green);
 	}
 
 	.consent-banner__manage {
