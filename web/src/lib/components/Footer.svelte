@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { buildFooter } from '$lib/footer/footerContent';
+	import { getConsent } from '$lib/analytics';
 	import type { FooterContent, FooterSocialPlatform } from '$lib/sanity/queries';
 
 	type Props = {
@@ -21,6 +22,11 @@
 	};
 
 	const year = new Date().getFullYear();
+
+	// Cookie settings is a button, not a legal link. The legal list is overridable from
+	// Sanity, so a data entry there cannot call openPreferences() — and a magic href the
+	// footer intercepts would break silently the first time an editor reorders the list.
+	const consent = getConsent();
 
 	type Status = 'idle' | 'submitting' | 'success' | 'error';
 	let email = $state('');
@@ -198,6 +204,19 @@
 								</a>
 							</li>
 						{/each}
+						<li>
+							<button type="button" class="footer__link footer__cookie" onclick={() => consent.openPreferences()}>
+								Cookie settings
+							</button>
+						</li>
+					</ul>
+				{:else}
+					<ul class="footer__legal">
+						<li>
+							<button type="button" class="footer__link footer__cookie" onclick={() => consent.openPreferences()}>
+								Cookie settings
+							</button>
+						</li>
 					</ul>
 				{/if}
 				{#if content.socials.length}
@@ -502,6 +521,21 @@
 		font-size: var(--text-small);
 	}
 
+	/* Reset the button back to the link vocabulary it sits in: visually it is the third
+	   legal link, it just happens to open a dialog rather than navigate. */
+	.footer__cookie {
+		padding: 0;
+		background: none;
+		border: 0;
+		font-family: inherit;
+		cursor: pointer;
+	}
+
+	.footer__cookie:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 3px;
+	}
+
 	.footer__socials {
 		display: inline-flex;
 		align-items: center;
@@ -537,7 +571,8 @@
 		.footer__arrow,
 		.footer__signup-input,
 		.footer__signup-button,
-		.footer__signup-error {
+		.footer__signup-error,
+		.footer__cookie {
 			transition: none;
 		}
 	}

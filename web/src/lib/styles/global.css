@@ -33,6 +33,22 @@ body {
 	font-kerning: normal;
 	font-optical-sizing: auto;
 	line-height: 1.7;
+	/* Room reserved for fixed bottom-of-viewport furniture, so the footer is never
+	   trapped underneath it. Each piece contributes its own inset variable rather than
+	   setting padding-bottom itself: the mobile enquiry console and the consent banner
+	   can be on screen at the same time, and two rules writing the same property means
+	   one silently wins and the other's furniture covers the page. */
+	padding-bottom: var(--bottom-inset-enquire, 0px);
+}
+
+@media (max-width: 760px) {
+	/* The banner only reserves room where it is full-width and stacked on the console.
+	   On desktop it is a corner panel, and banding off the foot of every page for it
+	   would cost more than it saves. --consent-banner-height is published by
+	   ConsentBanner.svelte and is absent whenever no banner is rendered. */
+	body {
+		padding-bottom: calc(var(--bottom-inset-enquire, 0px) + var(--consent-banner-height, 0px));
+	}
 }
 
 h1,
