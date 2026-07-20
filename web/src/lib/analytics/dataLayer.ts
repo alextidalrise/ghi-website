@@ -16,6 +16,10 @@ import type { DataLayerEvent } from './types';
 
 let mode: AnalyticsMode = 'off';
 
+type DataLayerModel = {
+	reset(): void;
+};
+
 /** Callbacks that clear per-page state (impression keys, lead fingerprints, …). */
 const sessionResets = new Set<() => void>();
 
@@ -65,5 +69,21 @@ export function push(event: DataLayerEvent): void {
 	if (!analyticsEnabled()) return;
 
 	window.dataLayer = window.dataLayer ?? [];
+
+	// GTM keeps data-layer values in an abstract model for the lifetime of the page.
+	// Without clearing that model, parameters from an earlier event leak into later ones;
+	// Version 2 variables also merge arrays, so a one-item select_item can retain the rest
+	// of a previous view_item_list. Reset immediately before every application event so
+	// each payload is evaluated in isolation.
+	window.dataLayer.push(function (this: DataLayerModel) {
+		this.reset();
+	});
+
+	// The reset also clears our debug marker. Restore it before the event so the GTM
+	// blocking exception continues to protect the production GA4 property during QA.
+	if (mode === 'debug') {
+		window.dataLayer.push({ ghi_environment: 'debug' });
+	}
+
 	window.dataLayer.push(clean);
 }

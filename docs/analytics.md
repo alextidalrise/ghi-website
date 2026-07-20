@@ -88,12 +88,13 @@ everything denied, so Google may record a cookieless ping but can set no cookies
 
 `ads_data_redaction` is on until marketing is accepted.
 
-### The consent UI is not built yet
+### Consent UI
 
-This repository ships the consent *logic* only; the banner and preference panel are a
-separate piece of work. **Until they ship, nobody can grant consent**, so production will
-sit permanently in the denied state and GA4 reports will be sparse. That is the correct
-legal position, not a bug.
+The root layout renders a first-visit banner and a preference panel. Visitors can accept
+or reject all optional categories with equal prominence, choose analytics and marketing
+separately, and reopen the panel from Cookie settings in the footer. The UI starts from
+the server-read decision, so returning visitors do not see the banner flash during
+hydration.
 
 The store is **request-scoped, held in Svelte context** — not module state. On the server
 a module is shared by every request in the process, so module-level consent would let the
@@ -266,41 +267,48 @@ These cannot be done from this repository.
 
 ### GTM container
 
-- [ ] Google Tag: set **`send_page_view: false`**. Without this every navigation is counted
+- [x] Google Tag: set **`send_page_view: false`**. Without this every navigation is counted
       twice — once by the tag, once by `ghi_virtual_page_view`.
-- [ ] GA4 admin: disable enhanced measurement's **"page changes based on browser history
+- [x] GA4 admin: disable enhanced measurement's **"page changes based on browser history
       events"**, for the same reason.
-- [ ] Create custom event triggers for each `ghi_*` event and map them per §4.
-- [ ] Add a blocking exception on all production GA4 tags for
+- [x] Match all ten `ghi_*` events with `CE - GA4 Events` and translate their names through
+      `Lookup - GA4 Event Name` before sending them through the shared GA4 event tag.
+- [x] Add a blocking exception on all production GA4 tags for
       `ghi_environment equals debug`, so debug sessions cannot pollute real reporting.
-- [ ] Do not add a `<noscript>` container snippet. It cannot respect consent state, and the
+- [x] Do not add a `<noscript>` container snippet. It cannot respect consent state, and the
       site deliberately ships without one.
 - [ ] Give every published version a meaningful name and description.
 
-Suggested naming:
+Current naming:
 
 ```
-Tag - GA4 - Google tag              Trigger - Custom event - ghi_virtual_page_view
-Tag - GA4 - Page view               Trigger - Custom event - ghi_search_submitted
-Tag - GA4 - Search                  Trigger - Custom event - ghi_listing_viewed
-Tag - GA4 - View item list          …
-Tag - GA4 - Select item             Variable - DLV - listing_id
-Tag - GA4 - View item               Variable - DLV - lead_type
-Tag - GA4 - Generate lead
-Tag - GA4 - Contact click
+GA4 - Google tag                    CE - GA4 Events
+GA4 - Analytics Events              Block - Analytics Debug
+GA4 - Event Settings                Lookup - GA4 Event Name
+DLV - listing_id                    JS - selected_features
+DLV - lead_type                     JS - golf_relevance
 ```
+
+The two `JS -` variables turn the application's closed-vocabulary arrays into
+pipe-delimited GA4 event-parameter strings. The ecommerce `items` array is passed through
+unchanged.
+
+Before every application event, the client resets GTM's abstract data model and restores
+the debug marker when required. This prevents optional values and Version 2 arrays from
+leaking out of an earlier event into the next one during client-side navigation.
 
 ### GA4 property
 
-- [ ] Register event-scoped custom dimensions: `page_type`, `listing_id`, `listing_kind`,
+- [x] Register event-scoped custom dimensions: `page_type`, `listing_id`, `listing_kind`,
       `country`, `location`, `community`, `property_type`, `price_band`, `lead_type`,
       `form_location`, `contact_method`, `search_placement`, `navigation_method`,
       `gallery_surface`.
-- [ ] Mark **`generate_lead`** as a key event.
-- [ ] Leave `contact_click`, `floorplan_request_started`, `gallery_open` and `search` as
+- [x] Mark **`generate_lead`** as a key event.
+- [x] Leave `contact_click`, `floorplan_request_started`, `gallery_open` and `search` as
       supporting events, **not** key events.
-- [ ] **Do not enable Google Signals, advertising personalisation, or Google Ads data
-      sharing** until the marketing-consent path has been reviewed. Confirm who owns this.
+- [x] Keep Google Signals and user-provided data collection off, disallow ads
+      personalisation in every region, and leave Google Ads unlinked until the
+      marketing-consent path has been reviewed.
 
 ---
 
@@ -396,11 +404,11 @@ browser can confirm — run them in GTM Preview on a preview deployment via `?gh
 
 ## 10. Still to do before launch
 
-- **The consent UI.** Until it ships, no visitor can grant consent (§3).
 - **Legal review.** `/privacy`, `/terms` and `/cookies` are placeholders written in brand
   voice, marked `noindex` and flagged on-page as drafts. They need solicitor-reviewed copy.
   The `draft` prop on `LegalPage.svelte` controls both the notice and the `noindex`.
-- **Confirm the cookie policy wording** matches §7 once the banner's categories are final.
+- **Confirm the consent wording and cookie policy** with a solicitor, including the three
+  banner categories and the cookieless measurement described in §3 and §7.
 - Worth stating in the privacy policy that, before a decision is made, Google may receive a
   cookieless record that a page was viewed.
 - `/preview/enable` and `/preview/disable` are referenced by the layout and the Sanity

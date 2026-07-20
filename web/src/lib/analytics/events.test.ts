@@ -19,8 +19,18 @@ const {
 
 type Pushed = Record<string, unknown>;
 
+function rawLayer(): unknown[] {
+	return (globalThis as { window?: { dataLayer?: unknown[] } }).window?.dataLayer ?? [];
+}
+
 function layer(): Pushed[] {
-	return (globalThis as { window?: { dataLayer?: Pushed[] } }).window?.dataLayer ?? [];
+	return rawLayer().filter(
+		(value): value is Pushed =>
+			typeof value === 'object' &&
+			value !== null &&
+			'event' in value &&
+			typeof value.event === 'string'
+	);
 }
 
 function last(): Pushed {
@@ -233,5 +243,41 @@ describe('gating', () => {
 		configureAnalytics('off');
 		trackContactClicked({ method: 'phone', placement: 'contact_page' });
 		expect(layer()).toHaveLength(0);
+	});
+});
+
+describe('GTM data-model isolation', () => {
+	it('resets GTM state before every event so arrays and optional fields cannot leak', () => {
+		trackListViewed(
+			{ list_id: 'featured', list_name: 'Featured listings' },
+			[
+				{ item_id: 'GHI1', item_category: 'property' },
+				{ item_id: 'GHI2', item_category: 'property' }
+			]
+		);
+		trackListingSelected({ item_id: 'GHI2', item_category: 'property', index: 1 });
+
+		const raw = rawLayer();
+		expect(raw).toHaveLength(4);
+		expect(typeof raw[0]).toBe('function');
+		expect(typeof raw[2]).toBe('function');
+		expect(layer()[1].items).toEqual([
+			{ item_id: 'GHI2', item_category: 'property', index: 1 }
+		]);
+
+		const reset = vi.fn();
+		(raw[2] as (this: { reset(): void }) => void).call({ reset });
+		expect(reset).toHaveBeenCalledOnce();
+	});
+
+	it('restores the debug marker after a reset and before the event', () => {
+		configureAnalytics('debug');
+		trackContactClicked({ method: 'phone', placement: 'contact_page' });
+
+		const raw = rawLayer();
+		expect(raw).toHaveLength(3);
+		expect(typeof raw[0]).toBe('function');
+		expect(raw[1]).toEqual({ ghi_environment: 'debug' });
+		expect(raw[2]).toMatchObject({ event: 'ghi_contact_clicked' });
 	});
 });
