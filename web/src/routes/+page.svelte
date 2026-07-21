@@ -19,6 +19,19 @@
 	);
 </script>
 
+<svelte:head>
+	<title>Golf Homes International</title>
+	<meta name="description" content="Curated residential properties on and near premier golf courses in southern Europe and beyond." />
+	<link rel="canonical" href={data.canonicalUrl} />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content={data.canonicalUrl} />
+	<meta property="og:title" content="Golf Homes International" />
+	<meta property="og:description" content="Curated residential properties on and near premier golf courses in southern Europe and beyond." />
+	{#if data.homepageHero?.url}
+		<meta property="og:image" content={data.homepageHero.url} />
+	{/if}
+</svelte:head>
+
 <section class="home-hero on-dark">
 	{#if data.homepageHero}
 		<div

@@ -3,6 +3,7 @@ import type { PageServerLoad } from './$types';
 import { buildGolfCourseBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import { withPreviewLocationSeo } from '$lib/listing/detailPage';
 import { buildGolfCourseSeo } from '$lib/listing/seo';
+import { hasIndexAffectingQuery } from '$lib/seo/indexability';
 import { parseListingSearchParams } from '$lib/listing/searchParams';
 import {
 	fetchListingCards,
@@ -44,6 +45,9 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 
 	const breadcrumbs = buildGolfCourseBreadcrumbs(course, canonicalPath);
 	const seoBase = buildGolfCourseSeo(course, canonicalUrl);
+	if (hasIndexAffectingQuery(searchParams)) {
+		seoBase.noindex = true;
+	}
 	const seo = preview ? withPreviewLocationSeo(seoBase) : seoBase;
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, url.origin);
 

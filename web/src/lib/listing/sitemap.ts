@@ -79,6 +79,13 @@ export function buildInsightPath(row: SitemapInsightRow): string | null {
 	return `/insights/${row.slug}`;
 }
 
+const STATIC_INDEXABLE_PATHS = [
+	'/about',
+	'/contact',
+	'/front-line-collection',
+	'/partners'
+] as const;
+
 export function collectSitemapEntries(
 	taxonomyRows: SitemapTaxonomyRow[],
 	listingRows: SitemapListingRow[],
@@ -105,6 +112,10 @@ export function collectSitemapEntries(
 	}
 
 	add('/', null);
+
+	for (const path of STATIC_INDEXABLE_PATHS) {
+		add(path, null);
+	}
 
 	for (const row of taxonomyRows) {
 		add(buildTaxonomyPath(row), row._updatedAt);

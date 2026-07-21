@@ -10,7 +10,8 @@ export const prerender = false;
 // Hero comes from siteSettings.homepageHero (auto AVIF/WebP + srcset), the same image
 // the homepage uses. Resolves to null if unset/unreachable; the page falls back to the
 // optimized static asset so the gate always renders.
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ setHeaders }) => {
+	setHeaders({ 'X-Robots-Tag': 'noindex, follow, noarchive' });
 	const hero = resolveHomepageHeroImage(await fetchSiteSettingsHero());
 	return { hero };
 };

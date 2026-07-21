@@ -58,12 +58,11 @@ describe('collectSitemapEntries', () => {
 			]
 		);
 
-		expect(entries.map((entry) => entry.path)).toEqual([
-			'/',
-			'/spain',
-			'/spain/costa-del-sol',
-			'/spain/costa-del-sol/marbella/villa-example'
-		]);
+		const paths = entries.map((entry) => entry.path);
+		expect(paths).toContain('/');
+		expect(paths).toContain('/spain');
+		expect(paths).toContain('/spain/costa-del-sol');
+		expect(paths).toContain('/spain/costa-del-sol/marbella/villa-example');
 
 		const listing = entries.find((entry) => entry.path.endsWith('/villa-example'));
 		expect(listing?.lastmod).toBe('2026-05-04T00:00:00.000Z');
@@ -116,10 +115,39 @@ describe('collectSitemapEntries golf courses', () => {
 			]
 		);
 
-		expect(entries.map((entry) => entry.path)).toEqual([
-			'/',
-			'/spain/marbella/nueva-andalucia/golf/aloha-golf'
-		]);
+		const paths = entries.map((entry) => entry.path);
+		expect(paths).toContain('/');
+		expect(paths).toContain('/spain/marbella/nueva-andalucia/golf/aloha-golf');
+	});
+});
+
+describe('collectSitemapEntries static routes', () => {
+	it('includes all approved static indexable routes', () => {
+		const entries = collectSitemapEntries([], []);
+		const paths = entries.map((entry) => entry.path);
+
+		expect(paths).toContain('/about');
+		expect(paths).toContain('/contact');
+		expect(paths).toContain('/front-line-collection');
+		expect(paths).toContain('/partners');
+	});
+
+	it('does not include noindex, holding, internal or legal routes', () => {
+		const entries = collectSitemapEntries([], []);
+		const paths = entries.map((entry) => entry.path);
+
+		expect(paths).not.toContain('/soon');
+		expect(paths).not.toContain('/internal');
+		expect(paths).not.toContain('/privacy');
+		expect(paths).not.toContain('/terms');
+		expect(paths).not.toContain('/cookies');
+	});
+
+	it('does not include query-string URLs', () => {
+		const entries = collectSitemapEntries([], []);
+		for (const entry of entries) {
+			expect(entry.path).not.toContain('?');
+		}
 	});
 });
 
