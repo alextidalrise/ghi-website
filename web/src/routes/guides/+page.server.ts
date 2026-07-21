@@ -1,12 +1,18 @@
 import type { PageServerLoad } from './$types';
 import { breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
-import { fetchPublic, guidesHubQuery } from '$lib/sanity/queries';
+import { fetchPublic, guidesHubQuery, fetchGuidesHubPage } from '$lib/sanity/queries';
 import { GUIDES_PATH, buildGuidesBreadcrumbs, groupGuidesByCategory } from '$lib/guides';
 import type { GuideCard } from '$lib/guides';
+import { resolveGuidesHubContent } from '$lib/sanity/transforms/pageContent';
 
 export const load: PageServerLoad = async ({ url }) => {
-	const cards = (await fetchPublic<GuideCard[]>(guidesHubQuery)) ?? [];
-	const groups = groupGuidesByCategory(cards);
+	const [cards, rawPage] = await Promise.all([
+		fetchPublic<GuideCard[]>(guidesHubQuery).then((r) => r ?? []),
+		fetchGuidesHubPage()
+	]);
+
+	const content = resolveGuidesHubContent(rawPage);
+	const groups = groupGuidesByCategory(cards, content.categoryMeta);
 
 	const canonicalUrl = `${url.origin}${GUIDES_PATH}`;
 	const breadcrumbs = buildGuidesBreadcrumbs();
@@ -14,6 +20,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	return {
 		groups,
+		content,
 		canonicalUrl,
 		breadcrumbs,
 		breadcrumbJsonLd

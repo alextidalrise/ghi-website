@@ -2,11 +2,14 @@ import {
 	BookIcon,
 	CheckmarkIcon,
 	ClipboardIcon,
+	ComposeIcon,
 	DesktopIcon,
 	DocumentIcon,
 	EarthAmericasIcon,
 	EditIcon,
+	EnvelopeIcon,
 	EyeClosedIcon,
+	InfoOutlineIcon,
 	UsersIcon,
 	WarningOutlineIcon
 } from '@sanity/icons';
@@ -42,6 +45,42 @@ export const deskStructure: StructureResolver = (S) =>
 				.icon(DesktopIcon)
 				.child(
 					S.document().schemaType('siteSettings').documentId('siteSettings').title('Site settings')
+				),
+			S.listItem()
+				.title('Pages')
+				.icon(ComposeIcon)
+				.child(
+					S.list()
+						.title('Pages')
+						.items([
+							S.listItem()
+								.title('Guides hub')
+								.icon(BookIcon)
+								.child(
+									S.document()
+										.schemaType('guidesHubPage')
+										.documentId('guidesHubPage')
+										.title('Guides hub')
+								),
+							S.listItem()
+								.title('About')
+								.icon(InfoOutlineIcon)
+								.child(
+									S.document()
+										.schemaType('aboutPage')
+										.documentId('aboutPage')
+										.title('About')
+								),
+							S.listItem()
+								.title('Contact')
+								.icon(EnvelopeIcon)
+								.child(
+									S.document()
+										.schemaType('contactPage')
+										.documentId('contactPage')
+										.title('Contact')
+								)
+						])
 				),
 			S.listItem()
 				.title('Properties')

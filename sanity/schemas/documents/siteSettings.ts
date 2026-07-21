@@ -167,6 +167,36 @@ export const siteSettings = defineType({
 			validation: (Rule) => Rule.max(10).custom(noDuplicateLocations)
 		}),
 		defineField({
+			name: 'homepageSeo',
+			title: 'Homepage SEO',
+			type: 'seoFields',
+			description: 'SEO metadata for the homepage. Overrides the site-wide defaults.',
+			options: { collapsible: true, collapsed: true }
+		}),
+		defineField({
+			name: 'homepageContent',
+			title: 'Homepage content',
+			type: 'homepageContent',
+			description:
+				'Editorial copy for the homepage. Each field has a built-in default on the site if left empty.',
+			options: { collapsible: true, collapsed: true }
+		}),
+		defineField({
+			name: 'frontlineSeo',
+			title: 'Front Line Collection SEO',
+			type: 'seoFields',
+			description: 'SEO metadata for the /front-line-collection page.',
+			options: { collapsible: true, collapsed: true }
+		}),
+		defineField({
+			name: 'frontlineContent',
+			title: 'Front Line Collection content',
+			type: 'frontlineContent',
+			description:
+				'Editorial copy for the Front Line Collection page beyond the hero. Each field has a built-in default on the site if left empty.',
+			options: { collapsible: true, collapsed: true }
+		}),
+		defineField({
 			name: 'featureFilter',
 			title: 'Features filter',
 			type: 'object',

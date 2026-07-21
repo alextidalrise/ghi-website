@@ -677,6 +677,100 @@ export const UNIT_LISTING_PUBLIC = /* groq */ `{
   ${UNIT_CANONICAL_PATH_FIELDS}
 }`;
 
+/** Public homepage editorial content from siteSettings. */
+export const HOMEPAGE_CONTENT_PUBLIC = /* groq */ `{
+  heroHeadline,
+  buyerIntroHeading,
+  buyerIntroDeck,
+  buyerIntroCta,
+  featuredHeading,
+  featuredSummary,
+  frontlineHeading,
+  frontlineSummary,
+  destinationsHeading,
+  partnersHeading,
+  partnersSubhead,
+  partnersCta,
+  partnersCtaSupport,
+  reviewsHeading,
+  reviewsDeck,
+  primaryCtaLabel,
+  primaryCtaRoute
+}`;
+
+/** Public Front Line Collection editorial content from siteSettings. */
+export const FRONTLINE_CONTENT_PUBLIC = /* groq */ `{
+  explanatoryHeading,
+  explanatoryBody,
+  ctaLabel,
+  resultsHeading
+}`;
+
+/** Public guides-hub page singleton projection. */
+export const GUIDES_HUB_PUBLIC = /* groq */ `{
+  heroTitle,
+  heroLead,
+  sectionHeading,
+  sectionIntro,
+  categories[]{ key, label, blurb },
+  emptyStateMessage,
+  seo${SEO_PUBLIC}
+}`;
+
+/** Public about page singleton projection. */
+export const ABOUT_PAGE_PUBLIC = /* groq */ `{
+  heroTitle,
+  heroLead,
+  storyHeading,
+  storyBody,
+  storyQuote,
+  networkHeading,
+  networkBody,
+  networkChips,
+  networkCta,
+  placesHeading,
+  placesBody,
+  teamHeading,
+  teamMembers[]{
+    name,
+    role,
+    bio,
+    image${MEDIA_ASSET_PUBLIC}
+  },
+  teamContactFlag,
+  closingHeading,
+  closingBody,
+  closingPrimaryCta,
+  closingPrimaryRoute,
+  closingSecondaryCta,
+  closingSecondaryRoute,
+  reviewsHeading,
+  seo${SEO_PUBLIC}
+}`;
+
+/** Public contact page singleton projection. */
+export const CONTACT_PAGE_PUBLIC = /* groq */ `{
+  heroTitle,
+  heroLead,
+  contactName,
+  contactRole,
+  contactFlag,
+  directHeading,
+  whatsappCta,
+  phoneLabel,
+  reassuranceNote,
+  nextStepsHeading,
+  nextSteps,
+  formHeading,
+  formIntro,
+  partnerFormHeading,
+  partnersHeading,
+  partnersSubhead,
+  partnersCta,
+  partnersCtaSupport,
+  seo${SEO_PUBLIC}
+}`;
+
 /** Canonical path fields for slug resolution and 301 redirects. */
 export const CANONICAL_PATH_FIELDS = /* groq */ `
   "countrySlug": ${LISTING_COUNTRY_SLUG},

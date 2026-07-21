@@ -2,7 +2,9 @@ import type { PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
 import { loadReviews } from '$lib/reviews';
 import { fetchLocationHeroesBySlug } from '$lib/sanity/queries/settings';
+import { fetchAboutPage } from '$lib/sanity/queries';
 import { buildImageSrcset, buildPublicImageUrl } from '$lib/sanity/image';
+import { resolveAboutContent } from '$lib/sanity/transforms/pageContent';
 
 const BASE_PATH = '/about';
 
@@ -47,10 +49,13 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 		{ label: 'About', href: BASE_PATH }
 	];
 
-	const [heroes, reviews] = await Promise.all([
+	const [heroes, reviews, rawPage] = await Promise.all([
 		fetchLocationHeroesBySlug(DESTINATIONS.map((d) => d.heroSlug)),
-		loadReviews(fetch)
+		loadReviews(fetch),
+		fetchAboutPage()
 	]);
+
+	const content = resolveAboutContent(rawPage);
 	const heroBySlug = new Map(heroes.map((h) => [h.slug, h.heroImage]));
 
 	const destinations = DESTINATIONS.map((d) => {
@@ -65,16 +70,18 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 	});
 
 	const seo = {
-		title: 'About Us | Golf Homes International',
+		title: content.seo?.seoTitle?.trim() || 'About Us | Golf Homes International',
 		description:
+			content.seo?.metaDescription?.trim() ||
 			'Specialists in golf property across Spain and Portugal, built around people, not just listings. Meet the team and the trusted network that makes buying abroad simpler and safer.',
 		canonicalUrl,
-		noindex: false
+		noindex: content.seo?.noindex ?? false
 	};
 
 	return {
 		breadcrumbs,
 		seo,
+		content,
 		destinations,
 		reviews,
 		breadcrumbJsonLd: breadcrumbListJsonLd(breadcrumbs, url.origin)

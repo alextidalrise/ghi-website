@@ -8,6 +8,15 @@
 	import TrustedPartners from '$lib/components/home/TrustedPartners.svelte';
 	import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 	let { data } = $props();
+	const c = $derived(data.content);
+
+	const headlineParts = $derived(
+		c.heroHeadline
+			.split('\n')
+			.map((line) =>
+				line.split('*').map((text, j) => ({ text, italic: j % 2 === 1 }))
+			)
+	);
 </script>
 
 <section class="home-hero on-dark">
@@ -33,8 +42,7 @@
 
 	<div class="home-hero__content content-wrap">
 		<h1 class="home-hero__title">
-			Homes beside<br />
-			<em>the fairway</em>
+			{#each headlineParts as line, i}{#if i}<br />{/if}{#each line as part}{#if part.italic}<em>{part.text}</em>{:else}{part.text}{/if}{/each}{/each}
 		</h1>
 		{#if data.homepageHeroTagline}
 			<p class="home-hero__lead">{data.homepageHeroTagline}</p>
@@ -61,23 +69,29 @@
 	<DestinationsByCountry
 		countries={data.featuredCountries}
 		locations={data.featuredLocations}
+		heading={c.destinationsHeading}
 	/>
 
 	<!-- Lead-magnet signpost sits below the white "Explore by country" index so its faint
 	     green tint never lands directly under the search bar (where it competed with the
 	     bar and left awkward whitespace). -->
-	<BuyerGuides countries={data.featuredCountries} />
+	<BuyerGuides
+		countries={data.featuredCountries}
+		heading={c.buyerIntroHeading}
+		deck={c.buyerIntroDeck}
+		cta={c.buyerIntroCta}
+	/>
 
 	<FeaturedListings
 		cards={data.featuredCards}
-		heading="Featured properties"
-		summary="Hand-picked listings across Spain and Portugal."
+		heading={c.featuredHeading}
+		summary={c.featuredSummary}
 	/>
 
 	<FrontlineListings
 		cards={data.frontlineCards}
-		heading="Frontline Golf Properties"
-		summary="Homes directly on the fairway, in Spain and Portugal."
+		heading={c.frontlineHeading}
+		summary={c.frontlineSummary}
 		viewAllHref={FRONTLINE_COLLECTION_PATH}
 	/>
 
@@ -87,11 +101,20 @@
 
 	     flushTop: this band butts straight onto the green Frontline band above it, per the
 	     stacking rule — no section-gap, no top rule. -->
-	<GoogleReviews data={data.reviews} flushTop />
+	<GoogleReviews
+		data={data.reviews}
+		heading={c.reviewsHeading}
+		deck={c.reviewsDeck}
+		flushTop
+	/>
 
 	<TrustedPartners
 		partners={data.partnerLogos.length ? data.partnerLogos : undefined}
+		heading={c.partnersHeading}
+		subhead={c.partnersSubhead}
+		ctaLabel={c.partnersCta}
 		ctaHref="/partners"
+		ctaSupport={c.partnersCtaSupport}
 	/>
 
 	{#if data.featuredCards.length === 0 && data.frontlineCards.length === 0}

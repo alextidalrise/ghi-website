@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types';
 import {
 	fetchCountriesWithHero,
 	fetchFeatureFilterSettings,
+	fetchHomepageContent,
 	fetchHomepageFeaturedListingCards,
 	fetchHomepageFeaturedLocations,
 	fetchHomepageFrontlineListingCards,
@@ -12,6 +13,7 @@ import {
 } from '$lib/sanity/queries';
 import { loadReviews } from '$lib/reviews';
 import { resolveHomepageHeroImage } from '$lib/sanity/transforms/taxonomyHero';
+import { resolveHomepageContent } from '$lib/sanity/transforms/pageContent';
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	const [
@@ -24,7 +26,8 @@ export const load: PageServerLoad = async ({ fetch }) => {
 		partnerLogos,
 		facetRows,
 		reviews,
-		featureFilter
+		featureFilter,
+		rawContent
 	] = await Promise.all([
 		fetchNavTaxonomy(),
 		fetchHomepageFeaturedListingCards(),
@@ -35,8 +38,11 @@ export const load: PageServerLoad = async ({ fetch }) => {
 		fetchHomepagePartnerLogos(),
 		fetchListingFacetRows(),
 		loadReviews(fetch),
-		fetchFeatureFilterSettings()
+		fetchFeatureFilterSettings(),
+		fetchHomepageContent()
 	]);
+
+	const content = resolveHomepageContent(rawContent);
 
 	return {
 		countries: nav.countries,
@@ -51,6 +57,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
 		featuredCountries,
 		featuredLocations,
 		partnerLogos,
-		reviews
+		reviews,
+		content
 	};
 };
