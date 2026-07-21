@@ -65,10 +65,6 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 	<title>Golf Homes International</title>
-	<meta
-		name="description"
-		content="Curated residential properties on and near premier golf courses in southern Europe and beyond."
-	/>
 </svelte:head>
 
 {#if $isPreviewing}
