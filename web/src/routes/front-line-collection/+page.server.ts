@@ -3,10 +3,12 @@ import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcru
 import { parseListingSearchParams } from '$lib/listing/searchParams';
 import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 import {
+	fetchFrontlineContent,
 	fetchFrontlineCourseOptions,
 	fetchFrontlineHero,
 	fetchListingCards
 } from '$lib/sanity/queries';
+import { resolveFrontlineContent } from '$lib/sanity/transforms/pageContent';
 
 const BASE_PATH = FRONTLINE_COLLECTION_PATH;
 
@@ -14,17 +16,17 @@ export const load: PageServerLoad = async ({ url }) => {
 	const searchParams = parseListingSearchParams(url);
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
 
-	const [listingResults, courseOptions, hero] = await Promise.all([
+	const [listingResults, courseOptions, hero, rawContent] = await Promise.all([
 		fetchListingCards({
 			scope: { type: 'global' },
-			// The whole collection is frontline golf — pin it server-side rather than
-			// exposing the generic golf-relevance filter. User facets (course, price,
-			// type, beds, sort) still apply on top.
 			params: { ...searchParams, golfRelevance: ['frontline_golf'] }
 		}),
 		fetchFrontlineCourseOptions(),
-		fetchFrontlineHero()
+		fetchFrontlineHero(),
+		fetchFrontlineContent()
 	]);
+
+	const content = resolveFrontlineContent(rawContent);
 
 	const breadcrumbs: BreadcrumbItem[] = [
 		{ label: 'Home', href: '/' },
@@ -32,11 +34,12 @@ export const load: PageServerLoad = async ({ url }) => {
 	];
 
 	const seo = {
-		title: 'Frontline Golf Homes | Golf Homes International',
+		title: content.seo?.seoTitle?.trim() || 'Frontline Golf Homes | Golf Homes International',
 		description:
+			content.seo?.metaDescription?.trim() ||
 			'Every property on the first line of a golf course, across Spain and Portugal. Filter the frontline collection by golf course, price, property type and bedrooms.',
 		canonicalUrl,
-		noindex: false
+		noindex: content.seo?.noindex ?? false
 	};
 
 	return {
@@ -45,6 +48,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		listingResults,
 		courseOptions,
 		hero,
+		content,
 		breadcrumbs,
 		seo,
 		breadcrumbJsonLd: breadcrumbListJsonLd(breadcrumbs, url.origin)

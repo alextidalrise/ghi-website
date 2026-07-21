@@ -1,9 +1,12 @@
 import type { SchemaTypeDefinition } from 'sanity';
 
+import { aboutPage } from './aboutPage';
 import { author } from './author';
+import { contactPage } from './contactPage';
 import { development } from './development';
 import { golfCourse } from './golfCourse';
 import { guide } from './guide';
+import { guidesHubPage } from './guidesHubPage';
 import { insight } from './insight';
 import { locationTaxonomy } from './locationTaxonomy';
 import { partner } from './partner';
@@ -16,6 +19,9 @@ import { unitType } from './unitType';
 /** Document schemas for GHI Sanity Studio. */
 export const documentTypes: SchemaTypeDefinition[] = [
 	siteSettings,
+	guidesHubPage,
+	aboutPage,
+	contactPage,
 	locationTaxonomy,
 	golfCourse,
 	development,
@@ -30,10 +36,13 @@ export const documentTypes: SchemaTypeDefinition[] = [
 ];
 
 export {
+	aboutPage,
 	author,
+	contactPage,
 	development,
 	golfCourse,
 	guide,
+	guidesHubPage,
 	insight,
 	locationTaxonomy,
 	partner,

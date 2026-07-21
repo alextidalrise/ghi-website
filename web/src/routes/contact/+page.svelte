@@ -17,15 +17,15 @@
 
 	let { data, form } = $props();
 
-	// James is the named first point of contact across the site (see About). Photo is
-	// intentionally null until the real headshot lands — a sized monogram stands in,
-	// never a broken <img>, matching the About team treatment.
-	const lead = {
-		name: 'James Pryor',
-		initials: 'JP',
+	const c = $derived(data.content);
+
+	const lead = $derived({
+		name: c.contactName,
+		firstName: c.contactFirstName,
+		initials: c.contactInitials,
 		photo: null as string | null,
-		role: 'James leads the day to day and is the person you will speak to when you enquire.'
-	};
+		role: c.contactRole
+	});
 
 	// One line, one module ($lib/contact/contact) — shared with /soon, the enquiry rail and
 	// the closing band, so the number can never drift between surfaces.
@@ -33,13 +33,7 @@
 	const phoneHref = PHONE_HREF;
 	const whatsApp = whatsAppHref(GENERAL_WHATSAPP_MESSAGE);
 
-	// What happens after an enquiry lands. Specific, not aphoristic; reassurance for an
-	// audience that buys abroad once or twice in a lifetime.
-	const nextSteps = [
-		'We reply within one working day, usually sooner.',
-		'We ask a few questions to understand what you are after: the area, the budget, the timing.',
-		'No pressure and no obligation. Your details stay with us and never go to a sales list.'
-	];
+	const nextSteps = $derived(c.nextSteps);
 
 	// An introduction request, arriving as ?partner=<slug> from a partner card or a listing's
 	// enquiry shelf. Null for a direct visit or an unknown slug — the form is then the plain
@@ -156,12 +150,8 @@
 	<!-- Hero — white editorial. The page's green is spent on the contained enquiry
 	     panel below, not a full-bleed band. -->
 	<header class="hero content-wrap">
-		<h1 class="hero__title">Tell us what you're looking for</h1>
-		<p class="hero__lead">
-			Whether you are ready to view or just starting to picture it, we are here to help you buy
-			golf property in Spain and Portugal. Tell us a little about what you have in mind and the
-			right person will be in touch.
-		</p>
+		<h1 class="hero__title">{c.heroTitle}</h1>
+		<p class="hero__lead">{c.heroLead}</p>
 	</header>
 
 	<!-- Core: human reassurance (left) + the enquiry panel (right). On phones the human
@@ -181,7 +171,7 @@
 						{/if}
 					</div>
 					<div class="reach__person-text">
-						<p class="reach__flag text-overline">Your first point of contact</p>
+						<p class="reach__flag text-overline">{c.contactFlag}</p>
 						<h3 class="reach__name">{lead.name}</h3>
 						<p class="reach__role">{lead.role}</p>
 					</div>
@@ -189,7 +179,7 @@
 
 				<!-- Direct paths -->
 				<div class="reach__direct">
-					<h3 class="reach__subhead">Or reach us directly</h3>
+					<h3 class="reach__subhead">{c.directHeading}</h3>
 					<a
 						class="reach__whatsapp"
 						href={whatsApp}
@@ -205,24 +195,22 @@
 								d="M21.6 18.86c-.3-.16-1.78-.92-2.06-1.02-.28-.1-.48-.16-.68.15-.2.3-.78.96-.96 1.16-.18.2-.36.22-.66.07-.3-.15-1.27-.49-2.41-1.55-.89-.83-1.49-1.85-1.66-2.16-.18-.3-.02-.47.13-.62.14-.14.3-.36.46-.54.15-.18.2-.3.3-.51.1-.2.05-.38-.02-.54-.07-.15-.68-1.7-.93-2.32-.24-.6-.49-.52-.68-.53l-.58-.01c-.2 0-.53.08-.81.38-.28.3-1.06 1.06-1.06 2.58s1.09 3 1.24 3.2c.15.21 2.13 3.4 5.18 4.77.72.32 1.29.51 1.73.65.73.24 1.39.2 1.91.12.58-.09 1.78-.74 2.04-1.46.25-.71.25-1.32.18-1.45-.07-.13-.27-.21-.57-.36z"
 							/>
 						</svg>
-						<span>Message us on WhatsApp</span>
+						<span>{c.whatsappCta}</span>
 					</a>
 					<a
 						class="reach__phone"
 						href={phoneHref}
 						onclick={() => trackContactClicked({ method: 'phone', placement: 'contact_page' })}
 					>
-						<span class="reach__phone-label">Call or text</span>
+						<span class="reach__phone-label">{c.phoneLabel}</span>
 						<span class="reach__phone-number tabular-nums">{phoneDisplay}</span>
 					</a>
-					<p class="reach__note">
-						Prefer to put it in writing? Send the enquiry and it comes straight to us.
-					</p>
+					<p class="reach__note">{c.reassuranceNote}</p>
 				</div>
 
 				<!-- What happens next -->
 				<div class="reach__next">
-					<h3 class="reach__subhead">What happens next</h3>
+					<h3 class="reach__subhead">{c.nextStepsHeading}</h3>
 					<ul class="reach__steps">
 						{#each nextSteps as step (step)}
 							<li>{step}</li>
@@ -246,21 +234,19 @@
 									: 'Thank you, your enquiry is with us'}
 							</h3>
 							<p class="panel__confirm-note">
-								{lead.name.split(' ')[0]} will reply within one working day. If you would rather not wait,
+								{lead.firstName} will reply within one working day. If you would rather not wait,
 								message us on WhatsApp and we will pick it up right away.
 							</p>
 						</div>
 					{:else}
 						{#if partnerIntro}
-							<h3 class="panel__heading">Request an introduction</h3>
+							<h3 class="panel__heading">{c.partnerFormHeading}</h3>
 							<p class="panel__intro">
-								To <strong class="panel__partner">{partnerIntro.name}</strong>{#if partnerIntro.category}, our {partnerIntro.category.toLowerCase()} specialist{/if}. {lead.name.split(
-									' '
-								)[0]} will make the introduction personally.
+								To <strong class="panel__partner">{partnerIntro.name}</strong>{#if partnerIntro.category}, our {partnerIntro.category.toLowerCase()} specialist{/if}. {lead.firstName} will make the introduction personally.
 							</p>
 						{:else}
-							<h3 class="panel__heading">Send an enquiry</h3>
-							<p class="panel__intro">A few details and {lead.name.split(' ')[0]} will take it from there.</p>
+							<h3 class="panel__heading">{c.formHeading}</h3>
+							<p class="panel__intro">{c.formIntro}</p>
 						{/if}
 
 						<form
@@ -372,11 +358,11 @@
 		<div class="network__inner content-wrap">
 			<TrustedPartners
 				partners={data.partnerLogos.length ? data.partnerLogos : undefined}
-				heading="An introduction to the right people"
-				subhead="Lawyers, tax advisers, mortgage brokers and people on the ground. Use your own, or let us introduce you to a network we know and trust."
-				ctaLabel="View our partners"
+				heading={c.partnersHeading}
+				subhead={c.partnersSubhead}
+				ctaLabel={c.partnersCta}
 				ctaHref="/partners"
-				ctaSupport="Tell us what you need when you enquire and we will connect you with the right specialist."
+				ctaSupport={c.partnersCtaSupport}
 			/>
 		</div>
 	</section>

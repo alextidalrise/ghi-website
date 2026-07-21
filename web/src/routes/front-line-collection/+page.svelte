@@ -37,7 +37,7 @@
 		lead={data.hero.lead}
 		breadcrumbs={data.breadcrumbs}
 		ctaHref="#properties"
-		ctaLabel="Browse the collection"
+		ctaLabel={data.content.ctaLabel}
 		compact
 		fetchpriority="high"
 	>
@@ -53,7 +53,7 @@
 			cards={data.listingResults.cards}
 			total={data.listingResults.total}
 			pagination={data.listingResults.pagination}
-			heading="Frontline golf homes"
+			heading={data.content.resultsHeading}
 			courseOptions={data.courseOptions}
 			showGolfRelevance={false}
 		/>

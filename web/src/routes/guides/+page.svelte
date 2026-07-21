@@ -11,25 +11,34 @@
 	// separate the categories.
 	const showGroupHeadings = $derived(groups.length > 1);
 
-	const pageTitle = 'Guides | Golf Homes International';
-	const metaDescription =
-		'Detailed, current guidance on buying property near the finest golf in Spain and Portugal: the legal process, the costs, and the decisions that matter.';
+	const c = $derived(data.content);
+
+	const pageTitle = $derived(c.seo?.seoTitle?.trim() || 'Guides | Golf Homes International');
+	const metaDescription = $derived(
+		c.seo?.metaDescription?.trim() ||
+			'Detailed, current guidance on buying property near the finest golf in Spain and Portugal: the legal process, the costs, and the decisions that matter.'
+	);
+	const ogTitle = $derived(c.seo?.openGraphTitle?.trim() || 'Guides');
+	const ogDescription = $derived(c.seo?.openGraphDescription?.trim() || metaDescription);
 </script>
 
 <svelte:head>
 	<title>{pageTitle}</title>
 	<meta name="description" content={metaDescription} />
 	<link rel="canonical" href={data.canonicalUrl} />
+	{#if c.seo?.noindex}
+		<meta name="robots" content="noindex" />
+	{/if}
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={data.canonicalUrl} />
-	<meta property="og:title" content="Guides" />
-	<meta property="og:description" content={metaDescription} />
+	<meta property="og:title" content={ogTitle} />
+	<meta property="og:description" content={ogDescription} />
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
 
 <GuideTextHero
-	title="Guides"
-	lead="Considered, current guidance on buying and owning a home near the finest golf in Spain and Portugal."
+	title={c.heroTitle}
+	lead={c.heroLead}
 	breadcrumbs={data.breadcrumbs}
 />
 
@@ -39,7 +48,7 @@
 			<section class="guides-hub__group content-wrap" aria-labelledby={`group-${group.category}`}>
 				<div class="guides-hub__group-head">
 					<h2 class="guides-hub__group-heading" id={`group-${group.category}`}>
-						{showGroupHeadings ? group.meta.label : 'Where to start'}
+						{showGroupHeadings ? group.meta.label : c.sectionHeading}
 					</h2>
 					<p class="guides-hub__group-blurb">{group.meta.blurb}</p>
 				</div>
@@ -54,7 +63,7 @@
 		{/each}
 	{:else}
 		<section class="guides-hub__empty content-wrap">
-			<p>The first guides are being written. Check back shortly.</p>
+			<p>{c.emptyStateMessage}</p>
 		</section>
 	{/if}
 </div>

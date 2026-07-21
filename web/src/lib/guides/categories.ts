@@ -40,12 +40,17 @@ export type GuideCategoryGroup = {
 /**
  * Bucket guide cards into category groups in display order. Categories with no
  * guides are dropped, so the hub never shows an empty "Golf guides" heading before
- * that content exists.
+ * that content exists. An optional `metaOverrides` map replaces the built-in labels
+ * and blurbs per category when CMS content is available.
  */
-export function groupGuidesByCategory(cards: GuideCard[]): GuideCategoryGroup[] {
+export function groupGuidesByCategory(
+	cards: GuideCard[],
+	metaOverrides?: Record<string, GuideCategoryMeta>
+): GuideCategoryGroup[] {
+	const lookup = metaOverrides ?? GUIDE_CATEGORY_META;
 	return GUIDE_CATEGORY_ORDER.map((category) => ({
 		category,
-		meta: GUIDE_CATEGORY_META[category],
+		meta: lookup[category] ?? GUIDE_CATEGORY_META[category],
 		guides: cards.filter((card) => card.guideCategory === category)
 	})).filter((group) => group.guides.length > 0);
 }

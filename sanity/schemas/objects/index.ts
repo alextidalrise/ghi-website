@@ -34,6 +34,8 @@ import { pricingFields } from './pricingFields';
 import { propertyContentFields } from './propertyContentFields';
 import { propertyMediaFields } from './propertyMediaFields';
 import { propertyPricingFields } from './propertyPricingFields';
+import { frontlineContent } from './frontlineContent';
+import { homepageContent } from './homepageContent';
 import { relatedContentFields } from './relatedContentFields';
 import { reviewItem } from './reviewItem';
 import { seoFields } from './seoFields';
@@ -75,6 +77,9 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	// Footer (reuses navMenuChild for its links, so registered after it)
 	footerColumn,
 	socialLink,
+	// Page-level editorial objects
+	homepageContent,
+	frontlineContent,
 	// Primary field groups
 	locationFields,
 	pricingFields,
@@ -93,6 +98,8 @@ export const objectTypes: SchemaTypeDefinition[] = [
 ];
 
 export {
+	frontlineContent,
+	homepageContent,
 	reviewItem,
 	contentFields,
 	marketingFields,

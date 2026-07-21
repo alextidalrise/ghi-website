@@ -134,9 +134,30 @@ export function resolveTaxonomyLocationState(doc: {
 export const resolveDocumentLocations: DocumentLocationResolver = (params, context) => {
 	if (params.type === 'siteSettings') {
 		return {
-			message: 'Homepage settings',
+			message: 'Homepage & Front Line Collection settings',
 			tone: 'positive',
-			locations: [{ title: 'Homepage', href: '/' }]
+			locations: [
+				{ title: 'Homepage', href: '/' },
+				{ title: 'Front Line Collection', href: '/front-line-collection' }
+			]
+		};
+	}
+
+	if (params.type === 'guidesHubPage') {
+		return {
+			locations: [{ title: 'Guides', href: '/guides' }]
+		};
+	}
+
+	if (params.type === 'aboutPage') {
+		return {
+			locations: [{ title: 'About', href: '/about' }]
+		};
+	}
+
+	if (params.type === 'contactPage') {
+		return {
+			locations: [{ title: 'Contact', href: '/contact' }]
 		};
 	}
 

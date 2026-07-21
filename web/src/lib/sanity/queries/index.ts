@@ -102,6 +102,14 @@ export {
 } from './settings';
 
 export {
+	fetchHomepageContent,
+	fetchFrontlineContent,
+	fetchGuidesHubPage,
+	fetchAboutPage,
+	fetchContactPage
+} from './pages';
+
+export {
 	fetchNavTaxonomy,
 	fetchCountryNavCommunities,
 	type NavCountryOption,

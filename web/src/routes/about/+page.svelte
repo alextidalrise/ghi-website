@@ -3,53 +3,63 @@
 	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import TalkToUsBand from '$lib/components/TalkToUsBand.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
+	import type { AboutTeamMemberInput } from '$lib/sanity/transforms/pageContent';
 
 	let { data } = $props();
 
-	// The trusted network, surfaced as outline chips. The Partners page holds the
-	// full directory; this is the at-a-glance version that links through to it.
-	const network = ['Lawyers', 'Tax advisers', 'Mortgage brokers', 'On-the-ground specialists'];
+	const c = $derived(data.content);
 
-	// Destinations strip — real project location imagery (3:2). These are the places
-	// named in the copy; "and beyond" is carried in the section intro, not a fourth tile.
-	// Images come from each location's Sanity heroImage (auto AVIF/WebP + srcset) via the
-	// loader, so the strip uses the same optimized pipeline as the rest of the site.
 	const destinations = $derived(data.destinations);
 
-	// Team. Photo URLs are intentionally null until the real headshots land — the
-	// markup renders a sized monogram frame in their place, never a broken <img>.
-	// The `bio` lines are PLACEHOLDER copy in brand voice, written so the section
-	// reads complete in review; replace with the real one-liners before launch.
-	// The `role` lines are the confirmed copy supplied by the client.
-	const team = [
+	function memberInitials(name: string): string {
+		return name
+			.split(/\s+/)
+			.map((w) => w[0])
+			.join('')
+			.toUpperCase()
+			.slice(0, 2);
+	}
+
+	// Hardcoded fallback team used when no CMS team members are authored yet.
+	const FALLBACK_TEAM = [
 		{
 			name: 'James Pryor',
-			initials: 'JP',
-			photo: null as string | null,
 			lead: true,
-			// PLACEHOLDER bio — replace with James's real background line.
 			bio: 'Years spent living and playing across the Costa del Sol, with the local knowledge that only comes from being on the course and in the communities week after week.',
 			role: 'James leads the day to day and is the person you will speak to when you enquire.'
 		},
 		{
 			name: 'Jack Ballantine',
-			initials: 'JB',
-			photo: null as string | null,
 			lead: false,
-			// PLACEHOLDER bio — replace with Jack's real background line.
 			bio: 'A career in international real estate, from city new-builds to resort developments across southern Europe, brought to bear on where the market is heading.',
 			role: 'Jack focuses on strategy and growth.'
 		},
 		{
 			name: 'Alex Chapman',
-			initials: 'AC',
-			photo: null as string | null,
 			lead: false,
-			// PLACEHOLDER bio — replace with Alex's real background line.
 			bio: 'Builds the platform end to end, from the listings you browse to the systems that keep the portfolio curated and honest.',
 			role: 'Alex built and runs the platform and technology behind the business.'
 		}
 	];
+
+	const team = $derived(
+		c.teamMembers
+			? c.teamMembers
+					.filter((m: AboutTeamMemberInput) => m.name)
+					.map((m: AboutTeamMemberInput, i: number) => ({
+						name: m.name!,
+						initials: memberInitials(m.name!),
+						photo: null as string | null,
+						lead: i === 0,
+						bio: m.bio ?? '',
+						role: m.role ?? ''
+					}))
+			: FALLBACK_TEAM.map((m) => ({
+					...m,
+					initials: memberInitials(m.name),
+					photo: null as string | null
+				}))
+	);
 
 </script>
 
@@ -74,54 +84,58 @@
 
 	<!-- Hero — white editorial. The page's single green band is reserved for the close. -->
 	<header class="hero content-wrap">
-		<h1 class="hero__title">Built around people, not just listings</h1>
-		<p class="hero__lead">
-			Specialists in golf property across Spain and Portugal, here to make buying abroad simpler,
-			safer and a lot less daunting.
-		</p>
+		<h1 class="hero__title">{c.heroTitle}</h1>
+		<p class="hero__lead">{c.heroLead}</p>
 	</header>
 
 	<!-- Our story — long-form prose, narrowed measure, with one italic lift. -->
 	<section class="story content-wrap" aria-labelledby="story-heading">
-		<h2 id="story-heading" class="story__heading">Our story</h2>
+		<h2 id="story-heading" class="story__heading">{c.storyHeading}</h2>
 		<div class="story__body">
-			<p>
-				Golf Homes International started with two things we care about more than most: golf and
-				property. Between us we have spent around six years living in Spain and Portugal, playing the
-				courses and getting to know the communities.
-			</p>
-			<p>
-				Buying a home abroad is an emotional decision as much as a financial one, and for most people
-				it is something they do only once or twice in a lifetime. What we kept seeing was how little
-				care goes into the parts that matter most. Having the right professional beside you at every
-				stage is too often left to chance.
-			</p>
-			<blockquote class="story__quote">
-				So we built something different: not just a place to find golf property, but a way of buying
-				that puts the right people around you and supports your decision, rather than pushing a sale.
-			</blockquote>
+			{#if c.storyBody}
+				{#each c.storyBody as block}
+					{#if block && typeof block === 'object' && '_type' in block && block._type === 'block'}
+						{@const b = block as { children?: { text?: string }[]; style?: string }}
+						{@const text = Array.isArray(b.children) ? b.children.map((child: { text?: string }) => child.text ?? '').join('') : ''}
+						{#if b.style === 'blockquote'}
+							<blockquote class="story__quote">{text}</blockquote>
+						{:else}
+							<p>{text}</p>
+						{/if}
+					{/if}
+				{/each}
+			{:else}
+				<p>
+					Golf Homes International started with two things we care about more than most: golf and
+					property. Between us we have spent around six years living in Spain and Portugal, playing the
+					courses and getting to know the communities.
+				</p>
+				<p>
+					Buying a home abroad is an emotional decision as much as a financial one, and for most people
+					it is something they do only once or twice in a lifetime. What we kept seeing was how little
+					care goes into the parts that matter most. Having the right professional beside you at every
+					stage is too often left to chance.
+				</p>
+			{/if}
+			{#if c.storyQuote}
+				<blockquote class="story__quote">{c.storyQuote}</blockquote>
+			{/if}
 		</div>
 	</section>
 
 	<!-- The right people — tier 2: hairline-ruled band, network chips, link to Partners. -->
 	<section class="people content-wrap" aria-labelledby="people-heading">
 		<div class="people__intro">
-			<h2 id="people-heading" class="people__heading">The right people around you</h2>
-			<p class="people__body">
-				We work with a trusted group of professionals across the whole buying process, and people on
-				the ground in Spain and Portugal. You are free to use your own; but if you would like, we can
-				introduce you to people we know and trust. The right person at the right stage takes a huge
-				amount of stress out of buying abroad, and in our experience that is exactly the part most
-				people overlook.
-			</p>
+			<h2 id="people-heading" class="people__heading">{c.networkHeading}</h2>
+			<p class="people__body">{c.networkBody}</p>
 		</div>
 		<ul class="people__chips">
-			{#each network as item (item)}
+			{#each c.networkChips as item (item)}
 				<li>{item}</li>
 			{/each}
 		</ul>
 		<a class="people__link" href="/partners">
-			<span>See our trusted partners</span>
+			<span>{c.networkCta}</span>
 			<svg viewBox="0 0 26 12" fill="none" aria-hidden="true">
 				<path d="M0 6h23M19 1.5 24 6l-5 4.5" stroke="currentColor" stroke-width="1.5" />
 			</svg>
@@ -133,14 +147,8 @@
 	<section class="places" aria-labelledby="places-heading">
 		<div class="places__inner content-wrap">
 			<div class="places__intro">
-				<h2 id="places-heading" class="places__heading">Why golf, and why these places</h2>
-				<p class="places__body">
-					Golf is at the heart of what we do. Every location we cover is a genuine golfing
-					destination: Marbella, Sotogrande, the Algarve and beyond, places where world-class
-					courses, the climate and the lifestyle have built established, sought-after property
-					markets around the game. If golf is part of why you are buying abroad, these are the
-					places that deliver it.
-				</p>
+				<h2 id="places-heading" class="places__heading">{c.placesHeading}</h2>
+				<p class="places__body">{c.placesBody}</p>
 			</div>
 			<ul class="places__grid">
 				{#each destinations as place (place.name)}
@@ -172,12 +180,7 @@
 	<!-- Who we are — framing line, then the team masthead (editorial rows, not a card grid). -->
 	<section class="team content-wrap" aria-labelledby="team-heading">
 		<div class="team__intro">
-			<h2 id="team-heading" class="team__heading">Who we are</h2>
-			<p class="team__body">
-				We are a UK business, and most of the people we help are buying from the UK, though not all.
-				Wherever you are coming from, the aim is the same: to make buying golf property in Spain and
-				Portugal simpler, safer and a lot less daunting.
-			</p>
+			<h2 id="team-heading" class="team__heading">{c.teamHeading}</h2>
 		</div>
 
 		<ul class="team__list">
@@ -193,7 +196,7 @@
 					</div>
 					<div class="member__text">
 						{#if member.lead}
-							<p class="member__flag text-overline">Your first point of contact</p>
+							<p class="member__flag text-overline">{c.teamContactFlag}</p>
 						{/if}
 						<h3 class="member__name">{member.name}</h3>
 						<p class="member__bio">{member.bio}</p>
@@ -212,11 +215,14 @@
 	     bracketed masthead rows). That rule is the divider — a second one here would just be
 	     two lines with a gap between them. -->
 	<div class="content-wrap">
-		<GoogleReviewsCompact data={data.reviews} heading="What our buyers say" divider={false} />
+		<GoogleReviewsCompact data={data.reviews} heading={c.reviewsHeading} divider={false} />
 	</div>
 
 	<!-- Talk to us — the page's single green band. -->
-	<TalkToUsBand />
+	<TalkToUsBand
+		heading={c.closingHeading}
+		body={c.closingBody}
+	/>
 </article>
 
 <style>
@@ -446,14 +452,6 @@
 
 	.team__heading {
 		margin-bottom: var(--space-md);
-	}
-
-	.team__body {
-		font-family: var(--sans);
-		font-weight: 300;
-		font-size: var(--text-body);
-		line-height: 1.8;
-		color: var(--charcoal);
 	}
 
 	.team__list {

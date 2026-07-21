@@ -4,7 +4,9 @@ import type { Actions, PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
 import { loadReviews } from '$lib/reviews';
 import { fetchHomepagePartnerLogos, fetchPartnerIntroduction } from '$lib/sanity/queries/partners';
+import { fetchContactPage } from '$lib/sanity/queries';
 import { PARTNER_INTRO_PARAM } from '$lib/partners/partners';
+import { resolveContactContent } from '$lib/sanity/transforms/pageContent';
 
 const BASE_PATH = '/contact';
 
@@ -31,23 +33,28 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 	// partner cards and the listing enquiry shelf. Resolving it here is what makes the CTA
 	// keep its promise: the form names the specialist instead of opening blank. An unknown
 	// or stale slug resolves to null and the page falls back to the generic form.
-	const [partnerLogos, reviews, partnerIntro] = await Promise.all([
+	const [partnerLogos, reviews, partnerIntro, rawPage] = await Promise.all([
 		fetchHomepagePartnerLogos(),
 		loadReviews(fetch),
-		fetchPartnerIntroduction(url.searchParams.get(PARTNER_INTRO_PARAM))
+		fetchPartnerIntroduction(url.searchParams.get(PARTNER_INTRO_PARAM)),
+		fetchContactPage()
 	]);
 
+	const content = resolveContactContent(rawPage);
+
 	const seo = {
-		title: 'Contact | Golf Homes International',
+		title: content.seo?.seoTitle?.trim() || 'Contact | Golf Homes International',
 		description:
+			content.seo?.metaDescription?.trim() ||
 			'Speak to the Golf Homes International team about golf property in Spain and Portugal. Message us on WhatsApp, call, or send an enquiry and we will reply within a working day.',
 		canonicalUrl,
-		noindex: false
+		noindex: content.seo?.noindex ?? false
 	};
 
 	return {
 		breadcrumbs,
 		seo,
+		content,
 		partnerLogos,
 		partnerIntro,
 		reviews,
