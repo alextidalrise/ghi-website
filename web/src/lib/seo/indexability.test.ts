@@ -47,8 +47,8 @@ describe('hasIndexAffectingQuery', () => {
 		expect(hasIndexAffectingQuery(withOverrides({ features: ['pool'] }))).toBe(true);
 	});
 
-	it('ignores community (handled separately by location route)', () => {
-		expect(hasIndexAffectingQuery(withOverrides({ community: 'marbella' }))).toBe(false);
+	it('returns true for community filter', () => {
+		expect(hasIndexAffectingQuery(withOverrides({ community: 'marbella' }))).toBe(true);
 	});
 
 	it('returns true for multiple active filters', () => {
