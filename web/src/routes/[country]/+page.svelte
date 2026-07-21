@@ -49,6 +49,9 @@
 		<meta name="description" content={data.seo.description} />
 	{/if}
 	<link rel="canonical" href={data.seo.canonicalUrl} />
+	{#if data.seo.noindex}
+		<meta name="robots" content="noindex, follow" />
+	{/if}
 
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={data.seo.canonicalUrl} />

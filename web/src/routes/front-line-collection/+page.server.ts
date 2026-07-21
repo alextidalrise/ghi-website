@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
 import { parseListingSearchParams } from '$lib/listing/searchParams';
+import { hasIndexAffectingQuery } from '$lib/seo/indexability';
 import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 import {
 	fetchFrontlineContent,
@@ -41,6 +42,10 @@ export const load: PageServerLoad = async ({ url }) => {
 		canonicalUrl,
 		noindex: content.seo?.noindex ?? false
 	};
+
+	if (hasIndexAffectingQuery(searchParams)) {
+		seo.noindex = true;
+	}
 
 	return {
 		basePath: BASE_PATH,

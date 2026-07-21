@@ -15,7 +15,7 @@ import { loadReviews } from '$lib/reviews';
 import { resolveHomepageHeroImage } from '$lib/sanity/transforms/taxonomyHero';
 import { resolveHomepageContent } from '$lib/sanity/transforms/pageContent';
 
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ fetch, url }) => {
 	const [
 		nav,
 		featuredCards,
@@ -45,6 +45,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	const content = resolveHomepageContent(rawContent);
 
 	return {
+		canonicalUrl: `${url.origin}/`,
 		countries: nav.countries,
 		locations: nav.locations,
 		communities: nav.communities,

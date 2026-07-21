@@ -75,6 +75,7 @@
 
 <svelte:head>
 	<title>Golf Homes International — Launching soon</title>
+	<meta name="robots" content="noindex, follow, noarchive" />
 	<meta
 		name="description"
 		content="A curated portfolio of homes on and near Europe's premier golf courses. Launching soon. Leave your email to be the first to know."
