@@ -205,6 +205,32 @@ const aboutPage = {
 	placesHeading: 'Why golf, and why these places',
 	placesBody:
 		'Golf is at the heart of what we do. Every location we cover is a genuine golfing destination: Marbella, Sotogrande, the Algarve and beyond, places where world-class courses, the climate and the lifestyle have built established, sought-after property markets around the game. If golf is part of why you are buying abroad, these are the places that deliver it.',
+	places: [
+		{
+			_key: 'marbella',
+			name: 'Marbella',
+			region: 'Costa del Sol, Spain',
+			heroSlug: 'marbella',
+			alt: 'Golf fairways running down to the Mediterranean above Marbella on the Costa del Sol',
+			href: '/spain/marbella'
+		},
+		{
+			_key: 'sotogrande',
+			name: 'Sotogrande',
+			region: 'Cádiz, Spain',
+			heroSlug: 'sotogrande',
+			alt: 'Manicured championship course and low villas in the resort of Sotogrande',
+			href: '/spain/sotogrande'
+		},
+		{
+			_key: 'algarve',
+			name: 'The Algarve',
+			region: 'Southern Portugal',
+			heroSlug: 'quinta-do-lago',
+			alt: 'Pine-lined Algarve golf course above the Atlantic coastline in southern Portugal',
+			href: '/portugal'
+		}
+	],
 	teamHeading: 'Who we are',
 	teamMembers: [
 		{

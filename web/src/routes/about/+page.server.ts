@@ -49,21 +49,32 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 		{ label: 'About', href: BASE_PATH }
 	];
 
-	const [heroes, reviews, rawPage] = await Promise.all([
-		fetchLocationHeroesBySlug(DESTINATIONS.map((d) => d.heroSlug)),
-		loadReviews(fetch),
-		fetchAboutPage()
-	]);
+	const [rawPage, reviews] = await Promise.all([fetchAboutPage(), loadReviews(fetch)]);
 
 	const content = resolveAboutContent(rawPage);
+
+	const placeSources = content.places?.length
+		? content.places
+				.filter((p) => p.name && p.heroSlug)
+				.map((p) => ({
+					heroSlug: p.heroSlug!,
+					name: p.name!,
+					region: p.region ?? '',
+					alt: p.alt ?? '',
+					href: p.href || null
+				}))
+		: DESTINATIONS.map((d) => ({ ...d, href: null as string | null }));
+
+	const heroes = await fetchLocationHeroesBySlug(placeSources.map((d) => d.heroSlug));
 	const heroBySlug = new Map(heroes.map((h) => [h.slug, h.heroImage]));
 
-	const destinations = DESTINATIONS.map((d) => {
+	const destinations = placeSources.map((d) => {
 		const asset = heroBySlug.get(d.heroSlug);
 		return {
 			name: d.name,
 			region: d.region,
 			alt: d.alt,
+			href: d.href ?? null,
 			image: buildPublicImageUrl(asset, DESTINATION_IMAGE),
 			srcset: buildImageSrcset(asset, DESTINATION_WIDTHS, DESTINATION_IMAGE)
 		};
