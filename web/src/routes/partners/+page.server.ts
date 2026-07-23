@@ -14,10 +14,14 @@ export const load: PageServerLoad = async ({ url }) => {
 		{ label: 'Partners', href: BASE_PATH }
 	];
 
+	const title = 'Trusted Partners | Golf Homes International';
+	const description =
+		'Independent legal, tax, financial and property professionals across Spain and Portugal, each vetted to protect buyers. We make a personal introduction; the choice stays yours.';
 	const seo = {
-		title: 'Trusted Partners | Golf Homes International',
-		description:
-			'Independent legal, tax, financial and property professionals across Spain and Portugal, each vetted to protect buyers. We make a personal introduction; the choice stays yours.',
+		title,
+		description,
+		ogTitle: title,
+		ogDescription: description,
 		canonicalUrl,
 		noindex: false
 	};

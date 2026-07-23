@@ -92,17 +92,5 @@ export const homepageContent = defineType({
 			type: 'string',
 			description: 'Support line beneath the reviews heading.'
 		}),
-		defineField({
-			name: 'primaryCtaLabel',
-			title: 'Primary CTA label',
-			type: 'string',
-			description: 'Label on the main call-to-action button.'
-		}),
-		defineField({
-			name: 'primaryCtaRoute',
-			title: 'Primary CTA route',
-			type: 'string',
-			description: 'Path the primary CTA links to, e.g. "/contact".'
-		})
 	]
 });

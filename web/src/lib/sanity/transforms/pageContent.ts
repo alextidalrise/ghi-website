@@ -3,6 +3,7 @@ import {
 	type GuideCategoryMeta
 } from '$lib/guides/categories';
 import type { GuideCategory } from '$lib/guides/types';
+import type { MediaAssetInput } from './mediaFilter';
 
 type SeoInput = {
 	seoTitle?: string | null;
@@ -35,8 +36,6 @@ export type HomepageContentInput = {
 	partnersCtaSupport?: string | null;
 	reviewsHeading?: string | null;
 	reviewsDeck?: string | null;
-	primaryCtaLabel?: string | null;
-	primaryCtaRoute?: string | null;
 	seo?: SeoInput;
 };
 
@@ -56,8 +55,6 @@ export type HomepageContent = {
 	partnersCtaSupport: string;
 	reviewsHeading: string;
 	reviewsDeck: string;
-	primaryCtaLabel: string;
-	primaryCtaRoute: string;
 	seo: SeoInput;
 };
 
@@ -96,8 +93,6 @@ export function resolveHomepageContent(input: HomepageContentInput | null): Home
 			input?.reviewsDeck,
 			"Real reviews from people who've bought golf property with us in Spain and Portugal."
 		),
-		primaryCtaLabel: s(input?.primaryCtaLabel, 'Get in touch'),
-		primaryCtaRoute: s(input?.primaryCtaRoute, '/contact'),
 		seo: input?.seo ?? null
 	};
 }
@@ -107,16 +102,12 @@ export function resolveHomepageContent(input: HomepageContentInput | null): Home
 // ---------------------------------------------------------------------------
 
 export type FrontlineContentInput = {
-	explanatoryHeading?: string | null;
-	explanatoryBody?: string | null;
 	ctaLabel?: string | null;
 	resultsHeading?: string | null;
 	seo?: SeoInput;
 };
 
 export type FrontlineContent = {
-	explanatoryHeading: string;
-	explanatoryBody: string;
 	ctaLabel: string;
 	resultsHeading: string;
 	seo: SeoInput;
@@ -124,8 +115,6 @@ export type FrontlineContent = {
 
 export function resolveFrontlineContent(input: FrontlineContentInput | null): FrontlineContent {
 	return {
-		explanatoryHeading: s(input?.explanatoryHeading, ''),
-		explanatoryBody: s(input?.explanatoryBody, ''),
 		ctaLabel: s(input?.ctaLabel, 'Browse the collection'),
 		resultsHeading: s(input?.resultsHeading, 'Frontline golf homes'),
 		seo: input?.seo ?? null
@@ -146,7 +135,6 @@ export type GuidesHubPageInput = {
 	heroTitle?: string | null;
 	heroLead?: string | null;
 	sectionHeading?: string | null;
-	sectionIntro?: string | null;
 	categories?: GuidesHubCategoryInput[] | null;
 	emptyStateMessage?: string | null;
 	seo?: SeoInput;
@@ -156,7 +144,6 @@ export type GuidesHubContent = {
 	heroTitle: string;
 	heroLead: string;
 	sectionHeading: string;
-	sectionIntro: string;
 	categoryMeta: Record<string, GuideCategoryMeta>;
 	emptyStateMessage: string;
 	seo: SeoInput;
@@ -183,7 +170,6 @@ export function resolveGuidesHubContent(input: GuidesHubPageInput | null): Guide
 			'Considered, current guidance on buying and owning a home near the finest golf in Spain and Portugal.'
 		),
 		sectionHeading: s(input?.sectionHeading, 'Where to start'),
-		sectionIntro: s(input?.sectionIntro, ''),
 		categoryMeta,
 		emptyStateMessage: s(
 			input?.emptyStateMessage,
@@ -201,7 +187,7 @@ export type AboutTeamMemberInput = {
 	name?: string | null;
 	role?: string | null;
 	bio?: string | null;
-	image?: { asset?: unknown; altText?: string | null } | null;
+	image?: MediaAssetInput | null;
 };
 
 export type AboutPageInput = {

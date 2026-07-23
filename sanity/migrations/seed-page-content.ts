@@ -97,6 +97,9 @@ const homepageSeo = {
 	seoTitle: 'Golf Homes International | Golf property in Spain & Portugal',
 	metaDescription:
 		'Curated golf property for sale in Spain and Portugal. Frontline fairway homes, buyer guides, and trusted local partners.',
+	openGraphTitle: 'Golf Homes International | Golf property in Spain & Portugal',
+	openGraphDescription:
+		'Curated golf property for sale in Spain and Portugal. Frontline fairway homes, buyer guides, and trusted local partners.',
 	noindex: false
 };
 
@@ -111,6 +114,9 @@ const frontlineSeo = {
 	seoTitle: 'Front Line Collection | Golf Homes International',
 	metaDescription:
 		'Homes directly on the fairway in Spain and Portugal — the Front Line Collection from Golf Homes International.',
+	openGraphTitle: 'Front Line Collection | Golf Homes International',
+	openGraphDescription:
+		'Homes directly on the fairway in Spain and Portugal — the Front Line Collection from Golf Homes International.',
 	noindex: false
 };
 
@@ -120,7 +126,6 @@ const guidesHubPage = {
 	heroLead:
 		'Considered, current guidance on buying and owning a home near the finest golf in Spain and Portugal.',
 	sectionHeading: 'Where to start',
-	sectionIntro: '',
 	categories: [
 		{
 			_key: 'buying',
@@ -149,6 +154,9 @@ const guidesHubPage = {
 		seoTitle: 'Guides | Golf Homes International',
 		metaDescription:
 			'Buyer guides for golf property in Spain and Portugal — legal steps, taxes, financing, locations and courses.',
+		openGraphTitle: 'Guides | Golf Homes International',
+		openGraphDescription:
+			'Buyer guides for golf property in Spain and Portugal — legal steps, taxes, financing, locations and courses.',
 		noindex: false
 	}
 };
@@ -159,6 +167,34 @@ const aboutPage = {
 	heroLead:
 		'Specialists in golf property across Spain and Portugal, here to make buying abroad simpler, safer and a lot less daunting.',
 	storyHeading: 'Our story',
+	storyBody: [
+		{
+			_key: 'p1',
+			_type: 'block',
+			style: 'normal',
+			children: [
+				{
+					_key: 'c1',
+					_type: 'span',
+					text: 'Golf Homes International started with two things we care about more than most: golf and property. Between us we have spent around six years living in Spain and Portugal, playing the courses and getting to know the communities.'
+				}
+			],
+			markDefs: []
+		},
+		{
+			_key: 'p2',
+			_type: 'block',
+			style: 'normal',
+			children: [
+				{
+					_key: 'c2',
+					_type: 'span',
+					text: 'Buying a home abroad is an emotional decision as much as a financial one, and for most people it is something they do only once or twice in a lifetime. What we kept seeing was how little care goes into the parts that matter most. Having the right professional beside you at every stage is too often left to chance.'
+				}
+			],
+			markDefs: []
+		}
+	],
 	storyQuote:
 		'So we built something different: not just a place to find golf property, but a way of buying that puts the right people around you and supports your decision, rather than pushing a sale.',
 	networkHeading: 'The right people around you',
@@ -194,11 +230,18 @@ const aboutPage = {
 	closingHeading: 'Talk to us',
 	closingBody:
 		'No pressure and no obligation. Whether you are ready to view or just starting to think about it, we are happy to help.',
+	closingPrimaryCta: 'Get in touch',
+	closingPrimaryRoute: '/contact',
+	closingSecondaryCta: 'Browse properties',
+	closingSecondaryRoute: '/front-line-collection',
 	reviewsHeading: 'What our buyers say',
 	seo: {
 		_type: 'seoFields',
 		seoTitle: 'About | Golf Homes International',
 		metaDescription:
+			'Who we are: specialists in golf property across Spain and Portugal, with trusted partners at every stage of buying abroad.',
+		openGraphTitle: 'About | Golf Homes International',
+		openGraphDescription:
 			'Who we are: specialists in golf property across Spain and Portugal, with trusted partners at every stage of buying abroad.',
 		noindex: false
 	}
@@ -237,6 +280,9 @@ const contactPage = {
 		_type: 'seoFields',
 		seoTitle: 'Contact | Golf Homes International',
 		metaDescription:
+			'Speak to the Golf Homes International team about golf property in Spain and Portugal. Message us on WhatsApp, call, or send an enquiry and we will reply within a working day.',
+		openGraphTitle: 'Contact | Golf Homes International',
+		openGraphDescription:
 			'Speak to the Golf Homes International team about golf property in Spain and Portugal. Message us on WhatsApp, call, or send an enquiry and we will reply within a working day.',
 		noindex: false
 	}

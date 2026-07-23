@@ -20,6 +20,8 @@
 	const pageTitle = 'Insights | Golf Homes International';
 	const metaDescription =
 		'Perspective on golf-property markets, lifestyle and relocation across Spain and Portugal — the thinking behind a considered purchase, from Golf Homes International.';
+	const ogTitle = 'Insights | Golf Homes International';
+	const ogDescription = metaDescription;
 </script>
 
 <svelte:head>
@@ -28,8 +30,8 @@
 	<link rel="canonical" href={data.canonicalUrl} />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={data.canonicalUrl} />
-	<meta property="og:title" content="Insights" />
-	<meta property="og:description" content={metaDescription} />
+	<meta property="og:title" content={ogTitle} />
+	<meta property="og:description" content={ogDescription} />
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
 

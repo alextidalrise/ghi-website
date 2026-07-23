@@ -34,11 +34,15 @@ export const load: PageServerLoad = async ({ url }) => {
 		{ label: 'Front Line Collection', href: BASE_PATH }
 	];
 
+	const title = content.seo?.seoTitle?.trim() || 'Frontline Golf Homes | Golf Homes International';
+	const description =
+		content.seo?.metaDescription?.trim() ||
+		'Every property on the first line of a golf course, across Spain and Portugal. Filter the frontline collection by golf course, price, property type and bedrooms.';
 	const seo = {
-		title: content.seo?.seoTitle?.trim() || 'Frontline Golf Homes | Golf Homes International',
-		description:
-			content.seo?.metaDescription?.trim() ||
-			'Every property on the first line of a golf course, across Spain and Portugal. Filter the frontline collection by golf course, price, property type and bedrooms.',
+		title,
+		description,
+		ogTitle: content.seo?.openGraphTitle?.trim() || title,
+		ogDescription: content.seo?.openGraphDescription?.trim() || description,
 		canonicalUrl,
 		noindex: content.seo?.noindex ?? false
 	};

@@ -6,19 +6,6 @@ export const frontlineContent = defineType({
 	type: 'object',
 	fields: [
 		defineField({
-			name: 'explanatoryHeading',
-			title: 'Explanatory heading',
-			type: 'string',
-			description: 'Heading for the explanatory body copy section below the hero.'
-		}),
-		defineField({
-			name: 'explanatoryBody',
-			title: 'Explanatory body',
-			type: 'text',
-			rows: 4,
-			description: 'Body copy explaining the Front Line Collection concept.'
-		}),
-		defineField({
 			name: 'ctaLabel',
 			title: 'CTA label',
 			type: 'string',

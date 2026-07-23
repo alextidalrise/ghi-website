@@ -22,8 +22,8 @@
 
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={data.seo.canonicalUrl} />
-	<meta property="og:title" content={data.seo.title} />
-	<meta property="og:description" content={data.seo.description} />
+	<meta property="og:title" content={data.seo.ogTitle} />
+	<meta property="og:description" content={data.seo.ogDescription} />
 
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
