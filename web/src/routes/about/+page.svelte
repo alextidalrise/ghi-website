@@ -156,24 +156,47 @@
 			<ul class="places__grid">
 				{#each destinations as place (place.name)}
 					<li class="place">
-						<div class="place__frame">
-							{#if place.image}
-								<img
-									src={place.image}
-									srcset={place.srcset || undefined}
-									sizes="(max-width: 48rem) 100vw, 30vw"
-									alt={place.alt}
-									loading="lazy"
-									decoding="async"
-									width="900"
-									height="600"
-								/>
-							{/if}
-						</div>
-						<div class="place__label">
-							<h3 class="place__name">{place.name}</h3>
-							<p class="place__region">{place.region}</p>
-						</div>
+						{#if place.href}
+							<a class="place__link" href={place.href}>
+								<div class="place__frame">
+									{#if place.image}
+										<img
+											src={place.image}
+											srcset={place.srcset || undefined}
+											sizes="(max-width: 48rem) 100vw, 30vw"
+											alt={place.alt}
+											loading="lazy"
+											decoding="async"
+											width="900"
+											height="600"
+										/>
+									{/if}
+								</div>
+								<div class="place__label">
+									<h3 class="place__name">{place.name}</h3>
+									<p class="place__region">{place.region}</p>
+								</div>
+							</a>
+						{:else}
+							<div class="place__frame">
+								{#if place.image}
+									<img
+										src={place.image}
+										srcset={place.srcset || undefined}
+										sizes="(max-width: 48rem) 100vw, 30vw"
+										alt={place.alt}
+										loading="lazy"
+										decoding="async"
+										width="900"
+										height="600"
+									/>
+								{/if}
+							</div>
+							<div class="place__label">
+								<h3 class="place__name">{place.name}</h3>
+								<p class="place__region">{place.region}</p>
+							</div>
+						{/if}
 					</li>
 				{/each}
 			</ul>
@@ -417,6 +440,19 @@
 		gap: var(--space-sm);
 	}
 
+	.place__link {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm);
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.place__link:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 3px;
+	}
+
 	.place__frame {
 		overflow: hidden;
 		border: 1px solid var(--border);
@@ -430,7 +466,8 @@
 		transition: transform var(--duration-image) var(--ease);
 	}
 
-	.place:hover .place__frame img {
+	.place:hover .place__frame img,
+	.place__link:hover .place__frame img {
 		transform: scale(1.03);
 	}
 

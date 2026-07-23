@@ -190,6 +190,14 @@ export type AboutTeamMemberInput = {
 	image?: MediaAssetInput | null;
 };
 
+export type AboutPlaceInput = {
+	name?: string | null;
+	region?: string | null;
+	heroSlug?: string | null;
+	alt?: string | null;
+	href?: string | null;
+};
+
 export type AboutPageInput = {
 	heroTitle?: string | null;
 	heroLead?: string | null;
@@ -202,6 +210,7 @@ export type AboutPageInput = {
 	networkCta?: string | null;
 	placesHeading?: string | null;
 	placesBody?: string | null;
+	places?: AboutPlaceInput[] | null;
 	teamHeading?: string | null;
 	teamMembers?: AboutTeamMemberInput[] | null;
 	teamContactFlag?: string | null;
@@ -227,6 +236,7 @@ export type AboutContent = {
 	networkCta: string;
 	placesHeading: string;
 	placesBody: string;
+	places: AboutPlaceInput[] | null;
 	teamHeading: string;
 	teamMembers: AboutTeamMemberInput[] | null;
 	teamContactFlag: string;
@@ -268,6 +278,7 @@ export function resolveAboutContent(input: AboutPageInput | null): AboutContent 
 			input?.placesBody,
 			'Golf is at the heart of what we do. Every location we cover is a genuine golfing destination: Marbella, Sotogrande, the Algarve and beyond, places where world-class courses, the climate and the lifestyle have built established, sought-after property markets around the game. If golf is part of why you are buying abroad, these are the places that deliver it.'
 		),
+		places: input?.places?.length ? input.places : null,
 		teamHeading: s(input?.teamHeading, 'Who we are'),
 		teamMembers: input?.teamMembers?.length ? input.teamMembers : null,
 		teamContactFlag: s(input?.teamContactFlag, 'Your first point of contact'),

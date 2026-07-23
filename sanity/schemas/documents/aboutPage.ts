@@ -95,6 +95,53 @@ export const aboutPage = defineType({
 			rows: 4,
 			group: 'content'
 		}),
+		defineField({
+			name: 'places',
+			title: 'Places',
+			type: 'array',
+			description: 'Destination tiles shown in the "Why these places" section. Each can link to a page on the site.',
+			of: [
+				defineArrayMember({
+					type: 'object',
+					fields: [
+						defineField({
+							name: 'name',
+							title: 'Name',
+							type: 'string',
+							validation: (Rule) => Rule.required()
+						}),
+						defineField({
+							name: 'region',
+							title: 'Region',
+							type: 'string',
+							description: 'Sub-label, e.g. "Costa del Sol, Spain".'
+						}),
+						defineField({
+							name: 'heroSlug',
+							title: 'Hero image slug',
+							type: 'string',
+							description: 'Slug of the location whose hero image to display (e.g. "marbella", "quinta-do-lago").',
+							validation: (Rule) => Rule.required()
+						}),
+						defineField({
+							name: 'alt',
+							title: 'Image alt text',
+							type: 'string'
+						}),
+						defineField({
+							name: 'href',
+							title: 'Link',
+							type: 'string',
+							description: 'Internal path this tile links to, e.g. "/spain/marbella". Leave empty for no link.'
+						})
+					],
+					preview: {
+						select: { title: 'name', subtitle: 'href' }
+					}
+				})
+			],
+			group: 'content'
+		}),
 
 		defineField({
 			name: 'teamHeading',

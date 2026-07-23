@@ -725,6 +725,7 @@ export const ABOUT_PAGE_PUBLIC = /* groq */ `{
   networkCta,
   placesHeading,
   placesBody,
+  places[]{ name, region, heroSlug, alt, href },
   teamHeading,
   teamMembers[]{
     name,
