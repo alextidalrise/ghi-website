@@ -5,6 +5,21 @@ import {
 	locationsByCountryQuery
 } from './location';
 
+// Stray draft taxonomy documents can share a slug with a published community under
+// the same location, producing duplicate keys in Svelte's keyed {#each} blocks and
+// crashing the client-side router (each_key_duplicate).
+function dedupeCommunitiesBySlug(communities: NavCommunityOption[]): NavCommunityOption[] {
+	const best = new Map<string, NavCommunityOption>();
+	for (const c of communities) {
+		const key = `${c.countrySlug}/${c.locationSlug}/${c.slug}`;
+		const existing = best.get(key);
+		if (!existing || (existing._id.startsWith('drafts.') && !c._id.startsWith('drafts.'))) {
+			best.set(key, c);
+		}
+	}
+	return communities.filter((c) => best.get(`${c.countrySlug}/${c.locationSlug}/${c.slug}`) === c);
+}
+
 export type NavCountryOption = {
 	_id: string;
 	name: string;
@@ -79,18 +94,20 @@ export async function fetchNavTaxonomy(): Promise<NavTaxonomy> {
 		}>
 	>(communitiesForNavQuery);
 
-	const communities = (communityRows ?? []).flatMap((row) =>
-		row.slug && row.locationSlug && row.countrySlug
-			? [
-					{
-						_id: row._id,
-						name: row.name,
-						slug: row.slug,
-						locationSlug: row.locationSlug,
-						countrySlug: row.countrySlug
-					}
-				]
-			: []
+	const communities = dedupeCommunitiesBySlug(
+		(communityRows ?? []).flatMap((row) =>
+			row.slug && row.locationSlug && row.countrySlug
+				? [
+						{
+							_id: row._id,
+							name: row.name,
+							slug: row.slug,
+							locationSlug: row.locationSlug,
+							countrySlug: row.countrySlug
+						}
+					]
+				: []
+		)
 	);
 
 	return {
@@ -119,17 +136,19 @@ export async function fetchCountryNavCommunities(
 		}>
 	>(communitiesForNavQuery);
 
-	return (rows ?? []).flatMap((row) =>
-		row.slug && row.locationSlug && row.countrySlug === countrySlug
-			? [
-					{
-						_id: row._id,
-						name: row.name,
-						slug: row.slug,
-						locationSlug: row.locationSlug,
-						countrySlug: row.countrySlug
-					}
-				]
-			: []
+	return dedupeCommunitiesBySlug(
+		(rows ?? []).flatMap((row) =>
+			row.slug && row.locationSlug && row.countrySlug === countrySlug
+				? [
+						{
+							_id: row._id,
+							name: row.name,
+							slug: row.slug,
+							locationSlug: row.locationSlug,
+							countrySlug: row.countrySlug
+						}
+					]
+				: []
+		)
 	);
 }
