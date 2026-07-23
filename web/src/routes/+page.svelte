@@ -17,16 +17,27 @@
 				line.split('*').map((text, j) => ({ text, italic: j % 2 === 1 }))
 			)
 	);
+
+	const pageTitle = $derived(c.seo?.seoTitle?.trim() || 'Golf Homes International');
+	const metaDescription = $derived(
+		c.seo?.metaDescription?.trim() ||
+			'Curated residential properties on and near premier golf courses in southern Europe and beyond.'
+	);
+	const ogTitle = $derived(c.seo?.openGraphTitle?.trim() || pageTitle);
+	const ogDescription = $derived(c.seo?.openGraphDescription?.trim() || metaDescription);
 </script>
 
 <svelte:head>
-	<title>Golf Homes International</title>
-	<meta name="description" content="Curated residential properties on and near premier golf courses in southern Europe and beyond." />
+	<title>{pageTitle}</title>
+	<meta name="description" content={metaDescription} />
 	<link rel="canonical" href={data.canonicalUrl} />
+	{#if c.seo?.noindex}
+		<meta name="robots" content="noindex" />
+	{/if}
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={data.canonicalUrl} />
-	<meta property="og:title" content="Golf Homes International" />
-	<meta property="og:description" content="Curated residential properties on and near premier golf courses in southern Europe and beyond." />
+	<meta property="og:title" content={ogTitle} />
+	<meta property="og:description" content={ogDescription} />
 	{#if data.homepageHero?.url}
 		<meta property="og:image" content={data.homepageHero.url} />
 	{/if}

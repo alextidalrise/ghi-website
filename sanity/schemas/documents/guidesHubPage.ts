@@ -31,13 +31,6 @@ export const guidesHubPage = defineType({
 			group: 'content'
 		}),
 		defineField({
-			name: 'sectionIntro',
-			title: 'Section introduction',
-			type: 'text',
-			rows: 3,
-			group: 'content'
-		}),
-		defineField({
 			name: 'categories',
 			title: 'Category labels',
 			type: 'array',

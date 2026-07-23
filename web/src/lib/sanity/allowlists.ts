@@ -693,15 +693,11 @@ export const HOMEPAGE_CONTENT_PUBLIC = /* groq */ `{
   partnersCta,
   partnersCtaSupport,
   reviewsHeading,
-  reviewsDeck,
-  primaryCtaLabel,
-  primaryCtaRoute
+  reviewsDeck
 }`;
 
 /** Public Front Line Collection editorial content from siteSettings. */
 export const FRONTLINE_CONTENT_PUBLIC = /* groq */ `{
-  explanatoryHeading,
-  explanatoryBody,
   ctaLabel,
   resultsHeading
 }`;
@@ -711,7 +707,6 @@ export const GUIDES_HUB_PUBLIC = /* groq */ `{
   heroTitle,
   heroLead,
   sectionHeading,
-  sectionIntro,
   categories[]{ key, label, blurb },
   emptyStateMessage,
   seo${SEO_PUBLIC}

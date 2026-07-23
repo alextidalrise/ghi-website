@@ -3,6 +3,7 @@
 	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import TalkToUsBand from '$lib/components/TalkToUsBand.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
+	import { buildPublicImageUrl } from '$lib/sanity/image';
 	import type { AboutTeamMemberInput } from '$lib/sanity/transforms/pageContent';
 
 	let { data } = $props();
@@ -49,7 +50,8 @@
 					.map((m: AboutTeamMemberInput, i: number) => ({
 						name: m.name!,
 						initials: memberInitials(m.name!),
-						photo: null as string | null,
+						photo: m.image ? buildPublicImageUrl(m.image, { width: 360, height: 450 }) : null,
+						alt: m.image?.altText || `Portrait of ${m.name}`,
 						lead: i === 0,
 						bio: m.bio ?? '',
 						role: m.role ?? ''
@@ -57,7 +59,8 @@
 			: FALLBACK_TEAM.map((m) => ({
 					...m,
 					initials: memberInitials(m.name),
-					photo: null as string | null
+					photo: null as string | null,
+					alt: `Portrait of ${m.name}`
 				}))
 	);
 
@@ -73,8 +76,8 @@
 
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={data.seo.canonicalUrl} />
-	<meta property="og:title" content={data.seo.title} />
-	<meta property="og:description" content={data.seo.description} />
+	<meta property="og:title" content={data.seo.ogTitle} />
+	<meta property="og:description" content={data.seo.ogDescription} />
 
 	{@html jsonLdScriptHtml(data.breadcrumbJsonLd)}
 </svelte:head>
@@ -188,7 +191,7 @@
 				<li class="member" class:member--lead={member.lead}>
 					<div class="member__portrait">
 						{#if member.photo}
-							<img src={member.photo} alt={`Portrait of ${member.name}`} loading="lazy" />
+							<img src={member.photo} alt={member.alt} loading="lazy" />
 						{:else}
 							<!-- Sized monogram frame until the real headshot lands. -->
 							<span class="member__monogram" aria-hidden="true">{member.initials}</span>
@@ -222,6 +225,8 @@
 	<TalkToUsBand
 		heading={c.closingHeading}
 		body={c.closingBody}
+		primary={{ label: c.closingPrimaryCta, href: c.closingPrimaryRoute }}
+		secondary={{ label: c.closingSecondaryCta, href: c.closingSecondaryRoute }}
 	/>
 </article>
 
