@@ -245,12 +245,28 @@ function filterCtaFields(ctas: CtaInput | null | undefined): PublicCta | null {
 	return ctas;
 }
 
+function dedupeGolfCourses(courses: GolfCourseRef[] | null | undefined): GolfCourseRef[] {
+	if (!Array.isArray(courses)) return [];
+	const seen = new Set<string>();
+	return courses.filter((course) => {
+		if (!course) return false;
+		const id = course._id;
+		if (!id) return true;
+		if (seen.has(id)) return false;
+		seen.add(id);
+		return true;
+	});
+}
+
 function filterGolfFields(golf: GolfInput | null | undefined): PublicGolf | null {
 	if (!golf) {
 		return null;
 	}
 
-	return golf;
+	return {
+		...golf,
+		linkedGolfCourses: dedupeGolfCourses(golf.linkedGolfCourses)
+	};
 }
 
 function filterContentFields(content: ContentInput | null | undefined): PublicContent | null {
