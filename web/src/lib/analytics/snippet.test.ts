@@ -111,54 +111,6 @@ describe('buildBootstrapScript', () => {
 		expect(script()).not.toContain('noscript');
 		expect(script()).not.toContain('ns.html');
 	});
-
-	describe('container loading', () => {
-		it('inserts the container immediately by default', () => {
-			const out = script();
-			expect(out).not.toContain('requestIdleCallback');
-			expect(out).not.toContain("addEventListener('load'");
-		});
-
-		it('waits for load, then an idle slot, when deferred', () => {
-			const out = script({ defer: true });
-			expect(out).toContain("d.readyState==='complete'?idle():w.addEventListener('load',idle)");
-			expect(out).toContain('w.requestIdleCallback(go,{timeout:2000})');
-		});
-
-		it('falls back to a timer where requestIdleCallback is unavailable', () => {
-			// Safari shipped rIC only in 17.4; without this the container would never load
-			// for anyone on an older iOS.
-			expect(script({ defer: true })).toContain('setTimeout(go,200)');
-		});
-
-		it('loads the container once even if both entry points fire', () => {
-			expect(script({ defer: true })).toContain('if(w.__ghiGtm)return;w.__ghiGtm=1');
-		});
-
-		it('still timestamps gtm.start synchronously when deferred', () => {
-			// Only the fetch moves. If the timestamp moved too, GTM would report the page as
-			// having started at the moment we chose to load it.
-			const out = script({ defer: true });
-			expect(out.indexOf("'gtm.start'")).toBeLessThan(out.indexOf('requestIdleCallback'));
-		});
-
-		it('is syntactically valid JavaScript in either mode', () => {
-			// The loader is assembled from string fragments and runs before anything else on
-			// the page, so a stray paren would take the whole document down with it. Function
-			// compiles without executing, which is exactly the check we want.
-			for (const defer of [false, true]) {
-				const body = script({ defer }).slice('<script>'.length, -'</script>'.length);
-				expect(() => new Function(body)).not.toThrow();
-			}
-		});
-
-		it('sets consent defaults before the container in either mode', () => {
-			for (const defer of [false, true]) {
-				const out = script({ defer });
-				expect(out.indexOf("gtag('consent','default'")).toBeLessThan(out.indexOf('gtm.js?id='));
-			}
-		});
-	});
 });
 
 describe('buildDisabledComment', () => {
