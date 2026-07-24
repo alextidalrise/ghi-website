@@ -2,7 +2,12 @@ import { dev } from '$app/environment';
 import { env as privateEnv } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
-import { resolveAnalyticsConfig, type AnalyticsConfig } from './config';
+import {
+	GTM_DEFER_PARAM,
+	resolveAnalyticsConfig,
+	resolveGtmDeferral,
+	type AnalyticsConfig
+} from './config';
 import { CONSENT_COOKIE, parseConsent } from './consentCookie';
 import { buildBootstrapScript, buildDisabledComment } from './snippet';
 import type { StoredConsent } from './types';
@@ -104,7 +109,8 @@ export const analyticsHandle: Handle = async ({ event, resolve }) => {
 			: buildBootstrapScript({
 					gtmId: config.gtmId,
 					consent,
-					debug: config.mode === 'debug'
+					debug: config.mode === 'debug',
+					defer: resolveGtmDeferral(event.url.searchParams.get(GTM_DEFER_PARAM))
 				});
 
 	return resolve(event, {
