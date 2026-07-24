@@ -28,8 +28,14 @@
 	--surface-tint: oklch(0.972 0.012 168);
 
 	/* Typography families */
-	--serif: 'Playfair Display', 'Georgia', serif;
-	--sans: 'Libre Franklin', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	/* The *Fallback families are metric-matched shims defined in fonts.css — they must
+	   sit directly after each web font so the text is laid out with the web font's
+	   vertical metrics before it arrives, and swapping in shifts nothing. The plain
+	   families after them are the last resort if no local() match is found. */
+	--serif: 'Playfair Display', 'Playfair Display Fallback', Georgia, serif;
+	--sans:
+		'Libre Franklin', 'Libre Franklin Fallback', 'Helvetica Neue', Helvetica, Arial,
+		sans-serif;
 
 	/* Type scale */
 	--text-display: clamp(2.25rem, 5vw + 0.5rem, 4rem);
