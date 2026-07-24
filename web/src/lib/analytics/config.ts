@@ -58,6 +58,24 @@ export function isExcludedRoute(routeId: string | null): boolean {
 }
 
 /**
+ * Query parameter that opts a single request into the deferred GTM container.
+ *
+ * The eager container is the default and stays the default: GA4 only sees a visit once
+ * the container has loaded, so holding it back trades away the arrivals that leave
+ * early — exactly the traffic bounce rate is about.
+ *
+ * This override exists so that trade can be *measured* rather than argued about. Both
+ * arms then run against the same deploy, the same CDN and the same page, which two
+ * sequential deploys cannot promise. Nothing but measurement reads it; removing it is
+ * safe once the question is settled.
+ */
+export const GTM_DEFER_PARAM = 'ghi_gtm';
+
+export function resolveGtmDeferral(raw: string | null | undefined): boolean {
+	return raw?.trim() === 'defer';
+}
+
+/**
  * Resolve whether — and how — analytics runs for this request. First match wins.
  *
  * Note the ordering of the debug check: it sits *after* the excluded-route and Sanity

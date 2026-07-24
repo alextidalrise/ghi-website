@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { isExcludedRoute, resolveAnalyticsConfig, type AnalyticsConfigInput } from './config';
+import {
+	isExcludedRoute,
+	resolveAnalyticsConfig,
+	resolveGtmDeferral,
+	type AnalyticsConfigInput
+} from './config';
 
 /** A request that would resolve to `live`; each test perturbs one field. */
 function liveInput(overrides: Partial<AnalyticsConfigInput> = {}): AnalyticsConfigInput {
@@ -138,5 +143,23 @@ describe('isExcludedRoute', () => {
 		expect(isExcludedRoute('/')).toBe(false);
 		expect(isExcludedRoute('/insights/[slug]')).toBe(false);
 		expect(isExcludedRoute(null)).toBe(false);
+	});
+});
+
+describe('resolveGtmDeferral', () => {
+	it('defers only on an exact opt-in', () => {
+		expect(resolveGtmDeferral('defer')).toBe(true);
+		expect(resolveGtmDeferral(' defer ')).toBe(true);
+	});
+
+	it('keeps the container eager for everything else', () => {
+		// The absent case is the one that matters: real traffic never carries the param,
+		// and real traffic must keep reporting arrivals it would otherwise lose.
+		expect(resolveGtmDeferral(null)).toBe(false);
+		expect(resolveGtmDeferral(undefined)).toBe(false);
+		expect(resolveGtmDeferral('')).toBe(false);
+		expect(resolveGtmDeferral('eager')).toBe(false);
+		expect(resolveGtmDeferral('true')).toBe(false);
+		expect(resolveGtmDeferral('Defer')).toBe(false);
 	});
 });
