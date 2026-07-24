@@ -181,6 +181,17 @@ Out of scope for initial restructure; do not block ship.
 
 ---
 
+## O. UAE / Dubai market expansion
+
+Third market alongside Spain and Portugal. Full plan: **`docs/uae-expansion-plan.md`**.
+
+Blocked on four decisions with the team (top-level node Dubai vs UAE, brand positioning, GCC roadmap,
+which Sanity dataset production serves). The hardening epic (**U**) is unblocked and worth doing
+regardless — it closes a live crash vector in `formatPrice.ts` that the first non-EUR listing would
+trigger.
+
+---
+
 ## N. Property features — move grouping into Sanity
 
 The property **Features** section (`web/src/lib/components/property/Features.svelte`) renders a ranked "signature" lead over a grouped "also includes" index. Both the signature ranking and the group assignment are **keyword heuristics in component code** today, because `content.amenities` is a flat, untagged list of strings. This works across the current dataset but is brittle: a new amenity vocabulary can land an item in the wrong group or "Additional", and the score/keyword tables have to be hand-maintained.
