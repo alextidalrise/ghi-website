@@ -33,46 +33,7 @@ export type BootstrapOptions = {
 	consent: StoredConsent | null;
 	/** Adds GTM Preview markers so the container can keep debug traffic out of prod. */
 	debug: boolean;
-	/** Hold the container back until after `load`. See `buildContainerLoader`. */
-	defer?: boolean;
 };
-
-/**
- * The container loader, in its eager and deferred forms.
- *
- * Both push `gtm.start` synchronously. Only the `<script>` insertion moves, so GTM's own
- * timing still describes when the page actually started rather than when we got round to
- * fetching the container.
- *
- * The deferred form waits for `load` and then for an idle slot, capped at 2s so a page
- * that never goes idle still loads the container. `__ghiGtm` guards the two entry points
- * — a document that is already `complete` when the script runs would otherwise be able to
- * schedule the load twice.
- *
- * Deferring is not the default and should not become one lightly: everything after the
- * container lands is invisible to GA4, so a visitor who leaves before it loads is not a
- * bounce, they are nothing at all. It exists to be measured, behind an explicit opt-in.
- */
-function buildContainerLoader(gtmId: string, defer: boolean): string {
-	const insert =
-		"var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';" +
-		"j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;" +
-		'f.parentNode.insertBefore(j,f);';
-
-	const body = defer
-		? 'var go=function(){if(w.__ghiGtm)return;w.__ghiGtm=1;' +
-			insert +
-			'};' +
-			'var idle=function(){w.requestIdleCallback?w.requestIdleCallback(go,{timeout:2000}):setTimeout(go,200);};' +
-			"d.readyState==='complete'?idle():w.addEventListener('load',idle);"
-		: insert;
-
-	return (
-		"(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});" +
-		body +
-		`})(window,document,'script','dataLayer',${embed(gtmId)});`
-	);
-}
 
 /**
  * Build the full inline `<script>` for an eligible page.
@@ -89,12 +50,7 @@ function buildContainerLoader(gtmId: string, defer: boolean): string {
  * records that a decision happened; merging them misreports the consent state to
  * Consent Mode's own modelling. Both are synchronous, so separating them costs nothing.
  */
-export function buildBootstrapScript({
-	gtmId,
-	consent,
-	debug,
-	defer = false
-}: BootstrapOptions): string {
+export function buildBootstrapScript({ gtmId, consent, debug }: BootstrapOptions): string {
 	const lines = [
 		'window.dataLayer=window.dataLayer||[];',
 		'function gtag(){dataLayer.push(arguments);}',
@@ -115,7 +71,12 @@ export function buildBootstrapScript({
 		lines.push("gtag('set',{debug_mode:true});");
 	}
 
-	lines.push(buildContainerLoader(gtmId, defer));
+	lines.push(
+		"(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});" +
+			"var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';" +
+			"j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;" +
+			`f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',${embed(gtmId)});`
+	);
 
 	return `<script>${lines.join('')}</script>`;
 }
