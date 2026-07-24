@@ -5,7 +5,7 @@ import { resolveTaxonomyHero, type TaxonomyHero } from './taxonomyHero';
 
 const HERO_WIDTHS = [960, 1280, 1600, 1920, 2400];
 const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 85 };
-const COURSE_CARD = { width: 600, height: 400, fit: 'crop' as const, quality: 82 };
+const COURSE_CARD = { width: 600, height: 400, fit: 'crop' as const, quality: 65 };
 
 export type GolfCourseCommunityRef = {
 	_id?: string;
