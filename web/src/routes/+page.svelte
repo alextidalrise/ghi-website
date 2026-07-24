@@ -25,6 +25,16 @@
 	);
 	const ogTitle = $derived(c.seo?.openGraphTitle?.trim() || pageTitle);
 	const ogDescription = $derived(c.seo?.openGraphDescription?.trim() || metaDescription);
+
+	// The hero is the LCP element, so its byte weight *is* the mobile score. Declaring the
+	// slot narrower than the viewport on phones drops the candidate the browser picks from
+	// 1280w (138KB) to 960w (52KB). Nothing is lost visually: the photo is a 16:9 crop
+	// cover-fitted into a tall phone box, so it is already upscaled ~2.6x vertically, and
+	// it sits under two gradient overlays. The upscale — not the source width — is what
+	// sets perceived sharpness here.
+	// Must stay byte-identical to the preload's imagesizes below, or the preload misses
+	// and the image is fetched twice.
+	const HERO_SIZES = '(max-width: 900px) 70vw, 100vw';
 </script>
 
 <svelte:head>
@@ -46,7 +56,7 @@
 			rel="preload"
 			as="image"
 			imagesrcset={data.homepageHero.srcset}
-			imagesizes="100vw"
+			imagesizes={HERO_SIZES}
 			fetchpriority="high"
 		/>
 	{/if}
@@ -62,12 +72,11 @@
 			<img
 				src={data.homepageHero.url}
 				srcset={data.homepageHero.srcset}
-				sizes="100vw"
+				sizes={HERO_SIZES}
 				alt={data.homepageHero.alt}
 				width="1920"
 				height="1080"
 				fetchpriority="high"
-				decoding="async"
 			/>
 		</div>
 		<div class="home-hero__overlay" aria-hidden="true"></div>
