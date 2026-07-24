@@ -108,6 +108,16 @@ export const analyticsHandle: Handle = async ({ event, resolve }) => {
 				});
 
 	return resolve(event, {
-		transformPageChunk: ({ html }) => html.replace(PLACEHOLDER, markup)
+		transformPageChunk: ({ html }) => {
+			html = html.replace(PLACEHOLDER, markup);
+
+			const preload = html.match(/<link\s[^>]*rel="preload"\s[^>]*as="image"[^>]*>/);
+			if (preload) {
+				html = html.replace(preload[0], '');
+				html = html.replace('<meta charset="utf-8" />', `<meta charset="utf-8" />\n${preload[0]}`);
+			}
+
+			return html;
+		}
 	});
 };
