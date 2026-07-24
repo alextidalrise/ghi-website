@@ -41,6 +41,15 @@
 	{#if data.homepageHero?.url}
 		<meta property="og:image" content={data.homepageHero.url} />
 	{/if}
+	{#if data.homepageHero?.srcset}
+		<link
+			rel="preload"
+			as="image"
+			imagesrcset={data.homepageHero.srcset}
+			imagesizes="100vw"
+			fetchpriority="high"
+		/>
+	{/if}
 </svelte:head>
 
 <section class="home-hero on-dark">

@@ -19,6 +19,22 @@ import type { StoredConsent } from './types';
 /** Replaced in `app.html`. Must stay in <head>, which SvelteKit emits in the first chunk. */
 const PLACEHOLDER = '%ghi.analytics%';
 
+const CRITICAL_CSS_RE = /\/assets\/(?:0|2)\./;
+
+function deferBelowFoldCss(html: string): string {
+	return html.replace(
+		/<link href="([^"]*\.css)" rel="stylesheet">/g,
+		(match, href: string) => {
+			if (CRITICAL_CSS_RE.test(href)) return match;
+			return (
+				`<link rel="preload" href="${href}" as="style" onload="this.rel='stylesheet'">` +
+				`<noscript>${match}</noscript>`
+			);
+		}
+	);
+}
+
+
 const DEBUG_COOKIE = 'ghi_analytics_debug';
 const DEBUG_PARAM = 'ghi_debug';
 
@@ -108,6 +124,10 @@ export const analyticsHandle: Handle = async ({ event, resolve }) => {
 				});
 
 	return resolve(event, {
-		transformPageChunk: ({ html }) => html.replace(PLACEHOLDER, markup)
+		transformPageChunk: ({ html }) => {
+			html = html.replace(PLACEHOLDER, markup);
+			html = deferBelowFoldCss(html);
+			return html;
+		}
 	});
 };

@@ -1,9 +1,9 @@
 import { buildImageSrcset, buildPublicImageUrl, getImagePlaceholder } from '../image';
 import type { MediaAssetInput } from './mediaFilter';
 
-const HERO_WIDTHS = [960, 1280, 1600, 1920, 2400];
+const HERO_WIDTHS = [640, 960, 1280, 1600, 1920, 2400];
 const LOCATION_CARD = { width: 600, height: 800, fit: 'crop' as const, quality: 85 };
-const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 85 };
+const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 75 };
 
 export type TaxonomyHero = {
 	url: string;
