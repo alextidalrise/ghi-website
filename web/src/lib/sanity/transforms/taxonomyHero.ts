@@ -2,7 +2,7 @@ import { buildImageSrcset, buildPublicImageUrl, getImagePlaceholder } from '../i
 import type { MediaAssetInput } from './mediaFilter';
 
 const HERO_WIDTHS = [640, 960, 1280, 1600, 1920, 2400];
-const LOCATION_CARD = { width: 600, height: 800, fit: 'crop' as const, quality: 85 };
+const LOCATION_CARD = { width: 600, height: 800, fit: 'crop' as const, quality: 65 };
 const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 60 };
 
 export type TaxonomyHero = {

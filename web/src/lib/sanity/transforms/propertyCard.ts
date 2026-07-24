@@ -10,7 +10,7 @@ export type PublicPropertyCardLocation = NonNullable<RawPropertyCard['location']
 export type PublicPropertyCardSpecs = RawPropertyCard['specs'];
 
 /** 3:2 card hero dimensions per DESIGN.md property card spec. */
-export const CARD_HERO_IMAGE = { width: 600, height: 400, fit: 'crop' as const, quality: 82 };
+export const CARD_HERO_IMAGE = { width: 600, height: 400, fit: 'crop' as const, quality: 65 };
 
 export type PublicPropertyCard = {
 	_id: RawPropertyCard['_id'];
