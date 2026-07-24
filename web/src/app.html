@@ -6,11 +6,16 @@
 		<meta name="text-scale" content="scale" />
 		<link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
 		<link rel="dns-prefetch" href="https://cdn.sanity.io" />
-		<!-- %sveltekit.head% comes first so the page's own LCP image preload is the first
-		     resource the preload scanner meets. Everything below it — 67KB of fonts, the
-		     ~120KB GTM bundle — is discovered afterwards and so queues behind the image
+		<!-- SvelteKit's head block comes first so the page's own LCP image preload is the
+		     first resource the preload scanner meets. Everything below it (67KB of fonts,
+		     the ~120KB GTM bundle) is discovered afterwards and queues behind the image
 		     rather than racing it for a throttled connection. Order is the whole point of
-		     this block; adding a preload above this line puts it in front of the LCP. -->
+		     this block: a preload added above the line below lands in front of the LCP.
+
+		     Never write a placeholder token inside a comment here. Replacement is a plain
+		     string substitution, so the markup lands inside the comment, and the first
+		     Svelte hydration marker in it carries a comment-close sequence that ends this
+		     comment early and spills the rest onto the page as visible text. -->
 		%sveltekit.head%
 		<link rel="preload" href="/fonts/libre-franklin-latin.woff2" as="font" type="font/woff2" crossorigin />
 		<link rel="preload" href="/fonts/playfair-display-latin.woff2" as="font" type="font/woff2" crossorigin />
