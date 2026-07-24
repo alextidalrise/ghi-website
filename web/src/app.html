@@ -6,18 +6,15 @@
 		<meta name="text-scale" content="scale" />
 		<link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
 		<link rel="dns-prefetch" href="https://cdn.sanity.io" />
-		<!-- These two must stay above the head block below. Stylesheets are inlined (see
-		     inlineStyleThreshold in svelte.config.js), which drops ~80KB of CSS into that
-		     block — far enough that a font hint placed after it is discovered too late to
-		     meet the ~100ms block period `font-display: optional` allows, and the fallback
-		     face is then locked in for the whole page view rather than swapping when the
-		     font lands. Moving these below the block silently reverts the site to Georgia
-		     and Arial. -->
-		<link rel="preload" href="/fonts/libre-franklin-latin.woff2" as="font" type="font/woff2" crossorigin />
-		<link rel="preload" href="/fonts/playfair-display-latin.woff2" as="font" type="font/woff2" crossorigin />
 		<!-- The head block carries the page's own LCP image preload, so it goes ahead of
 		     the ~120KB GTM bundle below: the tag bundle is then discovered afterwards and
 		     queues behind the image rather than racing it on a throttled connection.
+
+		     The fonts are deliberately not preloaded. They were, to beat the ~100ms block
+		     period `font-display: optional` allows — but fonts.css now uses swap with
+		     metric-matched fallbacks, so a font arriving late swaps in without moving a
+		     line and there is nothing left to race. Preloading them only takes ~67KB of
+		     bandwidth off the LCP image inside the window that decides the mobile score.
 
 		     Never write a placeholder token inside a comment here. Replacement is a plain
 		     string substitution, so the markup lands inside the comment, and the first

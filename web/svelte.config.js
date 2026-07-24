@@ -7,23 +7,15 @@ const config = {
 		runes: ({ filename }) => filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 	},
 	kit: {
-		adapter: adapter(),
-		// Merge and inline every stylesheet under this size (UTF-16 code units, measured
-		// uncompressed) instead of linking it. The homepage pulled eight stylesheets —
-		// 82KB raw, ~18KB gzipped, largest 31KB — and render-blocking CSS is fetched at
-		// the browser's highest priority, above images, which `fetchpriority="high"`
-		// cannot outrank. So those eight requests sat in front of the LCP hero: 2.4s of
-		// resource load delay for an image that then transferred in 22ms.
-		//
-		// Inlining is roughly transfer-neutral (the same bytes move, gzipped, inside the
-		// document) and trades eight blocking round trips for none. Lighthouse mobile,
-		// same build, varying only this number: 91 with eight blocking, 93 with four,
-		// 94 with none. It costs some main-thread parse time, so TBT rises — worth it
-		// while TBT has headroom, but that is the number to watch if this is raised.
-		//
-		// 40000 clears the largest file. A previous attempt at 102400 appeared to regress
-		// badly, but it shipped alongside a 138KB hero image that was the real cause.
-		inlineStyleThreshold: 40000
+		adapter: adapter()
+		/* Deliberately no inlineStyleThreshold. Inlining all eight stylesheets does remove
+		   every render-blocking request, and Lighthouse against a local preview scored it
+		   a point better (94 vs 93) — but production disagreed: 88 against 91. The ~82KB
+		   of CSS in the document buys Speed Index (5.1s -> 3.7s) and costs more back on
+		   FCP (1.7s -> 2.0s), LCP (2.9s -> 3.4s) and TBT (20ms -> 130ms).
+		   Local preview is not a valid test for this setting: it has no GTM and no real
+		   network, which is where the larger document is paid for. Re-measure on
+		   production, not localhost, before turning it back on. */
 	}
 };
 
