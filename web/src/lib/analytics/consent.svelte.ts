@@ -1,7 +1,14 @@
 import { browser } from '$app/environment';
 import { getContext, setContext } from 'svelte';
 import { clearAnalyticsCookies } from './browserCookies';
-import { CONSENT_COOKIE, CONSENT_MAX_AGE, createConsent, signalsFor } from './consentCookie';
+import {
+	CONSENT_COOKIE,
+	CONSENT_MAX_AGE,
+	createConsent,
+	parseConsent,
+	readCookie,
+	signalsFor
+} from './consentCookie';
 import type { ConsentCategories, StoredConsent } from './types';
 
 /**
@@ -22,6 +29,7 @@ type Listener = (consent: StoredConsent) => void;
 
 export class ConsentStore {
 	#stored = $state<StoredConsent | null>(null);
+	#hydrated = $state(false);
 	#preferencesOpen = $state(false);
 	#listeners = new Set<Listener>();
 
@@ -29,14 +37,56 @@ export class ConsentStore {
 		this.#stored = initial;
 	}
 
+	/**
+	 * Adopt the decision stored in `document.cookie`.
+	 *
+	 * The server used to read the cookie and hand it in via the constructor, which put a
+	 * per-visitor value into the SSR payload and made the page uncacheable. Reading it
+	 * here keeps the document identical for everyone.
+	 *
+	 * Called from the root layout's `onMount`, i.e. after the first client render has
+	 * already matched the server's. Doing it any earlier would make the client render a
+	 * banner the server did not, which is a hydration mismatch.
+	 */
+	hydrate(): void {
+		if (!browser || this.#hydrated) return;
+
+		this.adopt(parseConsent(readCookie(document.cookie, CONSENT_COOKIE)));
+	}
+
+	/**
+	 * Record what the visitor's stored decision turned out to be — including "none".
+	 *
+	 * The state transition behind `hydrate()`, split out so it can be driven without a
+	 * DOM. `null` here means "we looked and there was no valid decision", which is a
+	 * different thing from the pre-read state and is what turns the banner on.
+	 */
+	adopt(stored: StoredConsent | null): void {
+		this.#stored = stored;
+		this.#hydrated = true;
+	}
+
+	/** The cookie has been read. Until then the store cannot answer for the visitor. */
+	get hydrated(): boolean {
+		return this.#hydrated;
+	}
+
 	/** A valid, current-version decision exists. */
 	get decided(): boolean {
 		return this.#stored !== null;
 	}
 
-	/** The banner's condition: the visitor has not chosen yet. */
+	/**
+	 * The banner's condition: the visitor has not chosen yet.
+	 *
+	 * False until hydration, so the banner is absent from the server's HTML and from the
+	 * first client render. That is what stops it flashing at a visitor who has already
+	 * decided — previously avoided by reading the cookie server-side, which is exactly
+	 * what made the page uncacheable. A first-time visitor sees it a tick after hydration
+	 * instead of in the initial paint.
+	 */
 	get needsPrompt(): boolean {
-		return this.#stored === null;
+		return this.#hydrated && this.#stored === null;
 	}
 
 	get analytics(): boolean {
@@ -86,8 +136,9 @@ export class ConsentStore {
 	 * Withdrawing a previously granted category reloads the page. Deleting `_ga` is not
 	 * enough on its own: the already-loaded gtag keeps the client id in memory and simply
 	 * rewrites the cookie on the next hit. A reload brings the page back with denied
-	 * defaults emitted server-side and no in-memory state. Granting consent never reloads
-	 * — that would be a hostile response to someone accepting.
+	 * defaults and no in-memory state — the bootstrap re-reads the now-withdrawn cookie
+	 * and replays it before the container loads. Granting consent never reloads; that
+	 * would be a hostile response to someone accepting.
 	 */
 	save(choice: ConsentCategories): void {
 		if (!browser) return;
@@ -97,6 +148,8 @@ export class ConsentStore {
 
 		this.#write(record);
 		this.#stored = record;
+		// A decision recorded before the cookie read is itself an answer for this visitor.
+		this.#hydrated = true;
 		this.#preferencesOpen = false;
 
 		window.gtag?.('consent', 'update', signalsFor(record));
@@ -132,6 +185,7 @@ export class ConsentStore {
 
 		this.#write(record);
 		this.#stored = record;
+		this.#hydrated = true;
 		this.#preferencesOpen = false;
 
 		window.gtag?.('consent', 'update', signalsFor(record));
@@ -146,11 +200,14 @@ export class ConsentStore {
 const CONSENT_KEY = Symbol('ghi.consent');
 
 /**
- * Create the request-scoped store. Called once, from the root layout's script body, with
- * the consent cookie the server already read — so the first client render agrees with the
- * markup and the banner never flashes for a visitor who has already decided.
+ * Create the request-scoped store. Called once, from the root layout's script body.
+ *
+ * `initial` is null in normal operation — the server no longer reads the consent cookie,
+ * because doing so made the HTML per-visitor and uncacheable. The layout calls
+ * `hydrate()` on mount to pick the decision up from `document.cookie`. The parameter is
+ * kept so tests can construct a store in a known state without touching the DOM.
  */
-export function createConsentContext(initial: StoredConsent | null): ConsentStore {
+export function createConsentContext(initial: StoredConsent | null = null): ConsentStore {
 	return setContext(CONSENT_KEY, new ConsentStore(initial));
 }
 

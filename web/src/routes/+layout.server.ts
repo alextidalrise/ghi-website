@@ -2,7 +2,6 @@ import { redirect, type Cookies } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
 import { fetchHeaderNav, fetchFooter } from '$lib/sanity/queries';
-import { readConsent } from '$lib/analytics/server';
 
 // Paths that must stay reachable even during a launch takeover: the holding page
 // itself, plus internal tooling, the API, and the Sanity preview entry points.
@@ -45,13 +44,16 @@ export const load: LayoutServerLoad = async ({
 	route,
 	cookies
 }) => {
-	// Reading consent server-side lets the (future) banner render correctly in the very
-	// first paint, with no flash for a visitor who already decided. The gate itself was
-	// resolved once in analyticsHandle; reuse it rather than recomputing.
-	const analyticsState = {
-		mode: analytics?.mode ?? 'off',
-		consent: readConsent(cookies)
-	};
+	/* Deliberately does NOT read the consent cookie. Doing so put the visitor's decision
+	   into the SSR data payload, which made the HTML different for every visitor and so
+	   impossible to cache at the edge — and TTFB is what caps this site's PageSpeed
+	   scores. The store now reads the cookie in the browser instead (see
+	   ConsentStore.hydrate), and the banner stays hidden until it has, so a returning
+	   visitor still never sees it flash.
+	   `mode` is safe to keep: it is a property of the host and route, not the visitor —
+	   with the one exception of a debug session, whose response analyticsHandle marks
+	   no-store. */
+	const analyticsState = { mode: analytics?.mode ?? 'off' };
 
 	// The holding route renders bare (no nav/footer), so it needs no taxonomy — and
 	// skipping the Sanity call keeps it standing even if the dataset is empty/unreachable.

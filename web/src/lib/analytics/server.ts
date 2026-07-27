@@ -3,17 +3,20 @@ import { env as privateEnv } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import { resolveAnalyticsConfig, type AnalyticsConfig } from './config';
-import { CONSENT_COOKIE, parseConsent } from './consentCookie';
 import { buildBootstrapScript, buildDisabledComment } from './snippet';
-import type { StoredConsent } from './types';
 
 /**
  * Server-side analytics wiring.
  *
  * The gate is resolved here, not in the browser, because the bootstrap script has to be
- * written into the HTML before hydration. That also means the visitor's stored consent
- * is known server-side, so the very first script on the page can carry their real
- * decision instead of waiting for a client-side cookie read.
+ * written into the HTML before hydration.
+ *
+ * The visitor's stored consent is deliberately NOT read here. It used to be, which let
+ * the first script carry their decision directly — but it also made every response
+ * per-visitor and so uncacheable, and server TTFB is what caps this site's PageSpeed
+ * scores. The bootstrap now reads the cookie itself, synchronously and still ahead of
+ * the GTM container, so the ordering guarantee survives while the document becomes
+ * identical for everyone. See `buildStoredConsentReader` in `snippet.ts`.
  */
 
 /** Replaced in `app.html`. Must stay in <head>, which SvelteKit emits in the first chunk. */
@@ -24,11 +27,6 @@ const DEBUG_PARAM = 'ghi_debug';
 
 /** Deliberately short: a debug session should expire on its own, not linger. */
 const DEBUG_MAX_AGE = 60 * 60 * 2;
-
-/** Read and validate the visitor's stored consent decision. */
-export function readConsent(cookies: Cookies): StoredConsent | null {
-	return parseConsent(cookies.get(CONSENT_COOKIE));
-}
 
 /**
  * Decide whether this request may run analytics in debug mode.
@@ -96,18 +94,26 @@ export const analyticsHandle: Handle = async ({ event, resolve }) => {
 	const config = configFor(event);
 	event.locals.analytics = config;
 
-	const consent = readConsent(event.cookies);
-
 	const markup =
 		config.mode === 'off' || !config.gtmId
 			? buildDisabledComment(config.reason)
 			: buildBootstrapScript({
 					gtmId: config.gtmId,
-					consent,
 					debug: config.mode === 'debug'
 				});
 
-	return resolve(event, {
+	const response = await resolve(event, {
 		transformPageChunk: ({ html }) => html.replace(PLACEHOLDER, markup)
 	});
+
+	/* The two cases whose HTML is legitimately not the same as everyone else's: a QA debug
+	   session (extra GTM Preview markers) and a Sanity draft preview (unpublished content).
+	   Marking them here — rather than in whatever later sets the cache headers — keeps the
+	   rule next to the code that creates the variance, so enabling edge caching cannot
+	   accidentally publish a draft or pin a debug document into a shared cache. */
+	if (config.mode === 'debug' || event.locals.preview === true) {
+		response.headers.set('cache-control', 'private, no-store');
+	}
+
+	return response;
 };
