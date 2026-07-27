@@ -10,9 +10,17 @@
 		    under a country header so this is off; the country page shows a flat list of one
 		    country's locations and turns it on. */
 		showCountry?: boolean;
+		/** How many leading tiles to fetch eagerly, at high priority.
+		    Defaults to 0 — lazy is right wherever this grid sits below a hero that owns the
+		    LCP, which is the homepage's case. On the country page the hero is a text band
+		    with no image, so the first tile *is* the LCP element and lands inside the mobile
+		    viewport; leaving it lazy cost ~1.5s of load delay there (measured on /spain,
+		    PSI mobile). Set this only on pages where a tile genuinely paints above the fold —
+		    marking more tiles than are visible just steals bandwidth from the real LCP. */
+		priorityCount?: number;
 	};
 
-	let { locations, maxColumns = 4, showCountry = false }: Props = $props();
+	let { locations, maxColumns = 4, showCountry = false, priorityCount = 0 }: Props = $props();
 
 	// Columns per row on desktop. We fill up to `maxColumns` (4) per row and let the
 	// remainder wrap, so six locations read as 4 + 2. The exception is an exact count of
@@ -30,7 +38,14 @@
 			<li class="location-tile" style="--reveal-delay: {index * 70}ms">
 				<a class="location-tile__link" href={location.href}>
 					<span class="location-tile__media">
-						<img src={location.image} alt={location.alt} width="600" height="800" loading="lazy" />
+						<img
+							src={location.image}
+							alt={location.alt}
+							width="600"
+							height="800"
+							loading={index < priorityCount ? 'eager' : 'lazy'}
+							fetchpriority={index < priorityCount ? 'high' : undefined}
+						/>
 						<span class="location-tile__scrim" aria-hidden="true"></span>
 					</span>
 					<span class="location-tile__body">
