@@ -1,0 +1,32 @@
+<!--
+  Overline. A small tracked uppercase label.
+
+  RATIONED TO ONE PER EMAIL, and bin/validate.mjs enforces it.
+
+  The brand has a real overline in its type scale, so this is not banned
+  outright. What is banned is the reflex: a tiny tracked label above every
+  section heading. One is a deliberate brand mark; four is scaffolding, and it
+  reads as a template rather than as a voice. If a section needs separating,
+  the Emphasis Ladder has cheaper devices for it.
+
+  Uppercase needs the tracking to be legible at 11px, which is why the token
+  carries 0.12em. It is also why this must never hold more than about four
+  words: uppercase at 11px is slow to read in quantity, and no sentence belongs
+  in it.
+
+  Tracking is dropped entirely for right-to-left locales. Arabic is cursive, and
+  letter-spacing forces gaps between glyphs that are supposed to join, breaking
+  words into disconnected letterforms. `text-transform: uppercase` is harmless
+  there (Arabic has no case) so it stays rather than branching twice.
+
+  Props
+    tone  default (muted on white) | on-green
+    gap   bottom padding in px (default 12)
+-->
+<tr>
+  <td
+    align="{{ align || page.start }}"
+    class="{{ tone === 'on-green' ? '' : 'dm-muted' }}"
+    style="padding: 0 0 {{ gap === '' ? 12 : gap }}px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.overline.size }}px; line-height: {{ page.scale.overline.leading }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.medium }}; letter-spacing: {{ page.rtl ? 0 : page.track.overline }}; text-transform: uppercase; color: {{ tone === 'on-green' ? page.brand.gold : page.brand.muted }};"
+  ><yield></yield></td>
+</tr>

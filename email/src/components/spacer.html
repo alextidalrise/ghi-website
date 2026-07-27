@@ -1,0 +1,23 @@
+<!--
+  Vertical space, as a table row.
+
+  Only for space that a neighbouring component's padding cannot express, which
+  in practice means between two full-bleed rows. Inside a section, use the
+  child components' `gap` prop instead: fewer rows means fewer bytes and one
+  place to reason about rhythm.
+
+  `font-size: 0` + `line-height: 1px` + `&nbsp;` is the combination that gives
+  an exact height in Word's engine. Without it the cell inflates to a text line.
+
+  Props
+    height  px (default 32)
+    tone    default (white) | green
+-->
+<tr>
+  <td
+    bgcolor="{{ tone === 'green' ? page.brand.green : page.brand.white }}"
+    class="{{ tone === 'green' ? '' : 'dm-surface' }}"
+    height="{{ height === '' ? 32 : height }}"
+    style="background-color: {{ tone === 'green' ? page.brand.green : page.brand.white }}; height: {{ height === '' ? 32 : height }}px; line-height: 1px; font-size: 0; mso-line-height-rule: exactly;"
+  >&nbsp;</td>
+</tr>

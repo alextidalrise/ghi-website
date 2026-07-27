@@ -1,0 +1,26 @@
+<!--
+  Body copy.
+
+  Props
+    variant  lead | body | ui | legal   (default body)
+    tone     default | muted | on-green
+    gap      bottom padding in px (default 24)
+    align    overrides the locale's natural alignment
+
+  The paragraph carries `margin: 0`; the spacing below it is the cell's padding.
+  Word's engine treats <p> margins inconsistently, so no structural space is
+  ever entrusted to them.
+
+  Note on weight: the site sets body copy in Libre Franklin Light 300. That does
+  not survive here. Arial has no light weight, so the majority of recipients
+  would see Regular regardless, and designing to a weight most people never
+  receive means the measure and rhythm are tuned for the wrong rendering. Email
+  body copy is Regular 400 everywhere. See docs/02-brand-rules.md.
+-->
+<tr>
+  <td
+    align="{{ align || page.start }}"
+    class="{{ tone === 'muted' ? 'dm-muted' : (tone === 'on-green' ? '' : 'dm-ink') }} {{ variant === 'lead' ? 'sm-lead' : '' }}"
+    style="padding: 0 0 {{ gap === '' ? 24 : gap }}px; font-family: {{ page.font.sans }}; font-size: {{ variant === 'lead' ? page.scale.lead.size : (variant === 'ui' ? page.scale.ui.size : (variant === 'legal' ? page.scale.legal.size : page.scale.body.size)) }}px; line-height: {{ variant === 'lead' ? page.scale.lead.leading : (variant === 'ui' ? page.scale.ui.leading : (variant === 'legal' ? page.scale.legal.leading : page.scale.body.leading)) }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ tone === 'muted' ? page.brand.muted : (tone === 'on-green' ? page.brand.onGreen : page.brand.charcoal) }};"
+  ><yield></yield></td>
+</tr>

@@ -1,0 +1,66 @@
+<!--
+  Full-bleed image. A direct child of the 600px column, not of a section.
+
+  Sits at Emphasis Ladder tier 3: photography as surface. Per DESIGN.md, tier 3
+  does not apply when the surrounding content is itself photographic; a rail of
+  property images does not also get a photographic band.
+
+  `width` and `height` attributes describe the DISPLAY slot, not the source
+  file, so clients that honour them reserve the correct box and the layout does
+  not jump when the image arrives. The source is served at 2x through
+  lib/image-url.mjs with the format pinned.
+
+  Alt text is styled inline. When images are blocked (Outlook's default, and
+  many corporate Gmail policies) the alt string is what the reader gets, and an
+  unstyled one renders as small blue Times New Roman on white. These styles make
+  the fallback look deliberate.
+
+  Alt text is CHARCOAL, not muted grey. It sits on the stone placeholder
+  background, where muted measures 3.96:1 and fails AA. The one moment the alt
+  text has a job is the one moment it would have been unreadable. Charcoal on
+  stone is 10.54:1.
+
+  Props
+    src     absolute HTTPS URL from buildEmailImageUrl()
+    alt     meaningful description, or "" for decorative
+    width   display width in px (600 for full bleed)
+    height  display height in px
+    href    optional destination; wraps the image in a link
+    caption optional caption text below the image
+    edit    Mailchimp editable-region name
+-->
+<tr>
+  <td style="padding: 0; font-size: 0; line-height: 0;" mc:edit="{{ edit }}">
+    <if condition="href">
+      <a href="{{ href }}" style="text-decoration: none; border: 0;">
+        <img
+          src="{{ src }}"
+          alt="{{ alt }}"
+          width="{{ width === '' ? 600 : width }}"
+          height="{{ height }}"
+          style="display: block; width: 100%; max-width: {{ width === '' ? 600 : width }}px; height: auto; border: 0; outline: none; text-decoration: none; font-family: {{ page.font.sans }}; font-size: {{ page.scale.ui.size }}px; line-height: {{ page.scale.ui.leading }}px; color: {{ page.brand.charcoal }}; background-color: {{ page.brand.border }};"
+        >
+      </a>
+    </if>
+    <else>
+      <img
+        src="{{ src }}"
+        alt="{{ alt }}"
+        width="{{ width === '' ? 600 : width }}"
+        height="{{ height }}"
+        style="display: block; width: 100%; max-width: {{ width === '' ? 600 : width }}px; height: auto; border: 0; outline: none; text-decoration: none; font-family: {{ page.font.sans }}; font-size: {{ page.scale.ui.size }}px; line-height: {{ page.scale.ui.leading }}px; color: {{ page.brand.charcoal }}; background-color: {{ page.brand.border }};"
+      >
+    </else>
+  </td>
+</tr>
+
+<if condition="caption">
+  <tr>
+    <td
+      align="{{ page.start }}"
+      bgcolor="{{ page.brand.white }}"
+      class="dm-surface dm-muted sm-gutter"
+      style="background-color: {{ page.brand.white }}; padding: 12px 32px 0; font-family: {{ page.font.sans }}; font-size: {{ page.scale.ui.size }}px; line-height: {{ page.scale.ui.leading }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ page.brand.muted }};"
+    >{{ caption }}</td>
+  </tr>
+</if>

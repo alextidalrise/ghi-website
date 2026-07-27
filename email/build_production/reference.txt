@@ -1,0 +1,69 @@
+GOLF HOMES INTERNATIONAL
+https://www.golfhomesinternational.com/?utm_source=mailchimp&utm_medium=email
+========================================================================
+
+[Image: A villa above the fairway at dusk, with La Concha and the Sierra
+Blanca beyond]
+
+*|IF:FNAME|*Dear *|FNAME|*,*|ELSE:|*Dear reader,*|END:IF|*
+
+Andalucía
+
+SIX HOUSES ON THE FAIRWAY
+-------------------------
+
+Frontline property changes hands quietly here. These six came to us
+between March and June, and four of them have not been listed publicly.
+
+Frontline means different things from one resort to the next. At Los
+Naranjos it can mean a garden that opens onto the ninth. At La Zagaleta
+it more often means a view across a valley you do not own and cannot
+build on, which is the more durable thing to buy. Our note on how to
+read a frontline listing
+(https://www.golfhomesinternational.com/guides/reading-a-frontline-listing?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline)
+covers the distinction properly.
+
+VIEW THE COLLECTION:
+https://www.golfhomesinternational.com/spain/andalucia?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline
+
+------------------------------------------------------------------------
+
+ASK ABOUT A SPECIFIC HOUSE
+--------------------------
+
+Every property we list has been visited. If you want an honest view on
+one of them, including the ones we decided not to take on, write back to
+this address and we will tell you what we saw.
+
+ARRANGE A CONVERSATION:
+https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline
+
+------------------------------------------------------------------------
+
+BEFORE YOU TRAVEL
+-----------------
+
+Viewings in July fill up by the middle of June, and most of these houses
+are shown by appointment. If you would like to see two or three on one
+trip, tell us early which ones matter to you. The drive between
+Sotogrande and Marbella East is longer than the map suggests.
+
+------------------------------------------------------------------------
+
+Written from the Marbella office. Reply to this message and it reaches a
+person, not a queue.
+
+------------------------------------------------------------------------
+
+========================================================================
+
+You are receiving this because you asked us to keep you informed about
+property on and around the golf courses of southern Europe.
+
+*|LIST:COMPANY|*, *|LIST:ADDRESS|*
+
+View this email in your browser: *|ARCHIVE_PAGE_URL|*
+Update your preferences: *|UPDATE_PROFILE|*
+Unsubscribe: *|UNSUB|*
+
+(c) *|CURRENT_YEAR|* Golf Homes International. All rights reserved.

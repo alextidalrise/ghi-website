@@ -1,0 +1,18 @@
+{
+	"code": "ar",
+	"dir": "rtl",
+	"label": "العربية",
+	"logoAlt": "Golf Homes International",
+	"viewInBrowser": "اعرض هذه الرسالة في المتصفح",
+	"unsubscribe": "إلغاء الاشتراك",
+	"updatePreferences": "تحديث تفضيلاتك",
+	"permissionReminder": "تصلك هذه الرسالة لأنك طلبت منا إبقاءك على اطلاع بالعقارات المطلة على ملاعب الغولف في جنوب أوروبا وما حولها.",
+	"footerRights": "جميع الحقوق محفوظة.",
+	"plaintext": {
+		"imageLabel": "صورة",
+		"linkLabel": "رابط",
+		"footerHeading": "Golf Homes International",
+		"headingRule": "="
+	},
+	"arrow": "←"
+}

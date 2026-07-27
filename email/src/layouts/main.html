@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+  lang="{{ page.i18n.code }}"
+  dir="{{ page.i18n.dir }}"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Stops iOS 10+ resizing the whole email to fit the screen. -->
+  <meta name="x-apple-disable-message-reformatting">
+  <!-- Opts in to client dark-mode handling instead of forced inversion. -->
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>{{ page.title }}</title>
+
+  <!--
+    Word renders at 120dpi, which scales every dimension up by 25% and pushes a
+    600px column to 750px. PixelsPerInch pins it back to 96. Without it, classic
+    Outlook clips the column on a maximised window.
+
+    Never nest an HTML comment inside the conditional block below. A comment
+    close sequence anywhere within it terminates the conditional early and dumps
+    the remaining markup as visible text in every non-Outlook client. For the
+    same reason, do not write that character sequence literally in any comment
+    in this file.
+  -->
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+
+  <style>
+    @import "src/css/main.css";
+  </style>
+</head>
+
+<!--
+  `id="body"` is load-bearing: the `u + #body a` reset that stops the Gmail app
+  recolouring links targets it by id.
+-->
+<body
+  id="body"
+  class="dm-page"
+  style="margin: 0; padding: 0; width: 100%; word-break: break-word; -webkit-font-smoothing: antialiased; background-color: {{ page.brand.white }};"
+>
+
+  <!--
+    Preheader. Sits before all visible content so it becomes the inbox preview
+    line. The trailing entity run is not decoration: without it Gmail pulls the
+    first sentence of body copy in after the preheader, which reads as a
+    duplicated headline in the inbox list.
+  -->
+  <div style="display: none; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; color: {{ page.brand.white }};">
+    {{ page.preheader }}
+    &#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;&#847;&zwnj;&nbsp;&#8199;&#65279;
+  </div>
+
+  <!--
+    role="article" + aria-roledescription gives screen readers a landmark to
+    enter and a name to announce. Without it VoiceOver reads the message as an
+    unlabelled document.
+  -->
+  <div role="article" aria-roledescription="email" aria-label="{{ page.title }}" lang="{{ page.i18n.code }}" dir="{{ page.i18n.dir }}">
+
+    <table role="presentation" class="dm-page" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; background-color: {{ page.brand.white }};">
+      <tr>
+        <td align="center" style="padding: 0;">
+
+          <!--[if mso | IE]>
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" align="center"><tr><td width="600">
+          <![endif]-->
+
+          <!--
+            The column is width:100% + max-width:600px rather than width="600",
+            so it shrinks fluidly if a client strips the media query. Outlook
+            ignores max-width, which is what the conditional table above is for.
+          -->
+          <table
+            role="presentation"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            class="dm-surface"
+            style="width: 100%; max-width: 600px; margin: 0 auto; background-color: {{ page.brand.white }};"
+          >
+
+            <x-masthead></x-masthead>
+
+            <yield></yield>
+
+            <x-footer></x-footer>
+
+          </table>
+
+          <!--[if mso | IE]>
+          </td></tr></table>
+          <![endif]-->
+
+        </td>
+      </tr>
+    </table>
+
+  </div>
+</body>
+</html>

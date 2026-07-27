@@ -1,0 +1,46 @@
+<!--
+  Call to action.
+
+  A table with a padded cell, not a styled <a>. Word's engine ignores padding on
+  inline elements, so a padded anchor collapses to bare text in classic Outlook.
+  Cell padding is the only construction that renders everywhere.
+
+  The brand's zero-border-radius rule is a genuine advantage here: with square
+  corners there is no VML fallback, no `<v:roundrect>`, and no conditional
+  markup at all. The button renders identically in classic Outlook and Apple
+  Mail. Rounded corners are the single most common reason email CTAs need
+  Outlook-specific code, and this brand does not have them.
+
+  Touch target: 16px padding + 20px line-height + 16px = 52px tall, clearing the
+  44px minimum. On phones `.sm-cta` makes it full width.
+
+  Dark mode: the fill stays green and the label stays ivory, because that IS the
+  brand's primary button. What it gains is a sage edge, because #1F3D34 against
+  the dark body #1C231E measures 1.35:1 and would fail WCAG 2.2 non-text
+  contrast (1.4.11) as a UI boundary. The border is doing accessibility work.
+
+  Props
+    href     absolute HTTPS destination (required)
+    variant  primary (green fill) | gold (gold fill, for use ON the green band)
+    gap      bottom padding in px (default 8)
+    align    overrides the locale's natural alignment
+-->
+<tr>
+  <td align="{{ align || page.start }}" style="padding: 0 0 {{ gap === '' ? 8 : gap }}px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="sm-full" style="border-collapse: separate;">
+      <tr>
+        <td
+          align="center"
+          bgcolor="{{ variant === 'gold' ? page.brand.gold : page.brand.green }}"
+          class="{{ variant === 'gold' ? '' : 'dm-cta-edge' }}"
+          style="background-color: {{ variant === 'gold' ? page.brand.gold : page.brand.green }}; border: 1px solid {{ variant === 'gold' ? page.brand.gold : page.brand.green }}; padding: 16px 32px; mso-padding-alt: 16px 32px;"
+        >
+          <a
+            href="{{ href }}"
+            style="display: block; font-family: {{ page.font.sans }}; font-size: {{ page.scale.ui.size }}px; line-height: 20px; mso-line-height-rule: exactly; font-weight: {{ page.weight.medium }}; letter-spacing: {{ page.rtl ? 0 : page.track.wide }}; color: {{ variant === 'gold' ? page.brand.green : page.brand.onGreen }}; text-decoration: none;"
+          ><yield></yield></a>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>

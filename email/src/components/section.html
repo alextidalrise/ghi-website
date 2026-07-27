@@ -1,0 +1,30 @@
+<!--
+  Section — a white editorial band. The workhorse of the body.
+
+  Structure is tr > td (ground + gutter) > table, and every child inside is
+  itself a tr > td carrying its own bottom padding. All structural spacing is
+  therefore table-cell padding, never a margin on a <div> or <p>, which is the
+  rule classic Outlook's Word engine requires.
+
+  Props
+    pt    top padding in px (default 40)
+    pb    bottom padding in px (default 40)
+    edit  Mailchimp editable-region name. Present = a marketer may change the
+          contents in the Mailchimp builder. Absent = locked. These names are
+          also the keys the Mailchimp API accepts under `template.sections`,
+          so they are the contract the future agent writes against. Do not
+          rename one without reading docs/07-agent-integration.md.
+-->
+<tr>
+  <td
+    align="{{ page.start }}"
+    bgcolor="{{ page.brand.white }}"
+    class="dm-surface sm-gutter"
+    style="background-color: {{ page.brand.white }}; padding: {{ pt === '' ? 40 : pt }}px 32px {{ pb === '' ? 40 : pb }}px;"
+    mc:edit="{{ edit }}"
+  >
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%;">
+      <yield></yield>
+    </table>
+  </td>
+</tr>

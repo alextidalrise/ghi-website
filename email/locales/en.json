@@ -1,0 +1,18 @@
+{
+	"code": "en",
+	"dir": "ltr",
+	"label": "English",
+	"logoAlt": "Golf Homes International",
+	"viewInBrowser": "View this email in your browser",
+	"unsubscribe": "Unsubscribe",
+	"updatePreferences": "Update your preferences",
+	"permissionReminder": "You are receiving this because you asked us to keep you informed about property on and around the golf courses of southern Europe.",
+	"footerRights": "All rights reserved.",
+	"plaintext": {
+		"imageLabel": "Image",
+		"linkLabel": "Link",
+		"footerHeading": "Golf Homes International",
+		"headingRule": "="
+	},
+	"arrow": "→"
+}

@@ -1,0 +1,29 @@
+{
+  "generatedFrom": "web/static/design-system/assets/",
+  "logo": {
+    "displayWidth": 200,
+    "displayHeight": 45
+  },
+  "files": [
+    {
+      "file": "logo-ivory@2x.png",
+      "width": 400,
+      "height": 90,
+      "bytes": 11247
+    },
+    {
+      "file": "logo-green-on-white@2x.png",
+      "width": 400,
+      "height": 90,
+      "bytes": 10471
+    },
+    {
+      "file": "reference-andalucia@2x.jpg",
+      "width": 1200,
+      "height": 800,
+      "displayWidth": 600,
+      "displayHeight": 400,
+      "bytes": 129791
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+---
+title: 'ستة منازل على حافة الملعب'
+preheader: 'أربعة منها لم تُعرض للبيع علنًا. ملاحظة عن معنى الواجهة الأمامية في كل منتجع.'
+locale: ar
+subject: 'ستة منازل على حافة الملعب'
+---
+
+<x-main>
+
+  <!--
+    RTL PROOF FIXTURE.
+
+    Arabic is not hypothetical for this brand: docs/uae-expansion-plan.md puts
+    Dubai next after Spain and Portugal, so right-to-left is a requirement the
+    system should already satisfy rather than retrofit.
+
+    Nothing here differs structurally from reference.html. That is the point.
+    Every component in this system is horizontally SYMMETRIC (equal left and
+    right cell padding, never asymmetric), so right-to-left reduces to three
+    things: the `dir` attribute on <html>, the alignment keyword resolved from
+    the locale, and the direction of the arrow glyph. There is no parallel
+    stylesheet and no RTL-specific component.
+
+    That symmetry is a constraint, not an accident. A component with `padding-left:
+    32px; padding-right: 0` would mirror wrongly here, and email cannot use
+    logical properties (`padding-inline-start`) because Word's engine does not
+    support them. bin/validate.mjs fails asymmetric horizontal padding for this
+    reason.
+
+    One campaign is one locale: Mailchimp sends to a language segment, so this
+    is a separate template and a separate campaign, not a switch inside one email.
+  -->
+
+  <x-figure
+    edit="hero_image"
+    src="{{ page.site.origin }}/email/reference-andalucia@2x.jpg"
+    alt="فيلا تطل على ملعب الغولف عند الغروب، وخلفها جبل لا كونتشا وسييرا بلانكا"
+    width="600"
+    height="400"
+  ></x-figure>
+
+  <x-section edit="lead" pt="40" pb="40">
+
+    <x-text variant="ui" tone="muted" gap="24">*|IF:FNAME|*عزيزي *|FNAME|*،*|ELSE:|*تحية طيبة،*|END:IF|*</x-text>
+
+    <x-overline gap="12">الأندلس</x-overline>
+
+    <x-heading level="1" gap="20">ستة منازل على حافة الملعب</x-heading>
+
+    <x-text variant="lead" gap="24">
+      تنتقل ملكية العقارات المطلة على الملاعب هنا بهدوء. وصلتنا هذه المنازل الستة بين مارس
+      ويونيو، وأربعة منها لم تُعرض للبيع علنًا.
+    </x-text>
+
+    <x-text gap="32">
+      تختلف الواجهة الأمامية من منتجع إلى آخر. في لوس نارانخوس قد تعني حديقة تفتح على الحفرة
+      التاسعة. أما في لا ثاغاليتا فتعني غالبًا إطلالة على واد لا تملكه ولا يمكن البناء عليه،
+      وهو الأمر الأبقى.
+    </x-text>
+
+    <x-button
+      href="{{ page.site.origin }}/spain/andalucia?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline-ar"
+      gap="0"
+    >تصفّح المجموعة</x-button>
+
+  </x-section>
+
+  <x-band edit="cta_section" pt="48" pb="48">
+
+    <x-heading level="2" tone="on-green" gap="16">اسأل عن منزل بعينه</x-heading>
+
+    <x-text tone="on-green" gap="28">
+      كل عقار ندرجه قد زرناه بأنفسنا. إن أردت رأيًا صريحًا في أحدها، بما في ذلك العقارات التي
+      قررنا عدم إدراجها، فاكتب إلينا وسنخبرك بما رأيناه.
+    </x-text>
+
+    <x-button
+      variant="gold"
+      href="{{ page.site.origin }}/contact?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline-ar"
+      gap="0"
+    >رتّب موعدًا للحديث</x-button>
+
+  </x-band>
+
+  <x-section edit="body" pt="40" pb="40">
+
+    <x-heading level="2" gap="16">قبل السفر</x-heading>
+
+    <x-text gap="0">
+      تمتلئ مواعيد المعاينة في يوليو بحلول منتصف يونيو، ومعظم هذه المنازل تُعرض بموعد مسبق.
+      إن رغبت في رؤية اثنين أو ثلاثة في رحلة واحدة، فأخبرنا مبكرًا أيها يهمك.
+    </x-text>
+
+    <x-rule gap="28"></x-rule>
+
+    <x-text variant="ui" tone="muted" gap="0">
+      كُتبت هذه الرسالة من مكتب ماربيا. ردّك عليها يصل إلى شخص، لا إلى قائمة انتظار.
+    </x-text>
+
+  </x-section>
+
+</x-main>

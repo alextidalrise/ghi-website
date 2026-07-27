@@ -1,0 +1,308 @@
+/**
+ * Golf Homes International — email stylesheet.
+ *
+ * Deliberately small. Critical presentation CSS (font, size, leading, colour,
+ * background, width, alignment, padding, borders) is written inline by the
+ * components, so what is left here is only what CANNOT be inlined: client
+ * resets, the single responsive breakpoint, and the dark-mode enhancements.
+ *
+ * Nothing in this file may carry meaning on its own. Every client in the matrix
+ * is allowed to throw the whole <style> block away, and the email must still
+ * read correctly when it does. That is the contract.
+ */
+
+/*
+ * Web fonts are a progressive enhancement and nothing depends on them.
+ *
+ * Apple Mail on macOS and iOS honour this. Gmail (every platform), both
+ * Outlooks for Windows, Outlook.com and Yahoo strip it, so the majority of
+ * opens are laid out in Georgia and Arial. Those are the metrics every size in
+ * lib/tokens.mjs was chosen against; the web font is the bonus, not the target.
+ *
+ * Only the weights actually used are requested. Libre Franklin Light 300 is
+ * deliberately absent: Arial has no light weight, so specifying it would design
+ * for a rendering most recipients never receive.
+ *
+ * Must remain the first rule in the file; CSS requires @import before any
+ * other statement.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500&family=Playfair+Display:wght@400;600&display=swap');
+
+/* -------------------------------------------------------------------------- */
+/* 1. Client resets                                                            */
+/* -------------------------------------------------------------------------- */
+
+html,
+body {
+	margin: 0 auto !important;
+	padding: 0 !important;
+	width: 100% !important;
+}
+
+/* Stop iOS and Windows Phone inflating text in ways that break the column. */
+body,
+table,
+td,
+a {
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
+}
+
+/* Word's rendering engine adds ~1.5pt of phantom space around every table. */
+table,
+td {
+	mso-table-lspace: 0pt;
+	mso-table-rspace: 0pt;
+	border-collapse: collapse;
+}
+
+img {
+	-ms-interpolation-mode: bicubic;
+	border: 0;
+	line-height: 100%;
+	outline: none;
+	text-decoration: none;
+}
+
+/*
+ * iOS auto-links dates, addresses and phone numbers and restyles them in blue.
+ * On a green ground that is both off-brand and, at iOS blue on #1F3D34,
+ * roughly 2.4:1 — a genuine accessibility failure, not just an aesthetic one.
+ */
+a[x-apple-data-detectors] {
+	color: inherit !important;
+	text-decoration: none !important;
+	font-size: inherit !important;
+	font-family: inherit !important;
+	font-weight: inherit !important;
+	line-height: inherit !important;
+}
+
+/* The Gmail app applies the same treatment. `u + #body` targets it specifically. */
+u + #body a,
+#MessageViewBody a {
+	color: inherit;
+	text-decoration: none;
+	font-size: inherit;
+	font-family: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+}
+
+/*
+ * Gmail greys out content it considers already-seen in a thread, which turns
+ * body copy into low-contrast mush on a resend. Inheriting keeps our colours.
+ */
+.im {
+	color: inherit !important;
+}
+
+/* Yahoo and AOL underline anything that looks like a link target. */
+.yshortcuts a {
+	border-bottom: none !important;
+}
+
+/* Outlook.com forces its own line-height on <p> unless told otherwise. */
+p {
+	margin: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 2. Responsive                                                               */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * One breakpoint, max-width. Email responsive behaviour is a single "phone or
+ * not" question, and a max-width query is the right direction: a client that
+ * strips media queries must fall back to the DESKTOP rules, because those are
+ * the ones that survive at any width. A mobile-first min-width cascade would
+ * leave media-query-stripping clients holding the phone layout on a monitor.
+ *
+ * `!important` is mandatory. By the time these apply, the desktop values are
+ * inline styles on the element, and a plain stylesheet rule cannot beat an
+ * inline declaration.
+ *
+ * Everything here is an adjustment, never a reveal. No content is hidden at one
+ * width and shown at another, so a stripped media query can never remove
+ * something the reader needed.
+ */
+
+@media only screen and (max-width: 600px) {
+	/* Side padding tightens so copy does not run to a 24px measure on a 320px screen. */
+	.sm-gutter {
+		padding-left: 24px !important;
+		padding-right: 24px !important;
+	}
+
+	/* Vertical rhythm compresses; 56px of section padding is a blank phone screen. */
+	.sm-section {
+		padding-top: 36px !important;
+		padding-bottom: 36px !important;
+	}
+
+	.sm-band {
+		padding-top: 36px !important;
+		padding-bottom: 36px !important;
+	}
+
+	/* Display type steps down. Georgia at 34px wraps badly under ~360px. */
+	.sm-display {
+		font-size: 28px !important;
+		line-height: 33px !important;
+	}
+
+	.sm-h2 {
+		font-size: 22px !important;
+		line-height: 27px !important;
+	}
+
+	.sm-lead {
+		font-size: 17px !important;
+		line-height: 27px !important;
+	}
+
+	/* Side-by-side cells become full-width rows. */
+	.sm-stack {
+		display: block !important;
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+
+	/*
+	 * Also what makes a CTA full width on a phone: the button's outer table
+	 * carries this, so the tap target spans the column instead of hugging a
+	 * short label. Width only, never `display: block` on a <table>, which
+	 * several clients render badly.
+	 */
+	.sm-full {
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+/* 3. Dark mode                                                                */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Five behaviours have to be survivable (see docs/01-technical-standard.md):
+ * clients that ignore dark mode, clients that honour this block, clients that
+ * partially invert, clients that fully invert, and clients that do their own
+ * thing regardless. The rules below are a progressive enhancement for the
+ * second group only. Nothing depends on them.
+ *
+ * These are hand-written rather than generated from `dark:` variants on
+ * purpose. A maintainer needs to read this block and understand the whole
+ * dark-mode policy in one screen, which a wall of `dark:!text-dark-ink`
+ * classes does not give them.
+ *
+ * `!important` is mandatory: by the time these apply, the light-mode values are
+ * inline styles on the element, and inline beats a stylesheet.
+ *
+ * The green masthead and footer are deliberately absent. Their ground stays
+ * #1F3D34 in both modes. A dark ground is what inverting clients leave alone,
+ * which is why the bookends are where the logo and the required footer live.
+ */
+
+@media (prefers-color-scheme: dark) {
+	/* Outer canvas behind the 600px column. */
+	.dm-page {
+		background-color: #0e1410 !important;
+	}
+
+	/* The white editorial body. */
+	.dm-surface {
+		background-color: #1c231e !important;
+	}
+
+	/* Body copy and headings. */
+	.dm-ink {
+		color: #e8e5df !important;
+	}
+
+	/* Secondary text. 4.6:1 on #1C231E. */
+	.dm-muted {
+		color: #8a8a8a !important;
+	}
+
+	/*
+	 * Links and headings that are green ink on white. Green on a dark ground is
+	 * unreadable, so they take the sage value the site uses for the same job.
+	 */
+	.dm-accent {
+		color: #c5d6c0 !important;
+	}
+
+	/* Hairlines are drawn as 1px-tall filled cells, not borders. */
+	.dm-hairline {
+		background-color: #2a332c !important;
+	}
+
+	.dm-border {
+		border-color: #2a332c !important;
+	}
+
+	/*
+	 * The CTA keeps its green fill and ivory label in dark mode, because that IS
+	 * the brand's button. What it gains is a sage edge: #1F3D34 against #1C231E
+	 * measures 1.35:1, which fails WCAG 2.2 non-text contrast (1.4.11) for a UI
+	 * boundary. The border is doing accessibility work, not decoration.
+	 */
+	.dm-cta-edge {
+		border-color: #c5d6c0 !important;
+	}
+
+	/* Swap logo variants without a second image request in light mode. */
+	.dm-hide {
+		display: none !important;
+		mso-hide: all !important;
+	}
+}
+
+/*
+ * Outlook.com and the new Outlook stamp [data-ogsc] / [data-ogsb] on elements
+ * when the user is in dark mode, instead of honouring prefers-color-scheme.
+ *
+ * Wrapped in `@media screen` so juice keeps them: media-query rules are
+ * preserved wholesale during inlining, whereas a bare attribute selector that
+ * matches nothing in our source can be dropped.
+ */
+@media screen {
+	[data-ogsc] .dm-page {
+		background-color: #0e1410 !important;
+	}
+
+	[data-ogsc] .dm-surface,
+	[data-ogsb] .dm-surface {
+		background-color: #1c231e !important;
+	}
+
+	[data-ogsc] .dm-ink {
+		color: #e8e5df !important;
+	}
+
+	[data-ogsc] .dm-muted {
+		color: #8a8a8a !important;
+	}
+
+	[data-ogsc] .dm-accent {
+		color: #c5d6c0 !important;
+	}
+
+	[data-ogsc] .dm-hairline,
+	[data-ogsb] .dm-hairline {
+		background-color: #2a332c !important;
+	}
+
+	[data-ogsc] .dm-border {
+		border-color: #2a332c !important;
+	}
+
+	[data-ogsc] .dm-cta-edge {
+		border-color: #c5d6c0 !important;
+	}
+
+	[data-ogsc] .dm-hide {
+		display: none !important;
+	}
+}

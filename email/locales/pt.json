@@ -1,0 +1,18 @@
+{
+	"code": "pt",
+	"dir": "ltr",
+	"label": "Português",
+	"logoAlt": "Golf Homes International",
+	"viewInBrowser": "Ver este email no navegador",
+	"unsubscribe": "Cancelar a subscrição",
+	"updatePreferences": "Atualizar as suas preferências",
+	"permissionReminder": "Recebe esta mensagem porque nos pediu para o mantermos informado sobre imóveis nos campos de golfe do sul da Europa e arredores.",
+	"footerRights": "Todos os direitos reservados.",
+	"plaintext": {
+		"imageLabel": "Imagem",
+		"linkLabel": "Ligação",
+		"footerHeading": "Golf Homes International",
+		"headingRule": "="
+	},
+	"arrow": "→"
+}
