@@ -32,28 +32,32 @@ export const load: PageServerLoad = async ({
 	fetch,
 	locals: { preview, loadQuery }
 }) => {
-	const country = await fetchMaybePreview<CountryBySlugQueryResult>(
-		countryBySlugQuery,
-		{ countrySlug: params.country },
-		loadQuery,
-		preview
-	);
+	/* One await, not three. Every query below is keyed on `params.country` — the slug from
+	   the URL — and none of them read the fetched `country` document, so nothing here needs
+	   to wait for it. Reviews are an outbound call to a third party and depend on nothing at
+	   all. Awaiting those separately turned one round trip into three sequential ones, and
+	   TTFB is the binding constraint on this page: measured at 1.25–3.0s on production,
+	   against a 6–21ms connect, which gates FCP, LCP and Speed Index alike.
 
-	if (!country?.slug) {
-		error(404, 'Location not found.');
-	}
-
-	const canonicalPath = `/${country.slug}`;
-
+	   The cost of collapsing them is that an unknown slug now runs the other queries before
+	   404ing. That is a rare, cheap path, and it buys the common one two fewer round trips. */
 	const [
+		country,
 		locations,
 		featuredCards,
 		frontlineCards,
 		featuredLocations,
 		communities,
 		facetRows,
-		featureFilter
+		featureFilter,
+		reviews
 	] = await Promise.all([
+		fetchMaybePreview<CountryBySlugQueryResult>(
+			countryBySlugQuery,
+			{ countrySlug: params.country },
+			loadQuery,
+			preview
+		),
 		fetchPublic<LocationTaxonomyPage[]>(locationsByCountryQuery, {
 			params: { countrySlug: params.country }
 		}),
@@ -64,8 +68,15 @@ export const load: PageServerLoad = async ({
 		fetchCountryFeaturedLocations({ countrySlug: params.country }),
 		fetchCountryNavCommunities(params.country),
 		fetchCountryListingFacetRows(params.country),
-		fetchFeatureFilterSettings()
+		fetchFeatureFilterSettings(),
+		loadReviews(fetch)
 	]);
+
+	if (!country?.slug) {
+		error(404, 'Location not found.');
+	}
+
+	const canonicalPath = `/${country.slug}`;
 
 	/* Taxonomy the country-scoped search bar consumes. Locations arrive without a country
 	   slug (they were queried under one already), so stamp it on for the bar's shape. */
@@ -90,8 +101,6 @@ export const load: PageServerLoad = async ({
 		? withPreviewLocationSeo(buildLocationSeo(country, canonicalUrl))
 		: buildLocationSeo(country, canonicalUrl);
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, url.origin);
-
-	const reviews = await loadReviews(fetch);
 
 	return {
 		pageType: 'country' as const,

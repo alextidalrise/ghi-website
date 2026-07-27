@@ -93,10 +93,15 @@
 <article class="country-page">
 	<section class="country-page__content content-wrap">
 		{#if countryLocations.length > 0}
+			<!-- priorityCount=1: this page's hero is a text band with no image, so the first
+			     location tile is the LCP element on mobile and sits inside the initial
+			     viewport. Left lazy it cost ~1.5s of resource load delay (measured on /spain).
+			     One tile, not more — on the mobile rail only the first is fully visible. -->
 			<FeaturedLocations
 				locations={countryLocations}
 				heading="Locations"
 				summary={locationsSummary}
+				priorityCount={1}
 			/>
 		{/if}
 

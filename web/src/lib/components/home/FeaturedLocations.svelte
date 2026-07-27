@@ -8,13 +8,16 @@
 		summary?: string;
 		/** Hard cap on tiles per row in the desktop grid; passed straight to LocationTiles. */
 		maxColumns?: number;
+		/** Leading tiles to fetch eagerly; passed straight to LocationTiles. See its docs. */
+		priorityCount?: number;
 	};
 
 	let {
 		locations,
 		heading = 'Featured locations',
 		summary = 'Ten destinations across Spain and Portugal.',
-		maxColumns = 4
+		maxColumns = 4,
+		priorityCount = 0
 	}: Props = $props();
 </script>
 
@@ -30,7 +33,7 @@
 		<!-- Shared tile grid. showCountry labels each tile with its country: on the country
 		     page every tile belongs to the same country, so the overline is a quiet
 		     wayfinding echo rather than the grouping the homepage gets from its headers. -->
-		<LocationTiles {locations} {maxColumns} showCountry />
+		<LocationTiles {locations} {maxColumns} {priorityCount} showCountry />
 	</section>
 {/if}
 
