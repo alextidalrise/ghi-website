@@ -24,7 +24,9 @@
 
 	// Request-scoped: the store must not be module-level, or on the server one visitor's
 	// decision would render for everyone who followed. Consent UI reads it via getConsent().
-	createConsentContext(initialAnalytics?.consent ?? null);
+	// Starts empty and reads the cookie on mount (see onMount below) — the server no longer
+	// sends the decision, so the document stays identical for every visitor.
+	const consentStore = createConsentContext();
 
 	// Clear per-page dedupe state before the new DOM commits. It has to happen here rather
 	// than alongside the page view: a list container's `update()` runs as the new page
@@ -53,6 +55,11 @@
 	const bare = $derived(page.route.id === '/soon');
 
 	onMount(() => {
+		// After the first client render, so the banner's absence still matches the server's
+		// markup and hydration stays clean. Anything earlier would render a banner the
+		// server did not emit.
+		consentStore.hydrate();
+
 		if (!$isPreviewing) {
 			return;
 		}

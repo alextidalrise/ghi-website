@@ -10,8 +10,21 @@ const decision = (analytics: boolean, marketing: boolean): StoredConsent => ({
 });
 
 describe('ConsentStore', () => {
-	it('starts undecided when the visitor has no cookie', () => {
-		const store = new ConsentStore(null);
+	/* The banner must be absent from the server's HTML — that is what lets the page be
+	   cached and shared between visitors. Until the cookie has been read in the browser
+	   the store genuinely does not know who this is, and must not guess. */
+	it('does not prompt before the cookie has been read', () => {
+		const store = new ConsentStore();
+		expect(store.hydrated).toBe(false);
+		expect(store.needsPrompt).toBe(false);
+		expect(store.decided).toBe(false);
+	});
+
+	it('prompts once the cookie is read and holds no decision', () => {
+		const store = new ConsentStore();
+		store.adopt(null);
+
+		expect(store.hydrated).toBe(true);
 		expect(store.needsPrompt).toBe(true);
 		expect(store.decided).toBe(false);
 		expect(store.analytics).toBe(false);
@@ -19,7 +32,9 @@ describe('ConsentStore', () => {
 	});
 
 	it('reflects a stored decision without prompting again', () => {
-		const store = new ConsentStore(decision(true, false));
+		const store = new ConsentStore();
+		store.adopt(decision(true, false));
+
 		expect(store.needsPrompt).toBe(false);
 		expect(store.decided).toBe(true);
 		expect(store.analytics).toBe(true);
@@ -32,8 +47,10 @@ describe('ConsentStore', () => {
 		// the server is shared by every request in the process — so the first visitor's
 		// decision would have rendered for everyone who followed. One instance per render
 		// is what makes SSR safe, so instances must share nothing.
-		const accepted = new ConsentStore(decision(true, true));
-		const undecided = new ConsentStore(null);
+		const accepted = new ConsentStore();
+		accepted.adopt(decision(true, true));
+		const undecided = new ConsentStore();
+		undecided.adopt(null);
 
 		expect(accepted.needsPrompt).toBe(false);
 		expect(undecided.needsPrompt).toBe(true);
