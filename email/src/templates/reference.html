@@ -1,0 +1,123 @@
+---
+title: 'Six houses on the fairway'
+preheader: 'Four of them have not been listed publicly. A note on what frontline actually means from one resort to the next.'
+locale: en
+subject: 'Six houses on the fairway'
+---
+
+<x-main>
+
+  <!--
+    REFERENCE EMAIL — the foundation's proving fixture, not a campaign template.
+
+    It exists to exercise every primitive and every edge case the QA plan tests,
+    so a change to the system shows up here first. It is built, screenshotted and
+    validated on every release. See docs/04-qa-plan.md.
+
+    Copy is real. Placeholder text hides exactly the problems this fixture is
+    meant to catch: how a real sentence wraps, where a real headline breaks, what
+    a real CTA label does to a button at 320px.
+  -->
+
+  <x-figure
+    edit="hero_image"
+    src="{{ page.site.origin }}/email/reference-andalucia@2x.jpg"
+    alt="A villa above the fairway at dusk, with La Concha and the Sierra Blanca beyond"
+    width="600"
+    height="400"
+  ></x-figure>
+
+  <x-section edit="lead" pt="40" pb="40">
+
+    <!--
+      Personalisation with a fallback. A bare *|FNAME|* renders "Dear ," for
+      every contact missing the field, which on an imported audience is most of
+      them. The IF/ELSE wrapper is mandatory, not stylistic.
+
+      This will look empty in a Mailchimp test send: contact merge tags do not
+      populate there. Check it with Preview & Test > Enter preview mode > Live
+      merge tag info. See docs/03-mailchimp.md.
+    -->
+    <x-text variant="ui" tone="muted" gap="24">*|IF:FNAME|*Dear *|FNAME|*,*|ELSE:|*Dear reader,*|END:IF|*</x-text>
+
+    <!-- The one overline this email is allowed. See src/components/overline.html. -->
+    <x-overline gap="12">Andalucía</x-overline>
+
+    <x-heading level="1" gap="20">Six houses on the fairway</x-heading>
+
+    <x-text variant="lead" gap="24">
+      Frontline property changes hands quietly here. These six came to us between March
+      and June, and four of them have not been listed publicly.
+    </x-text>
+
+    <x-text gap="32">
+      Frontline means different things from one resort to the next. At Los Naranjos it can
+      mean a garden that opens onto the ninth. At La Zagaleta it more often means a view
+      across a valley you do not own and cannot build on, which is the more durable thing
+      to buy. Our
+      <x-link href="{{ page.site.origin }}/guides/reading-a-frontline-listing?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline">note on how to read a frontline listing</x-link>
+      covers the distinction properly.
+    </x-text>
+
+    <x-button
+      href="{{ page.site.origin }}/spain/andalucia?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline"
+      gap="0"
+    >View the collection</x-button>
+
+  </x-section>
+
+  <!--
+    The one green band this email is allowed in the body. The masthead already
+    spends the brand's green-punctuation budget, so this is the single most
+    important moment and gets the heaviest device. A second band would trip
+    bin/validate.mjs.
+
+    It sits HERE, not at the end. The footer is also green, so a band placed
+    immediately above it merges with it into one continuous slab roughly forty
+    percent of the email tall, which is exactly the failure DESIGN.md's
+    one-band cap exists to prevent. Ordering the body white, green, white means
+    the band reads as a deliberate landing point and the email still closes on
+    white into the footer's own edge. The validator enforces the ordering.
+
+    No hairline rule above it: the band's own edge is the divider, so a rule
+    there would be redundant (DESIGN.md, "Stacking bands").
+  -->
+  <x-band edit="cta_section" pt="48" pb="48">
+
+    <x-heading level="2" tone="on-green" gap="16">Ask about a specific house</x-heading>
+
+    <x-text tone="on-green" gap="28">
+      Every property we list has been visited. If you want an honest view on one of them,
+      including the ones we decided not to take on, write back to this address and we will
+      tell you what we saw.
+    </x-text>
+
+    <x-button
+      variant="gold"
+      href="{{ page.site.origin }}/contact?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline"
+      gap="0"
+    >Arrange a conversation</x-button>
+
+  </x-band>
+
+  <x-section edit="body" pt="40" pb="40">
+
+    <x-heading level="2" gap="16">Before you travel</x-heading>
+
+    <x-text gap="0">
+      Viewings in July fill up by the middle of June, and most of these houses are shown by
+      appointment. If you would like to see two or three on one trip, tell us early which
+      ones matter to you. The drive between Sotogrande and Marbella East is longer than the
+      map suggests.
+    </x-text>
+
+    <x-rule gap="28"></x-rule>
+
+    <x-text variant="ui" tone="muted" gap="0">
+      Written from the Marbella office. Reply to this message and it reaches a person, not a
+      queue.
+    </x-text>
+
+  </x-section>
+
+</x-main>

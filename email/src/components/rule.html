@@ -1,0 +1,32 @@
+<!--
+  Hairline rule. The brand's 1px separator, Emphasis Ladder tier 2.
+
+  Drawn as a 1px-tall filled cell rather than a border. Word's engine renders
+  sub-pixel borders inconsistently, sometimes dropping a 1px border entirely and
+  sometimes rendering it at 2px; a filled cell is exactly 1px everywhere.
+
+  `font-size: 0` and `line-height: 1px` stop the &nbsp; inflating the cell to a
+  text line's height in Outlook, which is the classic 20px "hairline".
+
+  This is decorative only, always. At #E2DED5 on white it measures ~1.15:1: it
+  is invisible to some readers and is the first thing a colour-transforming
+  client destroys. Nothing may depend on it to be understood.
+
+  Props
+    gap   padding above and below in px (default 32)
+    tone  default (stone on white) | gold (on the green band)
+-->
+<tr>
+  <td style="padding: {{ gap === '' ? 32 : gap }}px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%;">
+      <tr>
+        <td
+          height="1"
+          bgcolor="{{ tone === 'gold' ? page.brand.gold : page.brand.border }}"
+          class="{{ tone === 'gold' ? '' : 'dm-hairline' }}"
+          style="background-color: {{ tone === 'gold' ? page.brand.gold : page.brand.border }}; height: 1px; line-height: 1px; font-size: 0; mso-line-height-rule: exactly;"
+        >&nbsp;</td>
+      </tr>
+    </table>
+  </td>
+</tr>

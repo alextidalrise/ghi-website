@@ -1,0 +1,55 @@
+<!--
+  Green emphasis band. Emphasis Ladder tier 4, the heaviest tool in the kit.
+
+  RATIONED. The masthead already spends the brand's green-punctuation budget,
+  and the footer is chrome. A campaign may add at most ONE further green band in
+  the body, and only for the single most important moment in the email. Two
+  greens stacked read as one heavy slab and burn the page's only landing point.
+  bin/validate.mjs enforces the cap.
+
+  Before reaching for this, go down the ladder: whitespace and type scale, then
+  a hairline rule, then photography. Most sections that "need to stand out" need
+  tier 1 or 2.
+
+  Children should pass tone="on-green" so their ink is ivory.
+
+  Props
+    pt / pb  vertical padding in px (default 56)
+    edit     Mailchimp editable-region name
+-->
+<!--
+  Gold hairline above. DESIGN.md specifies a gold `border-block` on tier-4
+  green bands, and it does real work in dark mode: the green ground (#1f3d34)
+  sits at only 1.35:1 against the dark body surface (#1c231e), so without an
+  edge the band all but vanishes and the heaviest device in the kit stops
+  reading as emphasis at all. Gold on green is 6.86:1 in both modes.
+-->
+<tr>
+  <td
+    height="1"
+    bgcolor="{{ page.brand.gold }}"
+    style="background-color: {{ page.brand.gold }}; height: 1px; line-height: 1px; font-size: 0; mso-line-height-rule: exactly;"
+  >&nbsp;</td>
+</tr>
+
+<tr>
+  <td
+    align="{{ page.start }}"
+    bgcolor="{{ page.brand.green }}"
+    class="sm-gutter sm-band"
+    style="background-color: {{ page.brand.green }}; padding: {{ pt === '' ? 56 : pt }}px 32px {{ pb === '' ? 56 : pb }}px;"
+    mc:edit="{{ edit }}"
+  >
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%;">
+      <yield></yield>
+    </table>
+  </td>
+</tr>
+
+<tr>
+  <td
+    height="1"
+    bgcolor="{{ page.brand.gold }}"
+    style="background-color: {{ page.brand.gold }}; height: 1px; line-height: 1px; font-size: 0; mso-line-height-rule: exactly;"
+  >&nbsp;</td>
+</tr>

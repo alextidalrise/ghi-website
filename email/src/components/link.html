@@ -1,0 +1,17 @@
+<!--
+  Inline link, for use inside body copy. Renders a bare <a>, no row of its own.
+
+  Underlined AT REST. The site underlines on hover only and shifts green to gold
+  on hover; email has no hover state, so that entire vocabulary is unavailable.
+  Colour alone cannot identify a link (WCAG 1.4.1), which leaves the underline
+  doing the work permanently.
+
+  Props
+    href  absolute HTTPS destination
+    tone  default (green on white) | on-green (gold on the green band)
+-->
+<a
+  href="{{ href }}"
+  class="{{ tone === 'on-green' ? '' : 'dm-accent' }}"
+  style="color: {{ tone === 'on-green' ? page.brand.gold : page.brand.green }}; text-decoration: underline; text-underline-offset: 2px; font-weight: {{ page.weight.medium }};"
+><yield></yield></a>

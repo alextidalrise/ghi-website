@@ -1,0 +1,40 @@
+<!--
+  Masthead — LOCKED system content. Not campaign-editable.
+
+  The green ground is deliberate and is half of the dark-mode strategy: a dark
+  surface is what inverting clients leave alone, so the logo sits on a ground
+  that renders the same in every mode. It also spends the Emphasis Ladder's one
+  green band (DESIGN.md tier 4) at the top of the email, where the brand should
+  land first.
+
+  The logo is a flattened PNG rather than a transparent one. A transparent PNG
+  with light ink lands on a light ground the moment a client inverts the
+  surface behind it, and the wordmark disappears.
+
+  The inline `height` is `auto`, not the logo's pixel height, and the alt text
+  is sized to fit the 200px box on two lines. With images blocked, a fixed CSS
+  height clips the alt string: the reader sees "Golf Homes" and the rest is cut
+  off, so the brand name is wrong in exactly the situation where the alt text is
+  all there is. The `height` ATTRIBUTE stays, so clients that reserve space
+  still get the right box.
+
+  No `mc:edit` region here: nothing in the masthead may be changed per campaign.
+-->
+<tr>
+  <td
+    align="{{ page.start }}"
+    bgcolor="{{ page.brand.green }}"
+    class="sm-gutter"
+    style="background-color: {{ page.brand.green }}; padding: 32px;"
+  >
+    <a href="{{ page.site.origin }}/?utm_source=mailchimp&utm_medium=email" style="text-decoration: none; border: 0;">
+      <img
+        src="{{ page.site.logoIvory }}"
+        width="{{ page.site.logoWidth }}"
+        height="{{ page.site.logoHeight }}"
+        alt="{{ page.i18n.logoAlt }}"
+        style="display: block; width: {{ page.site.logoWidth }}px; height: auto; border: 0; outline: none; text-decoration: none; font-family: {{ page.font.serif }}; font-size: 17px; line-height: 22px; font-weight: {{ page.weight.display }}; color: {{ page.brand.onGreen }};"
+      >
+    </a>
+  </td>
+</tr>

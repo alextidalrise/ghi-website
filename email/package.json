@@ -1,0 +1,24 @@
+{
+	"name": "email",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"description": "Golf Homes International HTML email foundation: Maizzle build, brand tokens, locale system, validator and QA harness.",
+	"scripts": {
+		"dev": "maizzle serve",
+		"build": "maizzle build production && node bin/plaintext.mjs",
+		"build:local": "maizzle build",
+		"assets": "node bin/build-assets.mjs",
+		"validate": "node bin/validate.mjs",
+		"validate:links": "node bin/validate.mjs --links",
+		"validate:self-test": "node bin/validate-self-test.mjs",
+		"plaintext": "node bin/plaintext.mjs",
+		"qa": "node bin/qa-screens.mjs",
+		"check": "pnpm validate:self-test && pnpm build && pnpm validate && node bin/plaintext.mjs --check && pnpm qa"
+	},
+	"devDependencies": {
+		"@maizzle/framework": "^5.5.0",
+		"playwright": "^1.61.1",
+		"sharp": "^0.35.3"
+	}
+}

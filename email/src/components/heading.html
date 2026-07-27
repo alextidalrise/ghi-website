@@ -1,0 +1,50 @@
+<!--
+  Heading.
+
+  Props
+    level  1 | 2 | 3   the semantic level. Exactly one h1 per email; no skipped
+                       levels. Enforced by bin/validate.mjs.
+    size   display | h2 | h3   the visual step, independent of level so a
+                       section can be an h2 rendered at h3 scale without
+                       breaking the outline.
+    tone   default (green ink on white) | on-green (ivory on the green band)
+    gap    bottom padding in px (default 16)
+
+  `mso-line-height-rule: exactly` is not optional: without it Word rounds
+  line-height to whole points and a 39px leading lands at 41px, which
+  accumulates into visible drift down a long email.
+
+  Georgia, not Playfair, is what most recipients see. The tracking here
+  (-0.01em) is tuned for Georgia; the site's -0.03em display tracking would
+  crowd it, because Georgia is already the wider, more open face.
+-->
+<if condition="level == 1">
+  <tr>
+    <td align="{{ align || page.start }}" style="padding: 0 0 {{ gap === '' ? 16 : gap }}px;">
+      <h1
+        class="{{ tone === 'on-green' ? '' : 'dm-accent' }} {{ size === 'h2' ? 'sm-h2' : 'sm-display' }}"
+        style="margin: 0; font-family: {{ page.font.serif }}; font-size: {{ size === 'h2' ? page.scale.h2.size : page.scale.display.size }}px; line-height: {{ size === 'h2' ? page.scale.h2.leading : page.scale.display.leading }}px; mso-line-height-rule: exactly; letter-spacing: {{ page.track.display }}; font-weight: {{ page.weight.display }}; color: {{ tone === 'on-green' ? page.brand.onGreen : page.brand.green }};"
+      ><yield></yield></h1>
+    </td>
+  </tr>
+</if>
+<elseif condition="level == 3">
+  <tr>
+    <td align="{{ align || page.start }}" style="padding: 0 0 {{ gap === '' ? 16 : gap }}px;">
+      <h3
+        class="{{ tone === 'on-green' ? '' : 'dm-accent' }}"
+        style="margin: 0; font-family: {{ page.font.serif }}; font-size: {{ page.scale.h3.size }}px; line-height: {{ page.scale.h3.leading }}px; mso-line-height-rule: exactly; letter-spacing: {{ page.track.normal }}; font-weight: {{ page.weight.body }}; color: {{ tone === 'on-green' ? page.brand.onGreen : page.brand.green }};"
+      ><yield></yield></h3>
+    </td>
+  </tr>
+</elseif>
+<else>
+  <tr>
+    <td align="{{ align || page.start }}" style="padding: 0 0 {{ gap === '' ? 16 : gap }}px;">
+      <h2
+        class="{{ tone === 'on-green' ? '' : 'dm-accent' }} sm-h2"
+        style="margin: 0; font-family: {{ page.font.serif }}; font-size: {{ page.scale.h2.size }}px; line-height: {{ page.scale.h2.leading }}px; mso-line-height-rule: exactly; letter-spacing: {{ page.track.normal }}; font-weight: {{ page.weight.body }}; color: {{ tone === 'on-green' ? page.brand.onGreen : page.brand.green }};"
+      ><yield></yield></h2>
+    </td>
+  </tr>
+</else>
