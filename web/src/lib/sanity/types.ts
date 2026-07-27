@@ -769,6 +769,113 @@ export type Geopoint = {
   alt?: number;
 };
 
+export type ContactPage = {
+  _id: string;
+  _type: "contactPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  heroTitle?: string;
+  heroLead?: string;
+  contactName?: string;
+  contactRole?: string;
+  contactFlag?: string;
+  directHeading?: string;
+  whatsappCta?: string;
+  phoneLabel?: string;
+  reassuranceNote?: string;
+  nextStepsHeading?: string;
+  nextSteps?: Array<string>;
+  formHeading?: string;
+  formIntro?: string;
+  partnerFormHeading?: string;
+  partnersHeading?: string;
+  partnersSubhead?: string;
+  partnersCta?: string;
+  partnersCtaSupport?: string;
+  seo?: SeoFields;
+};
+
+export type AboutPage = {
+  _id: string;
+  _type: "aboutPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  heroTitle?: string;
+  heroLead?: string;
+  storyHeading?: string;
+  storyBody?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  storyQuote?: string;
+  networkHeading?: string;
+  networkBody?: string;
+  networkChips?: Array<string>;
+  networkCta?: string;
+  placesHeading?: string;
+  placesBody?: string;
+  places?: Array<{
+    name: string;
+    region?: string;
+    heroSlug: string;
+    alt?: string;
+    href?: string;
+    _key: string;
+  }>;
+  teamHeading?: string;
+  teamMembers?: Array<{
+    name: string;
+    role?: string;
+    bio?: string;
+    image?: MediaAssetMetadata;
+    _key: string;
+  }>;
+  teamContactFlag?: string;
+  closingHeading?: string;
+  closingBody?: string;
+  closingPrimaryCta?: string;
+  closingPrimaryRoute?: string;
+  closingSecondaryCta?: string;
+  closingSecondaryRoute?: string;
+  reviewsHeading?: string;
+  seo?: SeoFields;
+};
+
+export type GuidesHubPage = {
+  _id: string;
+  _type: "guidesHubPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  heroTitle?: string;
+  heroLead?: string;
+  sectionHeading?: string;
+  categories?: Array<{
+    key: "buying" | "location" | "golf";
+    label: string;
+    blurb?: string;
+    _key: string;
+  }>;
+  emptyStateMessage?: string;
+  seo?: SeoFields;
+};
+
 export type SiteSettings = {
   _id: string;
   _type: "siteSettings";
@@ -824,12 +931,41 @@ export type SiteSettings = {
       _key: string;
     } & LocationTaxonomyReference
   >;
+  homepageSeo?: SeoFields;
+  homepageContent?: HomepageContent;
+  frontlineSeo?: SeoFields;
+  frontlineContent?: FrontlineContent;
   featureFilter?: {
     minCount?: number;
     optionsLimit?: number;
     blocklist?: Array<string>;
     allowlist?: Array<string>;
   };
+};
+
+export type FrontlineContent = {
+  _type: "frontlineContent";
+  ctaLabel?: string;
+  resultsHeading?: string;
+};
+
+export type HomepageContent = {
+  _type: "homepageContent";
+  heroHeadline?: string;
+  buyerIntroHeading?: string;
+  buyerIntroDeck?: string;
+  buyerIntroCta?: string;
+  featuredHeading?: string;
+  featuredSummary?: string;
+  frontlineHeading?: string;
+  frontlineSummary?: string;
+  destinationsHeading?: string;
+  partnersHeading?: string;
+  partnersSubhead?: string;
+  partnersCta?: string;
+  partnersCtaSupport?: string;
+  reviewsHeading?: string;
+  reviewsDeck?: string;
 };
 
 export type NavMenuChild = {
@@ -1350,7 +1486,12 @@ export type AllSanitySchemaTypes =
   | MediaFields
   | GolfCourse
   | Geopoint
+  | ContactPage
+  | AboutPage
+  | GuidesHubPage
   | SiteSettings
+  | FrontlineContent
+  | HomepageContent
   | NavMenuChild
   | NavLink
   | InternalFeesTax
@@ -6082,6 +6223,336 @@ export type LocationBreadcrumbQueryResult =
       }>;
     }
   | null;
+
+// Source: ../web/src/lib/sanity/queries/pages.ts
+// Variable: homepageContentQuery
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{    homepageSeo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},    homepageContent{  heroHeadline,  buyerIntroHeading,  buyerIntroDeck,  buyerIntroCta,  featuredHeading,  featuredSummary,  frontlineHeading,  frontlineSummary,  destinationsHeading,  partnersHeading,  partnersSubhead,  partnersCta,  partnersCtaSupport,  reviewsHeading,  reviewsDeck}  }
+export type HomepageContentQueryResult = {
+  homepageSeo: {
+    seoTitle: string | null;
+    metaDescription: string | null;
+    openGraphTitle: string | null;
+    openGraphDescription: string | null;
+    openGraphImage: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      altText: string | null;
+      lqip: string | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
+    noindex: boolean | null;
+    schemaType:
+      | "Apartment"
+      | "House"
+      | "Product"
+      | "RealEstateListing"
+      | "Residence"
+      | null;
+    backLinks: Array<{
+      label: string | null;
+      url: string | null;
+    }> | null;
+    supportingArticles: Array<string> | null;
+  } | null;
+  homepageContent: {
+    heroHeadline: string | null;
+    buyerIntroHeading: string | null;
+    buyerIntroDeck: string | null;
+    buyerIntroCta: string | null;
+    featuredHeading: string | null;
+    featuredSummary: string | null;
+    frontlineHeading: string | null;
+    frontlineSummary: string | null;
+    destinationsHeading: string | null;
+    partnersHeading: string | null;
+    partnersSubhead: string | null;
+    partnersCta: string | null;
+    partnersCtaSupport: string | null;
+    reviewsHeading: string | null;
+    reviewsDeck: string | null;
+  } | null;
+} | null;
+
+// Source: ../web/src/lib/sanity/queries/pages.ts
+// Variable: frontlineContentQuery
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{    frontlineSeo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},    frontlineContent{  ctaLabel,  resultsHeading}  }
+export type FrontlineContentQueryResult = {
+  frontlineSeo: {
+    seoTitle: string | null;
+    metaDescription: string | null;
+    openGraphTitle: string | null;
+    openGraphDescription: string | null;
+    openGraphImage: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      altText: string | null;
+      lqip: string | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
+    noindex: boolean | null;
+    schemaType:
+      | "Apartment"
+      | "House"
+      | "Product"
+      | "RealEstateListing"
+      | "Residence"
+      | null;
+    backLinks: Array<{
+      label: string | null;
+      url: string | null;
+    }> | null;
+    supportingArticles: Array<string> | null;
+  } | null;
+  frontlineContent: {
+    ctaLabel: string | null;
+    resultsHeading: string | null;
+  } | null;
+} | null;
+
+// Source: ../web/src/lib/sanity/queries/pages.ts
+// Variable: guidesHubPageQuery
+// Query: *[_type == "guidesHubPage"][0]{  heroTitle,  heroLead,  sectionHeading,  categories[]{ key, label, blurb },  emptyStateMessage,  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles}}
+export type GuidesHubPageQueryResult = {
+  heroTitle: string | null;
+  heroLead: string | null;
+  sectionHeading: string | null;
+  categories: Array<{
+    key: "buying" | "golf" | "location";
+    label: string;
+    blurb: string | null;
+  }> | null;
+  emptyStateMessage: string | null;
+  seo: {
+    seoTitle: string | null;
+    metaDescription: string | null;
+    openGraphTitle: string | null;
+    openGraphDescription: string | null;
+    openGraphImage: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      altText: string | null;
+      lqip: string | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
+    noindex: boolean | null;
+    schemaType:
+      | "Apartment"
+      | "House"
+      | "Product"
+      | "RealEstateListing"
+      | "Residence"
+      | null;
+    backLinks: Array<{
+      label: string | null;
+      url: string | null;
+    }> | null;
+    supportingArticles: Array<string> | null;
+  } | null;
+} | null;
+
+// Source: ../web/src/lib/sanity/queries/pages.ts
+// Variable: aboutPageQuery
+// Query: *[_type == "aboutPage"][0]{  heroTitle,  heroLead,  storyHeading,  storyBody,  storyQuote,  networkHeading,  networkBody,  networkChips,  networkCta,  placesHeading,  placesBody,  places[]{ name, region, heroSlug, alt, href },  teamHeading,  teamMembers[]{    name,    role,    bio,    image{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  },  teamContactFlag,  closingHeading,  closingBody,  closingPrimaryCta,  closingPrimaryRoute,  closingSecondaryCta,  closingSecondaryRoute,  reviewsHeading,  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles}}
+export type AboutPageQueryResult = {
+  heroTitle: string | null;
+  heroLead: string | null;
+  storyHeading: string | null;
+  storyBody: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  storyQuote: string | null;
+  networkHeading: string | null;
+  networkBody: string | null;
+  networkChips: Array<string> | null;
+  networkCta: string | null;
+  placesHeading: string | null;
+  placesBody: string | null;
+  places: Array<{
+    name: string;
+    region: string | null;
+    heroSlug: string;
+    alt: string | null;
+    href: string | null;
+  }> | null;
+  teamHeading: string | null;
+  teamMembers: Array<{
+    name: string;
+    role: string | null;
+    bio: string | null;
+    image: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      altText: string | null;
+      lqip: string | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
+  }> | null;
+  teamContactFlag: string | null;
+  closingHeading: string | null;
+  closingBody: string | null;
+  closingPrimaryCta: string | null;
+  closingPrimaryRoute: string | null;
+  closingSecondaryCta: string | null;
+  closingSecondaryRoute: string | null;
+  reviewsHeading: string | null;
+  seo: {
+    seoTitle: string | null;
+    metaDescription: string | null;
+    openGraphTitle: string | null;
+    openGraphDescription: string | null;
+    openGraphImage: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      altText: string | null;
+      lqip: string | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
+    noindex: boolean | null;
+    schemaType:
+      | "Apartment"
+      | "House"
+      | "Product"
+      | "RealEstateListing"
+      | "Residence"
+      | null;
+    backLinks: Array<{
+      label: string | null;
+      url: string | null;
+    }> | null;
+    supportingArticles: Array<string> | null;
+  } | null;
+} | null;
+
+// Source: ../web/src/lib/sanity/queries/pages.ts
+// Variable: contactPageQuery
+// Query: *[_type == "contactPage"][0]{  heroTitle,  heroLead,  contactName,  contactRole,  contactFlag,  directHeading,  whatsappCta,  phoneLabel,  reassuranceNote,  nextStepsHeading,  nextSteps,  formHeading,  formIntro,  partnerFormHeading,  partnersHeading,  partnersSubhead,  partnersCta,  partnersCtaSupport,  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles}}
+export type ContactPageQueryResult = {
+  heroTitle: string | null;
+  heroLead: string | null;
+  contactName: string | null;
+  contactRole: string | null;
+  contactFlag: string | null;
+  directHeading: string | null;
+  whatsappCta: string | null;
+  phoneLabel: string | null;
+  reassuranceNote: string | null;
+  nextStepsHeading: string | null;
+  nextSteps: Array<string> | null;
+  formHeading: string | null;
+  formIntro: string | null;
+  partnerFormHeading: string | null;
+  partnersHeading: string | null;
+  partnersSubhead: string | null;
+  partnersCta: string | null;
+  partnersCtaSupport: string | null;
+  seo: {
+    seoTitle: string | null;
+    metaDescription: string | null;
+    openGraphTitle: string | null;
+    openGraphDescription: string | null;
+    openGraphImage: {
+      asset: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        _type: "image";
+      } | null;
+      fileAsset: {
+        asset?: SanityFileAssetReference;
+        media?: unknown;
+        _type: "file";
+      } | null;
+      altText: string | null;
+      lqip: string | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
+    noindex: boolean | null;
+    schemaType:
+      | "Apartment"
+      | "House"
+      | "Product"
+      | "RealEstateListing"
+      | "Residence"
+      | null;
+    backLinks: Array<{
+      label: string | null;
+      url: string | null;
+    }> | null;
+    supportingArticles: Array<string> | null;
+  } | null;
+} | null;
 
 // Source: ../web/src/lib/sanity/queries/partners.ts
 // Variable: partnerCategoriesQuery
@@ -11878,6 +12349,11 @@ declare module "@sanity/client" {
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && isCatchAll != true\n    && (\n      parent._ref == $locationId\n      || $locationId in associatedLocations[]._ref\n    )\n  ] | order(name asc){\n    _id,\n    name,\n    "slug": slug.current,\n    type,\n    breadcrumbLabel,\n    seoTitle,\n    metaDescription,\n    publicDescription,\n    "canonicalLocationSlug": parent->slug.current,\n    "isAssociated": $locationId in associatedLocations[]._ref && parent._ref != $locationId\n  }\n': CommunitiesByLocationQueryResult;
     '\n  *[\n    _type == "locationTaxonomy"\n    && type == "community"\n    && isCatchAll != true\n    && defined(slug.current)\n    && defined(parent->slug.current)\n    && defined(parent->parent->slug.current)\n  ] | order(name asc) {\n    _id,\n    name,\n    "slug": slug.current,\n    "locationSlug": parent->slug.current,\n    "countrySlug": parent->parent->slug.current\n  }\n': CommunitiesForNavQueryResult;
     '\n  *[_id == $taxonomyId][0]{\n    "chain": [\n      ...*[_id == ^._id][0].parent->parent->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  tagline,\n  coordinates\n},\n      ...*[_id == ^._id][0].parent->{\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  tagline,\n  coordinates\n},\n      {\n  _id,\n  name,\n  "slug": slug.current,\n  type,\n  breadcrumbLabel,\n  isCatchAll,\n  seoTitle,\n  metaDescription,\n  publicDescription,\n  overviewHeading,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  tagline,\n  coordinates\n}\n    ][defined(name)]\n  }\n': LocationBreadcrumbQueryResult;
+    '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    homepageSeo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n    homepageContent{\n  heroHeadline,\n  buyerIntroHeading,\n  buyerIntroDeck,\n  buyerIntroCta,\n  featuredHeading,\n  featuredSummary,\n  frontlineHeading,\n  frontlineSummary,\n  destinationsHeading,\n  partnersHeading,\n  partnersSubhead,\n  partnersCta,\n  partnersCtaSupport,\n  reviewsHeading,\n  reviewsDeck\n}\n  }\n': HomepageContentQueryResult;
+    '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    frontlineSeo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n},\n    frontlineContent{\n  ctaLabel,\n  resultsHeading\n}\n  }\n': FrontlineContentQueryResult;
+    '\n  *[_type == "guidesHubPage"][0]{\n  heroTitle,\n  heroLead,\n  sectionHeading,\n  categories[]{ key, label, blurb },\n  emptyStateMessage,\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': GuidesHubPageQueryResult;
+    '\n  *[_type == "aboutPage"][0]{\n  heroTitle,\n  heroLead,\n  storyHeading,\n  storyBody,\n  storyQuote,\n  networkHeading,\n  networkBody,\n  networkChips,\n  networkCta,\n  placesHeading,\n  placesBody,\n  places[]{ name, region, heroSlug, alt, href },\n  teamHeading,\n  teamMembers[]{\n    name,\n    role,\n    bio,\n    image{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  },\n  teamContactFlag,\n  closingHeading,\n  closingBody,\n  closingPrimaryCta,\n  closingPrimaryRoute,\n  closingSecondaryCta,\n  closingSecondaryRoute,\n  reviewsHeading,\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': AboutPageQueryResult;
+    '\n  *[_type == "contactPage"][0]{\n  heroTitle,\n  heroLead,\n  contactName,\n  contactRole,\n  contactFlag,\n  directHeading,\n  whatsappCta,\n  phoneLabel,\n  reassuranceNote,\n  nextStepsHeading,\n  nextSteps,\n  formHeading,\n  formIntro,\n  partnerFormHeading,\n  partnersHeading,\n  partnersSubhead,\n  partnersCta,\n  partnersCtaSupport,\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n}\n': ContactPageQueryResult;
     '\n  *[\n    _type == "partnerCategory"\n    && defined(slug.current)\n    && count(*[_type == "partner" && references(^._id) && defined(slug.current)]) > 0\n  ] | order(coalesce(order, 999) asc, name asc) {\n  "id": slug.current,\n  name,\n  monogram,\n  role,\n  "partners": *[\n    _type == "partner"\n    && references(^._id)\n    && defined(slug.current)\n  ] | order(coalesce(order, 999) asc, name asc) {\n  _id,\n  name,\n  "slug": slug.current,\n  coverage,\n  description,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n}\n': PartnerCategoriesQueryResult;
     '\n  *[\n    _type == "partner"\n    && defined(slug.current)\n    && defined(logo.asset)\n  ] | order(coalesce(order, 999) asc, name asc)[0...$limit] {\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n': HomepagePartnerLogosQueryResult;
     '\n  *[_type == "partner" && slug.current == $slug][0]{\n    name,\n    "slug": slug.current,\n    "category": category->name\n  }\n': PartnerBySlugQueryResult;
