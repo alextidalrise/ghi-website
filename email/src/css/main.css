@@ -14,19 +14,19 @@
 /*
  * Web fonts are a progressive enhancement and nothing depends on them.
  *
- * Apple Mail on macOS and iOS honour this. Gmail (every platform), both
- * Outlooks for Windows, Outlook.com and Yahoo strip it, so the majority of
+ * Apple Mail on macOS and iOS honour them. Gmail (every platform), both
+ * Outlooks for Windows, Outlook.com and Yahoo strip them, so the majority of
  * opens are laid out in Georgia and Arial. Those are the metrics every size in
  * lib/tokens.mjs was chosen against; the web font is the bonus, not the target.
  *
- * Only the weights actually used are requested. Libre Franklin Light 300 is
- * deliberately absent: Arial has no light weight, so specifying it would design
- * for a rendering most recipients never receive.
- *
- * Must remain the first rule in the file; CSS requires @import before any
- * other statement.
+ * The font request lives as a <link> in the layout <head>, NOT as an @import
+ * here. Mailchimp's template importer fetches and parses every @import in the
+ * <style> block server-side and errors when it cannot ("Cannot find a CSS file
+ * at ..."); real clients would simply ignore one they cannot use. A <link>
+ * sidesteps that parser and Apple Mail honours it identically. Only the weights
+ * actually used are requested (Libre Franklin 400/500, Playfair 400/600); Light
+ * 300 is deliberately absent because Arial has no light weight to match.
  */
-@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500&family=Playfair+Display:wght@400;600&display=swap');
 
 /* -------------------------------------------------------------------------- */
 /* 1. Client resets                                                            */

@@ -169,6 +169,23 @@ as untagged traffic. The validator fails on this.
 
 ---
 
+### Web fonts must load via `<link>`, not `@import`
+
+Mailchimp's template importer parses every `@import` inside a `<style>` block
+server-side and **errors if it cannot fetch the imported file** — "Cannot find a
+CSS file at ...". A real email client would simply ignore an `@import` it does
+not support. The build therefore requests the Google Fonts via a `<link>` in the
+layout `<head>` (`src/layouts/main.html`), which the importer leaves alone. Apple
+Mail honours `<link>` identically; everything else falls back to Georgia/Arial
+regardless. Do not move the font request back into the CSS as an `@import`.
+
+### The footer's company and address come from Audience settings
+
+`*|LIST:COMPANY|*` and `*|LIST:ADDRESS|*` resolve from **Audience → Settings**,
+not from the template. If they are unset the footer renders blank there, and the
+physical address is a legal sending requirement. Confirm both before the first
+send. `*|CURRENT_YEAR|*` is automatic.
+
 ## Send checklist
 
 1. `pnpm --filter email check` passes.

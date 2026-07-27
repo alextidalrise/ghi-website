@@ -38,6 +38,13 @@
   </noscript>
   <![endif]-->
 
+  <!--
+    Web fonts via <link>, not an @import inside <style>. Mailchimp's template
+    importer parses every @import in the style block server-side and errors when
+    it cannot fetch one; a <link> sidesteps that. Progressive enhancement only:
+    Apple Mail honours this, everything else falls back to Georgia/Arial.
+  -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500&family=Playfair+Display:wght@400;600&display=swap">
   <style>
     @import "src/css/main.css";
   </style>
