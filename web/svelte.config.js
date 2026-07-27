@@ -7,7 +7,18 @@ const config = {
 		runes: ({ filename }) => filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 	},
 	kit: {
-		adapter: adapter()
+		/* Run the serverless functions in Frankfurt, not Vercel's US-East default.
+		   Responses were arriving with `x-vercel-id: fra1::iad1::` — entering the edge
+		   network at Frankfurt, then crossing the Atlantic to execute in Washington DC and
+		   crossing back. Production TTFB was 1.2–3.0s against a 6–21ms connect, and since
+		   nothing paints until the document lands, that gated FCP, LCP and Speed Index
+		   alike on every page.
+		   fra1 over lhr1: the audience is European buyers of Spanish and Portuguese
+		   property rather than UK-only, and Frankfurt is the better-connected hub for the
+		   continent. The difference between the two for a UK visitor is ~15ms — noise next
+		   to the ~90ms transatlantic hop this removes. One region, so it stays within a
+		   Hobby plan's single-region limit. */
+		adapter: adapter({ regions: ['fra1'] })
 		/* Deliberately no inlineStyleThreshold. Inlining all eight stylesheets does remove
 		   every render-blocking request, and Lighthouse against a local preview scored it
 		   a point better (94 vs 93) — but production disagreed: 88 against 91. The ~82KB
