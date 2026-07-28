@@ -3,6 +3,22 @@
 A short log of removed schema paths so future debugging has context for
 documents that may still carry legacy fields.
 
+## 2026-07-28 — Campaign parameters off internal links
+
+Links pointing at our own site no longer carry `utm_*` or ad click identifiers.
+They measured nothing — `safePageLocation` excludes them from `page_location`, so
+they never reached our own page-view data — while giving GA4 a fresh campaign to
+attribute the session to, overwriting the source the visitor actually arrived
+from. The web app now strips them at render time
+(`web/src/lib/sanity/href.ts`), so this is a one-off cleanup of what was stored,
+not an ongoing requirement.
+
+No schema change. `strip-internal-utms-migrate` cleaned two hrefs in the Atlas
+Bridge partner insight draft; the contact CTA became `?partner=atlas-bridge-wealth`,
+which records the referring partner on the enquiry itself rather than throwing it
+at analytics. External links were deliberately left alone — a partner's tagging of
+their own domain is theirs.
+
 ## 2026-06-17 — Marketing group cleanup
 
 Trimmed the shared `marketingFields` object (used by `propertyListing` and

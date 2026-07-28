@@ -3,6 +3,7 @@ import {
 	type GuideCategoryMeta
 } from '$lib/guides/categories';
 import type { GuideCategory } from '$lib/guides/types';
+import { withoutCampaignParams } from '../href';
 import type { MediaAssetInput } from './mediaFilter';
 
 type SeoInput = {
@@ -278,7 +279,15 @@ export function resolveAboutContent(input: AboutPageInput | null): AboutContent 
 			input?.placesBody,
 			'Golf is at the heart of what we do. Every location we cover is a genuine golfing destination: Marbella, Sotogrande, the Algarve and beyond, places where world-class courses, the climate and the lifestyle have built established, sought-after property markets around the game. If golf is part of why you are buying abroad, these are the places that deliver it.'
 		),
-		places: input?.places?.length ? input.places : null,
+		// The tile href and the two closing CTAs are the only paths an editor types by hand
+		// on this page, so they are the only ones that can arrive campaign-tagged. See
+		// `$lib/sanity/href` for why that must not reach a visitor's address bar.
+		places: input?.places?.length
+			? input.places.map((place) => ({
+					...place,
+					href: place.href ? withoutCampaignParams(place.href) : place.href
+				}))
+			: null,
 		teamHeading: s(input?.teamHeading, 'Who we are'),
 		teamMembers: input?.teamMembers?.length ? input.teamMembers : null,
 		teamContactFlag: s(input?.teamContactFlag, 'Your first point of contact'),
@@ -288,9 +297,11 @@ export function resolveAboutContent(input: AboutPageInput | null): AboutContent 
 			'No pressure and no obligation. Whether you are ready to view or just starting to think about it, we are happy to help.'
 		),
 		closingPrimaryCta: s(input?.closingPrimaryCta, 'Get in touch'),
-		closingPrimaryRoute: s(input?.closingPrimaryRoute, '/contact'),
+		closingPrimaryRoute: withoutCampaignParams(s(input?.closingPrimaryRoute, '/contact')),
 		closingSecondaryCta: s(input?.closingSecondaryCta, 'Browse properties'),
-		closingSecondaryRoute: s(input?.closingSecondaryRoute, '/front-line-collection'),
+		closingSecondaryRoute: withoutCampaignParams(
+			s(input?.closingSecondaryRoute, '/front-line-collection')
+		),
 		reviewsHeading: s(input?.reviewsHeading, 'What our buyers say'),
 		seo: input?.seo ?? null
 	};

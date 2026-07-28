@@ -1,4 +1,5 @@
 import { defineQuery } from 'groq';
+import { withoutCampaignParams } from '../href';
 import { fetchPublic } from './fetch';
 import { NAV_HREF, NAV_EXTERNAL } from './headerNav';
 
@@ -72,9 +73,15 @@ type RawFooter = {
 
 const SOCIAL_PLATFORMS: FooterSocialPlatform[] = ['instagram', 'facebook', 'linkedin', 'youtube', 'x'];
 
+// Campaign tags come off here for the same reason as in the header — see `toLink` there
+// and `$lib/sanity/href`. Social links are left alone: those destinations are not ours.
 function toLink(raw: RawLink | null | undefined): FooterLink | null {
 	if (!raw?.label || !raw.href) return null;
-	return { label: raw.label, href: raw.href, external: Boolean(raw.external) };
+	return {
+		label: raw.label,
+		href: withoutCampaignParams(raw.href),
+		external: Boolean(raw.external)
+	};
 }
 
 function toColumn(raw: RawColumn | null | undefined): FooterColumn | null {
