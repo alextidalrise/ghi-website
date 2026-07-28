@@ -41,10 +41,10 @@ const IMAGE_SOURCE = join(
 );
 
 const IDS = {
-	uk: 'guide.spain-uk-buyers',
-	intl: 'guide.spain-international-buyers',
-	ptUk: 'guide.portugal-uk-buyers',
-	ptIntl: 'guide.portugal-international-buyers'
+	uk: 'guide-spain-uk-buyers',
+	intl: 'guide-spain-international-buyers',
+	ptUk: 'guide-portugal-uk-buyers',
+	ptIntl: 'guide-portugal-international-buyers'
 };
 
 // Earlier placeholder guides this seed replaces.
