@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CustomBlockComponentProps } from '@portabletext/svelte';
 	import type { InsightRoutesBlock } from '$lib/insights/types';
+	import { withoutCampaignParams } from '$lib/sanity/href';
 
 	let { portableText }: { portableText: CustomBlockComponentProps<InsightRoutesBlock> } = $props();
 
@@ -18,7 +19,10 @@
 				heading: route?.heading?.trim() ?? '',
 				body: route?.body?.trim() ?? '',
 				label: route?.actionLabel?.trim() ?? '',
-				href: route?.actionHref?.trim() ?? '',
+				// `actionHref` is free text, so it can arrive campaign-tagged like any other
+				// authored link. See `$lib/sanity/href` for why that must not reach a visitor:
+				// it is invisible in our own page-view data and rewrites GA4's session source.
+				href: withoutCampaignParams(route?.actionHref?.trim() ?? ''),
 				outcome: route?.outcome?.trim() ?? ''
 			}))
 			.filter((route) => route.heading && route.body && route.label && route.href)
