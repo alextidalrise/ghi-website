@@ -127,6 +127,8 @@
 		"migrate:guide-country:dry-run": "tsx migrations/guide-country-migrate.ts --dry-run",
 		"migrate:partner-countries": "tsx migrations/partner-countries-migrate.ts",
 		"migrate:partner-countries:dry-run": "tsx migrations/partner-countries-migrate.ts --dry-run",
+		"migrate:nobu-routes": "tsx migrations/nobu-monte-rei-routes-migrate.ts",
+		"migrate:nobu-routes:dry-run": "tsx migrations/nobu-monte-rei-routes-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

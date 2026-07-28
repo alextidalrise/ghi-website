@@ -266,6 +266,110 @@ export const insightFaq = defineType({
 	}
 });
 
+/**
+ * One route in a `insightRoutes` decision aid. Unlike a card-grid point, a route is not
+ * only a consideration — it is a path the reader can take, so it carries a single next
+ * step and a plain statement of what happens once they take it. Both fields are required:
+ * a route with no action is a card grid item, and an action with no stated outcome is the
+ * kind of CTA that makes a reader hesitate.
+ */
+export const insightRoute = defineType({
+	name: 'insightRoute',
+	title: 'Route',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Name the route as something the reader does, e.g. "Assess current opportunities".',
+			validation: (Rule) => Rule.required().max(60)
+		}),
+		defineField({
+			name: 'body',
+			title: 'Body',
+			type: 'text',
+			rows: 3,
+			description: 'Who this route suits and what it covers. One or two sentences.',
+			validation: (Rule) => Rule.required().max(220)
+		}),
+		defineField({
+			name: 'actionLabel',
+			title: 'Action label',
+			type: 'string',
+			description: 'The single next step, as a verb and object. Keep it short — it sets in a button.',
+			validation: (Rule) => Rule.required().max(32)
+		}),
+		defineField({
+			name: 'actionHref',
+			title: 'Action link',
+			type: 'string',
+			description: 'Where the action points, e.g. /contact.',
+			validation: (Rule) =>
+				Rule.required().custom((value) =>
+					typeof value === 'string' && /^(https?:\/\/|\/|mailto:|tel:)/.test(value)
+						? true
+						: 'Use an absolute path (/contact) or a full URL.'
+				)
+		}),
+		defineField({
+			name: 'outcome',
+			title: 'What happens next',
+			type: 'text',
+			rows: 2,
+			description:
+				'What the reader gets after acting, and when. State only what GHI will actually do.',
+			validation: (Rule) => Rule.required().max(200)
+		})
+	],
+	preview: {
+		select: { title: 'heading', subtitle: 'actionLabel' }
+	}
+});
+
+/**
+ * A two-route decision aid: the point in an article where the reader stops weighing and
+ * picks a path. Exactly two routes, deliberately — a third turns a decision into a menu,
+ * and the block's whole job is to make the choice small enough to make. Each route owns
+ * its own next step, so the reader never has to work out which of several CTAs applies
+ * to them.
+ *
+ * Use it once, high in the piece, after the reader knows enough to choose. It is not an
+ * inline CTA (`insightCtaCallout`, one ask, anywhere) and not a card grid
+ * (`insightCardGrid`, parallel considerations with no action).
+ */
+export const insightRoutes = defineType({
+	name: 'insightRoutes',
+	title: 'Buyer routes',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Short label above the routes, e.g. "Two routes from here".',
+			initialValue: 'Two routes from here',
+			validation: (Rule) => Rule.max(60)
+		}),
+		defineField({
+			name: 'routes',
+			title: 'Routes',
+			type: 'array',
+			of: [{ type: 'insightRoute' }],
+			validation: (Rule) => Rule.required().length(2)
+		})
+	],
+	preview: {
+		select: { heading: 'heading', a: 'routes.0.heading', b: 'routes.1.heading' },
+		prepare({ heading, a, b }) {
+			return {
+				title: [a, b].filter(Boolean).join('  /  ') || 'Buyer routes',
+				subtitle: heading || 'Buyer routes'
+			};
+		}
+	}
+});
+
 /** An inline enquiry prompt inside the body — distinct from the closing CTA band. */
 export const insightCtaCallout = defineType({
 	name: 'insightCtaCallout',
@@ -362,6 +466,7 @@ const insightSectionBody = defineField({
 		// has nowhere to put a caption.
 		defineArrayMember({ type: 'insightFigure' }),
 		defineArrayMember({ type: 'insightCardGrid' }),
+		defineArrayMember({ type: 'insightRoutes' }),
 		defineArrayMember({ type: 'insightPullQuote' }),
 		defineArrayMember({ type: 'insightTakeaways' }),
 		defineArrayMember({ type: 'insightFaq' }),

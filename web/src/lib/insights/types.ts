@@ -35,6 +35,24 @@ export type InsightCardGridBlock = {
 	items?: InsightCardGridItem[] | null;
 };
 
+/** One path in a two-route decision aid: what it suits, its next step, and what follows. */
+export type InsightRouteItem = {
+	_key?: string;
+	heading?: string | null;
+	body?: string | null;
+	actionLabel?: string | null;
+	actionHref?: string | null;
+	outcome?: string | null;
+};
+
+/** Exactly two routes, each with its own next step. See the `insightRoutes` schema. */
+export type InsightRoutesBlock = {
+	_type: 'insightRoutes';
+	_key: string;
+	heading?: string | null;
+	routes?: InsightRouteItem[] | null;
+};
+
 /** Large pulled-out quote. */
 export type InsightPullQuoteBlock = {
 	_type: 'insightPullQuote';
@@ -87,6 +105,7 @@ export type InsightBodyBlock =
 	| GuideImageBlock
 	| InsightFigureBlock
 	| InsightCardGridBlock
+	| InsightRoutesBlock
 	| InsightPullQuoteBlock
 	| InsightTakeawaysBlock
 	| InsightFaqBlock

@@ -98,6 +98,14 @@
 		border-color: var(--charcoal);
 	}
 
+	/* The site's gold focus ring (used by the routes block, the closing band and ~15 other
+	   components). The hover/focus background shift alone is green→charcoal — too close to read
+	   as a focus indicator, so a keyboard user had no clear one here. */
+	.inline-cta .inline-cta__button:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 3px;
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.inline-cta .inline-cta__button {
 			transition: none;
