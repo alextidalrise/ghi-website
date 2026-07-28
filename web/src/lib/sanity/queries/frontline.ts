@@ -7,7 +7,6 @@ import {
 } from '../transforms/frontlineHero';
 import { fetchPublic } from './fetch';
 import { PUBLIC_LISTING_FILTER } from './filters';
-import { GOLF_COURSE_PUBLIC_FILTER } from './golf';
 
 export type CourseFilterOption = { label: string; value: string };
 
@@ -19,7 +18,6 @@ export type CourseFilterOption = { label: string; value: string };
 const frontlineCourseOptionsQuery = /* groq */ `
   *[
     _type == "golfCourse"
-    && ${GOLF_COURSE_PUBLIC_FILTER}
     && defined(slug.current)
     && count(*[
       _type == "propertyListing"

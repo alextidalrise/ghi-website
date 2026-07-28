@@ -1,11 +1,6 @@
 import { defineQuery } from 'groq';
 import { MEDIA_ASSET_PUBLIC } from '../allowlists';
 
-/** Public gate for golf course documents. */
-export const GOLF_COURSE_PUBLIC_FILTER = /* groq */ `
-  (coalesce(reviewStatus, "draft") == "approved" || $previewAll)
-`;
-
 const GOLF_COURSE_PUBLIC_PROJECTION = /* groq */ `{
   _id,
   name,
@@ -49,7 +44,6 @@ export const golfCourseByPathQuery = defineQuery(`
     && community->slug.current == $communitySlug
     && community->parent->slug.current == $locationSlug
     && community->parent->parent->slug.current == $countrySlug
-    && ${GOLF_COURSE_PUBLIC_FILTER}
   ][0]${GOLF_COURSE_PUBLIC_PROJECTION}
 `);
 
@@ -57,7 +51,6 @@ export const golfCourseByPathQuery = defineQuery(`
 export const golfCoursesByLocationQuery = defineQuery(`
   *[
     _type == "golfCourse"
-    && ${GOLF_COURSE_PUBLIC_FILTER}
     && defined(community._ref)
     && (
       community->parent._ref == $locationId
@@ -66,11 +59,10 @@ export const golfCoursesByLocationQuery = defineQuery(`
   ] | order(name asc)${GOLF_COURSE_PUBLIC_PROJECTION}
 `);
 
-/** Approved golf courses for sitemap path assembly. */
+/** Golf courses for sitemap path assembly. */
 export const sitemapGolfCoursesQuery = defineQuery(`
   *[
     _type == "golfCourse"
-    && ${GOLF_COURSE_PUBLIC_FILTER}
     && defined(slug.current)
     && defined(community->slug.current)
     && defined(community->parent->slug.current)

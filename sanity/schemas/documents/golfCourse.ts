@@ -1,5 +1,4 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { GOLF_COURSE_REVIEW_STATUSES } from '../constants/enums';
 
 export const golfCourse = defineType({
 	name: 'golfCourse',
@@ -110,15 +109,6 @@ export const golfCourse = defineType({
 			group: 'governance',
 			description:
 				'Exact GPS location of this course. Internal only — only shown publicly if map privacy has been approved.'
-		}),
-		defineField({
-			name: 'reviewStatus',
-			title: 'Review status',
-			type: 'string',
-			group: 'governance',
-			options: { list: [...GOLF_COURSE_REVIEW_STATUSES], layout: 'dropdown' },
-			initialValue: 'draft',
-			description: 'Internal publishing status for this golf course record.'
 		})
 	],
 	preview: {
