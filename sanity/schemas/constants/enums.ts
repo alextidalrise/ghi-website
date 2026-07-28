@@ -215,13 +215,6 @@ export const DEVELOPMENT_STATUSES = [
 	{ title: 'Unknown', value: 'unknown' }
 ] as const;
 
-export const GOLF_COURSE_REVIEW_STATUSES = [
-	{ title: 'Draft', value: 'draft' },
-	{ title: 'Needs review', value: 'needs_review' },
-	{ title: 'Approved', value: 'approved' },
-	{ title: 'Archived', value: 'archived' }
-] as const;
-
 /**
  * Guide categories. `buying` is live; `location` and `golf` are reserved so the
  * section can expand without a schema change. A single `guide` document branches on

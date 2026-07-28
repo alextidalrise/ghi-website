@@ -85,6 +85,8 @@
 		"migrate:taxonomy-dotted-ids:dry-run": "tsx migrations/taxonomy-dotted-ids-migrate.ts --dry-run",
 		"migrate:content-dotted-ids": "tsx migrations/content-dotted-ids-migrate.ts",
 		"migrate:content-dotted-ids:dry-run": "tsx migrations/content-dotted-ids-migrate.ts --dry-run",
+		"migrate:unset-golf-review-status": "tsx migrations/unset-golf-review-status-migrate.ts",
+		"migrate:unset-golf-review-status:dry-run": "tsx migrations/unset-golf-review-status-migrate.ts --dry-run",
 		"seed:location-taxonomy": "tsx migrations/seed-location-taxonomy.ts",
 		"seed:location-taxonomy:dry-run": "tsx migrations/seed-location-taxonomy.ts --dry-run",
 		"seed:overview-lorem": "tsx migrations/seed-overview-lorem.ts",
