@@ -29,8 +29,14 @@ export type PublicFetchOptions = {
  * Off by default in production. On in local dev. In a deployed environment it is on
  * ONLY when PREVIEW_ALL_LISTINGS=true. Set PREVIEW_ALL_LISTINGS=false to force the
  * real production gates even in dev.
+ *
+ * Hardening: on a Vercel *production* deployment this is forced OFF regardless of any
+ * env var, so a stray PREVIEW_ALL_LISTINGS=true can never again route public traffic
+ * through the drafts-reading client and leak unpublished content (the 2026-07 incident).
+ * Preview/dev Vercel deployments and local dev still honour the flag.
  */
 function previewAllListings(): boolean {
+	if (env.VERCEL_ENV === 'production') return false;
 	if (env.PREVIEW_ALL_LISTINGS === 'true') return true;
 	if (env.PREVIEW_ALL_LISTINGS === 'false') return false;
 	return dev;
