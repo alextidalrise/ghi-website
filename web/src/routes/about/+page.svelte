@@ -549,7 +549,9 @@
 
 	.member__flag {
 		margin-bottom: var(--space-sm);
-		color: var(--gold);
+		/* Green overline, not gold (gold on white fails AA); the content is a flag emoji so
+		   colour is cosmetic, but the code follows the rule. See DESIGN.md Gold-as-Accent Rule. */
+		color: var(--green);
 	}
 
 	.member__name {
