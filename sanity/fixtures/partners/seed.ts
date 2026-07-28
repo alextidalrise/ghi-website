@@ -49,8 +49,8 @@ function readSanityCliAuthToken(): string | undefined {
 	}
 }
 
-const categoryId = (slug: string) => `partner-category.${slug}`;
-const partnerId = (slug: string) => `partner.${slug}`;
+const categoryId = (slug: string) => `partner-category-${slug}`;
+const partnerId = (slug: string) => `partner-${slug}`;
 
 type CategorySeed = {
 	slug: string;

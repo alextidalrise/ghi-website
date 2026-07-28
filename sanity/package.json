@@ -83,6 +83,8 @@
 		"migrate:taxonomy-parent-refs:dry-run": "tsx migrations/taxonomy-parent-refs-migrate.ts --dry-run",
 		"migrate:taxonomy-dotted-ids": "tsx migrations/taxonomy-dotted-ids-migrate.ts",
 		"migrate:taxonomy-dotted-ids:dry-run": "tsx migrations/taxonomy-dotted-ids-migrate.ts --dry-run",
+		"migrate:content-dotted-ids": "tsx migrations/content-dotted-ids-migrate.ts",
+		"migrate:content-dotted-ids:dry-run": "tsx migrations/content-dotted-ids-migrate.ts --dry-run",
 		"seed:location-taxonomy": "tsx migrations/seed-location-taxonomy.ts",
 		"seed:location-taxonomy:dry-run": "tsx migrations/seed-location-taxonomy.ts --dry-run",
 		"seed:overview-lorem": "tsx migrations/seed-overview-lorem.ts",

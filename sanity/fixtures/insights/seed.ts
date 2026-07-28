@@ -38,7 +38,7 @@ const LOCAL_ASSETS_DIR = join(__dirname, '../../../web/static/design-system/asse
 const LOCAL_HERO = 'andalucia-golf-villa.png';
 
 const AUTHOR_IDS = {
-	ghi: 'author.golf-homes-international'
+	ghi: 'author-golf-homes-international'
 };
 
 function readSanityCliAuthToken(): string | undefined {
@@ -241,7 +241,7 @@ type ArticleSpec = {
  * Copy is the design team's; only the "GHI Journal" kicker was dropped (we say Insights).
  */
 const LIVING_BY_THE_FAIRWAYS: ArticleSpec = {
-	id: 'insight.living-by-the-fairways',
+	id: 'insight-living-by-the-fairways',
 	title: 'Living by the Fairways: The Quiet Luxury of Golf Course Living',
 	// The mockup's own <em> — "The Quiet Luxury of <em>Golf Course Living</em>".
 	titleEmphasis: 'Golf Course Living',
