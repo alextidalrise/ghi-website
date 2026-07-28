@@ -1162,6 +1162,9 @@ export type InsightSection = {
       } & InsightCardGrid)
     | ({
         _key: string;
+      } & InsightRoutes)
+    | ({
+        _key: string;
       } & InsightPullQuote)
     | ({
         _key: string;
@@ -1218,6 +1221,25 @@ export type InsightPullQuote = {
   _type: "insightPullQuote";
   quote: string;
   attribution?: string;
+};
+
+export type InsightRoutes = {
+  _type: "insightRoutes";
+  heading?: string;
+  routes: Array<
+    {
+      _key: string;
+    } & InsightRoute
+  >;
+};
+
+export type InsightRoute = {
+  _type: "insightRoute";
+  heading: string;
+  body: string;
+  actionLabel: string;
+  actionHref: string;
+  outcome: string;
 };
 
 export type InsightCardGrid = {
@@ -1511,6 +1533,8 @@ export type AllSanitySchemaTypes =
   | InsightTakeaways
   | InsightTakeawayItem
   | InsightPullQuote
+  | InsightRoutes
+  | InsightRoute
   | InsightCardGrid
   | InsightCardGridItem
   | InsightFigure
@@ -5669,6 +5693,16 @@ export type InsightBySlugQueryResult = {
           _type: "insightPullQuote";
           quote: string;
           attribution?: string;
+        }
+      | {
+          _key: string;
+          _type: "insightRoutes";
+          heading?: string;
+          routes: Array<
+            {
+              _key: string;
+            } & InsightRoute
+          >;
         }
       | {
           _key: string;

@@ -6,6 +6,11 @@ import { loadReviews } from '$lib/reviews';
 import { fetchHomepagePartnerLogos, fetchPartnerIntroduction } from '$lib/sanity/queries/partners';
 import { fetchContactPage } from '$lib/sanity/queries';
 import { PARTNER_INTRO_PARAM } from '$lib/partners/partners';
+import {
+	ENQUIRY_TOPIC_PARAM,
+	enquiryTopicLabel,
+	resolveEnquiryTopic
+} from '$lib/contact/enquiryTopics';
 import { resolveContactContent } from '$lib/sanity/transforms/pageContent';
 
 const BASE_PATH = '/contact';
@@ -42,6 +47,14 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 
 	const content = resolveContactContent(rawPage);
 
+	// `?enquiry=<key>` is a pre-framed enquiry, written by enquiryTopicHref from an article's
+	// buyer routes. Same job as `?partner=`: the form opens on what the visitor clicked
+	// rather than blank. An unrecognised key resolves to null and the form is the plain one.
+	// A partner introduction is the more specific request, so it wins when both are present.
+	const enquiryTopic = partnerIntro
+		? null
+		: resolveEnquiryTopic(url.searchParams.get(ENQUIRY_TOPIC_PARAM), content.contactFirstName);
+
 	const title = content.seo?.seoTitle?.trim() || 'Contact | Golf Homes International';
 	const description =
 		content.seo?.metaDescription?.trim() ||
@@ -61,6 +74,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 		content,
 		partnerLogos,
 		partnerIntro,
+		enquiryTopic,
 		reviews,
 		breadcrumbJsonLd: breadcrumbListJsonLd(breadcrumbs, url.origin)
 	};
@@ -79,6 +93,7 @@ export const actions: Actions = {
 		const phone = String(data.get('phone') ?? '').trim();
 		const message = String(data.get('message') ?? '').trim();
 		const partnerSlug = String(data.get(PARTNER_INTRO_PARAM) ?? '').trim();
+		const topicKey = String(data.get(ENQUIRY_TOPIC_PARAM) ?? '').trim();
 
 		// Echo the submitted values back so the form repopulates on any failure. The partner
 		// is not echoed: it lives in the URL, which survives a failed post.
@@ -113,10 +128,17 @@ export const actions: Actions = {
 		// hidden field, so the name that reaches the team is the one Sanity holds. The HubSpot
 		// form exposes only firstname/email/phone/message, so it rides in the message body: no
 		// new HubSpot field to provision, and the enquiry arrives with its context intact.
+		//
+		// A pre-framed enquiry (`?enquiry=`) rides the same way, and is likewise resolved from
+		// its key rather than trusted from the hidden field: the label the team reads is copy
+		// we wrote, not whatever was posted. Only one context line is ever added — an
+		// introduction is the more specific request, so it wins.
 		const partner = await fetchPartnerIntroduction(partnerSlug);
-		const submittedMessage = partner
-			? `Introduction requested: ${partner.name}${partner.category ? ` (${partner.category})` : ''}\n\n${message}`
-			: message;
+		const topicLabel = partner ? null : enquiryTopicLabel(topicKey);
+		const context = partner
+			? `Introduction requested: ${partner.name}${partner.category ? ` (${partner.category})` : ''}`
+			: topicLabel;
+		const submittedMessage = context ? `${context}\n\n${message}` : message;
 
 		const fields = [
 			{ objectTypeId: '0-1', name: 'firstname', value: name },

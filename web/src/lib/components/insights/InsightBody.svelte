@@ -10,6 +10,7 @@
 	// Journal-specific renderers.
 	import InsightFigure from './InsightFigure.svelte';
 	import InsightCardGrid from './InsightCardGrid.svelte';
+	import InsightRoutes from './InsightRoutes.svelte';
 	import InsightPullQuote from './InsightPullQuote.svelte';
 	import InsightTakeaways from './InsightTakeaways.svelte';
 	import InsightFaq from './InsightFaq.svelte';
@@ -28,6 +29,7 @@
 			mediaAssetMetadata: GuideImage,
 			insightFigure: InsightFigure,
 			insightCardGrid: InsightCardGrid,
+			insightRoutes: InsightRoutes,
 			insightPullQuote: InsightPullQuote,
 			insightTakeaways: InsightTakeaways,
 			insightFaq: InsightFaq,

@@ -8,6 +8,7 @@
 	import TrustedPartners from '$lib/components/home/TrustedPartners.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 	import { PARTNER_INTRO_PARAM, partnerIntroMessage } from '$lib/partners/partners';
+	import { ENQUIRY_TOPIC_PARAM } from '$lib/contact/enquiryTopics';
 	import {
 		GENERAL_WHATSAPP_MESSAGE,
 		PHONE_DISPLAY,
@@ -40,6 +41,11 @@
 	// enquiry it has always been.
 	const partnerIntro = $derived(data.partnerIntro ?? null);
 
+	// A pre-framed enquiry, arriving as ?enquiry=<key> from an article's buyer routes. Null
+	// for a direct visit or an unknown key, and never set alongside a partner introduction —
+	// the load resolves that precedence, so the panel only ever has one framing to show.
+	const enquiryTopic = $derived(data.enquiryTopic ?? null);
+
 	// Form state. Initialised from the server action's echoed values so a no-JS submit
 	// repopulates after a failed post; with JS, use:enhance keeps these across a retry.
 	//
@@ -50,11 +56,12 @@
 	let email = $state(untrack(() => form?.values?.email ?? ''));
 	let phone = $state(untrack(() => form?.values?.phone ?? ''));
 	let message = $state(
-		untrack(
-			() =>
-				form?.values?.message ??
-				(data.partnerIntro ? partnerIntroMessage(data.partnerIntro) : '')
-		)
+		untrack(() => {
+			// An echoed value from a failed post always wins — it is what the visitor typed.
+			if (form?.values?.message !== undefined) return form.values.message;
+			if (data.partnerIntro) return partnerIntroMessage(data.partnerIntro);
+			return data.enquiryTopic?.message ?? '';
+		})
 	);
 
 	let submitting = $state(false);
@@ -229,9 +236,13 @@
 								<path d="M4 12.5 9.5 18 20 6" fill="none" stroke="currentColor" stroke-width="2" />
 							</svg>
 							<h3 class="panel__confirm-head">
-								{partnerIntro
-									? 'Thank you, we will make the introduction'
-									: 'Thank you, your enquiry is with us'}
+								{#if partnerIntro}
+									Thank you, we will make the introduction
+								{:else if enquiryTopic}
+									{enquiryTopic.confirmHeading}
+								{:else}
+									Thank you, your enquiry is with us
+								{/if}
 							</h3>
 							<p class="panel__confirm-note">
 								{lead.firstName} will reply within one working day. If you would rather not wait,
@@ -244,6 +255,9 @@
 							<p class="panel__intro">
 								To <strong class="panel__partner">{partnerIntro.name}</strong>{#if partnerIntro.category}, our {partnerIntro.category.toLowerCase()} specialist{/if}. {lead.firstName} will make the introduction personally.
 							</p>
+						{:else if enquiryTopic}
+							<h3 class="panel__heading">{enquiryTopic.heading}</h3>
+							<p class="panel__intro">{enquiryTopic.intro}</p>
 						{:else}
 							<h3 class="panel__heading">{c.formHeading}</h3>
 							<p class="panel__intro">{c.formIntro}</p>
@@ -260,6 +274,12 @@
 							     reaches the team is the one Sanity holds, not whatever was posted. -->
 							{#if partnerIntro}
 								<input type="hidden" name={PARTNER_INTRO_PARAM} value={partnerIntro.slug} />
+							{/if}
+
+							<!-- Likewise the key, not the label: the server re-resolves it, so the context
+							     the team reads is ours rather than whatever was posted. -->
+							{#if enquiryTopic}
+								<input type="hidden" name={ENQUIRY_TOPIC_PARAM} value={enquiryTopic.key} />
 							{/if}
 
 							{#if shownTopError}
