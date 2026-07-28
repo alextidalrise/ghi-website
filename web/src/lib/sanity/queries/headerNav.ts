@@ -1,4 +1,5 @@
 import { defineQuery } from 'groq';
+import { withoutCampaignParams } from '../href';
 import { fetchPublic } from './fetch';
 
 // Resolves a navLink to a concrete href. References become canonical paths derived from
@@ -62,9 +63,16 @@ type RawLink = { label?: string | null; href?: string | null; external?: boolean
 type RawItem = RawLink & { children?: RawLink[] | null };
 type RawHeaderNav = { items?: RawItem[] | null; cta?: RawLink | null } | null;
 
+// Campaign tags are stripped as the raw href becomes a typed link, alongside the other
+// cleaning these transforms do. A `utm_*` on a menu link would re-attribute the visitor's
+// GA4 session on every navigation, and the nav is on every page — see `$lib/sanity/href`.
 function toLink(raw: RawLink | null | undefined): HeaderNavLink | null {
 	if (!raw?.label || !raw.href) return null;
-	return { label: raw.label, href: raw.href, external: Boolean(raw.external) };
+	return {
+		label: raw.label,
+		href: withoutCampaignParams(raw.href),
+		external: Boolean(raw.external)
+	};
 }
 
 function toItem(raw: RawItem | null | undefined): HeaderNavItem | null {
@@ -77,7 +85,7 @@ function toItem(raw: RawItem | null | undefined): HeaderNavItem | null {
 	if (!raw.href && children.length === 0) return null;
 	return {
 		label: raw.label,
-		href: raw.href ?? null,
+		href: raw.href ? withoutCampaignParams(raw.href) : null,
 		external: Boolean(raw.external),
 		children
 	};

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CustomBlockComponentProps } from '@portabletext/svelte';
 	import type { InsightCtaCalloutBlock } from '$lib/insights/types';
+	import { isInternalHref, withoutCampaignParams } from '$lib/sanity/href';
 
 	let { portableText }: { portableText: CustomBlockComponentProps<InsightCtaCalloutBlock> } = $props();
 
@@ -8,8 +9,11 @@
 	const heading = $derived(value.heading?.trim() || null);
 	const body = $derived(value.body?.trim() || null);
 	const label = $derived(value.buttonLabel?.trim() || 'Speak to GHI');
-	const href = $derived(value.buttonHref?.trim() || '/contact');
-	const external = $derived(/^https?:\/\//.test(href));
+	// This CTA points at /contact on almost every insight, which makes it the most likely
+	// place for someone to tag an internal link for attribution. See `$lib/sanity/href` for
+	// why that silently damages GA4 rather than measuring anything.
+	const href = $derived(withoutCampaignParams(value.buttonHref?.trim() || '/contact'));
+	const external = $derived(/^https?:\/\//.test(href) && !isInternalHref(href));
 </script>
 
 {#if heading}
