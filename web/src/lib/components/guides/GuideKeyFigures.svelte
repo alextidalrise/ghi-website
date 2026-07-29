@@ -44,7 +44,9 @@
 		font-weight: 500;
 		letter-spacing: var(--tracking-overline);
 		text-transform: uppercase;
-		color: var(--gold);
+		/* Green, not gold: gold on white is ~1.6:1 and this labels the densest block
+		   on the page. Gold is for marks/rules only — see DESIGN.md Gold-as-Accent Rule. */
+		color: var(--green);
 		padding-block: var(--space-md) 0;
 	}
 

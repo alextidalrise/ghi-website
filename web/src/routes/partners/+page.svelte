@@ -190,7 +190,9 @@
 		font-weight: 500;
 		letter-spacing: var(--tracking-overline);
 		text-transform: uppercase;
-		color: var(--gold);
+		/* Green, not gold: gold overline text on white is ~1.6:1 (fails AA). The gold
+		   dot separators below stay — dots are allowed. See DESIGN.md Gold-as-Accent Rule. */
+		color: var(--green);
 	}
 
 	.why__attrs li {

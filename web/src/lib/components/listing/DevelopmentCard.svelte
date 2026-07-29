@@ -127,7 +127,9 @@
 		padding: clamp(0.875rem, 0.6rem + 1vw, 1.125rem);
 	}
 
-	/* A quiet gold tag marks the card as a development rather than a single home. */
+	/* A quiet tag marks the card as a development rather than a single home. Muted, not
+	   gold: gold on white is ~1.6:1 (fails AA); --muted (~5.3:1) keeps it quiet and legible.
+	   Gold is for marks/rules only — see DESIGN.md Gold-as-Accent Rule. */
 	.property-card__kicker {
 		margin-bottom: 0.375rem;
 		font-family: var(--sans);
@@ -135,7 +137,7 @@
 		font-weight: 600;
 		letter-spacing: var(--tracking-overline);
 		text-transform: uppercase;
-		color: var(--gold);
+		color: var(--muted);
 	}
 
 	.property-card__location {
