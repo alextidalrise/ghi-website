@@ -2,6 +2,18 @@ import { defineField, defineType } from 'sanity';
 import { INSIGHT_CATEGORIES } from '../constants/enums';
 
 /**
+ * A closing-CTA action (label + link) is all-or-nothing: a button with no link, or a
+ * link with no label, would render a broken or invisible action. Require both or neither.
+ */
+const ctaActionRule = (value: { label?: string; href?: string } | undefined) => {
+	if (!value) return true;
+	const hasLabel = typeof value.label === 'string' && value.label.trim().length > 0;
+	const hasHref = typeof value.href === 'string' && value.href.trim().length > 0;
+	if (hasLabel !== hasHref) return 'Set both a label and a link, or leave both empty.';
+	return true;
+};
+
+/**
  * An editorial "Insights" article — GHI's journal. One document type serves every
  * article: the `insightCategory` field branches the topic (mirroring how `guide`
  * branches on `guideCategory`), doubling as the article kicker and the /insights
@@ -151,6 +163,54 @@ export const insight = defineType({
 			rows: 2,
 			group: 'content',
 			description: 'Optional override for the closing enquiry band copy.'
+		}),
+		defineField({
+			name: 'ctaPrimary',
+			title: 'Closing CTA — lead action (override)',
+			type: 'object',
+			group: 'content',
+			description:
+				'Optional. Replaces the gold lead button on the closing band (default: "Get in touch"). Use it to close on the route the article actually argues for — e.g. "Register for Nobu updates" → /contact?enquiry=nobu-monte-rei-updates.',
+			options: { collapsible: true, collapsed: true },
+			fields: [
+				defineField({
+					name: 'label',
+					title: 'Button label',
+					type: 'string',
+					validation: (Rule) => Rule.max(40)
+				}),
+				defineField({
+					name: 'href',
+					title: 'Link',
+					type: 'string',
+					description: 'Internal path (e.g. /contact?enquiry=nobu-monte-rei-updates) or a full URL.'
+				})
+			],
+			validation: (Rule) => Rule.custom(ctaActionRule)
+		}),
+		defineField({
+			name: 'ctaSecondary',
+			title: 'Closing CTA — alternative action (override)',
+			type: 'object',
+			group: 'content',
+			description:
+				'Optional. Replaces the outline "not ready to enquire" button on the closing band (default: "Browse properties").',
+			options: { collapsible: true, collapsed: true },
+			fields: [
+				defineField({
+					name: 'label',
+					title: 'Button label',
+					type: 'string',
+					validation: (Rule) => Rule.max(40)
+				}),
+				defineField({
+					name: 'href',
+					title: 'Link',
+					type: 'string',
+					description: 'Internal path or a full URL.'
+				})
+			],
+			validation: (Rule) => Rule.custom(ctaActionRule)
 		}),
 		defineField({
 			name: 'relatedInsights',

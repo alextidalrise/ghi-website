@@ -154,6 +154,12 @@ export type InsightHeroNote = {
 };
 
 /** Full article projection for the post template. */
+/** A closing-CTA action override authored in Sanity. Both fields are needed to render a button. */
+export type InsightCtaAction = {
+	label?: string | null;
+	href?: string | null;
+};
+
 export type InsightDetail = {
 	_id: string;
 	_type: 'insight';
@@ -174,6 +180,9 @@ export type InsightDetail = {
 	sections?: InsightSection[] | null;
 	ctaHeading?: string | null;
 	ctaBody?: string | null;
+	/** Optional overrides for the closing band's buttons; each needs both a label and href to render. */
+	ctaPrimary?: InsightCtaAction | null;
+	ctaSecondary?: InsightCtaAction | null;
 	seo?: InsightSeo;
 	related?: InsightCard[] | null;
 };

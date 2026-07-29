@@ -6,8 +6,22 @@
 	import InsightAuthorBio from '$lib/components/insights/InsightAuthorBio.svelte';
 	import TalkToUsBand from '$lib/components/TalkToUsBand.svelte';
 	import InsightCard from '$lib/components/insights/InsightCard.svelte';
+	import { withoutCampaignParams } from '$lib/sanity/href';
+	import type { InsightCtaAction } from '$lib/insights';
 
 	let { data } = $props();
+
+	// An authored CTA override renders only when it carries BOTH a label and a link — the
+	// schema enforces all-or-nothing, this is the render-time guard. Campaign params are
+	// stripped for the same reason InsightRoutes strips them: an authored href can arrive
+	// utm-tagged, and that must not reach a visitor (it corrupts our own analytics). When the
+	// override is absent, `undefined` lets TalkToUsBand fall back to its house defaults.
+	const toBandAction = (action?: InsightCtaAction | null) => {
+		const label = action?.label?.trim();
+		const href = action?.href?.trim();
+		if (!label || !href) return undefined;
+		return { label, href: withoutCampaignParams(href) };
+	};
 
 	const insight = $derived(data.insight);
 	const toc = $derived(data.toc);
@@ -20,6 +34,8 @@
 		insight.ctaBody?.trim() ||
 			"Tell us what you have in mind and we'll help you compare the right villas, apartments and resort homes — no pressure, just guidance from people who know the market."
 	);
+	const ctaPrimary = $derived(toBandAction(insight.ctaPrimary));
+	const ctaSecondary = $derived(toBandAction(insight.ctaSecondary));
 </script>
 
 <svelte:head>
@@ -101,10 +117,14 @@
   designed when the footer is what follows. It also makes for the better close — the reader
   gets somewhere else to go first, and the enquiry gets the final word.
 
-  The heading and body are the article's own (Sanity `ctaHeading` / `ctaBody`), so an editor
-  can pitch the close to the piece rather than repeating the About page verbatim.
+  The heading, body and both actions are the article's own (Sanity `ctaHeading` / `ctaBody` /
+  `ctaPrimary` / `ctaSecondary`), so an editor can pitch the close to the piece rather than
+  repeating the About page verbatim. When an action override is absent it is `undefined`, and
+  TalkToUsBand falls back to its house defaults (Get in touch / Browse properties) — so a piece
+  that argues its own route (e.g. "Register for Nobu updates") can close on that route instead
+  of defaulting every reader into a property search.
 -->
-<TalkToUsBand heading={ctaHeading} body={ctaBody} />
+<TalkToUsBand heading={ctaHeading} body={ctaBody} primary={ctaPrimary} secondary={ctaSecondary} />
 
 <style>
 	.article__body {

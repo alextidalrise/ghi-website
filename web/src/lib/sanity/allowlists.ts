@@ -403,6 +403,8 @@ export const INSIGHT_DETAIL_FIELDS = /* groq */ `
   sections[]${INSIGHT_SECTION_PUBLIC},
   ctaHeading,
   ctaBody,
+  ctaPrimary{ label, href },
+  ctaSecondary{ label, href },
   seo${SEO_PUBLIC}
 `;
 
