@@ -11,6 +11,12 @@
 	// Set once scroll-spy starts (see onMount); the highlight only shows when enhanced.
 	let activeAnchor = $state('');
 
+	// The section the reader is currently in. On mobile the rail sticks and collapses to a
+	// single bar, so this is what turns that bar into a live "you are here" indicator rather
+	// than a generic, scrolled-past label. Falls back to the first item before scroll-spy runs.
+	const activeIndex = $derived(Math.max(0, items.findIndex((item) => item.anchor === activeAnchor)));
+	const activeItem = $derived(items[activeIndex] ?? null);
+
 	const listId = 'guide-contents-list';
 
 	onMount(() => {
@@ -63,7 +69,17 @@
 		aria-controls={listId}
 		onclick={() => (open = !open)}
 	>
-		<span>{title}</span>
+		<span class="toc__toggle-text">
+			<span class="toc__toggle-eyebrow">{title}</span>
+			{#if enhanced && activeItem}
+				<span class="toc__toggle-current">
+					<span class="toc__toggle-index" aria-hidden="true"
+						>{String(activeIndex + 1).padStart(2, '0')}</span
+					>
+					{activeItem.heading}
+				</span>
+			{/if}
+		</span>
 		<svg
 			class="toc__chevron"
 			class:toc__chevron--up={open}
@@ -101,7 +117,7 @@
 	}
 
 	.toc__heading,
-	.toc__toggle span {
+	.toc__toggle-eyebrow {
 		font-size: var(--text-overline);
 		font-weight: 500;
 		letter-spacing: var(--tracking-overline);
@@ -115,24 +131,58 @@
 		border-bottom: 1px solid var(--border);
 	}
 
-	/* The toggle is the mobile-only title; hidden on desktop. */
+	/* The toggle is the mobile-only title; hidden on desktop. Opaque, because on mobile the rail
+	   sticks under the nav and article text scrolls beneath this bar. */
 	.toc__toggle {
 		display: none;
 		width: 100%;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--space-sm);
+		gap: var(--space-md);
+		/* Comfortable target for the older, touch audience — a full row, not a hairline of text. */
+		min-height: 3rem;
 		padding: var(--space-sm) 0;
-		background: none;
+		background: var(--white);
 		border: 0;
 		border-block: 1px solid var(--border);
 		cursor: pointer;
 		color: var(--muted);
+		text-align: left;
+	}
+
+	/* Eyebrow over current-section, stacked. min-width:0 lets the current line ellipsize
+	   instead of shoving the chevron off the row. */
+	.toc__toggle-text {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+
+	.toc__toggle-current {
+		display: flex;
+		align-items: baseline;
+		gap: 0.55rem;
+		font-size: var(--text-ui);
+		font-weight: 500;
+		color: var(--green);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.toc__toggle-index {
+		flex-shrink: 0;
+		font-size: var(--text-small);
+		font-variant-numeric: tabular-nums;
+		color: var(--gold);
 	}
 
 	.toc__chevron {
 		transition: transform var(--duration-hover) var(--ease);
 		flex-shrink: 0;
+		color: var(--muted);
 	}
 
 	.toc__chevron--up {
@@ -188,6 +238,11 @@
 	}
 
 	@media (max-width: 56rem) {
+		/* Anchors the open list as a dropdown (see below). */
+		.toc {
+			position: relative;
+		}
+
 		.toc__heading {
 			display: none;
 		}
@@ -202,9 +257,23 @@
 			display: none;
 		}
 
+		/* Open as an overlay dropdown, not an in-flow block. The rail is sticky (see the page),
+		   so if the list expanded in flow it would grow the rail's box at its original position
+		   far up the page and jerk the article down under the reader. Taking it out of flow keeps
+		   the sticky bar one row tall and lets the list paint over the prose instead. */
 		.toc--enhanced.toc--open .toc__list {
 			display: flex;
-			padding-block: var(--space-sm);
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 100%;
+			z-index: 1;
+			max-height: min(60vh, 24rem);
+			overflow-y: auto;
+			padding: var(--space-sm) var(--space-md);
+			background: var(--white);
+			border: 1px solid var(--border);
+			border-top: 0;
 		}
 	}
 

@@ -267,10 +267,21 @@
 		}
 	}
 
-	/* Mobile: the contents rail stacks above the chapters as a collapsible jump list. */
+	/* Mobile: the contents rail sticks under the nav and collapses to a one-row bar (see
+	   GuideContents), keeping a live "you are here" and a jump control the whole way down —
+	   the orientation the desktop sticky rail gives, which a scrolled-past block would lose. */
 	@media (max-width: 56rem) {
 		.guide__rail {
+			position: sticky;
+			top: var(--nav-height);
+			z-index: 5;
 			margin-bottom: var(--space-xl);
+		}
+
+		/* A tapped jump must clear the sticky bar (~3rem tall, pinned at the nav), or the target
+		   heading lands hidden behind it. */
+		.guide-section {
+			scroll-margin-top: calc(var(--nav-height) + 3rem + var(--space-sm));
 		}
 	}
 

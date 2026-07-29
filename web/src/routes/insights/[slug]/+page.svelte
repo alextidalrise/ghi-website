@@ -185,8 +185,20 @@
 	}
 
 	@media (max-width: 56rem) {
+		/* The rail sticks under the nav and collapses to a one-row bar (see GuideContents), so
+		   the reader keeps a live "you are here" and a jump control the whole way down — the
+		   orientation the desktop sticky rail gives, which a scrolled-past mobile block loses. */
 		.article__rail {
+			position: sticky;
+			top: var(--nav-height);
+			z-index: 5;
 			margin-bottom: var(--space-xl);
+		}
+
+		/* A tapped jump must clear the sticky bar (~3rem tall, pinned at the nav), or the target
+		   heading lands hidden behind it. */
+		.article-section {
+			scroll-margin-top: calc(var(--nav-height) + 3rem + var(--space-sm));
 		}
 	}
 
