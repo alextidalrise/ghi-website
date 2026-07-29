@@ -21,9 +21,16 @@
 {#if items.length > 0}
 	<div class="faq">
 		{#each items as item, index (item._key ?? index)}
-			<details class="faq__item" name="insight-faq">
+			<!-- No `name`: the group is a set of independent disclosures, so a reader can hold
+			     several answers open at once. An exclusive accordion (shared `name`) would collapse
+			     the last answer whenever the next is opened — hostile when questions are compared. -->
+			<details class="faq__item">
 				<summary class="faq__q">
-					<span>{item.question}</span>
+					<!-- The question carries a real heading so it lands in the document outline one step
+					     below the section `h2`, letting screen-reader users jump the Q&A by heading. It
+					     sits inside `summary` (whose content model permits heading content) so the
+					     disclosure control and the heading remain one accessible node. -->
+					<h3 class="faq__q-text">{item.question}</h3>
 					<svg class="faq__mark" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
 						<path d="M3 5.5 7 9.5 11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" fill="none" />
 					</svg>
@@ -64,6 +71,15 @@
 	/* Remove the default disclosure triangle across engines. */
 	.faq__q::-webkit-details-marker {
 		display: none;
+	}
+
+	/* The question is a heading for the outline, not for restyling: fold its type back to
+	   whatever the summary already computes (serif, --text-h4, --green), so promoting the
+	   old <span> to <h3> changes the document outline and nothing on screen. */
+	.faq__q-text {
+		margin: 0;
+		font: inherit;
+		color: inherit;
 	}
 
 	.faq__mark {
