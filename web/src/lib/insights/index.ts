@@ -45,6 +45,7 @@ export type {
 	InsightCategory,
 	InsightAuthor,
 	InsightDetail,
+	InsightCtaAction,
 	InsightHeroNote,
 	InsightSection,
 	InsightTocItem,
