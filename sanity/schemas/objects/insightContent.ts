@@ -414,6 +414,43 @@ export const insightCtaCallout = defineType({
 	}
 });
 
+/**
+ * A live Front Line collection carousel, placed inline in a section body. It carries no
+ * listings of its own: the cards are the canonical, published-only frontline feed fetched at
+ * request time (the same feed the homepage shows), so withdrawn or unpublished records drop
+ * out on their own and nothing is copied into the article. Editors control only the framing —
+ * enabling the block is what shows the feed. The carousel already links out to the full
+ * collection, so it replaces, rather than sits beside, an `insightCtaCallout` for that action.
+ */
+export const insightFrontlineRail = defineType({
+	name: 'insightFrontlineRail',
+	title: 'Front Line carousel',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description:
+				'Optional title above the carousel. Leave blank when the section heading already names it — the block renders under the section heading without repeating it.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'summary',
+			title: 'Summary',
+			type: 'text',
+			rows: 2,
+			description: 'Optional line under the heading. Falls back to a count of the live listings.'
+		})
+	],
+	preview: {
+		select: { heading: 'heading' },
+		prepare({ heading }) {
+			return { title: heading || 'Front Line carousel', subtitle: 'Live front-line collection' };
+		}
+	}
+});
+
 /** The rich-text body of an Insights section: prose plus the shared and journal blocks. */
 const insightSectionBody = defineField({
 	name: 'body',
@@ -470,7 +507,8 @@ const insightSectionBody = defineField({
 		defineArrayMember({ type: 'insightPullQuote' }),
 		defineArrayMember({ type: 'insightTakeaways' }),
 		defineArrayMember({ type: 'insightFaq' }),
-		defineArrayMember({ type: 'insightCtaCallout' })
+		defineArrayMember({ type: 'insightCtaCallout' }),
+		defineArrayMember({ type: 'insightFrontlineRail' })
 	],
 	validation: (Rule) => Rule.required().min(1)
 });
