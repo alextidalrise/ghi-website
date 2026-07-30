@@ -1182,7 +1182,16 @@ export type InsightSection = {
     | ({
         _key: string;
       } & InsightCtaCallout)
+    | ({
+        _key: string;
+      } & InsightFrontlineRail)
   >;
+};
+
+export type InsightFrontlineRail = {
+  _type: "insightFrontlineRail";
+  heading?: string;
+  summary?: string;
 };
 
 export type InsightCtaCallout = {
@@ -1534,6 +1543,7 @@ export type AllSanitySchemaTypes =
   | SanityImageCrop
   | SanityImageHotspot
   | InsightSection
+  | InsightFrontlineRail
   | InsightCtaCallout
   | InsightFaq
   | InsightFaqItem
@@ -5694,6 +5704,12 @@ export type InsightBySlugQueryResult = {
             lqip: string | null;
             dimensions: SanityImageDimensions | null;
           };
+        }
+      | {
+          _key: string;
+          _type: "insightFrontlineRail";
+          heading?: string;
+          summary?: string;
         }
       | {
           _key: string;

@@ -15,6 +15,7 @@
 	import InsightTakeaways from './InsightTakeaways.svelte';
 	import InsightFaq from './InsightFaq.svelte';
 	import InsightCtaCallout from './InsightCtaCallout.svelte';
+	import InsightFrontlineRail from './InsightFrontlineRail.svelte';
 
 	let { value }: { value: InsightBodyBlock[] | null | undefined } = $props();
 
@@ -33,7 +34,8 @@
 			insightPullQuote: InsightPullQuote,
 			insightTakeaways: InsightTakeaways,
 			insightFaq: InsightFaq,
-			insightCtaCallout: InsightCtaCallout
+			insightCtaCallout: InsightCtaCallout,
+			insightFrontlineRail: InsightFrontlineRail
 		}
 	};
 </script>

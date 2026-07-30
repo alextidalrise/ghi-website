@@ -97,6 +97,18 @@ export type InsightCtaCalloutBlock = {
 	buttonHref?: string | null;
 };
 
+/**
+ * A live Front Line collection carousel placed inline in the body. Carries only its framing —
+ * the listings are the request-time frontline feed, delivered to the renderer via context
+ * rather than projected onto the block. See `insightFrontlineRail` and `frontlineContext`.
+ */
+export type InsightFrontlineRailBlock = {
+	_type: 'insightFrontlineRail';
+	_key: string;
+	heading?: string | null;
+	summary?: string | null;
+};
+
 /** A member of a section body: prose, the shared guide blocks, or a journal block. */
 export type InsightBodyBlock =
 	| PortableTextBlock
@@ -109,7 +121,8 @@ export type InsightBodyBlock =
 	| InsightPullQuoteBlock
 	| InsightTakeawaysBlock
 	| InsightFaqBlock
-	| InsightCtaCalloutBlock;
+	| InsightCtaCalloutBlock
+	| InsightFrontlineRailBlock;
 
 export type InsightSection = {
 	heading?: string | null;

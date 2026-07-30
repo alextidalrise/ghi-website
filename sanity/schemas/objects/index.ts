@@ -9,6 +9,7 @@ import {
 	insightFaq,
 	insightFaqItem,
 	insightFigure,
+	insightFrontlineRail,
 	insightHeroNote,
 	insightPullQuote,
 	insightRoute,
@@ -73,6 +74,7 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	insightFaqItem,
 	insightFaq,
 	insightCtaCallout,
+	insightFrontlineRail,
 	insightSection,
 	// Header navigation (navLink registered before the items that nest it)
 	navLink,
@@ -125,6 +127,7 @@ export {
 	insightFaqItem,
 	insightFaq,
 	insightCtaCallout,
+	insightFrontlineRail,
 	insightSection,
 	footerColumn,
 	socialLink,
