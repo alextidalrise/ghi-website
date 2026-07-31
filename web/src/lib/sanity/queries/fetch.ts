@@ -75,7 +75,11 @@ export async function fetchMaybePreview<T>(
 	preview: boolean
 ): Promise<T | null> {
 	if (preview && loadQuery) {
-		const result = await loadQuery<T>(query, params);
+		// Bind the public params (publishedStatus/previewAll) here too: preview projections may
+		// now reference them — e.g. an insight body's hand-picked Front Line rail gates its
+		// listing refs by publish status — and an unbound param would throw in GROQ. Extra params
+		// are harmless to queries that don't read them.
+		const result = await loadQuery<T>(query, withPublicParams(params));
 		return result.data;
 	}
 

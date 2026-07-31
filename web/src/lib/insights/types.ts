@@ -1,6 +1,7 @@
 import type { PortableTextBlock } from '@portabletext/types';
 import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
 import type { GuideCalloutBlock, GuideKeyFiguresBlock, GuideImageBlock } from '$lib/guides/types';
+import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 export type InsightCategory = 'market' | 'lifestyle' | 'golf' | 'relocation';
 
@@ -98,15 +99,24 @@ export type InsightCtaCalloutBlock = {
 };
 
 /**
- * A live Front Line collection carousel placed inline in the body. Carries only its framing —
- * the listings are the request-time frontline feed, delivered to the renderer via context
- * rather than projected onto the block. See `insightFrontlineRail` and `frontlineContext`.
+ * A Front Line collection carousel placed inline in the body. The editor hand-picks an ordered
+ * set of listing references; the GROQ projection dereferences them (publish-gated) into raw card
+ * rows, and the Insight server load maps those to `cards` — the discriminated card union the rail
+ * renderer consumes directly off the block. See `insightFrontlineRail` and the section load.
  */
 export type InsightFrontlineRailBlock = {
 	_type: 'insightFrontlineRail';
 	_key: string;
 	heading?: string | null;
 	summary?: string | null;
+	/** Auto-summary templates used when `summary` is blank; `{count}` interpolates the live number. */
+	summaryCountSingular?: string | null;
+	summaryCountPlural?: string | null;
+	/** The outbound link beneath the carousel. Absent `showViewAll` (older blocks) reads as shown. */
+	showViewAll?: boolean | null;
+	viewAllLabel?: string | null;
+	viewAllHref?: string | null;
+	cards?: SimilarListingCard[] | null;
 };
 
 /** A member of a section body: prose, the shared guide blocks, or a journal block. */
