@@ -2,7 +2,8 @@ import { defineQuery } from 'groq';
 import {
 	FEATURED_LOCATION_PROJECTION,
 	FEATURED_LOCATION_REF_FILTER,
-	LISTING_CARD_UNION
+	LISTING_CARD_UNION,
+	LISTING_REF_PUBLIC_FILTER
 } from '../allowlists';
 import {
 	toSimilarListingCard,
@@ -29,31 +30,15 @@ export const COUNTRY_FEATURED_LOCATIONS_LIMIT = 6;
 
 export type { ListingSearchScope };
 
-/**
- * Gates for a hand-picked *reference array* (homepageFeaturedListings,
- * featuredListings), applied to the reference via `@->` BEFORE dereferencing.
- *
- * Mirrors PUBLIC_LISTING_FILTER (queries/filters.ts) plus the featured doc-type
- * rules, but it must filter in reference position. A filtered dereference
- * (`refs[]->[gate]`) resolves to null for any unpublished target, so editor-picked
- * draft listings never render in dev preview mode. Filtering the ref array first
- * (`refs[@->gate]->{...}`) resolves drafts correctly and keeps the gates in GROQ.
- *
- * Keep these clauses in sync with queries/filters.ts (here they are @-> prefixed).
- */
-const FEATURED_LISTING_REF_FILTER = /* groq */ `
-  (
-    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])
-    || @->_type == "development"
-  )
-  && (coalesce(@->status, "") == $publishedStatus || $previewAll)
-`;
+// The hand-picked listing-ref gate (`@->` type + publish status, applied before dereferencing)
+// lives in ../allowlists as LISTING_REF_PUBLIC_FILTER — shared with the insight body's inline
+// Front Line rail so the two hand-pick surfaces can never drift.
 
 /** Ordered featured cards from site settings — editor order preserved. */
 export const homepageFeaturedListingsQuery = defineQuery(`
   *[_type == "siteSettings" && _id == "siteSettings"][0]{
     "cards": homepageFeaturedListings[
-      ${FEATURED_LISTING_REF_FILTER}
+      ${LISTING_REF_PUBLIC_FILTER}
     ]->${LISTING_CARD_UNION}
   }
 `);
@@ -79,7 +64,7 @@ export const countryFeaturedListingsQuery = defineQuery(`
     && slug.current == $countrySlug
   ][0]{
     "cards": featuredListings[
-      ${FEATURED_LISTING_REF_FILTER}
+      ${LISTING_REF_PUBLIC_FILTER}
     ]->${LISTING_CARD_UNION}
   }
 `);

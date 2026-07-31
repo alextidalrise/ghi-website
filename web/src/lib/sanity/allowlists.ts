@@ -351,62 +351,9 @@ export const INSIGHT_CARD_PUBLIC = /* groq */ `{
   author->${AUTHOR_PUBLIC}
 }`;
 
-/**
- * Insight section body. Image members are reshaped to the public media projection (as in
- * GUIDE_SECTION_PUBLIC); every other member — prose, callouts, key figures, pull quotes,
- * takeaways, FAQ, inline CTA — passes through in full (none carry sensitive fields).
- */
-export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
-  heading,
-  "anchor": anchor.current,
-  body[]{
-    _type == "mediaAssetMetadata" => {
-      _type,
-      _key,
-      asset,
-      altText,
-      "lqip": asset.asset->metadata.lqip,
-      "dimensions": asset.asset->metadata.dimensions
-    },
-    _type == "insightFigure" => {
-      _type,
-      _key,
-      caption,
-      "image": image{
-        asset,
-        altText,
-        "lqip": asset.asset->metadata.lqip,
-        "dimensions": asset.asset->metadata.dimensions
-      }
-    },
-    _type != "mediaAssetMetadata" && _type != "insightFigure" => { ... }
-  }
-}`;
-
-/** Full insight article fields (no wrapping braces, so the by-slug query can add related). */
-export const INSIGHT_DETAIL_FIELDS = /* groq */ `
-  _id,
-  _type,
-  title,
-  titleEmphasis,
-  "slug": slug.current,
-  insightCategory,
-  subhead,
-  publishedAt,
-  featured,
-  readingTimeOverride,
-  "bodyChars": length(pt::text(sections[].body[])),
-  heroImage${MEDIA_ASSET_PUBLIC},
-  heroCaption,
-  heroNote{ heading, body },
-  author->${AUTHOR_PUBLIC},
-  sections[]${INSIGHT_SECTION_PUBLIC},
-  ctaHeading,
-  ctaBody,
-  ctaPrimary{ label, href },
-  ctaSecondary{ label, href },
-  seo${SEO_PUBLIC}
-`;
+// INSIGHT_SECTION_PUBLIC and INSIGHT_DETAIL_FIELDS are defined lower down, after
+// LISTING_CARD_UNION — the insight body's inline Front Line rail dereferences hand-picked
+// listing refs through that union, and a `const` can't be interpolated before it is defined.
 
 /** Full guide page fields (no wrapping braces, so the by-slug query can add siblings). */
 export const GUIDE_DETAIL_FIELDS = /* groq */ `
@@ -508,6 +455,99 @@ export const LISTING_CARD_UNION = /* groq */ `{
   _type == "development" => ${DEVELOPMENT_CARD_PUBLIC},
   _type == "propertyListing" => ${PROPERTY_CARD_PUBLIC}
 }`;
+
+/**
+ * Gate for a hand-picked *reference array* of listings (homepage/country featured rails, and
+ * the inline Front Line rail in an insight body), applied to the reference via `@->` BEFORE
+ * dereferencing. A filter bracket placed AFTER the `->` deref (`refs[]->[gate]`) collapses every
+ * element to null in GROQ, so the type/publish fields must be read off the target with `@->` and
+ * the deref run on the surviving refs (`refs[@->gate]->{...}`) — that resolves editor-picked
+ * drafts correctly in preview and keeps the gate in GROQ.
+ *
+ * Mirrors PUBLIC_LISTING_FILTER (queries/filters.ts) plus the featured doc-type rules, in
+ * reference position. Keep in sync with queries/filters.ts (here the clauses are `@->` prefixed).
+ */
+export const LISTING_REF_PUBLIC_FILTER = /* groq */ `
+  (
+    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])
+    || @->_type == "development"
+  )
+  && (coalesce(@->status, "") == $publishedStatus || $previewAll)
+`;
+
+/**
+ * Insight section body. Image members are reshaped to the public media projection (as in
+ * GUIDE_SECTION_PUBLIC); the inline Front Line rail dereferences its hand-picked, publish-gated
+ * listing refs into the shared card union; every other member — prose, callouts, key figures,
+ * pull quotes, takeaways, FAQ, inline CTA — passes through in full (none carry sensitive fields).
+ */
+export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
+  heading,
+  "anchor": anchor.current,
+  body[]{
+    _type == "mediaAssetMetadata" => {
+      _type,
+      _key,
+      asset,
+      altText,
+      "lqip": asset.asset->metadata.lqip,
+      "dimensions": asset.asset->metadata.dimensions
+    },
+    _type == "insightFigure" => {
+      _type,
+      _key,
+      caption,
+      "image": image{
+        asset,
+        altText,
+        "lqip": asset.asset->metadata.lqip,
+        "dimensions": asset.asset->metadata.dimensions
+      }
+    },
+    _type == "insightFrontlineRail" => {
+      _type,
+      _key,
+      heading,
+      summary,
+      summaryCountSingular,
+      summaryCountPlural,
+      showViewAll,
+      viewAllLabel,
+      viewAllHref,
+      "listings": listings[
+        ${LISTING_REF_PUBLIC_FILTER}
+      ]->${LISTING_CARD_UNION}
+    },
+    _type != "mediaAssetMetadata"
+      && _type != "insightFigure"
+      && _type != "insightFrontlineRail" => { ... }
+  }
+}`;
+
+/** Full insight article fields (no wrapping braces, so the by-slug query can add related). */
+export const INSIGHT_DETAIL_FIELDS = /* groq */ `
+  _id,
+  _type,
+  title,
+  titleEmphasis,
+  "slug": slug.current,
+  insightCategory,
+  subhead,
+  publishedAt,
+  featured,
+  readingTimeOverride,
+  "bodyChars": length(pt::text(sections[].body[])),
+  heroImage${MEDIA_ASSET_PUBLIC},
+  heroCaption,
+  heroNote{ heading, body },
+  author->${AUTHOR_PUBLIC},
+  sections[]${INSIGHT_SECTION_PUBLIC},
+  ctaHeading,
+  ctaBody,
+  ctaPrimary{ label, href },
+  ctaSecondary{ label, href },
+  seo${SEO_PUBLIC}
+`;
 
 /** Full property listing page allowlist. */
 export const PROPERTY_LISTING_PUBLIC = /* groq */ `{

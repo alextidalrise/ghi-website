@@ -415,17 +415,32 @@ export const insightCtaCallout = defineType({
 });
 
 /**
- * A live Front Line collection carousel, placed inline in a section body. It carries no
- * listings of its own: the cards are the canonical, published-only frontline feed fetched at
- * request time (the same feed the homepage shows), so withdrawn or unpublished records drop
- * out on their own and nothing is copied into the article. Editors control only the framing —
- * enabling the block is what shows the feed. The carousel already links out to the full
- * collection, so it replaces, rather than sits beside, an `insightCtaCallout` for that action.
+ * A Front Line collection carousel, placed inline in a section body. The listings are
+ * hand-picked here — an ordered set of property or development references the marketing team
+ * curates per article — and dereferenced at request time through the public listing gates, so
+ * withdrawn or unpublished picks drop out on their own and nothing is copied into the article.
+ * (Editor order is preserved.) The carousel links out to the full collection, so it replaces,
+ * rather than sits beside, an `insightCtaCallout` for that action.
  */
 export const insightFrontlineRail = defineType({
 	name: 'insightFrontlineRail',
 	title: 'Front Line carousel',
 	type: 'object',
+	fieldsets: [
+		{
+			name: 'autoSummary',
+			title: 'Auto-summary (when Summary is blank)',
+			description:
+				'The line shown under the heading when Summary is left empty. Use {count} for the live number of listings.',
+			options: { collapsible: true, collapsed: true }
+		},
+		{
+			name: 'viewAll',
+			title: 'View-all link',
+			description: 'The link beneath the carousel. Turn it off, or point it wherever you like.',
+			options: { collapsible: true, collapsed: false }
+		}
+	],
 	fields: [
 		defineField({
 			name: 'heading',
@@ -440,13 +455,93 @@ export const insightFrontlineRail = defineType({
 			title: 'Summary',
 			type: 'text',
 			rows: 2,
-			description: 'Optional line under the heading. Falls back to a count of the live listings.'
+			description:
+				'Optional line under the heading, shown verbatim. Leave blank to use the auto-summary below.'
+		}),
+		defineField({
+			name: 'summaryCountSingular',
+			title: 'Auto-summary (one listing)',
+			type: 'string',
+			fieldset: 'autoSummary',
+			initialValue: '1 property on the golf course',
+			description: 'Shown when exactly one listing is live. {count} is replaced with 1.',
+			validation: (Rule) => Rule.max(120)
+		}),
+		defineField({
+			name: 'summaryCountPlural',
+			title: 'Auto-summary (multiple listings)',
+			type: 'string',
+			fieldset: 'autoSummary',
+			initialValue: '{count} properties on the golf course',
+			description: 'Shown when two or more listings are live. Use {count} for the number.',
+			validation: (Rule) => Rule.max(120)
+		}),
+		defineField({
+			name: 'listings',
+			title: 'Listings',
+			type: 'array',
+			of: [
+				defineArrayMember({
+					type: 'reference',
+					to: [{ type: 'propertyListing' }, { type: 'development' }]
+				})
+			],
+			description:
+				'Hand-pick the properties or developments to feature, in the order they should appear. Withdrawn or unpublished listings drop out automatically.',
+			validation: (Rule) => Rule.required().min(1).max(12)
+		}),
+		defineField({
+			name: 'showViewAll',
+			title: 'Show the link',
+			type: 'boolean',
+			fieldset: 'viewAll',
+			initialValue: true,
+			description: 'Show a link out beneath the carousel. Off hides it entirely.'
+		}),
+		defineField({
+			name: 'viewAllLabel',
+			title: 'Link text',
+			type: 'string',
+			fieldset: 'viewAll',
+			initialValue: 'View all frontline',
+			// Only relevant when the link is shown; collapse it away otherwise. `!== false` so the
+			// field stays visible for older blocks that predate the toggle (undefined ⇒ shown).
+			hidden: ({ parent }) => parent?.showViewAll === false,
+			validation: (Rule) =>
+				Rule.max(40).custom((value, context) => {
+					const parent = context.parent as { showViewAll?: boolean } | undefined;
+					if (parent?.showViewAll === false) return true;
+					return value?.trim() ? true : 'Add link text, or turn the link off.';
+				})
+		}),
+		defineField({
+			name: 'viewAllHref',
+			title: 'Link destination',
+			type: 'string',
+			fieldset: 'viewAll',
+			initialValue: '/front-line-collection',
+			description: 'Where the link points, e.g. /front-line-collection or a full URL.',
+			hidden: ({ parent }) => parent?.showViewAll === false,
+			validation: (Rule) =>
+				Rule.custom((value, context) => {
+					const parent = context.parent as { showViewAll?: boolean } | undefined;
+					if (parent?.showViewAll === false) return true;
+					const trimmed = value?.trim();
+					if (!trimmed) return 'Add a destination, or turn the link off.';
+					return /^(https?:\/\/|\/|mailto:|tel:)/.test(trimmed)
+						? true
+						: 'Use an absolute path (/front-line-collection) or a full URL.';
+				})
 		})
 	],
 	preview: {
-		select: { heading: 'heading' },
-		prepare({ heading }) {
-			return { title: heading || 'Front Line carousel', subtitle: 'Live front-line collection' };
+		select: { heading: 'heading', listings: 'listings' },
+		prepare({ heading, listings }) {
+			const count = Array.isArray(listings) ? listings.length : 0;
+			return {
+				title: heading || 'Front Line carousel',
+				subtitle: `${count} hand-picked ${count === 1 ? 'listing' : 'listings'}`
+			};
 		}
 	}
 });

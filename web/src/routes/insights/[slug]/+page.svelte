@@ -8,20 +8,8 @@
 	import InsightCard from '$lib/components/insights/InsightCard.svelte';
 	import { withoutCampaignParams } from '$lib/sanity/href';
 	import type { InsightCtaAction } from '$lib/insights';
-	import { setContext } from 'svelte';
-	import { FRONTLINE_CARDS_KEY, type FrontlineCardsContext } from '$lib/insights/frontlineContext';
 
 	let { data } = $props();
-
-	// The live Front Line carousel (`insightFrontlineRail`) renders deep inside <PortableText>,
-	// so its cards reach it through context rather than props. A getter keeps the value live
-	// across client-side navigation between articles — the derived tracks each new load.
-	const frontlineCards = $derived(data.frontlineCards ?? []);
-	setContext<FrontlineCardsContext>(FRONTLINE_CARDS_KEY, {
-		get cards() {
-			return frontlineCards;
-		}
-	});
 
 	// An authored CTA override renders only when it carries BOTH a label and a link — the
 	// schema enforces all-or-nothing, this is the render-time guard. Campaign params are
