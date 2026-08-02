@@ -11,6 +11,7 @@ import {
 	insightFigure,
 	insightFrontlineRail,
 	insightHeroNote,
+	insightPortrait,
 	insightPullQuote,
 	insightRoute,
 	insightRoutes,
@@ -64,6 +65,7 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	// Insight content objects (blocks registered before the insightSection that nests them)
 	insightHeroNote,
 	insightFigure,
+	insightPortrait,
 	insightCardGridItem,
 	insightCardGrid,
 	insightRoute,
@@ -117,6 +119,7 @@ export {
 	guideSection,
 	insightHeroNote,
 	insightFigure,
+	insightPortrait,
 	insightCardGridItem,
 	insightCardGrid,
 	insightRoute,
