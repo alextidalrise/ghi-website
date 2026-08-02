@@ -9,6 +9,7 @@
 	import GuideImage from '$lib/components/guides/GuideImage.svelte';
 	// Journal-specific renderers.
 	import InsightFigure from './InsightFigure.svelte';
+	import InsightPortrait from './InsightPortrait.svelte';
 	import InsightCardGrid from './InsightCardGrid.svelte';
 	import InsightRoutes from './InsightRoutes.svelte';
 	import InsightPullQuote from './InsightPullQuote.svelte';
@@ -18,6 +19,13 @@
 	import InsightFrontlineRail from './InsightFrontlineRail.svelte';
 
 	let { value }: { value: InsightBodyBlock[] | null | undefined } = $props();
+
+	// A compact portrait floats on desktop; make its section body a flow-root so the float is
+	// contained here and never overhangs the next heading. Scoped to bodies that actually carry
+	// a portrait, so no portrait-free article changes its block spacing.
+	const hasPortrait = $derived(
+		Array.isArray(value) && value.some((block) => block?._type === 'insightPortrait')
+	);
 
 	const components: PortableTextComponents = {
 		block: GuideBlock,
@@ -29,6 +37,7 @@
 			// stays mapped for older documents that still carry the bare block.
 			mediaAssetMetadata: GuideImage,
 			insightFigure: InsightFigure,
+			insightPortrait: InsightPortrait,
 			insightCardGrid: InsightCardGrid,
 			insightRoutes: InsightRoutes,
 			insightPullQuote: InsightPullQuote,
@@ -41,7 +50,7 @@
 </script>
 
 {#if value && value.length > 0}
-	<div class="insight-body">
+	<div class="insight-body" class:insight-body--has-portrait={hasPortrait}>
 		<PortableText value={value as never} {components} onMissingComponent={false} />
 	</div>
 {/if}
@@ -53,6 +62,12 @@
 		font-size: var(--text-body);
 		line-height: 1.75;
 		text-wrap: pretty;
+	}
+
+	/* Contain the compact portrait's desktop float within its own section (see InsightPortrait).
+	   Only applied when a portrait is present, so block spacing elsewhere is untouched. */
+	.insight-body--has-portrait {
+		display: flow-root;
 	}
 
 	/* Prose paragraphs only — direct children. Custom blocks own their internal paragraphs. */

@@ -72,6 +72,54 @@ export const insightFigure = defineType({
 	}
 });
 
+/**
+ * A compact, article-specific editorial portrait: a small square photograph that sits
+ * beside the prose that introduces the person, with an optional name-and-role label.
+ *
+ * Distinct from `insightFigure` on purpose. A figure is the article's own full-width,
+ * 16:9 plate — the right treatment for a place or a property, the wrong one for a face
+ * (it crops a square portrait hard and gives it the visual weight of a hero). This block
+ * keeps the image's square ratio, renders it small, and floats it alongside a paragraph
+ * so it reads as a personal-service element rather than a feature. It is also NOT the
+ * global `author.avatar`, which belongs to the byline: the portrait can name whoever the
+ * copy introduces without touching the article's author record.
+ */
+export const insightPortrait = defineType({
+	name: 'insightPortrait',
+	title: 'Compact portrait',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'image',
+			title: 'Image',
+			type: 'mediaAssetMetadata',
+			description: 'A square, head-and-shoulders portrait works best — it renders small and uncropped.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'name',
+			title: 'Name',
+			type: 'string',
+			description: 'Optional. Shown beneath the portrait, e.g. "James Pryor".',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'role',
+			title: 'Role',
+			type: 'string',
+			description: 'Optional. Shown after the name, e.g. "Managing Director". Needs a name to appear.',
+			validation: (Rule) => Rule.max(80)
+		})
+	],
+	preview: {
+		select: { name: 'name', role: 'role', altText: 'image.altText', media: 'image.asset' },
+		prepare({ name, role, altText, media }) {
+			const label = [name, role].filter(Boolean).join(' · ');
+			return { title: label || altText || 'Portrait', subtitle: 'Compact portrait', media };
+		}
+	}
+});
+
 /** One point in a card grid. */
 export const insightCardGridItem = defineType({
 	name: 'insightCardGridItem',
@@ -597,6 +645,9 @@ const insightSectionBody = defineField({
 		// block here: the article needs the framed, captioned plate, and the bare media object
 		// has nowhere to put a caption.
 		defineArrayMember({ type: 'insightFigure' }),
+		// A compact, square, article-specific portrait — floated beside the prose it belongs to.
+		// The figure above is the full-width plate; this is the small personal-service treatment.
+		defineArrayMember({ type: 'insightPortrait' }),
 		defineArrayMember({ type: 'insightCardGrid' }),
 		defineArrayMember({ type: 'insightRoutes' }),
 		defineArrayMember({ type: 'insightPullQuote' }),

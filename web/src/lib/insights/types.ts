@@ -23,6 +23,19 @@ export type InsightFigureBlock = {
 	caption?: string | null;
 };
 
+/**
+ * A compact, square editorial portrait floated beside the prose that introduces someone.
+ * Unlike `InsightFigureBlock` (full-width, 16:9) it keeps the image's square ratio and renders
+ * small; unlike `author.avatar` it names whoever the copy introduces without touching the byline.
+ */
+export type InsightPortraitBlock = {
+	_type: 'insightPortrait';
+	_key: string;
+	image?: MediaAssetInput | null;
+	name?: string | null;
+	role?: string | null;
+};
+
 /** Two or three parallel points, side by side. */
 export type InsightCardGridItem = {
 	_key?: string;
@@ -126,6 +139,7 @@ export type InsightBodyBlock =
 	| GuideKeyFiguresBlock
 	| GuideImageBlock
 	| InsightFigureBlock
+	| InsightPortraitBlock
 	| InsightCardGridBlock
 	| InsightRoutesBlock
 	| InsightPullQuoteBlock

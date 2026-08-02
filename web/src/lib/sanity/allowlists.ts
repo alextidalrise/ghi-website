@@ -476,10 +476,12 @@ export const LISTING_REF_PUBLIC_FILTER = /* groq */ `
 `;
 
 /**
- * Insight section body. Image members are reshaped to the public media projection (as in
- * GUIDE_SECTION_PUBLIC); the inline Front Line rail dereferences its hand-picked, publish-gated
- * listing refs into the shared card union; every other member — prose, callouts, key figures,
- * pull quotes, takeaways, FAQ, inline CTA — passes through in full (none carry sensitive fields).
+ * Insight section body. Image members — the bare media block, the framed `insightFigure`, and
+ * the compact `insightPortrait` — are reshaped to the public media projection (as in
+ * GUIDE_SECTION_PUBLIC) so provenance fields never leak; the inline Front Line rail dereferences
+ * its hand-picked, publish-gated listing refs into the shared card union; every other member —
+ * prose, callouts, key figures, pull quotes, takeaways, FAQ, inline CTA — passes through in full
+ * (none carry sensitive fields).
  */
 export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
   heading,
@@ -504,6 +506,18 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
         "dimensions": asset.asset->metadata.dimensions
       }
     },
+    _type == "insightPortrait" => {
+      _type,
+      _key,
+      name,
+      role,
+      "image": image{
+        asset,
+        altText,
+        "lqip": asset.asset->metadata.lqip,
+        "dimensions": asset.asset->metadata.dimensions
+      }
+    },
     _type == "insightFrontlineRail" => {
       _type,
       _key,
@@ -520,6 +534,7 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
     },
     _type != "mediaAssetMetadata"
       && _type != "insightFigure"
+      && _type != "insightPortrait"
       && _type != "insightFrontlineRail" => { ... }
   }
 }`;
