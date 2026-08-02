@@ -90,9 +90,27 @@
 	}
 
 	@media (max-width: 30rem) {
+		/* Stacked, the label / value / note lost their column hierarchy and read as
+		   three near-equal lines. Re-rank them by weight, colour and size — not an
+		   uppercase eyebrow — so the partner name leads each record. */
 		.guide-figures__row {
 			grid-template-columns: minmax(0, 1fr);
-			gap: 0.25rem;
+			gap: 0.35rem;
+		}
+
+		.guide-figures__label {
+			color: var(--muted);
+			font-weight: 300;
+		}
+
+		.guide-figures__value {
+			font-size: 1.125rem;
+			font-weight: 500;
+			line-height: 1.35;
+		}
+
+		.guide-figures__note {
+			margin-top: 0.4rem;
 		}
 	}
 </style>
