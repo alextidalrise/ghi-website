@@ -20,16 +20,26 @@
 
 	const kicker = $derived(insightKickerLabel(insight.insightCategory));
 	const titleParts = $derived(splitTitleEmphasis(insight.title, insight.titleEmphasis));
+	// Passing BOTH width and height fixes the crop ratio at 4:3 for every srcset candidate — with
+	// height alone the builder emitted 480×840 (portrait) through 1120×840 (4:3), a ragged set. The
+	// candidates run to 1920w because the plate now reaches ~850px on a wide desktop and doubles
+	// again on a 2× display; the source is 4096px, so these are real resolution, not upscales.
 	const image = $derived(
-		buildPublicImageUrl(insight.heroImage, { width: 1120, height: 840, fit: 'crop', quality: 72 })
+		buildPublicImageUrl(insight.heroImage, { width: 1200, height: 900, fit: 'crop', quality: 74 })
 	);
 	const srcset = $derived(
-		buildImageSrcset(insight.heroImage, [480, 720, 960, 1120], {
-			height: 840,
+		buildImageSrcset(insight.heroImage, [480, 640, 800, 1024, 1280, 1600, 1920], {
+			width: 1200,
+			height: 900,
 			fit: 'crop',
-			quality: 72
+			quality: 74
 		})
 	);
+	// The plate's rendered width, mirrored for the browser's candidate pick and the preload. Stacked
+	// it is the full viewport; two-column it is the rail (≤28rem); past the content measure it spills
+	// into the gutter to ≈ 210px + 25vw. Understating this (it used to claim a flat 21rem) is exactly
+	// what made a small candidate stretch across the widened plate and look soft.
+	const HERO_SIZES = '(max-width: 57.99rem) 100vw, (max-width: 66.99rem) 28rem, calc(210px + 25vw)';
 	const lqip = $derived(getImagePlaceholder(insight.heroImage));
 	const alt = $derived(insight.heroImage?.altText?.trim() || insight.title || 'Insight');
 	const caption = $derived(insight.heroCaption?.trim() || null);
@@ -44,16 +54,16 @@
 	const reading = $derived(readingLabel(insight));
 </script>
 
-<!-- Preload the hero so it stays a clean LCP on mobile, where it sits above the fold at
-     full width. imagesizes mirrors the <img> sizes exactly so the same candidate is chosen;
-     on desktop that resolves to the 21rem rail width, a small preload. -->
+<!-- Preload the hero so it stays a clean LCP: full width above the fold on mobile, and the leading
+     plate on desktop. imagesizes mirrors the <img> sizes exactly so the preload fetches the same
+     candidate the layout will use. -->
 <svelte:head>
 	{#if image && srcset}
 		<link
 			rel="preload"
 			as="image"
 			imagesrcset={srcset}
-			imagesizes="(max-width: 52rem) 100vw, 21rem"
+			imagesizes={HERO_SIZES}
 			fetchpriority="high"
 		/>
 	{/if}
@@ -95,10 +105,10 @@
 						<img
 							src={image}
 							srcset={srcset || undefined}
-							sizes="(max-width: 52rem) 100vw, 21rem"
+							sizes={HERO_SIZES}
 							{alt}
-							width="1120"
-							height="840"
+							width="1200"
+							height="900"
 							loading="eager"
 							fetchpriority="high"
 							decoding="async"
