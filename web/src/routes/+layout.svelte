@@ -4,7 +4,6 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import ConsentUi from '$lib/components/consent/ConsentUi.svelte';
 	import { isPreviewing, useLiveMode } from '@sanity/svelte-loader';
-	import { enableVisualEditing } from '@sanity/visual-editing';
 	import { env as publicEnv } from '$env/dynamic/public';
 	import { onMount, tick, untrack } from 'svelte';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
@@ -64,7 +63,15 @@
 			return;
 		}
 
-		enableVisualEditing();
+		// Visual editing is only ever used inside the Studio preview iframe, but a static
+		// import lands its ~788KB (244KB gzip) in the layout chunk that every public visitor
+		// downloads and parses. Load it lazily here, behind the preview gate, so it never
+		// ships to production traffic. useLiveMode stays a static import — it comes from
+		// @sanity/svelte-loader, the chunk isPreviewing already pulls in, so deferring it
+		// would save nothing.
+		void import('@sanity/visual-editing').then(({ enableVisualEditing }) => {
+			enableVisualEditing();
+		});
 		useLiveMode({ studioUrl });
 	});
 </script>
