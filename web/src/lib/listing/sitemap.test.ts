@@ -6,6 +6,7 @@ import {
 	collectSitemapEntries,
 	renderSitemapXml
 } from './sitemap';
+import { sitemapListingsQuery } from '$lib/sanity/queries';
 
 describe('buildTaxonomyPath', () => {
 	it('builds country and location paths; community taxonomy is not indexed', () => {
@@ -173,5 +174,16 @@ describe('buildListingPath', () => {
 				isCatchAll: true
 			})
 		).toBe('/spain/nueva-andalucia/villa-example');
+	});
+});
+
+describe('sitemapListingsQuery', () => {
+	// Regression guard: the query MUST project isCatchAll. Without it, buildCanonicalPath
+	// receives isCatchAll=undefined and emits the 4-segment community path for catch-all
+	// listings (community slug == location, e.g. vilamoura/vilamoura), which then 301s to
+	// the 3-segment canonical — putting redirecting URLs in the sitemap. The path builder
+	// already handles isCatchAll (see buildListingPath above); only the query can regress.
+	it('projects isCatchAll so emitted paths match the 301 canonical', () => {
+		expect(sitemapListingsQuery).toContain('isCatchAll');
 	});
 });
