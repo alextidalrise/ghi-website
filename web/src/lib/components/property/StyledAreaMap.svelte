@@ -4,7 +4,8 @@
 	import type { GolfPin } from '$lib/listing/mapPins';
 	import { buildOsmExternalUrl } from '$lib/listing/osmEmbed';
 	import { resolveMapStyleUrl, applyBrandWash, boostPlaceLabels, circlePolygon } from '$lib/listing/mapStyle';
-	import 'maplibre-gl/dist/maplibre-gl.css';
+	// maplibre's JS and CSS are both loaded lazily in onMount (see below), so neither ships
+	// with the route bundle — the stylesheet is imported alongside the library there.
 
 	type Props = {
 		map: PublicMapPayload | null | undefined;
@@ -51,9 +52,15 @@
 		if (!coords || !container) return;
 
 		let cancelled = false;
+		let observer: IntersectionObserver | null = null;
 
-		(async () => {
+		// The map sits well below the fold. Loading maplibre (~1MB of JS plus its CSS) on
+		// mount saturates the connection and main thread during the page's load window and
+		// pushes out the LCP paint. Defer the whole thing until the container nears the
+		// viewport, then load the stylesheet and library together and build the map.
+		const run = async () => {
 			try {
+				await import('maplibre-gl/dist/maplibre-gl.css');
 				const maplibre = (await import('maplibre-gl')).default;
 				if (cancelled || !container) return;
 
@@ -146,10 +153,27 @@
 			} catch {
 				if (!cancelled) status = 'error';
 			}
-		})();
+		};
+
+		if ('IntersectionObserver' in window) {
+			observer = new IntersectionObserver(
+				(entries) => {
+					if (entries.some((e) => e.isIntersecting)) {
+						observer?.disconnect();
+						void run();
+					}
+				},
+				// Warm the map a little before it scrolls into view so it is ready on arrival.
+				{ rootMargin: '300px' }
+			);
+			observer.observe(container);
+		} else {
+			void run();
+		}
 
 		return () => {
 			cancelled = true;
+			observer?.disconnect();
 		};
 	});
 
