@@ -60,12 +60,15 @@
 		object-fit: cover;
 	}
 
+	/* At the UI size (14px), matching the article hero and figure-pair captions: one caption
+	   treatment across the article, comfortably readable at 390px without zoom, still understated.
+	   --muted clears AA (~5.3:1) on the white plate. */
 	.insight-figure__caption {
-		padding: 0.75rem 0.875rem;
+		padding: 0.8rem 0.9rem;
 		border-block-start: 1px solid var(--border);
 		font-family: var(--sans);
-		font-size: var(--text-small);
-		line-height: 1.5;
+		font-size: var(--text-ui);
+		line-height: 1.55;
 		color: var(--muted);
 	}
 </style>

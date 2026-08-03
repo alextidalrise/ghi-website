@@ -23,6 +23,26 @@ export type InsightFigureBlock = {
 	caption?: string | null;
 };
 
+/** One column of an `InsightFigurePairBlock`: a figure with its own caption and property link. */
+export type InsightFigurePairItem = {
+	_key?: string;
+	image?: MediaAssetInput | null;
+	caption?: string | null;
+	linkLabel?: string | null;
+	linkHref?: string | null;
+};
+
+/**
+ * Two figures read as an equal pair (a place-vs-place comparison). Two side-by-side columns
+ * on desktop, stacked on mobile; each keeps its own caption and optional property link. A
+ * deliberate, explicit module — never an automatic pairing of adjacent single figures.
+ */
+export type InsightFigurePairBlock = {
+	_type: 'insightFigurePair';
+	_key: string;
+	items?: InsightFigurePairItem[] | null;
+};
+
 /**
  * A compact, square editorial portrait floated beside the prose that introduces someone.
  * Unlike `InsightFigureBlock` (full-width, 16:9) it keeps the image's square ratio and renders
@@ -139,6 +159,7 @@ export type InsightBodyBlock =
 	| GuideKeyFiguresBlock
 	| GuideImageBlock
 	| InsightFigureBlock
+	| InsightFigurePairBlock
 	| InsightPortraitBlock
 	| InsightCardGridBlock
 	| InsightRoutesBlock

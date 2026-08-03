@@ -138,7 +138,13 @@
 	 * and no scrollbar-width overflow.
 	 */
 	.article-hero-band {
-		--hero-rail: 21rem;
+		/* The property plate leads the opening, so it earns real width on the desktop the brief is
+		   about: 21rem where the two-column layout first appears (58rem, so the display headline is
+		   never squeezed) growing to 28rem by ~1280px, where the old 21rem plate "sat small inside a
+		   large pale panel". Linear between the two — the coefficient is exactly (28−21)rem across the
+		   (80−58)rem span — so the image gains authority precisely as the viewport gives it room, and
+		   the tint band (whose split is derived from this) widens with it. */
+		--hero-rail: clamp(21rem, calc(21rem + (100vw - 58rem) * 0.318), 28rem);
 		--hero-gap: clamp(2rem, 5vw, 4.5rem);
 		--hero-split: calc(
 			50% + min(var(--content-max), 100%) / 2 - var(--content-padding) - var(--hero-rail) -
@@ -222,13 +228,15 @@
 		object-fit: cover;
 	}
 
-	/* Inside the frame, under a hairline — a plate and its label. */
+	/* Inside the frame, under a hairline — a plate and its label. Set at the UI size (14px), not
+	   the 12px fine-print size, so it stays comfortably readable at 390px without zoom while
+	   remaining an understated editorial caption. --muted clears AA (~5.3:1) on the white plate. */
 	.article-hero__caption {
-		padding: 0.75rem 0.875rem;
+		padding: 0.8rem 0.9rem;
 		border-block-start: 1px solid var(--border);
 		font-family: var(--sans);
-		font-size: var(--text-small);
-		line-height: 1.5;
+		font-size: var(--text-ui);
+		line-height: 1.55;
 		color: var(--muted);
 	}
 

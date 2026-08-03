@@ -506,6 +506,22 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
         "dimensions": asset.asset->metadata.dimensions
       }
     },
+    _type == "insightFigurePair" => {
+      _type,
+      _key,
+      items[]{
+        _key,
+        caption,
+        linkLabel,
+        linkHref,
+        "image": image{
+          asset,
+          altText,
+          "lqip": asset.asset->metadata.lqip,
+          "dimensions": asset.asset->metadata.dimensions
+        }
+      }
+    },
     _type == "insightPortrait" => {
       _type,
       _key,
@@ -534,6 +550,7 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
     },
     _type != "mediaAssetMetadata"
       && _type != "insightFigure"
+      && _type != "insightFigurePair"
       && _type != "insightPortrait"
       && _type != "insightFrontlineRail" => { ... }
   }
