@@ -38,6 +38,26 @@
 	}: Props = $props();
 </script>
 
+<!-- Preload the hero only when a caller has declared it the LCP (fetchpriority high). The
+     image's discovery would otherwise wait for CSS + layout; on a cached document that late
+     discovery, not TTFB, is what held these pages' LCP at ~6s. imagesizes must stay
+     byte-identical to the <img> sizes below so the browser preloads the same candidate. -->
+<svelte:head>
+	{#if fetchpriority === 'high' && image}
+		{#if srcset}
+			<link
+				rel="preload"
+				as="image"
+				imagesrcset={srcset}
+				imagesizes={sizes}
+				fetchpriority="high"
+			/>
+		{:else}
+			<link rel="preload" as="image" href={image} fetchpriority="high" />
+		{/if}
+	{/if}
+</svelte:head>
+
 <section class="page-hero on-dark" class:page-hero--compact={compact}>
 	<div
 		class="page-hero__bg"

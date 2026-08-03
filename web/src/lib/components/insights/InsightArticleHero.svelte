@@ -21,13 +21,13 @@
 	const kicker = $derived(insightKickerLabel(insight.insightCategory));
 	const titleParts = $derived(splitTitleEmphasis(insight.title, insight.titleEmphasis));
 	const image = $derived(
-		buildPublicImageUrl(insight.heroImage, { width: 1120, height: 840, fit: 'crop', quality: 82 })
+		buildPublicImageUrl(insight.heroImage, { width: 1120, height: 840, fit: 'crop', quality: 72 })
 	);
 	const srcset = $derived(
 		buildImageSrcset(insight.heroImage, [480, 720, 960, 1120], {
 			height: 840,
 			fit: 'crop',
-			quality: 82
+			quality: 72
 		})
 	);
 	const lqip = $derived(getImagePlaceholder(insight.heroImage));
@@ -43,6 +43,21 @@
 	const dateISO = $derived(insightDateISO(insight.publishedAt));
 	const reading = $derived(readingLabel(insight));
 </script>
+
+<!-- Preload the hero so it stays a clean LCP on mobile, where it sits above the fold at
+     full width. imagesizes mirrors the <img> sizes exactly so the same candidate is chosen;
+     on desktop that resolves to the 21rem rail width, a small preload. -->
+<svelte:head>
+	{#if image && srcset}
+		<link
+			rel="preload"
+			as="image"
+			imagesrcset={srcset}
+			imagesizes="(max-width: 52rem) 100vw, 21rem"
+			fetchpriority="high"
+		/>
+	{/if}
+</svelte:head>
 
 <div class="article-hero-band" class:article-hero-band--with-rail={hasRail}>
 <header class="article-hero content-wrap" class:article-hero--with-rail={hasRail}>

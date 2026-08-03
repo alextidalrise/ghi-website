@@ -12,10 +12,10 @@
 
 	const href = $derived(card.slug ? insightPath(card.slug) : '#');
 	const image = $derived(
-		buildPublicImageUrl(card.heroImage, { width: 1120, height: 840, fit: 'crop', quality: 82 })
+		buildPublicImageUrl(card.heroImage, { width: 1120, height: 840, fit: 'crop', quality: 72 })
 	);
 	const srcset = $derived(
-		buildImageSrcset(card.heroImage, [640, 900, 1120, 1440], { height: 840, fit: 'crop', quality: 82 })
+		buildImageSrcset(card.heroImage, [640, 900, 1120, 1440], { height: 840, fit: 'crop', quality: 72 })
 	);
 	const lqip = $derived(getImagePlaceholder(card.heroImage));
 	const alt = $derived(card.heroImage?.altText?.trim() || card.title || 'Featured insight');
@@ -24,6 +24,20 @@
 	const dateISO = $derived(insightDateISO(card.publishedAt));
 	const reading = $derived(readingLabel(card));
 </script>
+
+<!-- The lead article's image is the index's LCP on mobile (it stacks above the text).
+     Preload it, mirroring the <img> sizes so the browser preloads the same candidate. -->
+<svelte:head>
+	{#if image && srcset}
+		<link
+			rel="preload"
+			as="image"
+			imagesrcset={srcset}
+			imagesizes="(max-width: 52rem) 100vw, 52vw"
+			fetchpriority="high"
+		/>
+	{/if}
+</svelte:head>
 
 <article class="insight-featured">
 	<a class="insight-featured__link" {href}>
