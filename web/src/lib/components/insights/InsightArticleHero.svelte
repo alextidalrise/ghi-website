@@ -20,16 +20,26 @@
 
 	const kicker = $derived(insightKickerLabel(insight.insightCategory));
 	const titleParts = $derived(splitTitleEmphasis(insight.title, insight.titleEmphasis));
+	// Passing BOTH width and height fixes the crop ratio at 4:3 for every srcset candidate — with
+	// height alone the builder emitted 480×840 (portrait) through 1120×840 (4:3), a ragged set. The
+	// candidates run to 1920w because the plate now reaches ~850px on a wide desktop and doubles
+	// again on a 2× display; the source is 4096px, so these are real resolution, not upscales.
 	const image = $derived(
-		buildPublicImageUrl(insight.heroImage, { width: 1120, height: 840, fit: 'crop', quality: 72 })
+		buildPublicImageUrl(insight.heroImage, { width: 1200, height: 900, fit: 'crop', quality: 74 })
 	);
 	const srcset = $derived(
-		buildImageSrcset(insight.heroImage, [480, 720, 960, 1120], {
-			height: 840,
+		buildImageSrcset(insight.heroImage, [480, 640, 800, 1024, 1280, 1600, 1920], {
+			width: 1200,
+			height: 900,
 			fit: 'crop',
-			quality: 72
+			quality: 74
 		})
 	);
+	// The plate's rendered width, mirrored for the browser's candidate pick and the preload. Stacked
+	// it is the full viewport; two-column it is the rail (≤28rem); past the content measure it spills
+	// into the gutter to ≈ 210px + 25vw. Understating this (it used to claim a flat 21rem) is exactly
+	// what made a small candidate stretch across the widened plate and look soft.
+	const HERO_SIZES = '(max-width: 57.99rem) 100vw, (max-width: 66.99rem) 28rem, calc(210px + 25vw)';
 	const lqip = $derived(getImagePlaceholder(insight.heroImage));
 	const alt = $derived(insight.heroImage?.altText?.trim() || insight.title || 'Insight');
 	const caption = $derived(insight.heroCaption?.trim() || null);
@@ -44,23 +54,23 @@
 	const reading = $derived(readingLabel(insight));
 </script>
 
-<!-- Preload the hero so it stays a clean LCP on mobile, where it sits above the fold at
-     full width. imagesizes mirrors the <img> sizes exactly so the same candidate is chosen;
-     on desktop that resolves to the 21rem rail width, a small preload. -->
+<!-- Preload the hero so it stays a clean LCP: full width above the fold on mobile, and the leading
+     plate on desktop. imagesizes mirrors the <img> sizes exactly so the preload fetches the same
+     candidate the layout will use. -->
 <svelte:head>
 	{#if image && srcset}
 		<link
 			rel="preload"
 			as="image"
 			imagesrcset={srcset}
-			imagesizes="(max-width: 52rem) 100vw, 21rem"
+			imagesizes={HERO_SIZES}
 			fetchpriority="high"
 		/>
 	{/if}
 </svelte:head>
 
 <div class="article-hero-band" class:article-hero-band--with-rail={hasRail}>
-<header class="article-hero content-wrap" class:article-hero--with-rail={hasRail}>
+<header class="article-hero" class:article-hero--with-rail={hasRail}>
 	<div class="article-hero__text">
 		{#if breadcrumbs.length > 0}
 			<Breadcrumbs items={breadcrumbs} inline hideCurrent />
@@ -95,10 +105,10 @@
 						<img
 							src={image}
 							srcset={srcset || undefined}
-							sizes="(max-width: 52rem) 100vw, 21rem"
+							sizes={HERO_SIZES}
 							{alt}
-							width="1120"
-							height="840"
+							width="1200"
+							height="900"
 							loading="eager"
 							fetchpriority="high"
 							decoding="async"
@@ -153,7 +163,13 @@
 		border-block-end: 1px solid var(--border);
 	}
 
+	/* Was `.content-wrap`; inlined here so the two-column variant can break its right edge out of
+	   the content measure (see the rail-extension rule below) while the stacked/no-rail hero stays
+	   centred on the shared 1060px measure exactly like every section beneath it. */
 	.article-hero {
+		max-width: var(--content-max);
+		margin-inline: auto;
+		padding-inline: var(--content-padding);
 		padding-block: var(--space-xl) var(--space-2xl);
 		display: grid;
 		gap: var(--hero-gap);
@@ -289,6 +305,42 @@
 				var(--white) 0 var(--hero-split),
 				var(--surface-tint) var(--hero-split) 100%
 			);
+		}
+	}
+
+	/*
+	 * Once the viewport clears the 1060px content measure there is a real gutter, and the property
+	 * plate spills into the right side of it while everything else stays on the measure.
+	 *
+	 * `--hero-gutter` is the whitespace to the right of the plate today: the outer margin between
+	 * the content box and the viewport edge (`--edge`) plus the content padding. We fill
+	 * `--hero-gutter-fill` of it — the right padding keeps the rest, so the grid's right edge lands
+	 * that far into the gutter.
+	 *
+	 * The text column is pinned to the width it has on the content measure
+	 * (content-max − 2·padding − gap − rail; all fixed lengths here since padding is capped at this
+	 * width), and the rail is the flexible column, so the whole extension is absorbed by the plate:
+	 * the text column doesn't move and the rail's LEFT edge is unchanged, which keeps the tint split
+	 * (computed from the same measure) meeting the gap exactly. `--edge` is only ever read inside
+	 * padding here — never inside `grid-template-columns` — because a `%` in a track resolves against
+	 * the grid box, not the viewport, which would mis-size the rail.
+	 *
+	 * Tune the reach with `--hero-gutter-fill` (0 = today, 1 = plate meets the viewport edge).
+	 */
+	@media (min-width: 67rem) {
+		.article-hero--with-rail {
+			--hero-gutter-fill: 0.5;
+			--edge: max(0px, calc((100% - var(--content-max)) / 2));
+			--hero-gutter: calc(var(--edge) + var(--content-padding));
+			max-width: none;
+			margin-inline: 0;
+			padding-left: var(--hero-gutter);
+			padding-right: calc(var(--hero-gutter) * (1 - var(--hero-gutter-fill)));
+			grid-template-columns:
+				calc(
+					var(--content-max) - 2 * var(--content-padding) - var(--hero-gap) - var(--hero-rail)
+				)
+				minmax(0, 1fr);
 		}
 	}
 </style>
