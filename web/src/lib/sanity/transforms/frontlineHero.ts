@@ -2,7 +2,10 @@ import { buildImageSrcset, buildPublicImageUrl, getImagePlaceholder } from '../i
 import type { MediaAssetInput } from './mediaFilter';
 
 const HERO_WIDTHS = [720, 960, 1280, 1600, 2000];
-const FRONTLINE_HERO_IMAGE = { width: 1600, height: 1400, fit: 'crop' as const, quality: 85 };
+// Quality 65: this is the page's LCP, so the bytes matter, but the frontline hero is a
+// portrait feature image with less overlay than the landscape page heroes (which run at 60),
+// so it holds a touch more quality.
+const FRONTLINE_HERO_IMAGE = { width: 1600, height: 1400, fit: 'crop' as const, quality: 65 };
 
 /** Defaults so the page renders fully before an editor authors the hero. */
 export const FRONTLINE_HERO_DEFAULTS = {

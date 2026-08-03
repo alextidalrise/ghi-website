@@ -4,7 +4,9 @@ import { filterMediaAsset, filterMediaAssetList } from './mediaFilter';
 import { resolveTaxonomyHero, type TaxonomyHero } from './taxonomyHero';
 
 const HERO_WIDTHS = [960, 1280, 1600, 1920, 2400];
-const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 85 };
+// Quality 60 matches the taxonomy page hero: a full-bleed 1920×1080 landscape under a dark
+// overlay hides compression, and this is the golf page's LCP, so bytes here move the metric.
+const PAGE_HERO = { width: 1920, height: 1080, fit: 'crop' as const, quality: 60 };
 const COURSE_CARD = { width: 600, height: 400, fit: 'crop' as const, quality: 65 };
 
 export type GolfCourseCommunityRef = {

@@ -57,7 +57,11 @@ type CommunityTaxonomyRow = {
 };
 
 export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
-	const [country, locationPage] = await Promise.all([
+	// fetchFeatureFilterSettings() takes no args, so it is hoisted into the first round trip
+	// rather than sitting in the listing group below. That lets fetchLocationFeatureOptions —
+	// which needs only these settings and the resolved locationIds — run alongside the listing
+	// fetch instead of waiting behind it, collapsing a round trip off the critical path.
+	const [country, locationPage, featureFilter] = await Promise.all([
 		fetchMaybePreview<CountryBySlugQueryResult>(
 			countryBySlugQuery,
 			{ countrySlug: params.country },
@@ -69,7 +73,8 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 			{ countrySlug: params.country, locationSlug: params.location },
 			loadQuery,
 			preview
-		)
+		),
+		fetchFeatureFilterSettings()
 	]);
 
 	if (!country?.slug || !locationPage?.slug || !locationPage._id || !locationPage.name) {
@@ -110,22 +115,17 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		communityId: activeCommunity?._id ?? null
 	};
 
-	const [listingResults, frontlineCards, featureFilter] = await Promise.all([
+	// featureOptions applies the same block/allow lists and thresholds as the DiscoveryBar
+	// (via featureFilter, already resolved above), and depends only on locationIds — so it
+	// runs in this group alongside the listing fetch rather than in a round trip after it.
+	const [listingResults, frontlineCards, featureOptions] = await Promise.all([
 		fetchListingCards({
 			scope: listingScope,
 			params: searchParams
 		}),
 		fetchFrontlineListingCards({ scope: listingScope }),
-		fetchFeatureFilterSettings()
+		fetchLocationFeatureOptions(params.country, locationIds, featureFilter)
 	]);
-
-	// Runs after the settings resolve so the location filter applies the same block/allow
-	// lists and thresholds as the DiscoveryBar.
-	const featureOptions = await fetchLocationFeatureOptions(
-		params.country,
-		locationIds,
-		featureFilter
-	);
 
 	const frontlineViewAllHref = FRONTLINE_COLLECTION_PATH;
 
