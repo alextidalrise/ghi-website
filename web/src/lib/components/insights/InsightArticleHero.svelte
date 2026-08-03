@@ -60,7 +60,7 @@
 </svelte:head>
 
 <div class="article-hero-band" class:article-hero-band--with-rail={hasRail}>
-<header class="article-hero content-wrap" class:article-hero--with-rail={hasRail}>
+<header class="article-hero" class:article-hero--with-rail={hasRail}>
 	<div class="article-hero__text">
 		{#if breadcrumbs.length > 0}
 			<Breadcrumbs items={breadcrumbs} inline hideCurrent />
@@ -153,7 +153,13 @@
 		border-block-end: 1px solid var(--border);
 	}
 
+	/* Was `.content-wrap`; inlined here so the two-column variant can break its right edge out of
+	   the content measure (see the rail-extension rule below) while the stacked/no-rail hero stays
+	   centred on the shared 1060px measure exactly like every section beneath it. */
 	.article-hero {
+		max-width: var(--content-max);
+		margin-inline: auto;
+		padding-inline: var(--content-padding);
 		padding-block: var(--space-xl) var(--space-2xl);
 		display: grid;
 		gap: var(--hero-gap);
@@ -289,6 +295,42 @@
 				var(--white) 0 var(--hero-split),
 				var(--surface-tint) var(--hero-split) 100%
 			);
+		}
+	}
+
+	/*
+	 * Once the viewport clears the 1060px content measure there is a real gutter, and the property
+	 * plate spills into the right side of it while everything else stays on the measure.
+	 *
+	 * `--hero-gutter` is the whitespace to the right of the plate today: the outer margin between
+	 * the content box and the viewport edge (`--edge`) plus the content padding. We fill
+	 * `--hero-gutter-fill` of it — the right padding keeps the rest, so the grid's right edge lands
+	 * that far into the gutter.
+	 *
+	 * The text column is pinned to the width it has on the content measure
+	 * (content-max − 2·padding − gap − rail; all fixed lengths here since padding is capped at this
+	 * width), and the rail is the flexible column, so the whole extension is absorbed by the plate:
+	 * the text column doesn't move and the rail's LEFT edge is unchanged, which keeps the tint split
+	 * (computed from the same measure) meeting the gap exactly. `--edge` is only ever read inside
+	 * padding here — never inside `grid-template-columns` — because a `%` in a track resolves against
+	 * the grid box, not the viewport, which would mis-size the rail.
+	 *
+	 * Tune the reach with `--hero-gutter-fill` (0 = today, 1 = plate meets the viewport edge).
+	 */
+	@media (min-width: 67rem) {
+		.article-hero--with-rail {
+			--hero-gutter-fill: 0.5;
+			--edge: max(0px, calc((100% - var(--content-max)) / 2));
+			--hero-gutter: calc(var(--edge) + var(--content-padding));
+			max-width: none;
+			margin-inline: 0;
+			padding-left: var(--hero-gutter);
+			padding-right: calc(var(--hero-gutter) * (1 - var(--hero-gutter-fill)));
+			grid-template-columns:
+				calc(
+					var(--content-max) - 2 * var(--content-padding) - var(--hero-gap) - var(--hero-rail)
+				)
+				minmax(0, 1fr);
 		}
 	}
 </style>
