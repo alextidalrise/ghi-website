@@ -43,6 +43,12 @@
 	const THUMB_SIZES = '150px';
 	const LIGHTBOX_SIZES = '100vw';
 	const STAGE_RATIO = 3 / 2;
+	// The stage image is the LCP element on every detail page, so its bytes matter. q72
+	// (WebP/AVIF, auto=format) is ~25% lighter than q82 with no perceptible loss on a photo.
+	// One constant keeps the preload, the visible <img>, and the neighbour-warm cache key in
+	// lockstep — a mismatch would waste the preload and re-download. The lightbox (opened
+	// deliberately, never the LCP) keeps its own higher quality below.
+	const STAGE_QUALITY = 72;
 
 	function buildSrcset(
 		asset: MediaAssetInput,
@@ -100,9 +106,9 @@
 	const active = $derived(items[activeIndex] ?? null);
 
 	const stageSrc = $derived(
-		active ? buildPublicImageUrl(active.asset, { width: 1500, height: 1000, fit: 'crop', quality: 82 }) : null
+		active ? buildPublicImageUrl(active.asset, { width: 1500, height: 1000, fit: 'crop', quality: STAGE_QUALITY }) : null
 	);
-	const stageSrcset = $derived(active ? buildSrcset(active.asset, STAGE_WIDTHS, STAGE_RATIO, 'crop', 82) : '');
+	const stageSrcset = $derived(active ? buildSrcset(active.asset, STAGE_WIDTHS, STAGE_RATIO, 'crop', STAGE_QUALITY) : '');
 	const stageLqip = $derived(active ? getImagePlaceholder(active.asset) : null);
 	const lightboxSrc = $derived(
 		active ? buildPublicImageUrl(active.asset, { width: 1500, fit: 'clip', quality: 85 }) : null
@@ -112,7 +118,7 @@
 	const lightboxDims = $derived(active ? getImageDimensions(active.asset) : null);
 
 	// Preload sources for the first stage image so it stays a clean LCP element.
-	const preloadSrcset = $derived(items[0] ? buildSrcset(items[0].asset, STAGE_WIDTHS, STAGE_RATIO, 'crop', 82) : '');
+	const preloadSrcset = $derived(items[0] ? buildSrcset(items[0].asset, STAGE_WIDTHS, STAGE_RATIO, 'crop', STAGE_QUALITY) : '');
 
 	$effect(() => {
 		const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -164,7 +170,7 @@
 		// (which can outrun a single neighbour) still lands on a cached frame.
 		const at = (offset: number) => items[(activeIndex + offset + total * 2) % total].asset;
 		for (const offset of [1, -1]) {
-			warm(buildSrcset(at(offset), STAGE_WIDTHS, STAGE_RATIO, 'crop', 82), STAGE_SIZES);
+			warm(buildSrcset(at(offset), STAGE_WIDTHS, STAGE_RATIO, 'crop', STAGE_QUALITY), STAGE_SIZES);
 		}
 		if (lightboxOpen) {
 			for (const offset of [1, -1, 2, -2]) {
