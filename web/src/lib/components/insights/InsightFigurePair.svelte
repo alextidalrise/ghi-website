@@ -84,7 +84,10 @@
 	@media (min-width: 56rem) {
 		.figure-pair {
 			grid-template-columns: 1fr 1fr;
-			align-items: start;
+			/* Stretch both columns to the taller one's height so the pair reads as an equal set even
+			   when one caption runs longer. The images are already equal (shared 3:2); the extra
+			   height is absorbed by the shorter column's label block (see .figure-pair__link). */
+			align-items: stretch;
 		}
 
 		.figure-pair--single {
@@ -147,6 +150,10 @@
 	   the arrow keeps "…International →" from breaking across a line. */
 	.figure-pair__link {
 		align-self: flex-start;
+		/* Pinned to the foot of the label so, with equal-height columns, both "View …" links sit on a
+		   common bottom edge — a shorter caption opens space above the link, not a ragged card. On a
+		   stacked column (no extra height) this is a no-op and the link follows the caption normally. */
+		margin-top: auto;
 		font-family: var(--sans);
 		font-size: var(--text-small);
 		line-height: 1.4;
