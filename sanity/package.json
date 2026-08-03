@@ -137,6 +137,8 @@
 		"migrate:nobu-routes:dry-run": "tsx migrations/nobu-monte-rei-routes-migrate.ts --dry-run",
 		"migrate:james-portrait": "tsx migrations/insight-james-pryor-portrait-migrate.ts",
 		"migrate:james-portrait:dry-run": "tsx migrations/insight-james-pryor-portrait-migrate.ts --dry-run",
+		"migrate:destinations-pair": "tsx migrations/insight-destinations-figure-pair-migrate.ts",
+		"migrate:destinations-pair:dry-run": "tsx migrations/insight-destinations-figure-pair-migrate.ts --dry-run",
 		"test": "vitest run"
 	},
 	"dependencies": {

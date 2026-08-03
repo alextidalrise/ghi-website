@@ -9,6 +9,7 @@
 	import GuideImage from '$lib/components/guides/GuideImage.svelte';
 	// Journal-specific renderers.
 	import InsightFigure from './InsightFigure.svelte';
+	import InsightFigurePair from './InsightFigurePair.svelte';
 	import InsightPortrait from './InsightPortrait.svelte';
 	import InsightCardGrid from './InsightCardGrid.svelte';
 	import InsightRoutes from './InsightRoutes.svelte';
@@ -37,6 +38,7 @@
 			// stays mapped for older documents that still carry the bare block.
 			mediaAssetMetadata: GuideImage,
 			insightFigure: InsightFigure,
+			insightFigurePair: InsightFigurePair,
 			insightPortrait: InsightPortrait,
 			insightCardGrid: InsightCardGrid,
 			insightRoutes: InsightRoutes,

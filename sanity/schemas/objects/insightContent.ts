@@ -73,6 +73,103 @@ export const insightFigure = defineType({
 });
 
 /**
+ * One column of an `insightFigurePair`: a framed photograph, its caption, and an optional
+ * link out to the property it shows. Same fields as a standalone `insightFigure`, plus the
+ * property link — so the two columns each stay self-contained (image + caption + label
+ * travel together) rather than being reconstructed from adjacent blocks.
+ */
+export const insightFigurePairItem = defineType({
+	name: 'insightFigurePairItem',
+	title: 'Figure',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'image',
+			title: 'Image',
+			type: 'mediaAssetMetadata',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'caption',
+			title: 'Caption',
+			type: 'string',
+			description:
+				'Shown inside the frame, under the photograph. Say what it is and where — a plate label, not a sales line.',
+			validation: (Rule) => Rule.max(160)
+		}),
+		defineField({
+			name: 'linkLabel',
+			title: 'Property link label',
+			type: 'string',
+			description:
+				'Optional link shown beneath the caption, e.g. "View Las Villas Sotogrande on Golf Homes International". Needs a destination to appear.',
+			validation: (Rule) => Rule.max(120)
+		}),
+		defineField({
+			name: 'linkHref',
+			title: 'Property link destination',
+			type: 'string',
+			description: 'Where the label points, e.g. a property page URL.',
+			validation: (Rule) =>
+				Rule.custom((value, context) => {
+					const parent = context.parent as { linkLabel?: string } | undefined;
+					const label = parent?.linkLabel?.trim();
+					const href = value?.trim();
+					if (!label && !href) return true;
+					if (label && !href) return 'Add a destination, or remove the link label.';
+					if (href && !label) return 'Add a link label, or remove the destination.';
+					return /^(https?:\/\/|\/|mailto:|tel:)/.test(href!)
+						? true
+						: 'Use an absolute path (/spain/...) or a full URL.';
+				})
+		})
+	],
+	preview: {
+		select: { title: 'caption', subtitle: 'image.altText', media: 'image.asset' },
+		prepare({ title, subtitle, media }) {
+			return { title: title || subtitle || 'Figure', subtitle: title ? subtitle : undefined, media };
+		}
+	}
+});
+
+/**
+ * Two figures set side by side as an equal pair — a deliberate, content-specific module,
+ * NOT an automatic pairing of adjacent `insightFigure` blocks. Use it when two places or
+ * properties are meant to be read against each other (a Spain / Portugal comparison), so the
+ * layout itself says "weigh these two". Exactly two, because a pair is the comparison; a third
+ * turns it into a gallery. Each column carries its own caption and optional property link.
+ *
+ * On desktop/tablet-landscape the two share a row at equal width and a shared crop ratio (so
+ * neither image is distorted); on mobile they stack in source order. For a single image use
+ * `insightFigure`; for a run of images use several figures.
+ */
+export const insightFigurePair = defineType({
+	name: 'insightFigurePair',
+	title: 'Figure pair',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'items',
+			title: 'Figures',
+			type: 'array',
+			of: [{ type: 'insightFigurePairItem' }],
+			description: 'Exactly two figures, shown side by side on desktop and stacked on mobile.',
+			validation: (Rule) => Rule.required().length(2)
+		})
+	],
+	preview: {
+		select: { a: 'items.0.caption', b: 'items.1.caption', media: 'items.0.image.asset' },
+		prepare({ a, b, media }) {
+			return {
+				title: [a, b].filter(Boolean).join('  /  ') || 'Figure pair',
+				subtitle: 'Figure pair',
+				media
+			};
+		}
+	}
+});
+
+/**
  * A compact, article-specific editorial portrait: a small square photograph that sits
  * beside the prose that introduces the person, with an optional name-and-role label.
  *
@@ -645,6 +742,9 @@ const insightSectionBody = defineField({
 		// block here: the article needs the framed, captioned plate, and the bare media object
 		// has nowhere to put a caption.
 		defineArrayMember({ type: 'insightFigure' }),
+		// Two figures read as an equal pair (a place-vs-place comparison). Deliberate and explicit —
+		// never an automatic pairing of adjacent single figures.
+		defineArrayMember({ type: 'insightFigurePair' }),
 		// A compact, square, article-specific portrait — floated beside the prose it belongs to.
 		// The figure above is the full-width plate; this is the small personal-service treatment.
 		defineArrayMember({ type: 'insightPortrait' }),

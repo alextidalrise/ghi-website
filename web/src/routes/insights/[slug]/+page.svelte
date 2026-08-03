@@ -98,6 +98,25 @@
 	{/if}
 </article>
 
+<!--
+  The page's single green band (Emphasis Ladder tier 4), placed directly after the article
+  body/FAQ so the primary enquiry action is the first thing the reader meets at the foot of the
+  piece — lead generation before the "keep reading" rail, not after it. Related reading follows,
+  then the global footer.
+
+  It still carries its own gold hairline top and bottom, so it reads as a distinct object even
+  though white (the related rail) now follows rather than the footer's green. One green band per
+  page, unchanged.
+
+  The heading, body and both actions are the article's own (Sanity `ctaHeading` / `ctaBody` /
+  `ctaPrimary` / `ctaSecondary`), so an editor can pitch the close to the piece rather than
+  repeating the About page verbatim. When an action override is absent it is `undefined`, and
+  TalkToUsBand falls back to its house defaults (Get in touch / Browse properties) — so a piece
+  that argues its own route (e.g. "Register for Nobu updates") can close on that route instead
+  of defaulting every reader into a property search.
+-->
+<TalkToUsBand heading={ctaHeading} body={ctaBody} primary={ctaPrimary} secondary={ctaSecondary} />
+
 {#if related.length > 0}
 	<section class="article__related content-wrap" aria-labelledby="insight-related-heading">
 		<h2 class="article__related-heading" id="insight-related-heading">Related reading</h2>
@@ -110,21 +129,6 @@
 		</ul>
 	</section>
 {/if}
-
-<!--
-  The page's single green band, and the last thing on it. It sits AFTER the related rail,
-  not before: the band's gradient settles to the footer's exact green, so it only reads as
-  designed when the footer is what follows. It also makes for the better close — the reader
-  gets somewhere else to go first, and the enquiry gets the final word.
-
-  The heading, body and both actions are the article's own (Sanity `ctaHeading` / `ctaBody` /
-  `ctaPrimary` / `ctaSecondary`), so an editor can pitch the close to the piece rather than
-  repeating the About page verbatim. When an action override is absent it is `undefined`, and
-  TalkToUsBand falls back to its house defaults (Get in touch / Browse properties) — so a piece
-  that argues its own route (e.g. "Register for Nobu updates") can close on that route instead
-  of defaulting every reader into a property search.
--->
-<TalkToUsBand heading={ctaHeading} body={ctaBody} primary={ctaPrimary} secondary={ctaSecondary} />
 
 <style>
 	.article__body {
@@ -202,10 +206,12 @@
 		}
 	}
 
-	/* No bottom padding: the closing band below brings its own `--section-gap` clearance,
-	   and stacking the two would open a gap far wider than either intends. */
+	/* Now the last white section before the green footer (the enquiry band moved above it). The
+	   green footer is a coloured surface, so the rail needs real bottom clearance of its own or the
+	   cards butt against the footer's top edge; a generous close also lets the enquiry band above
+	   breathe. The band brings its own `--section-gap` top margin, so the top stays at `--space-2xl`. */
 	.article__related {
-		padding-block: var(--space-2xl) 0;
+		padding-block: var(--space-2xl) var(--section-gap);
 	}
 
 	.article__related-heading {
