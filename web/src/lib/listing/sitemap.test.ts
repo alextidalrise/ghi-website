@@ -14,6 +14,7 @@ describe('buildTaxonomyPath', () => {
 		expect(
 			buildTaxonomyPath({
 				type: 'location',
+				parentType: 'country',
 				countrySlug: 'spain',
 				locationSlug: 'costa-del-sol'
 			})
@@ -27,6 +28,29 @@ describe('buildTaxonomyPath', () => {
 			})
 		).toBeNull();
 	});
+
+	it('drops location nodes whose parent is a location, not a country', () => {
+		// Mistyped community nodes (e.g. the Estepona catch-all, or el-campanario) carry
+		// type:"location" but hang off the Estepona location, so `countrySlug` resolves to
+		// `estepona`. Emitting them produced /estepona/estepona and /estepona/el-campanario,
+		// both 404s. Gating on parent:"country" keeps them out of the sitemap.
+		expect(
+			buildTaxonomyPath({
+				type: 'location',
+				parentType: 'location',
+				countrySlug: 'estepona',
+				locationSlug: 'estepona'
+			})
+		).toBeNull();
+		expect(
+			buildTaxonomyPath({
+				type: 'location',
+				parentType: 'location',
+				countrySlug: 'estepona',
+				locationSlug: 'el-campanario'
+			})
+		).toBeNull();
+	});
 });
 
 describe('collectSitemapEntries', () => {
@@ -36,6 +60,7 @@ describe('collectSitemapEntries', () => {
 				{ type: 'country', countrySlug: 'spain', _updatedAt: '2026-05-01T00:00:00.000Z' },
 				{
 					type: 'location',
+					parentType: 'country',
 					countrySlug: 'spain',
 					locationSlug: 'costa-del-sol',
 					_updatedAt: '2026-05-02T00:00:00.000Z'

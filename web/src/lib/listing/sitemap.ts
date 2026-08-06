@@ -2,6 +2,7 @@ import { buildCanonicalPath, type CanonicalSegments } from './canonicalPath';
 
 export type SitemapTaxonomyRow = {
 	type?: string | null;
+	parentType?: string | null;
 	countrySlug?: string | null;
 	locationSlug?: string | null;
 	communitySlug?: string | null;
@@ -44,7 +45,12 @@ export function buildTaxonomyPath(row: SitemapTaxonomyRow): string | null {
 		return `/${row.countrySlug}`;
 	}
 
-	if (row.type === 'location' && row.locationSlug) {
+	/* A real location hangs directly off a country, so its two-segment path resolves. Guard on
+	   parentType: some community nodes are mistyped `location` (e.g. the Estepona catch-all and
+	   el-campanario, whose parent is the Estepona *location*, not a country). Left ungated they
+	   made `countrySlug` resolve to `parent->slug` — emitting /estepona/estepona and
+	   /estepona/el-campanario, both 404s the sitemap should never advertise. */
+	if (row.type === 'location' && row.locationSlug && row.parentType === 'country') {
 		return `/${row.countrySlug}/${row.locationSlug}`;
 	}
 
