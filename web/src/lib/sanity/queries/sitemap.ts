@@ -10,6 +10,7 @@ export const sitemapTaxonomyQuery = defineQuery(`
   ]{
     type,
     "slug": slug.current,
+    "parentType": parent->type,
     "countrySlug": select(
       type == "country" => slug.current,
       type == "location" => parent->slug.current,

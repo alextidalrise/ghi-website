@@ -2,6 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { buildLocationBreadcrumbs, breadcrumbListJsonLd } from '$lib/listing/breadcrumbs';
 import { withPreviewLocationSeo } from '$lib/listing/detailPage';
+import { resolveLegacyRedirect } from '$lib/listing/legacyRedirects';
 import { parseListingSearchParams } from '$lib/listing/searchParams';
 import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 import { buildFilteredLocationSeo, buildLocationSeo } from '$lib/listing/seo';
@@ -57,6 +58,14 @@ type CommunityTaxonomyRow = {
 };
 
 export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
+	// Legacy pre-hierarchy URLs (e.g. /estepona/estepona) land here with an unknown country
+	// slug and would otherwise 404 after running every query below. Redirect them permanently
+	// before any fetch, so crawlers reach the live page in one hop.
+	const legacyTarget = resolveLegacyRedirect(url.pathname);
+	if (legacyTarget) {
+		redirect(301, legacyTarget);
+	}
+
 	// fetchFeatureFilterSettings() takes no args, so it is hoisted into the first round trip
 	// rather than sitting in the listing group below. That lets fetchLocationFeatureOptions —
 	// which needs only these settings and the resolved locationIds — run alongside the listing
