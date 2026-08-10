@@ -476,6 +476,21 @@ export const LISTING_REF_PUBLIC_FILTER = /* groq */ `
 `;
 
 /**
+ * Publish gate for a SINGLE `development` reference (the insight development grid), applied via
+ * `select(GATE => development->{...})`.
+ *
+ * The `@->`-prefixed LISTING_REF_PUBLIC_FILTER above only works inside an ARRAY filter
+ * (`listings[FILTER]->`), where `@` binds to each element reference. On a single reference,
+ * `development[FILTER]->` does NOT bind `@` to the reference — it silently yields null, so every
+ * card would drop. Gate the deref with `select()` on the dereferenced status instead. Note
+ * `coalesce()` wraps `development->status` from OUTSIDE — `development->coalesce(...)`, a function
+ * call directly after `->`, is a GROQ parse error.
+ */
+export const DEVELOPMENT_REF_PUBLIC_GATE = /* groq */ `
+  (coalesce(development->status, "") == $publishedStatus || $previewAll)
+`;
+
+/**
  * Insight section body. Image members — the bare media block, the framed `insightFigure`, and
  * the compact `insightPortrait` — are reshaped to the public media projection (as in
  * GUIDE_SECTION_PUBLIC) so provenance fields never leak; the inline Front Line rail dereferences
@@ -581,10 +596,10 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
         altOverride,
         groupLabelOverride,
         "imageOverride": imageOverride${MEDIA_ASSET_PUBLIC},
-        "development": development[${LISTING_REF_PUBLIC_FILTER}]->${DEVELOPMENT_CARD_PUBLIC},
-        "completionDate": coalesce(
-          development[${LISTING_REF_PUBLIC_FILTER}]->pricing.completionDate,
-          development[${LISTING_REF_PUBLIC_FILTER}]->completionDate
+        "development": select(${DEVELOPMENT_REF_PUBLIC_GATE} => development->${DEVELOPMENT_CARD_PUBLIC}),
+        "completionDate": select(
+          ${DEVELOPMENT_REF_PUBLIC_GATE} =>
+            coalesce(development->pricing.completionDate, development->completionDate)
         )
       }
     },
