@@ -25,16 +25,32 @@
 		primary?: Action;
 		/** The "not ready to enquire" escape. Pass null to close on the primary alone. */
 		secondary?: Action | null;
+		/** Optional WhatsApp button label. The number is always the central one. */
+		whatsAppLabel?: string;
+		/** Optional prefilled WhatsApp message (text only). Falls back to the house message. */
+		whatsAppMessage?: string;
+		/**
+		 * Desktop action arrangement. `row` (default) wraps the buttons horizontally — right for
+		 * the short-labelled About close. `stack` puts them in one narrow column so the heading
+		 * keeps its width; use it when the labels are long (e.g. "Enquire about Portugal property"
+		 * + "WhatsApp our Portugal team"), which in a row would grow the column and starve the
+		 * heading into a tall wrap.
+		 */
+		actionsLayout?: 'row' | 'stack';
 	};
 
 	let {
 		heading = 'Talk to us',
 		body = 'No pressure and no obligation. Whether you are ready to view or just starting to think about it, we are happy to help.',
 		primary = { label: 'Get in touch', href: '/contact' },
-		secondary = { label: 'Browse properties', href: '/front-line-collection' }
+		secondary = { label: 'Browse properties', href: '/front-line-collection' },
+		whatsAppLabel = 'WhatsApp',
+		whatsAppMessage,
+		actionsLayout = 'row'
 	}: Props = $props();
 
-	const whatsApp = whatsAppHref(GENERAL_WHATSAPP_MESSAGE);
+	// The href is always built through the central helper/number; only the message varies.
+	const whatsApp = $derived(whatsAppHref(whatsAppMessage?.trim() || GENERAL_WHATSAPP_MESSAGE));
 </script>
 
 <section class="talk on-dark" aria-labelledby="talk-heading">
@@ -49,7 +65,7 @@
 		  reordering these with CSS `order` would leave a keyboard user tabbing
 		  top-left → bottom → top-right, so the DOM carries the order instead.
 		-->
-		<div class="talk__actions">
+		<div class="talk__actions" class:talk__actions--stack={actionsLayout === 'stack'}>
 			<a class="talk__btn talk__btn--primary" href={primary.href}>{primary.label}</a>
 			<a
 				class="talk__btn talk__btn--whatsapp"
@@ -66,7 +82,7 @@
 						d="M21.6 18.86c-.3-.16-1.78-.92-2.06-1.02-.28-.1-.48-.16-.68.15-.2.3-.78.96-.96 1.16-.18.2-.36.22-.66.07-.3-.15-1.27-.49-2.41-1.55-.89-.83-1.49-1.85-1.66-2.16-.18-.3-.02-.47.13-.62.14-.14.3-.36.46-.54.15-.18.2-.3.3-.51.1-.2.05-.38-.02-.54-.07-.15-.68-1.7-.93-2.32-.24-.6-.49-.52-.68-.53l-.58-.01c-.2 0-.53.08-.81.38-.28.3-1.06 1.06-1.06 2.58s1.09 3 1.24 3.2c.15.21 2.13 3.4 5.18 4.77.72.32 1.29.51 1.73.65.73.24 1.39.2 1.91.12.58-.09 1.78-.74 2.04-1.46.25-.71.25-1.32.18-1.45-.07-.13-.27-.21-.57-.36z"
 					/>
 				</svg>
-				<span>WhatsApp</span>
+				<span>{whatsAppLabel}</span>
 			</a>
 			{#if secondary}
 				<a class="talk__btn talk__btn--outline" href={secondary.href}>{secondary.label}</a>
@@ -232,12 +248,47 @@
 		.talk__btn--outline {
 			grid-column: 1 / -1;
 		}
+
+		/*
+		 * Stack variant on mobile: one column of full-width buttons, not the two-up grid. That grid
+		 * is built for three short labels (Get in touch / WhatsApp / Browse); the insight close runs
+		 * two LONG ones (Enquire about Portugal property / WhatsApp our Portugal team), which jam
+		 * into the half-width cells and wrap into tall, cramped boxes. Full-width stacked (v15's
+		 * mobile close) gives each label its own line and restores comfortable side padding.
+		 */
+		.talk__actions--stack {
+			grid-template-columns: 1fr;
+		}
+
+		.talk__actions--stack .talk__btn {
+			padding-inline: 1.5rem;
+		}
 	}
 
 	@media (min-width: 760px) {
 		.talk__inner {
 			grid-template-columns: 1fr auto;
 			gap: var(--space-2xl);
+		}
+
+		/*
+		 * Stack variant: the actions become one narrow column of full-width buttons instead of a
+		 * horizontal wrap. In the default `1fr auto` grid the `auto` column grows to fit whatever
+		 * the buttons need on one line, so two long labels ("Enquire about Portugal property" +
+		 * "WhatsApp our Portugal team") widen it enough to squeeze the heading into a tall wrap.
+		 * A capped, stretched column holds the actions to a sane width and hands the rest back to
+		 * the heading — the v15 close composition.
+		 */
+		.talk__actions--stack {
+			display: grid;
+			grid-auto-flow: row;
+			gap: var(--space-sm);
+			min-width: 16rem;
+			max-width: 18rem;
+		}
+
+		.talk__actions--stack .talk__btn {
+			width: 100%;
 		}
 	}
 

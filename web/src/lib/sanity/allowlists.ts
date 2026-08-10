@@ -476,6 +476,21 @@ export const LISTING_REF_PUBLIC_FILTER = /* groq */ `
 `;
 
 /**
+ * Publish gate for a SINGLE `development` reference (the insight development grid), applied via
+ * `select(GATE => development->{...})`.
+ *
+ * The `@->`-prefixed LISTING_REF_PUBLIC_FILTER above only works inside an ARRAY filter
+ * (`listings[FILTER]->`), where `@` binds to each element reference. On a single reference,
+ * `development[FILTER]->` does NOT bind `@` to the reference — it silently yields null, so every
+ * card would drop. Gate the deref with `select()` on the dereferenced status instead. Note
+ * `coalesce()` wraps `development->status` from OUTSIDE — `development->coalesce(...)`, a function
+ * call directly after `->`, is a GROQ parse error.
+ */
+export const DEVELOPMENT_REF_PUBLIC_GATE = /* groq */ `
+  (coalesce(development->status, "") == $publishedStatus || $previewAll)
+`;
+
+/**
  * Insight section body. Image members — the bare media block, the framed `insightFigure`, and
  * the compact `insightPortrait` — are reshaped to the public media projection (as in
  * GUIDE_SECTION_PUBLIC) so provenance fields never leak; the inline Front Line rail dereferences
@@ -548,11 +563,101 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
         ${LISTING_REF_PUBLIC_FILTER}
       ]->${LISTING_CARD_UNION}
     },
+    _type == "insightDestinationGrid" => {
+      _type,
+      _key,
+      heading,
+      items[]{
+        _key,
+        body,
+        caption,
+        actionLabel,
+        actionHrefOverride,
+        "imageOverride": imageOverride${MEDIA_ASSET_PUBLIC},
+        location->{
+          _id,
+          name,
+          "slug": slug.current,
+          type,
+          "countrySlug": parent->slug.current,
+          "heroImage": heroImage${MEDIA_ASSET_PUBLIC}
+        }
+      }
+    },
+    _type == "insightDevelopmentGrid" => {
+      _type,
+      _key,
+      heading,
+      mobileInitialMode,
+      expandLabel,
+      collapseLabel,
+      items[]{
+        _key,
+        altOverride,
+        groupLabelOverride,
+        "imageOverride": imageOverride${MEDIA_ASSET_PUBLIC},
+        "development": select(${DEVELOPMENT_REF_PUBLIC_GATE} => development->${DEVELOPMENT_CARD_PUBLIC}),
+        "completionDate": select(
+          ${DEVELOPMENT_REF_PUBLIC_GATE} =>
+            coalesce(development->pricing.completionDate, development->completionDate)
+        ),
+        "completionPrecision": select(${DEVELOPMENT_REF_PUBLIC_GATE} => development->completionPrecision),
+        "completionNote": select(${DEVELOPMENT_REF_PUBLIC_GATE} => development->completionNote)
+      }
+    },
+    _type == "insightCourseGrid" => {
+      _type,
+      _key,
+      heading,
+      items[]{
+        _key,
+        altOverride,
+        actionLabel,
+        "imageOverride": imageOverride${MEDIA_ASSET_PUBLIC},
+        "golfCourse": golfCourse->{
+          _id,
+          name,
+          "slug": slug.current,
+          tagline,
+          "communityName": community->name,
+          "communitySlug": community->slug.current,
+          "locationSlug": community->parent->slug.current,
+          "countryName": community->parent->parent->name,
+          "countrySlug": community->parent->parent->slug.current,
+          "media": media[0]${MEDIA_ASSET_PUBLIC}
+        }
+      }
+    },
+    _type == "insightPartnerLogoGrid" => {
+      _type,
+      _key,
+      heading,
+      items[]{
+        _key,
+        serviceLabel,
+        "partner": partner->${PARTNER_LOGO_PUBLIC}
+      }
+    },
+    _type == "insightGuideCards" => {
+      _type,
+      _key,
+      heading,
+      items[]{
+        _key,
+        summaryOverride,
+        "guide": guide->${GUIDE_CARD_PUBLIC}
+      }
+    },
     _type != "mediaAssetMetadata"
       && _type != "insightFigure"
       && _type != "insightFigurePair"
       && _type != "insightPortrait"
-      && _type != "insightFrontlineRail" => { ... }
+      && _type != "insightFrontlineRail"
+      && _type != "insightDestinationGrid"
+      && _type != "insightDevelopmentGrid"
+      && _type != "insightCourseGrid"
+      && _type != "insightPartnerLogoGrid"
+      && _type != "insightGuideCards" => { ... }
   }
 }`;
 
@@ -572,12 +677,16 @@ export const INSIGHT_DETAIL_FIELDS = /* groq */ `
   heroImage${MEDIA_ASSET_PUBLIC},
   heroCaption,
   heroNote{ heading, body },
+  heroLayout,
   author->${AUTHOR_PUBLIC},
   sections[]${INSIGHT_SECTION_PUBLIC},
   ctaHeading,
   ctaBody,
   ctaPrimary{ label, href },
   ctaSecondary{ label, href },
+  ctaShowSecondary,
+  ctaWhatsAppLabel,
+  ctaWhatsAppMessage,
   seo${SEO_PUBLIC}
 `;
 

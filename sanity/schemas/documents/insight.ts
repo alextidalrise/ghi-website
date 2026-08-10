@@ -133,6 +133,23 @@ export const insight = defineType({
 				'Optional framed note under the hero image: the article\'s thesis in one line, before the reader has scrolled. Leave blank and the hero runs image-only.'
 		}),
 		defineField({
+			name: 'heroLayout',
+			title: 'Hero layout',
+			type: 'string',
+			group: 'content',
+			options: {
+				list: [
+					{ title: 'Standard — leading rail plate', value: 'standard' },
+					{ title: 'Split — equal columns, square plate', value: 'splitSquare' }
+				],
+				layout: 'radio'
+			},
+			initialValue: 'standard',
+			description:
+				'Standard is the house hero: a narrow leading plate beside the headline. Split gives the headline and a square photograph equal columns, with the caption overlaid on the image — the launch-article treatment. Leave on Standard unless a piece is designed for the split.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
 			name: 'readingTimeOverride',
 			title: 'Reading time override (minutes)',
 			type: 'number',
@@ -211,6 +228,34 @@ export const insight = defineType({
 				})
 			],
 			validation: (Rule) => Rule.custom(ctaActionRule)
+		}),
+		defineField({
+			name: 'ctaShowSecondary',
+			title: 'Closing CTA — show the alternative button',
+			type: 'boolean',
+			group: 'content',
+			initialValue: true,
+			description:
+				'On by default: the closing band shows an alternative "not ready to enquire" button (the override above, or the "Browse properties" default). Turn OFF to close on the lead action and WhatsApp alone — no third button. This is distinct from leaving the override blank, which keeps the default button.'
+		}),
+		defineField({
+			name: 'ctaWhatsAppLabel',
+			title: 'Closing CTA — WhatsApp button label (override)',
+			type: 'string',
+			group: 'content',
+			description:
+				'Optional. Replaces the WhatsApp button label on the closing band (default: "WhatsApp"). e.g. "WhatsApp our Portugal team".',
+			validation: (Rule) => Rule.max(40)
+		}),
+		defineField({
+			name: 'ctaWhatsAppMessage',
+			title: 'Closing CTA — WhatsApp prefilled message (override)',
+			type: 'text',
+			rows: 2,
+			group: 'content',
+			description:
+				'Optional. The message text pre-filled in WhatsApp — text only, never a number or link (the number stays centralised). Leave blank for the house message.',
+			validation: (Rule) => Rule.max(280)
 		}),
 		defineField({
 			name: 'relatedInsights',

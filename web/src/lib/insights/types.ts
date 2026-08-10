@@ -2,6 +2,14 @@ import type { PortableTextBlock } from '@portabletext/types';
 import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
 import type { GuideCalloutBlock, GuideKeyFiguresBlock, GuideImageBlock } from '$lib/guides/types';
 import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
+import type {
+	InsightDevelopmentCard,
+	InsightDevelopmentGridItemRaw,
+	InsightDevelopmentGroup
+} from '$lib/sanity/transforms/insightDevelopmentCard';
+import type { InsightCourseGridItemRaw } from '$lib/sanity/transforms/insightCourseCard';
+import type { InsightPartnerLogoItemRaw } from '$lib/sanity/transforms/insightPartnerLogoCard';
+import type { InsightGuideCardItemRaw } from '$lib/sanity/transforms/insightGuideCard';
 
 export type InsightCategory = 'market' | 'lifestyle' | 'golf' | 'relocation';
 
@@ -152,6 +160,86 @@ export type InsightFrontlineRailBlock = {
 	cards?: SimilarListingCard[] | null;
 };
 
+/**
+ * One destination panel as projected (raw): the article's own copy/image plus the dereferenced
+ * canonical location that owns the name, hub route and default photograph. Resolved into a
+ * render-ready card by `toInsightDestinationCard`.
+ */
+export type InsightDestinationCardRaw = {
+	_key?: string;
+	body?: string | null;
+	caption?: string | null;
+	actionLabel?: string | null;
+	actionHrefOverride?: string | null;
+	imageOverride?: MediaAssetInput | null;
+	location?: {
+		_id?: string | null;
+		name?: string | null;
+		slug?: string | null;
+		type?: string | null;
+		countrySlug?: string | null;
+		heroImage?: MediaAssetInput | null;
+	} | null;
+};
+
+/** An ordered set of destination panels. Identity is live; only copy/image overrides are article-owned. */
+export type InsightDestinationGridBlock = {
+	_type: 'insightDestinationGrid';
+	_key: string;
+	heading?: string | null;
+	items?: InsightDestinationCardRaw[] | null;
+};
+
+/**
+ * The live development collection. The projection carries raw `items` (each with a publish-gated
+ * canonical development row); the Insight server load resolves those into `cards` (flat, editor
+ * order) and `groups` (by destination, for the mobile view) — the shape the renderer consumes.
+ */
+export type InsightDevelopmentGridBlock = {
+	_type: 'insightDevelopmentGrid';
+	_key: string;
+	heading?: string | null;
+	mobileInitialMode?: 'onePerGroup' | 'all' | null;
+	expandLabel?: string | null;
+	collapseLabel?: string | null;
+	items?: InsightDevelopmentGridItemRaw[] | null;
+	cards?: InsightDevelopmentCard[] | null;
+	groups?: InsightDevelopmentGroup[] | null;
+};
+
+/**
+ * A collection of golf courses. The projection carries raw `items` (each with a dereferenced
+ * canonical course); the renderer resolves them to cards. Identity and route are always live.
+ */
+export type InsightCourseGridBlock = {
+	_type: 'insightCourseGrid';
+	_key: string;
+	heading?: string | null;
+	items?: InsightCourseGridItemRaw[] | null;
+};
+
+/**
+ * A partner logo wall. The projection carries raw `items` (each with a dereferenced partner, logo
+ * included but `referralUrl` never); the renderer resolves them to cells linking to /partners.
+ */
+export type InsightPartnerLogoGridBlock = {
+	_type: 'insightPartnerLogoGrid';
+	_key: string;
+	heading?: string | null;
+	items?: InsightPartnerLogoItemRaw[] | null;
+};
+
+/**
+ * Exactly two live-text guide cards. The projection carries raw `items` (each with a dereferenced
+ * guide); the renderer resolves them to cards. Title/audience/route are live; text is never an image.
+ */
+export type InsightGuideCardsBlock = {
+	_type: 'insightGuideCards';
+	_key: string;
+	heading?: string | null;
+	items?: InsightGuideCardItemRaw[] | null;
+};
+
 /** A member of a section body: prose, the shared guide blocks, or a journal block. */
 export type InsightBodyBlock =
 	| PortableTextBlock
@@ -167,7 +255,12 @@ export type InsightBodyBlock =
 	| InsightTakeawaysBlock
 	| InsightFaqBlock
 	| InsightCtaCalloutBlock
-	| InsightFrontlineRailBlock;
+	| InsightFrontlineRailBlock
+	| InsightDestinationGridBlock
+	| InsightDevelopmentGridBlock
+	| InsightCourseGridBlock
+	| InsightPartnerLogoGridBlock
+	| InsightGuideCardsBlock;
 
 export type InsightSection = {
 	heading?: string | null;
@@ -234,6 +327,8 @@ export type InsightDetail = {
 	heroImage?: MediaAssetInput | null;
 	heroCaption?: string | null;
 	heroNote?: InsightHeroNote | null;
+	/** Hero composition. `splitSquare` is the opt-in equal-column, square-plate launch treatment. */
+	heroLayout?: 'standard' | 'splitSquare' | null;
 	author?: InsightAuthor | null;
 	sections?: InsightSection[] | null;
 	ctaHeading?: string | null;
@@ -241,6 +336,11 @@ export type InsightDetail = {
 	/** Optional overrides for the closing band's buttons; each needs both a label and href to render. */
 	ctaPrimary?: InsightCtaAction | null;
 	ctaSecondary?: InsightCtaAction | null;
+	/** When `false`, the closing band suppresses the alternative button entirely (distinct from an absent override). */
+	ctaShowSecondary?: boolean | null;
+	/** Optional closing-band WhatsApp overrides. Message is text only; the number stays centralised. */
+	ctaWhatsAppLabel?: string | null;
+	ctaWhatsAppMessage?: string | null;
 	seo?: InsightSeo;
 	related?: InsightCard[] | null;
 };

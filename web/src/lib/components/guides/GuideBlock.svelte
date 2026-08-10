@@ -14,6 +14,10 @@
 	<h4 class="guide-body__h4">{@render children?.()}</h4>
 {:else if style === 'blockquote'}
 	<blockquote class="guide-body__quote">{@render children?.()}</blockquote>
+{:else if style === 'lead'}
+	<p class="guide-body__lead">{@render children?.()}</p>
+{:else if style === 'note'}
+	<p class="guide-body__note">{@render children?.()}</p>
 {:else}
 	<p>{@render children?.()}</p>
 {/if}

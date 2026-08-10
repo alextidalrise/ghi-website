@@ -106,6 +106,30 @@ export const development = defineType({
 			group: 'development'
 		}),
 		defineField({
+			name: 'completionPrecision',
+			title: 'Completion shown as',
+			type: 'string',
+			group: 'development',
+			description:
+				'How precisely the completion date is known — controls how it reads on cards (e.g. "July 2028", "Q1 2028" or "2028"). Leave blank to infer from the date (1 January reads as the year only; any other day as its quarter).',
+			options: {
+				list: [
+					{ title: 'Month (e.g. July 2028)', value: 'month' },
+					{ title: 'Quarter (e.g. Q1 2028)', value: 'quarter' },
+					{ title: 'Year (e.g. 2028)', value: 'year' }
+				],
+				layout: 'radio'
+			}
+		}),
+		defineField({
+			name: 'completionNote',
+			title: 'Completion note (override)',
+			type: 'string',
+			group: 'development',
+			description:
+				'Replaces the completion line with this exact text — use only when a single date can’t express the timing, e.g. a phased build: "Phased completions: Q3 2026 and Q4 2028". Leave blank to derive the line from the completion date and precision above.'
+		}),
+		defineField({
 			name: 'completionStatus',
 			title: 'Completion status',
 			type: 'string',
