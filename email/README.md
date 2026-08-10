@@ -30,7 +30,8 @@ open email/qa/screens/index.html
 | `pnpm validate` | All checks against the compiled output |
 | `pnpm validate:links` | Resolve every campaign link over HTTP (run before a send) |
 | `pnpm validate:template portugal-v15 --links` | Validate and resolve links for one campaign only |
-| `pnpm validate:self-test` | Prove the validator's 29 checks still fire |
+| `pnpm validate:self-test` | Prove the validator's 30 checks still fire |
+| `pnpm assets:social` | Regenerate the reusable 2x PNG social icons from their SVG sources |
 | `pnpm validate:components` | Prove the v1 semantic modules and Portugal retention contract |
 | `pnpm plaintext` | Generate `.txt` alternatives |
 | `pnpm qa` | Screenshot every template across 8 scenarios |

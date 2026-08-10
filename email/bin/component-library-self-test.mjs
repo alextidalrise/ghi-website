@@ -42,6 +42,10 @@ const expectedPortugalMarkers = [
 
 const forbiddenPortugalCopy = ['A more useful way to compare the Algarve'];
 const approvedPreview = 'Explore Vilamoura, Quinta do Lago, Monte Rei and Palmares, with current developments, golf and independent buyer support.';
+const expectedSocialLinks = [
+	['Instagram', 'https://www.instagram.com/golfhomesinternational/?utm_source=mailchimp&utm_medium=email', '2c920cce-3ac9-d4c1-b8fe-20d02fb2e113.png'],
+	['LinkedIn', 'https://www.linkedin.com/company/golf-homes-international?utm_source=mailchimp&utm_medium=email', 'fb1db59d-5a98-4778-cad5-7a6300e42056.png'],
+];
 
 let failures = 0;
 
@@ -89,6 +93,17 @@ try {
 	else {
 		console.error('  FAIL  hidden preheader differs from Mailchimp preview setting');
 		failures += 1;
+	}
+
+	for (const [label, href, icon] of expectedSocialLinks) {
+		const encodedHref = href.replace(/&/g, '&amp;');
+		const htmlHas = html.includes(`href="${encodedHref}"`) && html.includes(icon);
+		const textHas = text.includes(`${label}: ${href}`);
+		if (htmlHas && textHas) console.log(`  ok    reusable footer social parity: ${label}`);
+		else {
+			console.error(`  FAIL  reusable footer social parity: ${label} (html=${htmlHas}, text=${textHas})`);
+			failures += 1;
+		}
 	}
 
 	for (const heading of expectedPortugalHeadings) {

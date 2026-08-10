@@ -12,7 +12,7 @@
  * Runs in CI alongside the real validation. See docs/05-release-process.md.
  */
 
-import { validate } from '../lib/validate.mjs';
+import { checkLinksLive, validate } from '../lib/validate.mjs';
 
 /** A minimal but valid email, used as the base each case breaks in one way. */
 const GOOD = `<!DOCTYPE html>
@@ -235,7 +235,22 @@ for (const testCase of cases) {
 	}
 }
 
-const totalChecks = cases.length + 3;
+const originalFetch = globalThis.fetch;
+try {
+	globalThis.fetch = async () => ({ status: 999, statusText: '', redirected: false });
+	const linkedinFindings = await checkLinksLive('<a href="https://www.linkedin.com/company/golf-homes-international">LinkedIn</a>');
+	const linkedinWarn = linkedinFindings.some((finding) => finding.level === 'warn' && finding.check === 'links-live');
+	const linkedinError = linkedinFindings.some((finding) => finding.level === 'error');
+	if (linkedinWarn && !linkedinError) console.log('  ok    LinkedIn 999 bot block is reviewable, not a broken-link error');
+	else {
+		console.error('  FAIL  LinkedIn 999 bot block classification');
+		failures += 1;
+	}
+} finally {
+	globalThis.fetch = originalFetch;
+}
+
+const totalChecks = cases.length + 4;
 console.log(`\n  ${totalChecks - failures}/${totalChecks} checks verified.`);
 
 if (failures) {

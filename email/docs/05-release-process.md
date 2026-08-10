@@ -60,7 +60,7 @@ pnpm --filter email check
 
 which is, in order:
 
-1. `validate:self-test` — proves the validator's 29 checks still fire
+1. `validate:self-test` — proves the validator's 30 checks still fire
 2. `qa:path-self-test` — proves long-form QA output cannot escape `qa/segments`
 3. `build` — compile + regenerate plain text
 4. `validate:components` — verify the semantic component/retention contract

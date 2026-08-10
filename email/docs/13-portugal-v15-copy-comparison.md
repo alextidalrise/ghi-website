@@ -14,7 +14,7 @@ The important distinction is:
 
 - **Substantive campaign copy:** retained verbatim. The hero proposition, editorial lead, four destination descriptions, advisory copy, collection introduction, all ten property records, golf introduction, independent-support statement, guide introduction and summaries, and closing enquiry copy match the canonical v15 web preview.
 - **Interface, metadata and delivery copy:** adapted. The email adds a subject, preheader, overline, guide CTA labels, visible partner names, UTM parameters and a compliance footer. It omits the web table of contents, mobile portfolio controls, course-level `View course` labels, the `Portugal collection` masthead label and the web-preview-only draft notices.
-- **Unresolved fidelity issue:** the canonical Instagram and LinkedIn footer destinations are absent from the email shell. This is a real omission, not a necessary email adaptation.
+- **Resolved after audit:** Alex approved Instagram and LinkedIn for the reusable footer. The corrected shell now includes email-safe linked icons, visible fallback labels and plain-text destinations.
 - **Design/order adaptation:** the email puts the hero image before the headline in reading order, rather than presenting the canonical copy-and-image composition together.
 
 No property name, location, price, availability stage or completion date has been rewritten or dropped.
@@ -226,7 +226,7 @@ The canonical web footer contains:
 - Instagram link
 - LinkedIn link
 
-The email:
+The email at audit time:
 
 - correctly omits the internal draft-preview sentence;
 - **omits the Instagram and LinkedIn links entirely**;
@@ -238,7 +238,7 @@ The email:
 Classification:
 
 - draft-preview sentence: **correct technical omission**;
-- Instagram and LinkedIn: **unintended link/design omission requiring correction or explicit approval**;
+- Instagram and LinkedIn: **unintended omission, subsequently corrected in the reusable footer after Alex's approval**;
 - compliance content: **required email-only addition**.
 
 ## URL comparison
@@ -263,7 +263,7 @@ This is a technical campaign-tracking adaptation rather than a destination chang
 - Masthead logo: email-only link to the GHI homepage with Mailchimp source/medium tags.
 - WhatsApp: same verified route; no GHI-site UTM is applicable.
 - Mailchimp compliance links: email-only merge-tag destinations.
-- Instagram and LinkedIn: present in canonical v15, missing from the rebuilt email.
+- Instagram and LinkedIn: present in canonical v15 and now restored in the reusable email footer with Mailchimp/email UTM parameters.
 
 ## Image and alt-text comparison
 
@@ -314,11 +314,10 @@ The body copy does not need a wholesale rewrite: its substantive paragraphs and 
 
 The remaining decisions are narrower and explicit:
 
-1. **Correct the missing Instagram and LinkedIn footer links** unless Alex deliberately approves their omission.
-2. Confirm whether the email-specific subject and preview text are approved.
-3. Confirm whether omitting `Portugal collection` from the masthead is acceptable.
-4. Confirm whether the image-first hero reading order is an acceptable inbox adaptation.
-5. Confirm whether omitting the six-item article navigation and four `View course` labels is acceptable.
-6. Confirm whether the added guide CTA labels and visible partner names are acceptable.
+1. Confirm whether the email-specific subject and preview text are approved.
+2. Confirm whether omitting `Portugal collection` from the masthead is acceptable.
+3. Confirm whether the image-first hero reading order is an acceptable inbox adaptation.
+4. Confirm whether omitting the six-item article navigation and four `View course` labels is acceptable.
+5. Confirm whether the added guide CTA labels and visible partner names are acceptable.
 
 Until those decisions are resolved and the corrected proof is reissued if required, the campaign remains a draft and is not final or authorised for a live audience.

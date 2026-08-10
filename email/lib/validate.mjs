@@ -301,7 +301,14 @@ export async function checkLinksLive(html, { timeoutMs = 10000 } = {}) {
 				headers: { 'User-Agent': 'GHI-email-link-check/1.0' }
 			});
 
-			if (response.status >= 400) {
+			const host = new URL(href).hostname.toLowerCase();
+			if (response.status === 999 && (host === 'linkedin.com' || host.endsWith('.linkedin.com'))) {
+				findings.push({
+					level: WARN,
+					check: 'links-live',
+					message: `LinkedIn blocked the automated checker with 999; verify in a normal browser — ${href}`
+				});
+			} else if (response.status >= 400) {
 				findings.push({
 					level: ERROR,
 					check: 'links-live',

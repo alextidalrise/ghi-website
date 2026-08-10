@@ -16,6 +16,10 @@
 import { loadLocale } from './locales.mjs';
 
 const WRAP_AT = 72;
+const SOCIAL_LINKS = [
+	['Instagram', 'https://www.instagram.com/golfhomesinternational/?utm_source=mailchimp&utm_medium=email'],
+	['LinkedIn', 'https://www.linkedin.com/company/golf-homes-international?utm_source=mailchimp&utm_medium=email'],
+];
 
 /**
  * @param {string} html   built email HTML
@@ -73,6 +77,8 @@ export function generatePlaintext(html, { locale = 'en' } = {}) {
 	blocks.push(wrap(i18n.permissionReminder));
 	blocks.push('');
 	blocks.push('*|LIST:COMPANY|*, *|LIST:ADDRESS|*');
+	blocks.push('');
+	for (const [label, href] of SOCIAL_LINKS) blocks.push(`${label}: ${href}`);
 	blocks.push('');
 	blocks.push(`${i18n.viewInBrowser}: *|ARCHIVE_PAGE_URL|*`);
 	blocks.push(`${i18n.updatePreferences}: *|UPDATE_PROFILE|*`);

@@ -9,6 +9,7 @@
 		"build": "maizzle build production && node bin/plaintext.mjs",
 		"build:local": "maizzle build",
 		"assets": "node bin/build-assets.mjs",
+		"assets:social": "node bin/generate-social-icons.mjs",
 		"validate": "node bin/validate.mjs",
 		"validate:links": "node bin/validate.mjs --links",
 		"validate:self-test": "node bin/validate-self-test.mjs",

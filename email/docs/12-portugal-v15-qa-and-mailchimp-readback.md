@@ -1,6 +1,6 @@
 # Portugal v15 QA and Mailchimp readback
 
-**State:** corrected internal proof accepted by Mailchimp after independent code/fidelity review; awaiting human inbox confirmation and design/content approval. Not authorised for a live audience or schedule.
+**State:** corrected internal proof accepted by Mailchimp after independent code/fidelity review; reusable Instagram/LinkedIn footer added afterward and not yet re-proofed. Awaiting human design/content approval. Not authorised for a live audience or schedule.
 
 **Canonical design/content reference:** James's approved v15 preview at `/home/admin/GHI/knowledge-base/03-content/campaigns/2026-08-10-portugal-launch/web-preview/index.html`.
 
@@ -19,13 +19,13 @@
 ### Automated
 
 - Component-retention contract: PASS.
-- Validator self-test: 29/29 checks verified, including a lookalike `fm` query-value regression.
+- Validator self-test: 30/30 checks verified, including lookalike `fm` query-value and LinkedIn bot-block regressions.
 - QA output-path self-test: unsafe traversal/path names rejected before any recursive deletion or browser launch.
 - Campaign validator: 0 errors.
-- Live-link resolution: 24 unique destinations, 0 errors.
+- Live-link resolution: 26 unique destinations, 0 errors; LinkedIn's automated-checker `999` response is retained as a review warning rather than misreported as a broken link.
 - Heading structure: one H1.
 - Campaign modules: four destination features, ten development cards, four golf cards, eight partner cells, two guide cards and one final dual-action enquiry block.
-- Images: 28.
+- Images: 30, comprising the 28 canonical campaign images plus two reusable social icons.
 - Stale failed-build copy `A more useful way to compare the Algarve`: absent.
 - Explicit plain text includes headings, entity facts, repeated statuses and link destinations.
 
@@ -49,12 +49,13 @@ The review caught and fixed:
 - hidden HTML preheader/Mailchimp preview-text mismatch;
 - an unsafe path-traversal route in the segmented QA renderer;
 - a query-parsing weakness in the legacy-image-format validator.
+- the missing reusable Instagram and LinkedIn footer destinations.
 
-No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence.
+No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence. The corrected social row was visually inspected at 700px, 375px and 320px: both linked icons and their visible fallback labels remained aligned, readable and unclipped.
 
 ### Accepted warnings before internal proof
 
-1. Compiled HTML is 84.9KB, above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 86,085 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
+1. Compiled HTML is 88,917 bytes (86.8KB), above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 88,092 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
 2. `Enquire about Portugal property` exceeds the validator's generic 28-character warning threshold, but the exact approved label was visually verified on one line at 320px.
 3. The WhatsApp URL has no UTM parameter. It is a direct `wa.me` action with a prefilled message, not a GHI website destination.
 
@@ -67,6 +68,8 @@ No horizontal overflow was recorded. The final 31-character CTA remains one line
 - Type: user HTML template
 - Active: yes
 - Responsive: yes
+- Reusable social destinations: Instagram and LinkedIn, with hosted 72px PNG assets rendered at 36px and visible fallback labels.
+- Last edited after the footer correction: `2026-08-10T16:02:13+00:00`.
 
 The approved plan's longer provisional name exceeded Mailchimp's 49-character maximum. The review-status name avoids implying component approval before Alex's visual gate and does not overwrite the existing GHI template.
 
@@ -90,10 +93,10 @@ The approved plan's longer provisional name exceeded Mailchimp's 49-character ma
 
 ### Stored-content readback
 
-- Corrected source HTML SHA-256 before Mailchimp: `617437232376ee4b68a2cd19c756ea1c9314db070a720e9ee3a1ad59fd77e7d6`
-- Corrected Mailchimp-stored HTML SHA-256: `d7a11ed2488b3a736a5a397d792dc38e9060834cff4f207fd49d22904de39726`
-- Difference: Mailchimp normalisation; structural readback retained one H1, 28 images, 61 linked elements and all required sections/entities.
-- Audited explicit plain-text SHA-256: `4a7288d6ccd5ce5284e0665025dd4a4299c182a693be67ae12ee85615d27e1f5`
+- Corrected source HTML SHA-256 before Mailchimp: `c0eb034363fa16d6bab9b1ade9af4ac857034aa6ae7b1b1d576c3435f033a6ab`
+- Corrected Mailchimp-stored HTML SHA-256: `db22a28745ef585861af18fa4b90a3143630612b7d1abc0375e75b89295eaec5`
+- Difference: Mailchimp normalisation; structural readback retained one H1, 30 images, 65 linked elements, one instance of each social icon and all required sections/entities.
+- Audited explicit plain-text SHA-256: `d2bd9d5f442e45ef5a30ff5b6686e107ce4fd933a16423f30e1d53657848108d`
 - Mailchimp-stored plain text matches the current source-controlled plain text exactly.
 - Mailchimp archive readback exposed the full destination, development, golf, partner, guide and enquiry hierarchy.
 
@@ -107,6 +110,8 @@ The first proof is superseded because independent review identified a Palmares i
 Mailchimp returned `Action executed successfully`. It did not expose a separate test-action identifier.
 
 After the proof action, Mailchimp regenerated the plain-text part. The source-controlled plain text was immediately restored and read back with exact SHA-256 equality. The campaign remained an audience-free draft with zero live delivery.
+
+The reusable social footer was added after that proof. Mailchimp content readback confirms both social icons and exact plain-text destinations, but no further proof action was taken while the remaining comparison decisions are under review.
 
 API acceptance is not evidence of inbox receipt. Alex and James must each confirm receipt of this same proof.
 

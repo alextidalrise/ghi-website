@@ -107,6 +107,12 @@ The all-components fixture is a review master. Production campaigns include only
 
 **Rules:** exactly one visually dominant primary action; WhatsApp is subordinate and uses the canonical configured route; no third default action; closes onto a white section before the green compliance footer.
 
+## Reusable footer contract
+
+`src/components/footer.html` is locked shell content shared by every compiled template. It includes the permission reminder, Mailchimp company/address merge tags, browser/preferences/unsubscribe actions, Instagram and LinkedIn, and the copyright line.
+
+The social destinations use hosted email-safe 72px PNGs rendered at 36px. Each icon is paired with a visible underlined label so the destination remains understandable when images are blocked; the explicit plain-text alternative must carry both labelled profile URLs. Campaign templates must not replace, omit or individually restyle these destinations.
+
 ## Cross-component requirements
 
 - absolute HTTPS URLs;

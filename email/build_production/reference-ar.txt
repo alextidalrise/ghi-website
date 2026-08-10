@@ -56,6 +56,9 @@ https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=e
 
 *|LIST:COMPANY|*, *|LIST:ADDRESS|*
 
+Instagram: https://www.instagram.com/golfhomesinternational/?utm_source=mailchimp&utm_medium=email
+LinkedIn: https://www.linkedin.com/company/golf-homes-international?utm_source=mailchimp&utm_medium=email
+
 اعرض هذه الرسالة في المتصفح: *|ARCHIVE_PAGE_URL|*
 تحديث تفضيلاتك: *|UPDATE_PROFILE|*
 إلغاء الاشتراك: *|UNSUB|*

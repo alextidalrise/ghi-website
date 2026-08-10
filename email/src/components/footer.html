@@ -86,6 +86,48 @@
         </td>
       </tr>
 
+      <!--
+        Reusable social destinations. PNGs rather than SVGs for broad email-client
+        support; visible underlined labels keep the destinations understandable
+        when images are blocked.
+      -->
+      <tr>
+        <td align="{{ page.start }}" style="padding: 0 0 20px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td valign="middle" style="padding: 0 10px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td valign="middle" style="padding: 0 4px;">
+                      <a href="{{ page.site.social.instagram }}" aria-label="Golf Homes International on Instagram" style="text-decoration: none; border: 0;">
+                        <img src="{{ page.site.social.instagramIcon }}" width="36" height="36" alt="" style="display: block; width: 36px; height: 36px; border: 0; outline: none; text-decoration: none;">
+                      </a>
+                    </td>
+                    <td valign="middle">
+                      <a href="{{ page.site.social.instagram }}" style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">Instagram</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+              <td valign="middle" style="padding: 0 10px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td valign="middle" style="padding: 0 4px;">
+                      <a href="{{ page.site.social.linkedin }}" aria-label="Golf Homes International on LinkedIn" style="text-decoration: none; border: 0;">
+                        <img src="{{ page.site.social.linkedinIcon }}" width="36" height="36" alt="" style="display: block; width: 36px; height: 36px; border: 0; outline: none; text-decoration: none;">
+                      </a>
+                    </td>
+                    <td valign="middle">
+                      <a href="{{ page.site.social.linkedin }}" style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">LinkedIn</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
       <tr>
         <td
           align="{{ page.start }}"
