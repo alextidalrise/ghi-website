@@ -17,6 +17,8 @@ export type InsightDevelopmentGridItemRaw = {
 	completionDate?: string | null;
 	/** How the date should read (month/quarter/year). Unset → inferred from the date. */
 	completionPrecision?: CompletionPrecision | null;
+	/** Free-text completion line that replaces the derived one (e.g. a phased build). */
+	completionNote?: string | null;
 };
 
 /** The editor's choice for how precisely a completion date is known. */
@@ -146,11 +148,14 @@ export function toInsightDevelopmentCard(
 	const groupLabel = raw?.groupLabelOverride?.trim() || locationLabel || countryLabel || 'Other';
 
 	const statusLabel = base.developmentStatus ? (STATUS_LABELS[base.developmentStatus] ?? null) : null;
-	const completionLabel = formatCompletionLabel(
-		base.developmentStatus,
-		raw?.completionDate,
-		raw?.completionPrecision
-	);
+	// A completion note is an editor's explicit override for timing a single date can't express
+	// (a phased build). It wins over the derived line — but never for a completed development, which
+	// shows no completion line at all ("Available now" says it).
+	const completionNote = raw?.completionNote?.trim();
+	const completionLabel =
+		completionNote && base.developmentStatus !== 'completed'
+			? completionNote
+			: formatCompletionLabel(base.developmentStatus, raw?.completionDate, raw?.completionPrecision);
 
 	return {
 		_id: base._id,

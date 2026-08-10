@@ -601,7 +601,8 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
           ${DEVELOPMENT_REF_PUBLIC_GATE} =>
             coalesce(development->pricing.completionDate, development->completionDate)
         ),
-        "completionPrecision": select(${DEVELOPMENT_REF_PUBLIC_GATE} => development->completionPrecision)
+        "completionPrecision": select(${DEVELOPMENT_REF_PUBLIC_GATE} => development->completionPrecision),
+        "completionNote": select(${DEVELOPMENT_REF_PUBLIC_GATE} => development->completionNote)
       }
     },
     _type == "insightCourseGrid" => {

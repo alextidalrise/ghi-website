@@ -122,6 +122,14 @@ export const development = defineType({
 			}
 		}),
 		defineField({
+			name: 'completionNote',
+			title: 'Completion note (override)',
+			type: 'string',
+			group: 'development',
+			description:
+				'Replaces the completion line with this exact text — use only when a single date can’t express the timing, e.g. a phased build: "Phased completions: Q3 2026 and Q4 2028". Leave blank to derive the line from the completion date and precision above.'
+		}),
+		defineField({
 			name: 'completionStatus',
 			title: 'Completion status',
 			type: 'string',

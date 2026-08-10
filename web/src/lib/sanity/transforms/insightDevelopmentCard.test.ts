@@ -99,6 +99,21 @@ describe('toInsightDevelopmentCard', () => {
 		expect(toInsightDevelopmentCard(item())!.completionLabel).toBe('Estimated completion: 2028');
 	});
 
+	it('lets a completion note override the derived line, but never for a completed development', () => {
+		const noted = toInsightDevelopmentCard(
+			item({ completionNote: 'Phased completions: Q3 2026 and Q4 2028' })
+		);
+		expect(noted!.completionLabel).toBe('Phased completions: Q3 2026 and Q4 2028');
+
+		const done = toInsightDevelopmentCard(
+			item({
+				development: devRow({ developmentStatus: 'completed' }),
+				completionNote: 'Phased completions: Q3 2026 and Q4 2028'
+			})
+		);
+		expect(done!.completionLabel).toBeNull();
+	});
+
 	it('emits no chip for an unknown status (degrades honestly)', () => {
 		const card = toInsightDevelopmentCard(item({ development: devRow({ developmentStatus: 'unknown' }) }));
 		expect(card!.statusLabel).toBeNull();
