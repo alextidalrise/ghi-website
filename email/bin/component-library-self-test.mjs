@@ -11,6 +11,7 @@ const requiredComponents = [
 	'editorial-lead.html',
 	'section-intro.html',
 	'destination-feature.html',
+	'development-card.html',
 	'advisory-cta.html',
 	'entity-card.html',
 	'card-pair.html',
@@ -35,6 +36,7 @@ const expectedPortugalHeadings = [
 
 const expectedPortugalMarkers = [
 	'data-component="destination-feature"',
+	'data-component="development-card"',
 	'data-component="entity-card"',
 	'data-component="partner-cell"',
 	'data-component="guide-card"',
@@ -71,12 +73,13 @@ const builtHtmlPath = join(root, 'build_production', 'portugal-v15.html');
 const builtTextPath = join(root, 'build_production', 'portugal-v15.txt');
 
 try {
-	const [html, text, componentHtml, entitySource, destinationSource, guideSource, cssSource] = await Promise.all([
+	const [html, text, componentHtml, entitySource, destinationSource, developmentSource, guideSource, cssSource] = await Promise.all([
 		readFile(builtHtmlPath, 'utf8'),
 		readFile(builtTextPath, 'utf8'),
 		readFile(join(root, 'build_production', 'component-library-v1.html'), 'utf8'),
 		readFile(join(root, 'src', 'components', 'entity-card.html'), 'utf8'),
 		readFile(join(root, 'src', 'components', 'destination-feature.html'), 'utf8'),
+		readFile(join(root, 'src', 'components', 'development-card.html'), 'utf8'),
 		readFile(join(root, 'src', 'components', 'guide-card.html'), 'utf8'),
 		readFile(join(root, 'src', 'css', 'main.css'), 'utf8')
 	]);
@@ -86,7 +89,7 @@ try {
 
 	const identityPairs = [
 		['Palmares destination', /<x-destination-feature\b[^>]*title="Palmares"[^>]*src="[^"]*\/1b476154ab3e9246b2573b889c362cc40dfdb8ba-1600x1066\.jpg/],
-		['Palmares development', /<x-entity-card\b[^>]*title="Palmares"[^>]*src="[^"]*\/637d376128a5a9b9282a334c1ed370485542f82c-5272x3948\.jpg/]
+		['Palmares development', /<x-development-card\b[^>]*title="Palmares"[^>]*src="[^"]*\/637d376128a5a9b9282a334c1ed370485542f82c-5272x3948\.jpg/]
 	];
 	for (const [label, pattern] of identityPairs) {
 		if (pattern.test(source)) console.log(`  ok    approved image identity: ${label}`);
@@ -165,7 +168,10 @@ try {
 		&& entitySource.includes('color:{{ page.brand.green }};text-decoration:none')
 		&& destinationSource.includes('text-transform:uppercase')
 		&& destinationSource.includes('color:{{ page.brand.green }};text-decoration:none')
-		&& source.split('cardheight="406" bodyheight="236"').length - 1 === 10
+		&& developmentSource.includes('data-component="development-card"')
+		&& developmentSource.includes('font-size:28px')
+		&& developmentSource.includes('text-underline-offset:5px')
+		&& developmentSource.includes('background-color:{{ page.brand.green }}')
 		&& source.split('cardheight="329" bodyheight="159"').length - 1 === 4
 		&& cssSource.includes('.sm-equal-card')
 		&& cssSource.includes('.sm-equal-card-row')
@@ -196,7 +202,8 @@ try {
 
 	const expectedCounts = new Map([
 		['data-component="destination-feature"', 4],
-		['data-component="entity-card"', 14],
+		['data-component="development-card"', 10],
+		['data-component="entity-card"', 4],
 		['data-component="partner-cell"', 6],
 		['data-component="guide-card"', 2]
 	]);

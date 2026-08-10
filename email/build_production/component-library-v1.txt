@@ -43,24 +43,32 @@ https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=e
 
 ------------------------------------------------------------------------
 
-ENTITY CARDS
-------------
+DEVELOPMENT AND GOLF-COURSE CARDS
+---------------------------------
 
-Example commercial qualification appears in explicit plain text.
+The full-width development treatment preserves commercial qualification
+in explicit plain text.
 
 [Image: Example development]
-
-Destination, Country
 
 EXAMPLE DEVELOPMENT
 -------------------
 https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+Destination
+
+Country
+
+------------------------------------------------------------------------
 
 From €600,000
 
 Under construction
 
 Completion varies by phase
+
+View development →
+(https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
 
 [Image: Example golf course]
 
@@ -69,6 +77,20 @@ Destination, Country
 EXAMPLE GOLF COURSE
 -------------------
 https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+View course →
+(https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+[Image: Example golf course two]
+
+Destination, Country
+
+EXAMPLE GOLF COURSE TWO
+-----------------------
+https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+View course →
+(https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
 
 ------------------------------------------------------------------------
 
