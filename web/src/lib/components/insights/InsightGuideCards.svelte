@@ -89,6 +89,10 @@
 	}
 
 	.guide-card__title {
+		/* Explicit — the global `h4 { color: var(--green) }` element rule matches this heading
+		   directly (beating inheritance from the card), which would paint the title green-on-green.
+		   The card is a green surface, so the title is ivory like the rest of its text. */
+		color: var(--on-green);
 		font-family: var(--serif);
 		font-size: var(--text-h4);
 		line-height: 1.25;
