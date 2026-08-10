@@ -162,7 +162,7 @@ try {
 	const equalHeightContract = entitySource.includes('height="{{ cardheight }}"')
 		&& entitySource.includes('height="{{ bodyheight }}"')
 		&& entitySource.includes('sm-equal-card-row')
-		&& guideSource.includes('height="460"')
+		&& guideSource.includes("layout === 'full' ? 500 : 460")
 		&& guideSource.includes('text-underline-offset:5px')
 		&& !source.includes('tone="green"')
 		&& entitySource.includes('text-transform:uppercase')
