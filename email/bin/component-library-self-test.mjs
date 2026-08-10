@@ -76,6 +76,7 @@ try {
 	]);
 	const source = await readFile(join(root, 'src', 'templates', 'portugal-v15.html'), 'utf8');
 	const normalizedHtml = html.replace(/\s+/g, ' ');
+	const normalizedText = text.replace(/\s+/g, ' ');
 
 	const identityPairs = [
 		['Palmares destination', /<x-destination-feature\b[^>]*title="Palmares"[^>]*src="[^"]*\/1b476154ab3e9246b2573b889c362cc40dfdb8ba-1600x1066\.jpg/],
@@ -92,6 +93,33 @@ try {
 	if (normalizedHtml.includes(approvedPreview)) console.log('  ok    hidden preheader matches Mailchimp preview setting');
 	else {
 		console.error('  FAIL  hidden preheader differs from Mailchimp preview setting');
+		failures += 1;
+	}
+
+	const heroHeading = 'Golf Homes International in Portugal: Golf Property Across the Algarve';
+	const heroAlt = 'Aerial view across Quinta do Lago towards the Ria Formosa and Atlantic coast';
+	const approvedHierarchy = html.indexOf(heroHeading) >= 0 && html.indexOf(heroHeading) < html.indexOf(heroAlt);
+	const plainHierarchy = normalizedText.indexOf(heroHeading.toUpperCase()) >= 0 && normalizedText.indexOf(heroHeading.toUpperCase()) < normalizedText.indexOf(heroAlt);
+	if (approvedHierarchy && plainHierarchy) console.log('  ok    hero hierarchy is copy-first in HTML and plain text');
+	else {
+		console.error(`  FAIL  hero hierarchy copy-first (html=${approvedHierarchy}, text=${plainHierarchy})`);
+		failures += 1;
+	}
+
+	const editionHtml = html.split('data-masthead-edition').length - 1;
+	const editionText = (text.match(/^Portugal collection$/gm) || []).length;
+	const overlineRemoved = !source.includes('<x-overline gap="12">Portugal</x-overline>');
+	if (editionHtml === 1 && editionText === 1 && overlineRemoved) console.log('  ok    canonical masthead edition restored without duplicate hero overline');
+	else {
+		console.error(`  FAIL  masthead edition/overline contract (html=${editionHtml}, text=${editionText}, overlineRemoved=${overlineRemoved})`);
+		failures += 1;
+	}
+
+	const courseCtaHtml = html.split('View course →').length - 1;
+	const courseCtaText = text.split('View course →').length - 1;
+	if (courseCtaHtml === 4 && courseCtaText === 4) console.log('  ok    four canonical course action labels retained in HTML and plain text');
+	else {
+		console.error(`  FAIL  course action labels (html=${courseCtaHtml}, text=${courseCtaText})`);
 		failures += 1;
 	}
 

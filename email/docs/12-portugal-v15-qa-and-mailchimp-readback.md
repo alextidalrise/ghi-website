@@ -1,6 +1,6 @@
 # Portugal v15 QA and Mailchimp readback
 
-**State:** corrected internal proof accepted by Mailchimp after independent code/fidelity review; reusable Instagram/LinkedIn footer added afterward and not yet re-proofed. Awaiting human design/content approval. Not authorised for a live audience or schedule.
+**State:** Alex's comparison decisions are implemented and read back in the audience-free Mailchimp draft. The reusable social footer and consolidated decision changes have not yet been re-proofed. Awaiting human design/content approval. Not authorised for a live audience or schedule.
 
 **Canonical design/content reference:** James's approved v15 preview at `/home/admin/GHI/knowledge-base/03-content/campaigns/2026-08-10-portugal-launch/web-preview/index.html`.
 
@@ -50,12 +50,14 @@ The review caught and fixed:
 - an unsafe path-traversal route in the segmented QA renderer;
 - a query-parsing weakness in the legacy-image-format validator.
 - the missing reusable Instagram and LinkedIn footer destinations.
+- the image-first hero order, replaced with the approved copy-first hierarchy;
+- the omitted `Portugal collection` masthead label and four `View course →` links.
 
-No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence. The corrected social row was visually inspected at 700px, 375px and 320px: both linked icons and their visible fallback labels remained aligned, readable and unclipped.
+No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence. The corrected social row was visually inspected at 700px, 375px and 320px: both linked icons and their visible fallback labels remained aligned, readable and unclipped. The restored masthead label and copy-first hero were inspected at desktop and 320px; the logo/label remained distinct and unclipped. All four restored course labels were inspected at 375px and 320px and remained readable within their cards.
 
 ### Accepted warnings before internal proof
 
-1. Compiled HTML is 88,917 bytes (86.8KB), above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 88,092 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
+1. Compiled HTML is 91,409 bytes (89.3KB), above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 90,552 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
 2. `Enquire about Portugal property` exceeds the validator's generic 28-character warning threshold, but the exact approved label was visually verified on one line at 320px.
 3. The WhatsApp URL has no UTM parameter. It is a direct `wa.me` action with a prefilled message, not a GHI website destination.
 
@@ -69,7 +71,7 @@ No horizontal overflow was recorded. The final 31-character CTA remains one line
 - Active: yes
 - Responsive: yes
 - Reusable social destinations: Instagram and LinkedIn, with hosted 72px PNG assets rendered at 36px and visible fallback labels.
-- Last edited after the footer correction: `2026-08-10T16:02:13+00:00`.
+- Last edited after the consolidated comparison changes: `2026-08-10T16:56:28+00:00`.
 
 The approved plan's longer provisional name exceeded Mailchimp's 49-character maximum. The review-status name avoids implying component approval before Alex's visual gate and does not overwrite the existing GHI template.
 
@@ -93,10 +95,10 @@ The approved plan's longer provisional name exceeded Mailchimp's 49-character ma
 
 ### Stored-content readback
 
-- Corrected source HTML SHA-256 before Mailchimp: `c0eb034363fa16d6bab9b1ade9af4ac857034aa6ae7b1b1d576c3435f033a6ab`
-- Corrected Mailchimp-stored HTML SHA-256: `db22a28745ef585861af18fa4b90a3143630612b7d1abc0375e75b89295eaec5`
-- Difference: Mailchimp normalisation; structural readback retained one H1, 30 images, 65 linked elements, one instance of each social icon and all required sections/entities.
-- Audited explicit plain-text SHA-256: `d2bd9d5f442e45ef5a30ff5b6686e107ce4fd933a16423f30e1d53657848108d`
+- Corrected source HTML SHA-256 before Mailchimp: `1d87681ecef2388b4b09730a6927cdeaab67ccbf9526daec92fd17cd9150823b`
+- Corrected Mailchimp-stored HTML SHA-256: `0a1a1bf711631b83d0670cca3154ccc884fe10808af007456d1d61a50633e717`
+- Difference: Mailchimp normalisation; two consecutive GET readbacks were stable. Structural readback retained one H1, 30 images, 69 linked elements, one masthead edition label, four course actions, both social destinations and all required sections/entities. The H1/standfirst/meta precede the hero image in stored reading order.
+- Audited explicit plain-text SHA-256: `41cc19cdc740ecf8d20776404c9b94fb1dbd0db8fd219d49f09ca269f0b9fb14`
 - Mailchimp-stored plain text matches the current source-controlled plain text exactly.
 - Mailchimp archive readback exposed the full destination, development, golf, partner, guide and enquiry hierarchy.
 
@@ -111,7 +113,7 @@ Mailchimp returned `Action executed successfully`. It did not expose a separate 
 
 After the proof action, Mailchimp regenerated the plain-text part. The source-controlled plain text was immediately restored and read back with exact SHA-256 equality. The campaign remained an audience-free draft with zero live delivery.
 
-The reusable social footer was added after that proof. Mailchimp content readback confirms both social icons and exact plain-text destinations, but no further proof action was taken while the remaining comparison decisions are under review.
+The reusable social footer and Alex's accepted comparison changes were added after that proof. Mailchimp content readback confirms the restored masthead label, copy-first hero, four course actions, both social icons and exact plain-text destinations. No further proof action was taken during implementation.
 
 API acceptance is not evidence of inbox receipt. Alex and James must each confirm receipt of this same proof.
 

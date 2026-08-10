@@ -13,9 +13,9 @@ Alex's concern is valid: the rebuilt email is **not a literal copy of every visi
 The important distinction is:
 
 - **Substantive campaign copy:** retained verbatim. The hero proposition, editorial lead, four destination descriptions, advisory copy, collection introduction, all ten property records, golf introduction, independent-support statement, guide introduction and summaries, and closing enquiry copy match the canonical v15 web preview.
-- **Interface, metadata and delivery copy:** adapted. The email adds a subject, preheader, overline, guide CTA labels, visible partner names, UTM parameters and a compliance footer. It omits the web table of contents, mobile portfolio controls, course-level `View course` labels, the `Portugal collection` masthead label and the web-preview-only draft notices.
+- **Interface, metadata and delivery copy:** adapted. Alex approved the email subject and preheader, the visible partner names and guide CTA labels. The email retains UTM parameters and a compliance footer. It intentionally omits the web table of contents and mobile portfolio controls. The canonical `Portugal collection` masthead label, copy-first hero hierarchy and four `View course →` labels have now been restored.
 - **Resolved after audit:** Alex approved Instagram and LinkedIn for the reusable footer. The corrected shell now includes email-safe linked icons, visible fallback labels and plain-text destinations.
-- **Design/order adaptation:** the email puts the hero image before the headline in reading order, rather than presenting the canonical copy-and-image composition together.
+- **Design/order adaptation:** the email now retains the canonical copy-first reading order in a dependable stacked layout rather than reproducing the web-only side-by-side composition.
 
 No property name, location, price, availability stage or completion date has been rewritten or dropped.
 
@@ -40,9 +40,9 @@ No property name, location, price, availability stage or completion date has bee
 
 | Field | Canonical v15 | Rebuilt email | Classification |
 |---|---|---|---|
-| Web meta description / email preheader | `Explore Golf Homes International's Portugal portfolio across Vilamoura, Quinta do Lago, Monte Rei and Palmares.` | `Explore Vilamoura, Quinta do Lago, Monte Rei and Palmares, with current developments, golf and independent buyer support.` | Added email copy. Related meaning, but not an exact retention. Requires editorial approval as preview text. |
+| Web meta description / email preheader | `Explore Golf Homes International's Portugal portfolio across Vilamoura, Quinta do Lago, Monte Rei and Palmares.` | `Explore Vilamoura, Quinta do Lago, Monte Rei and Palmares, with current developments, golf and independent buyer support.` | Approved email-specific preview text; related meaning rather than exact retention. |
 | Document title | `Golf Homes International in Portugal: Golf Property Across the Algarve` | `Golf Homes International in Portugal` | Shortened email metadata. The full canonical title remains the H1. |
-| Recipient-visible subject | No web equivalent | `Golf Homes International in Portugal` | Added email copy. Requires explicit subject approval. |
+| Recipient-visible subject | No web equivalent | `Golf Homes International in Portugal` | Approved email-specific subject. |
 | Hidden preheader | No web equivalent | Same as the email preview text above | Added technical/inbox content. It now matches Mailchimp's preview setting exactly. |
 
 ### 3. Brand masthead
@@ -50,8 +50,8 @@ No property name, location, price, availability stage or completion date has bee
 | Canonical v15 | Rebuilt email | Classification |
 |---|---|---|
 | GHI logo | GHI logo | Exact brand retention using an email-safe hosted raster asset. |
-| `Portugal collection` | Absent | Omission. This visible masthead label was not carried into the email shell. |
-| No hero overline | `Portugal` | Added email copy/UI label. It partly replaces destination context but is not literal v15 retention. |
+| `Portugal collection` | `Portugal collection` | Restored exact masthead label. |
+| No hero overline | No hero overline | The added `Portugal` overline was removed when the canonical masthead label was restored. |
 | Logo is not the primary textual link in the article | Logo links to the GHI homepage with `utm_source=mailchimp&utm_medium=email` | Technical email addition. |
 
 ### 4. Hero
@@ -63,7 +63,7 @@ No property name, location, price, availability stage or completion date has bee
 | Date and taxonomy | `10 August 2026`, `Portugal`, `Golf property`, `Buyer guidance` as separate web items | `10 August 2026 · Portugal · Golf property · Buyer guidance` | Technical formatting adaptation; words and order retained. |
 | Hero caption | `Quinta do Lago, the Ria Formosa and Atlantic coast` | Exact same wording | Exact retention. |
 | Hero alt text | `Aerial view across Quinta do Lago towards the Ria Formosa and Atlantic coast` | Exact same wording | Exact retention. |
-| Reading order | Headline/standfirst/meta precede the image in the canonical DOM; copy and image form one side-by-side composition on desktop | Hero image and caption precede the headline in email and plain-text reading order | Reordered design adaptation; not literal v15 hierarchy. |
+| Reading order | Headline/standfirst/meta precede the image in the canonical DOM; copy and image form one side-by-side composition on desktop | Headline/standfirst/meta precede the image in the HTML and plain-text reading order | Approved stacked email adaptation retaining the canonical copy-first hierarchy. |
 
 ### 5. Article navigation
 
@@ -164,7 +164,7 @@ Differences:
 | Course 2 | South Course · Quinta do Lago | South Course · Quinta do Lago · Portugal | `Portugal` added to the label. |
 | Course 3 | Monte Rei Golf & Country Club · Monte Rei | Monte Rei Golf & Country Club · Monte Rei · Portugal | `Portugal` added to the label. |
 | Course 4 | Palmares Golf Course · Palmares | Palmares Golf Course · Palmares · Portugal | `Portugal` added to the label. |
-| Course action | `View course →` on each web figure | No visible `View course` label; title/card is linked | Omission/technical link treatment. |
+| Course action | `View course →` on each web figure | `View course →` on each email card; title and image remain linked | Exact visible label restored with an email-safe redundant destination link. |
 
 Course names, order, destinations, URLs and alt texts are exact apart from added UTM parameters.
 
@@ -286,8 +286,9 @@ The explicit plain-text version:
 - includes the two added guide CTA labels;
 - adds the required compliance footer;
 - omits the hidden preheader, as expected for the explicit body alternative;
-- follows the email's image-first hero reading order rather than the canonical web DOM order;
-- omits the web table of contents, mobile interaction labels, course `View course` labels and social links.
+- follows the approved copy-first hero reading order;
+- intentionally omits the web table of contents and mobile interaction labels;
+- includes the restored course `View course →` labels and approved reusable social links.
 
 The newly detected international-guide paragraph break has been fixed. No malformed partner/guide joins remain.
 
@@ -312,12 +313,12 @@ This source discrepancy can make the email appear different if it is compared wi
 
 The body copy does not need a wholesale rewrite: its substantive paragraphs and commercial records already match the canonical v15 preview.
 
-The remaining decisions are narrower and explicit:
+The decision record is now:
 
-1. Confirm whether the email-specific subject and preview text are approved.
-2. Confirm whether omitting `Portugal collection` from the masthead is acceptable.
-3. Confirm whether the image-first hero reading order is an acceptable inbox adaptation.
-4. Confirm whether omitting the six-item article navigation and four `View course` labels is acceptable.
-5. Confirm whether the added guide CTA labels and visible partner names are acceptable.
+1. **Approved:** email-specific subject and preview text.
+2. **Implemented:** restore `Portugal collection` and remove the duplicate hero overline.
+3. **Implemented:** restore the canonical copy-first hero hierarchy using a stacked email-safe layout.
+4. **Approved/implemented:** continue omitting the web article navigation; restore four `View course →` labels.
+5. **Approved:** retain visible partner names and explicit guide CTA labels.
 
-Until those decisions are resolved and the corrected proof is reissued if required, the campaign remains a draft and is not final or authorised for a live audience.
+The decisions are resolved in source. The campaign remains a draft and is not authorised for a live audience; any corrected internal proof is a separate review action, not send authority.

@@ -17,6 +17,12 @@ The all-components fixture is a review master. Production campaigns include only
 
 ## Component contracts
 
+### `masthead`
+
+**Job:** locked GHI logo shell with an optional campaign-edition label supplied by frontmatter.
+
+**Rules:** the label is live text on the dark-green brand surface; it sits opposite the logo on desktop and stacks without overlap on narrow mobile; the explicit plain-text version retains the edition label once; no Mailchimp edit region is exposed.
+
 ### `editorial-lead`
 
 **Job:** preserve the approved opening hierarchy.
@@ -59,9 +65,9 @@ The all-components fixture is a review master. Production campaigns include only
 
 **Required:** `src`, `alt`, `href`, `title`, location line.
 
-**Optional development fields:** price, status, completion.
+**Optional fields:** price, status, completion and a visible action label such as `View course →`.
 
-**Rules:** image/title/action share one canonical entity destination; price/status/completion are live text; no overlay copy baked into imagery; empty optional facts collapse cleanly.
+**Rules:** image/title/action share one canonical entity destination; price/status/completion/action are live text and survive into plain text; no overlay copy baked into imagery; empty optional facts collapse cleanly.
 
 ### `card-pair`
 

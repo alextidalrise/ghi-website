@@ -9,6 +9,7 @@
         <if condition="price"><tr><td class="dm-ink" style="padding:0 0 8px;font-family:{{ page.font.sans }};font-size:{{ page.scale.body.size }}px;line-height:{{ page.scale.body.leading }}px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};color:{{ page.brand.charcoal }};">{{ price }}</td></tr></if>
         <if condition="status"><tr><td class="dm-accent" style="padding:0 0 6px;font-family:{{ page.font.sans }};font-size:{{ page.scale.ui.size }}px;line-height:{{ page.scale.ui.leading }}px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};color:{{ page.brand.green }};">{{ status }}</td></tr></if>
         <if condition="completion"><tr><td class="dm-muted" style="padding:0;font-family:{{ page.font.sans }};font-size:{{ page.scale.legal.size }}px;line-height:{{ page.scale.legal.leading }}px;mso-line-height-rule:exactly;color:{{ page.brand.muted }};">{{ completion }}</td></tr></if>
+        <if condition="cta"><tr><td style="padding:14px 0 0;font-family:{{ page.font.sans }};font-size:{{ page.scale.ui.size }}px;line-height:{{ page.scale.ui.leading }}px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};"><a href="{{ href }}" class="dm-accent" style="color:{{ page.brand.green }};text-decoration:underline;text-underline-offset:2px;">{{ cta }}</a></td></tr></if>
       </table>
     </td></tr>
   </table>

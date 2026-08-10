@@ -40,6 +40,8 @@ export function generatePlaintext(html, { locale = 'en' } = {}) {
 	 */
 	blocks.push(i18n.plaintext.footerHeading.toUpperCase());
 	blocks.push(mastheadHref(html) ?? '');
+	const edition = mastheadEdition(html);
+	if (edition) blocks.push(edition);
 	blocks.push(rule('='));
 
 	for (const block of walk(body)) {
@@ -110,6 +112,9 @@ function extractBody(html) {
 	body = body
 		// The hidden preheader duplicates the subject; it is not body content.
 		.replace(/<div[^>]*mso-hide:\s*all[\s\S]*?<\/div>/gi, '')
+		// The masthead may contain nested presentation cells. Its logo and optional
+		// edition are rebuilt above, so remove the marked table before walking leaves.
+		.replace(/<table\b[^>]*data-email-masthead-table[^>]*>[\s\S]*?<\/table>/gi, '')
 		.replace(/<!--[\s\S]*?-->/g, '')
 		.replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, '');
 
@@ -262,6 +267,12 @@ function withInlineLinkSegments(html) {
 function mastheadHref(html) {
 	const m = /<a\b[^>]*href\s*=\s*"(https:\/\/[^"]*)"[^>]*>\s*<img/i.exec(html);
 	return m ? decodeEntities(m[1]) : null;
+}
+
+/** Optional campaign edition label carried by the locked masthead shell. */
+function mastheadEdition(html) {
+	const m = /<td\b[^>]*data-masthead-edition[^>]*>([\s\S]*?)<\/td>/i.exec(html);
+	return m ? clean(m[1]) : null;
 }
 
 /** Decode the entity set that can legitimately appear inside a URL. */
