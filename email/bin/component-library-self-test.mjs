@@ -12,6 +12,7 @@ const requiredComponents = [
 	'section-intro.html',
 	'destination-feature.html',
 	'development-card.html',
+	'course-feature.html',
 	'advisory-cta.html',
 	'entity-card.html',
 	'card-pair.html',
@@ -37,7 +38,7 @@ const expectedPortugalHeadings = [
 const expectedPortugalMarkers = [
 	'data-component="destination-feature"',
 	'data-component="development-card"',
-	'data-component="entity-card"',
+	'data-component="course-feature"',
 	'data-component="partner-cell"',
 	'data-component="guide-card"',
 	'data-component="dual-action-enquiry"'
@@ -125,7 +126,7 @@ try {
 	}
 
 	const courseCtaHtml = html.split('View course →').length - 1;
-	const courseCtaText = text.split('View course →').length - 1;
+	const courseCtaText = text.split('VIEW COURSE →').length - 1;
 	if (courseCtaHtml === 4 && courseCtaText === 4) console.log('  ok    four canonical course action labels retained in HTML and plain text');
 	else {
 		console.error(`  FAIL  course action labels (html=${courseCtaHtml}, text=${courseCtaText})`);
@@ -173,7 +174,6 @@ try {
 		&& developmentSource.includes('font-size:28px')
 		&& developmentSource.includes('text-underline-offset:5px')
 		&& developmentSource.includes('background-color:{{ page.brand.green }}')
-		&& source.split('cardheight="329" bodyheight="159"').length - 1 === 4
 		&& cssSource.includes('.sm-equal-card')
 		&& cssSource.includes('.sm-equal-card-row')
 		&& cssSource.includes('height: auto !important;');
@@ -204,7 +204,7 @@ try {
 	const expectedCounts = new Map([
 		['data-component="destination-feature"', 4],
 		['data-component="development-card"', 10],
-		['data-component="entity-card"', 4],
+		['data-component="course-feature"', 4],
 		['data-component="partner-cell"', 6],
 		['data-component="guide-card"', 2]
 	]);

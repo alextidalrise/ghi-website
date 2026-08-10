@@ -78,6 +78,17 @@ EXAMPLE GOLF COURSE
 -------------------
 https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
 
+VIEW COURSE →:
+https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+[Image: Example golf course]
+
+Destination, Country
+
+EXAMPLE GOLF COURSE
+-------------------
+https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
 View course →
 (https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
 
