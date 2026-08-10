@@ -1167,9 +1167,11 @@ const insightSectionBody = defineField({
 			type: 'block',
 			styles: [
 				{ title: 'Normal', value: 'normal' },
+				{ title: 'Lead', value: 'lead' },
 				{ title: 'Heading', value: 'h3' },
 				{ title: 'Subheading', value: 'h4' },
-				{ title: 'Quote', value: 'blockquote' }
+				{ title: 'Quote', value: 'blockquote' },
+				{ title: 'Note (fine print)', value: 'note' }
 			],
 			lists: [
 				{ title: 'Bulleted', value: 'bullet' },

@@ -128,6 +128,7 @@
 	secondary={ctaSecondary}
 	whatsAppLabel={ctaWhatsAppLabel}
 	whatsAppMessage={ctaWhatsAppMessage}
+	actionsLayout="stack"
 />
 
 {#if related.length > 0}

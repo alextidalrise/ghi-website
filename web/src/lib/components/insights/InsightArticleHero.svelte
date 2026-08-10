@@ -396,6 +396,16 @@
 		aspect-ratio: 1 / 1;
 	}
 
+	/* The launch headline turns onto its own line for the italic phrase — "…in Portugal:" then
+	   a dropped, italic "Golf Property Across the Algarve" beneath it. Scoped to the split hero so
+	   the standard hero keeps its inline mid-sentence emphasis. A touch smaller than the roman line
+	   so it reads as the sentence continuing, not a second headline (matches v15's `h1 em`). */
+	.article-hero--split .article-hero__title em {
+		display: block;
+		font-size: 0.92em;
+		margin-top: 0.08em;
+	}
+
 	.article-hero__media--overlay {
 		position: relative;
 	}

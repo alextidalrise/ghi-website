@@ -134,7 +134,14 @@
 		color: var(--gold);
 	}
 
-	.insight-body :global(a) {
+	/* Prose links only. The guard is `:not([class])`, the same reasoning as the list rule above:
+	   Portable Text renders the article's own links (the `link` mark → GuideLink) as bare `<a>`,
+	   while every custom block's link carries a class (`.destination__cta`, `.guide-card`,
+	   `.dev-card`, the course/partner cells). Without the guard this green colour + hairline
+	   underline bled onto those block links — turning the green-on-green destination CTA and the
+	   whole green guide card invisible, and drawing a stray border-coloured underline across each
+	   development card. Bare-anchor scoping keeps prose links styled and leaves blocks to own theirs. */
+	.insight-body :global(a:not([class])) {
 		color: var(--green);
 		text-decoration: underline;
 		text-decoration-color: var(--border);
@@ -142,8 +149,8 @@
 		transition: text-decoration-color var(--duration-hover) var(--ease);
 	}
 
-	.insight-body :global(a:hover),
-	.insight-body :global(a:focus-visible) {
+	.insight-body :global(a:not([class]):hover),
+	.insight-body :global(a:not([class]):focus-visible) {
 		text-decoration-color: var(--gold);
 	}
 
@@ -163,8 +170,28 @@
 		color: var(--green);
 	}
 
+	/* The editorial lead — a serif green thesis line set a step up from the prose, the same
+	   register as the hero deck. Used for a section's opening statement (e.g. the portfolio
+	   standfirst above the development grid). */
+	.insight-body :global(.guide-body__lead) {
+		font-family: var(--serif);
+		font-size: clamp(1.2rem, 1rem + 0.9vw, 1.42rem);
+		line-height: 1.45;
+		color: var(--green);
+		max-width: 36ch;
+		text-wrap: pretty;
+	}
+
+	/* Fine print — a muted checked-on/reconfirm note, a clear step below the prose. */
+	.insight-body :global(.guide-body__note) {
+		font-size: var(--text-small);
+		line-height: 1.6;
+		color: var(--muted);
+		max-width: 66ch;
+	}
+
 	@media (prefers-reduced-motion: reduce) {
-		.insight-body :global(a) {
+		.insight-body :global(a:not([class])) {
 			transition: none;
 		}
 	}

@@ -29,6 +29,14 @@
 		whatsAppLabel?: string;
 		/** Optional prefilled WhatsApp message (text only). Falls back to the house message. */
 		whatsAppMessage?: string;
+		/**
+		 * Desktop action arrangement. `row` (default) wraps the buttons horizontally — right for
+		 * the short-labelled About close. `stack` puts them in one narrow column so the heading
+		 * keeps its width; use it when the labels are long (e.g. "Enquire about Portugal property"
+		 * + "WhatsApp our Portugal team"), which in a row would grow the column and starve the
+		 * heading into a tall wrap.
+		 */
+		actionsLayout?: 'row' | 'stack';
 	};
 
 	let {
@@ -37,7 +45,8 @@
 		primary = { label: 'Get in touch', href: '/contact' },
 		secondary = { label: 'Browse properties', href: '/front-line-collection' },
 		whatsAppLabel = 'WhatsApp',
-		whatsAppMessage
+		whatsAppMessage,
+		actionsLayout = 'row'
 	}: Props = $props();
 
 	// The href is always built through the central helper/number; only the message varies.
@@ -56,7 +65,7 @@
 		  reordering these with CSS `order` would leave a keyboard user tabbing
 		  top-left → bottom → top-right, so the DOM carries the order instead.
 		-->
-		<div class="talk__actions">
+		<div class="talk__actions" class:talk__actions--stack={actionsLayout === 'stack'}>
 			<a class="talk__btn talk__btn--primary" href={primary.href}>{primary.label}</a>
 			<a
 				class="talk__btn talk__btn--whatsapp"
@@ -245,6 +254,26 @@
 		.talk__inner {
 			grid-template-columns: 1fr auto;
 			gap: var(--space-2xl);
+		}
+
+		/*
+		 * Stack variant: the actions become one narrow column of full-width buttons instead of a
+		 * horizontal wrap. In the default `1fr auto` grid the `auto` column grows to fit whatever
+		 * the buttons need on one line, so two long labels ("Enquire about Portugal property" +
+		 * "WhatsApp our Portugal team") widen it enough to squeeze the heading into a tall wrap.
+		 * A capped, stretched column holds the actions to a sane width and hands the rest back to
+		 * the heading — the v15 close composition.
+		 */
+		.talk__actions--stack {
+			display: grid;
+			grid-auto-flow: row;
+			gap: var(--space-sm);
+			min-width: 16rem;
+			max-width: 18rem;
+		}
+
+		.talk__actions--stack .talk__btn {
+			width: 100%;
 		}
 	}
 
