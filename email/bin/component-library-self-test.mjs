@@ -152,10 +152,15 @@ try {
 		}
 	}
 
-	for (const expected of ['For UK buyers\n\nA step-by-step', 'For international buyers\n\nAn overview']) {
-		if (text.includes(expected)) console.log(`  ok    plain-text block separation: ${expected.split('\n')[0]}`);
+	const plainParagraphs = text.split(/\n{2,}/).map((part) => part.replace(/\n/g, ' ').trim()).filter(Boolean);
+	for (const [label, body] of [
+		['For UK buyers', 'A step-by-step introduction to the NIF, legal process, purchase costs, mortgages, tax and the 90-day rule.'],
+		['For international buyers', 'An overview of preparation, the legal process, purchase costs, finance, tax and residency boundaries.'],
+	]) {
+		const labelIndex = plainParagraphs.indexOf(label);
+		if (labelIndex >= 0 && plainParagraphs[labelIndex + 1] === body) console.log(`  ok    plain-text block separation: ${label}`);
 		else {
-			console.error(`  FAIL  missing plain-text block separation: ${expected.split('\n')[0]}`);
+			console.error(`  FAIL  plain-text block separation missing: ${label}`);
 			failures += 1;
 		}
 	}

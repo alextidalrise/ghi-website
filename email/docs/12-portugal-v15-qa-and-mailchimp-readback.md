@@ -93,7 +93,7 @@ The approved plan's longer provisional name exceeded Mailchimp's 49-character ma
 - Corrected source HTML SHA-256 before Mailchimp: `617437232376ee4b68a2cd19c756ea1c9314db070a720e9ee3a1ad59fd77e7d6`
 - Corrected Mailchimp-stored HTML SHA-256: `d7a11ed2488b3a736a5a397d792dc38e9060834cff4f207fd49d22904de39726`
 - Difference: Mailchimp normalisation; structural readback retained one H1, 28 images, 61 linked elements and all required sections/entities.
-- Corrected explicit plain-text SHA-256: `dfb1e967efa0a4c47a5ba82858e2185e21c73e0b6cd80f36bf8153693a3d0052`
+- Audited explicit plain-text SHA-256: `4a7288d6ccd5ce5284e0665025dd4a4299c182a693be67ae12ee85615d27e1f5`
 - Mailchimp-stored plain text matches the current source-controlled plain text exactly.
 - Mailchimp archive readback exposed the full destination, development, golf, partner, guide and enquiry hierarchy.
 
@@ -109,6 +109,8 @@ Mailchimp returned `Action executed successfully`. It did not expose a separate 
 After the proof action, Mailchimp regenerated the plain-text part. The source-controlled plain text was immediately restored and read back with exact SHA-256 equality. The campaign remained an audience-free draft with zero live delivery.
 
 API acceptance is not evidence of inbox receipt. Alex and James must each confirm receipt of this same proof.
+
+The full canonical-v15 copy and module register is in `docs/13-portugal-v15-copy-comparison.md`. It records exact body-copy retention separately from metadata, interface, tracking, footer and reading-order adaptations.
 
 ## Remaining human gates
 

@@ -240,9 +240,14 @@ function withInlineLinkSegments(html) {
 		return `${text} (${decodeEntities(href)})`;
 	});
 
+	const boundary = '\u0000';
 	return resolved
-		.replace(/<\/?(?:p|div|span|br|li|td|tr)\b[^>]*>/gi, '\n')
-		.split(/\n+/)
+		// Maizzle may wrap long text across source lines. Those are formatting
+		// whitespace, not paragraph boundaries; collapse them before inserting
+		// boundaries for actual block-level markup.
+		.replace(/\r?\n/g, ' ')
+		.replace(/<\/?(?:p|div|br|li|td|tr)\b[^>]*>/gi, boundary)
+		.split(boundary)
 		.map((segment) => clean(segment))
 		.filter(Boolean);
 }
