@@ -33,10 +33,12 @@ out = {
     "bytes": {name: len(data) for name, data in raw.items()},
     "blobs": blob_values,
 }
-(root / "qa" / "mailchimp-payload.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
+qa_dir = root / "qa"
+qa_dir.mkdir(parents=True, exist_ok=True)
+(qa_dir / "mailchimp-payload.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
 chunks = {name: [value[i:i + 3000] for i in range(0, len(value), 3000)] for name, value in blob_values.items()}
-(root / "qa" / "mailchimp-payload-chunks.json").write_text(json.dumps(chunks, indent=2), encoding="utf-8")
-chunk_dir = root / "qa" / "mailchimp-combined-chunks"
+(qa_dir / "mailchimp-payload-chunks.json").write_text(json.dumps(chunks, indent=2), encoding="utf-8")
+chunk_dir = qa_dir / "mailchimp-combined-chunks"
 chunk_dir.mkdir(parents=True, exist_ok=True)
 for index, chunk in enumerate(chunks["combined"], start=1):
     wrapped = "\n".join(chunk[i:i + 500] for i in range(0, len(chunk), 500)) + "\n"

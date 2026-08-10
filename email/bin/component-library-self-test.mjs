@@ -71,10 +71,13 @@ const builtHtmlPath = join(root, 'build_production', 'portugal-v15.html');
 const builtTextPath = join(root, 'build_production', 'portugal-v15.txt');
 
 try {
-	const [html, text, componentHtml] = await Promise.all([
+	const [html, text, componentHtml, entitySource, guideSource, cssSource] = await Promise.all([
 		readFile(builtHtmlPath, 'utf8'),
 		readFile(builtTextPath, 'utf8'),
-		readFile(join(root, 'build_production', 'component-library-v1.html'), 'utf8')
+		readFile(join(root, 'build_production', 'component-library-v1.html'), 'utf8'),
+		readFile(join(root, 'src', 'components', 'entity-card.html'), 'utf8'),
+		readFile(join(root, 'src', 'components', 'guide-card.html'), 'utf8'),
+		readFile(join(root, 'src', 'css', 'main.css'), 'utf8')
 	]);
 	const source = await readFile(join(root, 'src', 'templates', 'portugal-v15.html'), 'utf8');
 	const normalizedHtml = html.replace(/\s+/g, ' ');
@@ -148,6 +151,14 @@ try {
 	if (lightFooterSelected && greenFooterAvailable && lightFooterAvailable && gapRemoved && closingPlain) console.log('  ok    light footer selected, both footer blocks available, CTA/footer gap removed');
 	else {
 		console.error(`  FAIL  footer variant/gap contract (campaignLight=${lightFooterSelected}, libraryGreen=${greenFooterAvailable}, libraryLight=${lightFooterAvailable}, gapRemoved=${gapRemoved}, plainCTA=${closingPlain})`);
+		failures += 1;
+	}
+
+	const equalHeightContract = [entitySource, guideSource].every((component) => component.includes('height="100%"') && component.includes('sm-equal-card'))
+		&& cssSource.includes('.sm-equal-card') && cssSource.includes('height: auto !important;');
+	if (equalHeightContract) console.log('  ok    entity and guide card pairs equalise above mobile and reset when stacked');
+	else {
+		console.error('  FAIL  equal-height paired-card contract');
 		failures += 1;
 	}
 

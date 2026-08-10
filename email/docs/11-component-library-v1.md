@@ -67,13 +67,13 @@ The all-components fixture is a review master. Production campaigns include only
 
 **Optional fields:** price, status, completion and a visible action label such as `View course →`.
 
-**Rules:** image/title/action share one canonical entity destination; price/status/completion/action are live text and survive into plain text; no overlay copy baked into imagery; empty optional facts collapse cleanly.
+**Rules:** image/title/action share one canonical entity destination; price/status/completion/action are live text and survive into plain text; no overlay copy baked into imagery; empty optional facts collapse cleanly; paired property and golf-course shells stretch to the height of the tallest sibling on tablet/desktop and return to natural height when stacked on mobile.
 
 ### `card-pair`
 
 **Job:** two equal desktop cells that stack on mobile.
 
-**Rules:** child source order is mobile order; 24px gutter; no CSS grid/flexbox; one child is valid and must not leave a broken blank cell.
+**Rules:** child source order is mobile order; 24px gutter; no CSS grid/flexbox; paired visible card shells are equal height on tablet/desktop; one child is valid and must not leave a broken blank cell.
 
 ### `small-print`
 
@@ -103,7 +103,7 @@ The all-components fixture is a review master. Production campaigns include only
 
 **Required:** audience label, title, summary, canonical href and action label.
 
-**Rules:** no baked text artwork; one card is one coherent link destination; sufficient contrast; normally used as a pair.
+**Rules:** no baked text artwork; one card is one coherent link destination; sufficient contrast; normally used as a pair with both green shells equalised to the tallest sibling on tablet/desktop and natural independent heights on mobile.
 
 ### `dual-action-enquiry`
 
