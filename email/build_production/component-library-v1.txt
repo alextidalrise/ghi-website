@@ -128,6 +128,14 @@ WhatsApp our team (https://wa.me/447496443109)
 
 ------------------------------------------------------------------------
 
+LIGHT FOOTER VARIANT
+--------------------
+
+White compliance surface with dark-green links and social artwork, for
+use after a green closing CTA.
+
+------------------------------------------------------------------------
+
 ========================================================================
 
 You are receiving this because you asked us to keep you informed about

@@ -111,13 +111,18 @@ The all-components fixture is a review master. Production campaigns include only
 
 **Required:** heading, body, primary CTA and secondary WhatsApp CTA.
 
-**Rules:** exactly one visually dominant primary action; WhatsApp is subordinate and uses the canonical configured route; no third default action; closes onto a white section before the green compliance footer.
+**Rules:** exactly one visually dominant primary action; WhatsApp is subordinate and uses the canonical configured route; no third default action. The default retains a 24px white separation before the green footer; `flushfooter="true"` removes that row when the light footer follows directly.
 
 ## Reusable footer contract
 
-`src/components/footer.html` is locked shell content shared by every compiled template. It includes the permission reminder, Mailchimp company/address merge tags, browser/preferences/unsubscribe actions, Instagram and LinkedIn, and the copyright line.
+The locked shell provides two reusable variants with identical compliance content and reading order:
 
-The social destinations use hosted email-safe 72px PNGs rendered at 36px. Each icon is paired with a visible underlined label so the destination remains understandable when images are blocked; the explicit plain-text alternative must carry both labelled profile URLs. Campaign templates must not replace, omit or individually restyle these destinations.
+- `src/components/footer.html`: original dark-green footer and gold social assets; this remains the default and remains visible in the component-library template.
+- `src/components/footer-light.html`: white footer with charcoal/muted copy, dark-green underlined links and dark-green social assets; selected with `footerVariant: 'light'` in campaign frontmatter.
+
+Both include the permission reminder, Mailchimp company/address merge tags, browser/preferences/unsubscribe actions, Instagram and LinkedIn, and the copyright line.
+
+The social destinations use hosted email-safe 72px PNGs rendered at 36px, with gold artwork on green and dark-green artwork on white. Each icon is paired with a visible underlined label so the destination remains understandable when images are blocked; the explicit plain-text alternative must carry both labelled profile URLs. Campaign templates select a complete footer variant rather than replacing, omitting or individually restyling these destinations.
 
 ## Cross-component requirements
 

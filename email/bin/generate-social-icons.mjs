@@ -17,17 +17,22 @@ const browser = await chromium.launch({
 
 try {
 	for (const name of ['instagram', 'linkedin']) {
-		const svg = await readFile(join(sourceDir, `${name}.svg`), 'utf8');
-		const page = await browser.newPage({ viewport: { width: 72, height: 72 }, deviceScaleFactor: 1 });
-		await page.setContent(`<html><body style="margin:0;background:transparent">${svg}</body></html>`);
-		await page.screenshot({
-			path: join(sourceDir, `${name}@2x.png`),
-			type: 'png',
-			omitBackground: true,
-			clip: { x: 0, y: 0, width: 72, height: 72 },
-		});
-		await page.close();
-		console.log(`generated ${name}@2x.png`);
+		const source = await readFile(join(sourceDir, `${name}.svg`), 'utf8');
+		for (const variant of [
+			{ suffix: '', svg: source },
+			{ suffix: '-green', svg: source.replaceAll('#D6C3A3', '#1F3D34') },
+		]) {
+			const page = await browser.newPage({ viewport: { width: 72, height: 72 }, deviceScaleFactor: 1 });
+			await page.setContent(`<html><body style="margin:0;background:transparent">${variant.svg}</body></html>`);
+			await page.screenshot({
+				path: join(sourceDir, `${name}${variant.suffix}@2x.png`),
+				type: 'png',
+				omitBackground: true,
+				clip: { x: 0, y: 0, width: 72, height: 72 },
+			});
+			await page.close();
+			console.log(`generated ${name}${variant.suffix}@2x.png`);
+		}
 	}
 } finally {
 	await browser.close();

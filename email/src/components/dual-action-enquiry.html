@@ -6,5 +6,7 @@
   <tr><td align="{{ page.start }}" style="padding:0 0 20px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" class="sm-full" style="border-collapse:separate;"><tr><td align="center" bgcolor="{{ page.brand.gold }}" class="sm-button-compact" style="background-color:{{ page.brand.gold }};border:1px solid {{ page.brand.gold }};padding:16px 32px;mso-padding-alt:16px 32px;"><a href="{{ primary }}" style="display:block;font-family:{{ page.font.sans }};font-size:{{ page.scale.ui.size }}px;line-height:20px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};letter-spacing:{{ page.track.wide }};color:{{ page.brand.green }};text-decoration:none;">{{ primarylabel }}</a></td></tr></table></td></tr>
   <tr><td style="padding:0;"><a href="{{ secondary }}" style="font-family:{{ page.font.sans }};font-size:{{ page.scale.ui.size }}px;line-height:{{ page.scale.ui.leading }}px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};color:{{ page.brand.gold }};text-decoration:underline;">{{ secondarylabel }}</a></td></tr>
 </table></td></tr>
-<tr><td height="1" bgcolor="{{ page.brand.gold }}" style="background-color:{{ page.brand.gold }};height:1px;line-height:1px;font-size:0;mso-line-height-rule:exactly;">&nbsp;</td></tr>
-<tr><td bgcolor="{{ page.brand.white }}" class="dm-surface sm-gutter" style="background-color:{{ page.brand.white }};height:24px;line-height:24px;font-size:0;mso-line-height-rule:exactly;">&nbsp;</td></tr>
+<if condition="!flushfooter">
+  <tr><td height="1" bgcolor="{{ page.brand.gold }}" style="background-color:{{ page.brand.gold }};height:1px;line-height:1px;font-size:0;mso-line-height-rule:exactly;">&nbsp;</td></tr>
+  <tr><td bgcolor="{{ page.brand.white }}" class="dm-surface sm-gutter" style="background-color:{{ page.brand.white }};height:24px;line-height:24px;font-size:0;mso-line-height-rule:exactly;">&nbsp;</td></tr>
+</if>

@@ -9,11 +9,11 @@
   Reading order is deliberate and matches the plain-text version: what this is,
   why you are getting it, where we are, what you can do about it.
 
-  Green ground, like the masthead. The two bookend the white editorial body and
-  give the required content a surface that survives forced dark-mode inversion.
+  Light footer variant for campaigns where the closing green CTA already provides
+  sufficient emphasis. Compliance structure and reading order remain unchanged.
 -->
 
-<!-- Gold hairline. The Emphasis Ladder's edge treatment for a green band. -->
+<!-- Gold hairline separates the closing CTA from the lighter compliance surface. -->
 <tr>
   <td
     height="1"
@@ -25,10 +25,10 @@
 <tr>
   <td
     align="{{ page.start }}"
-    data-footer-variant="green"
-    bgcolor="{{ page.brand.green }}"
-    class="sm-gutter"
-    style="background-color: {{ page.brand.green }}; padding: 40px 32px;"
+    data-footer-variant="light"
+    bgcolor="{{ page.brand.white }}"
+    class="dm-surface sm-gutter"
+    style="background-color: {{ page.brand.white }}; padding: 40px 32px;"
   >
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%;">
 
@@ -36,7 +36,7 @@
       <tr>
         <td
           align="{{ page.start }}"
-          style="padding: 0 0 16px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ page.brand.onGreen }};"
+          style="padding: 0 0 16px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ page.brand.charcoal }};"
         >
           {{ page.i18n.permissionReminder }}
         </td>
@@ -50,14 +50,14 @@
       <tr>
         <td
           align="{{ page.start }}"
-          style="padding: 0 0 16px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ page.brand.onGreen }};"
+          style="padding: 0 0 16px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ page.brand.charcoal }};"
         >
           *|LIST:COMPANY|*, *|LIST:ADDRESS|*
         </td>
       </tr>
 
       <!--
-        Required actions. Gold on green measures 6.86:1, and each is underlined
+        Required actions. Green on white meets AA contrast, and each is underlined
         at rest: there is no hover in email, so colour alone would be the only
         signal that these are links, which WCAG 1.4.1 does not allow.
 
@@ -68,21 +68,21 @@
       <tr>
         <td
           align="{{ page.start }}"
-          style="padding: 0 0 20px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: 22px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ page.brand.onGreen }};"
+          style="padding: 0 0 20px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: 22px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ page.brand.charcoal }};"
         >
           <a
             href="*|ARCHIVE_PAGE_URL|*"
-            style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
+            style="color: {{ page.brand.green }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
           >{{ page.i18n.viewInBrowser }}</a>
-          <span style="color: {{ page.brand.onGreen }};">&nbsp;&middot;&nbsp;</span>
+          <span style="color: {{ page.brand.charcoal }};">&nbsp;&middot;&nbsp;</span>
           <a
             href="*|UPDATE_PROFILE|*"
-            style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
+            style="color: {{ page.brand.green }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
           >{{ page.i18n.updatePreferences }}</a>
-          <span style="color: {{ page.brand.onGreen }};">&nbsp;&middot;&nbsp;</span>
+          <span style="color: {{ page.brand.charcoal }};">&nbsp;&middot;&nbsp;</span>
           <a
             href="*|UNSUB|*"
-            style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
+            style="color: {{ page.brand.green }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
           >{{ page.i18n.unsubscribe }}</a>
         </td>
       </tr>
@@ -101,11 +101,11 @@
                   <tr>
                     <td valign="middle" style="padding: 0 4px;">
                       <a href="{{ page.site.social.instagram }}" aria-label="Golf Homes International on Instagram" style="text-decoration: none; border: 0;">
-                        <img src="{{ page.site.social.instagramIcon }}" width="36" height="36" alt="" style="display: block; width: 36px; height: 36px; border: 0; outline: none; text-decoration: none;">
+                        <img src="{{ page.site.social.instagramIconGreen }}" width="36" height="36" alt="" style="display: block; width: 36px; height: 36px; border: 0; outline: none; text-decoration: none;">
                       </a>
                     </td>
                     <td valign="middle">
-                      <a href="{{ page.site.social.instagram }}" style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">Instagram</a>
+                      <a href="{{ page.site.social.instagram }}" style="color: {{ page.brand.green }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">Instagram</a>
                     </td>
                   </tr>
                 </table>
@@ -115,11 +115,11 @@
                   <tr>
                     <td valign="middle" style="padding: 0 4px;">
                       <a href="{{ page.site.social.linkedin }}" aria-label="Golf Homes International on LinkedIn" style="text-decoration: none; border: 0;">
-                        <img src="{{ page.site.social.linkedinIcon }}" width="36" height="36" alt="" style="display: block; width: 36px; height: 36px; border: 0; outline: none; text-decoration: none;">
+                        <img src="{{ page.site.social.linkedinIconGreen }}" width="36" height="36" alt="" style="display: block; width: 36px; height: 36px; border: 0; outline: none; text-decoration: none;">
                       </a>
                     </td>
                     <td valign="middle">
-                      <a href="{{ page.site.social.linkedin }}" style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">LinkedIn</a>
+                      <a href="{{ page.site.social.linkedin }}" style="color: {{ page.brand.green }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">LinkedIn</a>
                     </td>
                   </tr>
                 </table>
@@ -132,7 +132,7 @@
       <tr>
         <td
           align="{{ page.start }}"
-          style="padding: 0; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ page.brand.onGreen }};"
+          style="padding: 0; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.body }}; color: {{ page.brand.muted }};"
         >
           &copy; *|CURRENT_YEAR|* Golf Homes International. {{ page.i18n.footerRights }}
         </td>

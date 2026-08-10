@@ -1,6 +1,6 @@
 # Portugal v15 QA and Mailchimp readback
 
-**State:** Alex's comparison decisions are implemented and read back in the audience-free Mailchimp draft. The reusable social footer and consolidated decision changes have not yet been re-proofed. Awaiting human design/content approval. Not authorised for a live audience or schedule.
+**State:** Alex's comparison decisions and light-footer revision are implemented and read back in the audience-free Mailchimp draft. Both light and original dark-green footers remain available in the reusable component template. These consolidated changes have not been re-proofed. Awaiting human design/content approval. Not authorised for a live audience or schedule.
 
 **Canonical design/content reference:** James's approved v15 preview at `/home/admin/GHI/knowledge-base/03-content/campaigns/2026-08-10-portugal-launch/web-preview/index.html`.
 
@@ -8,7 +8,7 @@
 
 - Campaign source: `src/templates/portugal-v15.html`
 - Component showcase: `src/templates/component-library-v1.html`
-- Semantic components: `src/components/{editorial-lead,section-intro,destination-feature,advisory-cta,entity-card,card-pair,small-print,partner-cell,partner-grid-row,guide-card,dual-action-enquiry}.html`
+- Semantic components: `src/components/{editorial-lead,section-intro,destination-feature,advisory-cta,entity-card,card-pair,small-print,partner-cell,partner-grid-row,guide-card,dual-action-enquiry,footer,footer-light}.html`
 - Compiled campaign HTML: `build_production/portugal-v15.html`
 - Explicit plain text: `build_production/portugal-v15.txt`
 - Long-email renderer: `bin/qa-long-email.mjs` (regenerates `qa/segments/`)
@@ -52,12 +52,14 @@ The review caught and fixed:
 - the missing reusable Instagram and LinkedIn footer destinations.
 - the image-first hero order, replaced with the approved copy-first hierarchy;
 - the omitted `Portugal collection` masthead label and four `View course →` links.
+- excessive green at the ending, resolved with the light footer treatment in Portugal while retaining the original green footer in the reusable library;
+- the 24px white spacer row between the final CTA and footer, removed only for the flush light-footer treatment.
 
-No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence. The corrected social row was visually inspected at 700px, 375px and 320px: both linked icons and their visible fallback labels remained aligned, readable and unclipped. The restored masthead label and copy-first hero were inspected at desktop and 320px; the logo/label remained distinct and unclipped. All four restored course labels were inspected at 375px and 320px and remained readable within their cards.
+No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence. The light footer was inspected at 700px, 375px and 320px: the green CTA meets the footer through one gold divider with no spacer row, while both linked dark-green icons and visible labels remain aligned, readable and unclipped. The component showcase was separately inspected at desktop and 320px and contains complete, labelled light and original dark-green variants. The restored masthead label and copy-first hero were inspected at desktop and 320px; the logo/label remained distinct and unclipped. All four restored course labels were inspected at 375px and 320px and remained readable within their cards.
 
 ### Accepted warnings before internal proof
 
-1. Compiled HTML is 91,409 bytes (89.3KB), above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 90,552 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
+1. Compiled HTML is 91,116 bytes (89.0KB), above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 90,259 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
 2. `Enquire about Portugal property` exceeds the validator's generic 28-character warning threshold, but the exact approved label was visually verified on one line at 320px.
 3. The WhatsApp URL has no UTM parameter. It is a direct `wa.me` action with a prefilled message, not a GHI website destination.
 
@@ -70,8 +72,8 @@ No horizontal overflow was recorded. The final 31-character CTA remains one line
 - Type: user HTML template
 - Active: yes
 - Responsive: yes
-- Reusable social destinations: Instagram and LinkedIn, with hosted 72px PNG assets rendered at 36px and visible fallback labels.
-- Last edited after the consolidated comparison changes: `2026-08-10T16:56:28+00:00`.
+- Reusable footer variants: labelled light and original dark-green blocks, each retaining compliance content, Instagram and LinkedIn, hosted 72px PNG assets rendered at 36px and visible fallback labels.
+- Last edited after the light-footer revision: `2026-08-10T17:41:11+00:00`.
 
 The approved plan's longer provisional name exceeded Mailchimp's 49-character maximum. The review-status name avoids implying component approval before Alex's visual gate and does not overwrite the existing GHI template.
 
@@ -95,10 +97,10 @@ The approved plan's longer provisional name exceeded Mailchimp's 49-character ma
 
 ### Stored-content readback
 
-- Corrected source HTML SHA-256 before Mailchimp: `1d87681ecef2388b4b09730a6927cdeaab67ccbf9526daec92fd17cd9150823b`
-- Corrected Mailchimp-stored HTML SHA-256: `0a1a1bf711631b83d0670cca3154ccc884fe10808af007456d1d61a50633e717`
-- Difference: Mailchimp normalisation; two consecutive GET readbacks were stable. Structural readback retained one H1, 30 images, 69 linked elements, one masthead edition label, four course actions, both social destinations and all required sections/entities. The H1/standfirst/meta precede the hero image in stored reading order.
-- Audited explicit plain-text SHA-256: `41cc19cdc740ecf8d20776404c9b94fb1dbd0db8fd219d49f09ca269f0b9fb14`
+- Corrected source HTML SHA-256 before Mailchimp: `ce6c73eb39160408801bd87fdc86fb88ce16d92ef6a8493108204db5186e717e`
+- Corrected Mailchimp-stored HTML SHA-256: `f2833ee81ac628891fc28a11ec0b8c0230ded3838c1c2ce2308326419332edfe`
+- Difference: Mailchimp normalisation; two consecutive GET readbacks were stable. Structural readback retained one H1, 30 images, 69 linked elements, one light footer, no campaign green footer, no 24px CTA/footer spacer row, one masthead edition label, four course actions, both social destinations and all required sections/entities. The H1/standfirst/meta precede the hero image in stored reading order.
+- Audited explicit plain-text SHA-256: `d1fbcb24adb26c1b24142d84da79f67193592f714c380c210d2fe1a1bd20ce49`
 - Mailchimp-stored plain text matches the current source-controlled plain text exactly.
 - Mailchimp archive readback exposed the full destination, development, golf, partner, guide and enquiry hierarchy.
 
@@ -113,7 +115,7 @@ Mailchimp returned `Action executed successfully`. It did not expose a separate 
 
 After the proof action, Mailchimp regenerated the plain-text part. The source-controlled plain text was immediately restored and read back with exact SHA-256 equality. The campaign remained an audience-free draft with zero live delivery.
 
-The reusable social footer and Alex's accepted comparison changes were added after that proof. Mailchimp content readback confirms the restored masthead label, copy-first hero, four course actions, both social icons and exact plain-text destinations. No further proof action was taken during implementation.
+The reusable social footers, Alex's accepted comparison changes and the light-footer/gap revision were added after that proof. Mailchimp content readback confirms the restored masthead label, copy-first hero, four course actions, light campaign footer, absence of the CTA/footer spacer row, both social icons and exact plain-text destinations. No further proof action was taken during implementation.
 
 API acceptance is not evidence of inbox receipt. Alex and James must each confirm receipt of this same proof.
 

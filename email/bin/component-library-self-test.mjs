@@ -18,7 +18,8 @@ const requiredComponents = [
 	'partner-cell.html',
 	'partner-grid-row.html',
 	'guide-card.html',
-	'dual-action-enquiry.html'
+	'dual-action-enquiry.html',
+	'footer-light.html'
 ];
 
 const expectedPortugalHeadings = [
@@ -43,8 +44,8 @@ const expectedPortugalMarkers = [
 const forbiddenPortugalCopy = ['A more useful way to compare the Algarve'];
 const approvedPreview = 'Explore Vilamoura, Quinta do Lago, Monte Rei and Palmares, with current developments, golf and independent buyer support.';
 const expectedSocialLinks = [
-	['Instagram', 'https://www.instagram.com/golfhomesinternational/?utm_source=mailchimp&utm_medium=email', '2c920cce-3ac9-d4c1-b8fe-20d02fb2e113.png'],
-	['LinkedIn', 'https://www.linkedin.com/company/golf-homes-international?utm_source=mailchimp&utm_medium=email', 'fb1db59d-5a98-4778-cad5-7a6300e42056.png'],
+	['Instagram', 'https://www.instagram.com/golfhomesinternational/?utm_source=mailchimp&utm_medium=email', 'e94b0a42-1a48-ccb5-779b-a91f9b3168de.png', '2c920cce-3ac9-d4c1-b8fe-20d02fb2e113.png'],
+	['LinkedIn', 'https://www.linkedin.com/company/golf-homes-international?utm_source=mailchimp&utm_medium=email', '1a1bf10b-e0ae-24e9-0413-439834506287.png', 'fb1db59d-5a98-4778-cad5-7a6300e42056.png'],
 ];
 
 let failures = 0;
@@ -70,9 +71,10 @@ const builtHtmlPath = join(root, 'build_production', 'portugal-v15.html');
 const builtTextPath = join(root, 'build_production', 'portugal-v15.txt');
 
 try {
-	const [html, text] = await Promise.all([
+	const [html, text, componentHtml] = await Promise.all([
 		readFile(builtHtmlPath, 'utf8'),
-		readFile(builtTextPath, 'utf8')
+		readFile(builtTextPath, 'utf8'),
+		readFile(join(root, 'build_production', 'component-library-v1.html'), 'utf8')
 	]);
 	const source = await readFile(join(root, 'src', 'templates', 'portugal-v15.html'), 'utf8');
 	const normalizedHtml = html.replace(/\s+/g, ' ');
@@ -123,15 +125,30 @@ try {
 		failures += 1;
 	}
 
-	for (const [label, href, icon] of expectedSocialLinks) {
+	for (const [label, href, lightIcon, greenIcon] of expectedSocialLinks) {
 		const encodedHref = href.replace(/&/g, '&amp;');
-		const htmlHas = html.includes(`href="${encodedHref}"`) && html.includes(icon);
+		const htmlHas = html.includes(`href="${encodedHref}"`) && html.includes(lightIcon);
+		const greenAvailable = componentHtml.includes(`href="${encodedHref}"`) && componentHtml.includes(greenIcon);
 		const textHas = text.includes(`${label}: ${href}`);
-		if (htmlHas && textHas) console.log(`  ok    reusable footer social parity: ${label}`);
+		if (htmlHas && greenAvailable && textHas) console.log(`  ok    light/green footer social parity: ${label}`);
 		else {
-			console.error(`  FAIL  reusable footer social parity: ${label} (html=${htmlHas}, text=${textHas})`);
+			console.error(`  FAIL  light/green footer social parity: ${label} (light=${htmlHas}, green=${greenAvailable}, text=${textHas})`);
 			failures += 1;
 		}
+	}
+
+	const lightFooterSelected = html.split('data-footer-variant="light"').length - 1 === 1 && !html.includes('data-footer-variant="green"');
+	const greenFooterAvailable = componentHtml.split('data-footer-variant="green"').length - 1 === 1;
+	const lightFooterAvailable = componentHtml.split('data-footer-variant="light"').length - 1 === 1;
+	const closingStart = html.indexOf('data-component="dual-action-enquiry"');
+	const lightFooterStart = html.indexOf('data-footer-variant="light"');
+	const closingBoundary = html.slice(closingStart, lightFooterStart);
+	const gapRemoved = closingStart >= 0 && lightFooterStart > closingStart && !closingBoundary.includes('height:24px');
+	const closingPlain = text.includes('ENQUIRE ABOUT GOLF PROPERTY IN PORTUGAL') && text.includes('WhatsApp our Portugal team');
+	if (lightFooterSelected && greenFooterAvailable && lightFooterAvailable && gapRemoved && closingPlain) console.log('  ok    light footer selected, both footer blocks available, CTA/footer gap removed');
+	else {
+		console.error(`  FAIL  footer variant/gap contract (campaignLight=${lightFooterSelected}, libraryGreen=${greenFooterAvailable}, libraryLight=${lightFooterAvailable}, gapRemoved=${gapRemoved}, plainCTA=${closingPlain})`);
+		failures += 1;
 	}
 
 	for (const heading of expectedPortugalHeadings) {

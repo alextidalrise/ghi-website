@@ -101,9 +101,9 @@ export function generatePlaintext(html, { locale = 'en' } = {}) {
  * moment the markup changed. Walking them as well would print the wordmark
  * twice and the permission reminder twice.
  *
- * The boundaries are the first and last full-bleed green cells, which are the
- * masthead and footer by construction. `sm-gutter` marks a band-level cell,
- * which distinguishes them from the green-filled CTA button cells.
+ * The start boundary is the first full-bleed green `sm-gutter` cell: the
+ * masthead. The end boundary is the explicit footer-variant marker, so a light
+ * footer cannot be confused with the closing green CTA.
  */
 function extractBody(html) {
 	const match = /<body\b[^>]*>([\s\S]*)<\/body>/i.exec(html);
@@ -121,10 +121,10 @@ function extractBody(html) {
 	const bands = [
 		...body.matchAll(/<td\b[^>]*(?:sm-gutter[^>]*background-color:\s*#1f3d34|background-color:\s*#1f3d34[^>]*sm-gutter)[^>]*>/gi)
 	];
+	const footer = /<td\b[^>]*data-footer-variant="(?:green|light)"[^>]*>/i.exec(body);
 
-	if (bands.length >= 2) {
+	if (bands.length >= 1 && footer) {
 		const masthead = bands[0];
-		const footer = bands[bands.length - 1];
 
 		// Trim from the end of the masthead cell to the start of the footer's
 		// preceding hairline.

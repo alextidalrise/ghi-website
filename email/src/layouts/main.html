@@ -104,7 +104,12 @@
 
             <yield></yield>
 
-            <x-footer></x-footer>
+            <if condition="page.footerVariant === 'light'">
+              <x-footer-light></x-footer-light>
+            </if>
+            <else>
+              <x-footer></x-footer>
+            </else>
 
           </table>
 
