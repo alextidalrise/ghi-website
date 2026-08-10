@@ -187,6 +187,34 @@ if (baseline.length) {
 	console.log('  ok    baseline fixture passes with no errors');
 }
 
+const transformedModernSource = GOOD.replace(
+	'https://www.golfhomesinternational.com/email/logo-ivory@2x.png',
+	'https://cdn.sanity.io/images/s88o8sjb/development/abc-1200x800.webp?fm=jpg&w=1200'
+);
+const transformedErrors = validate({ html: transformedModernSource, name: 'explicit JPG transform' }).filter(
+	(f) => f.level === 'error' && f.check === 'assets'
+);
+if (transformedErrors.length) {
+	console.error('  FAIL  WebP source with explicit fm=jpg should be delivered as JPEG');
+	failures += 1;
+} else {
+	console.log('  ok    explicit fm=jpg transform permits a modern source asset');
+}
+
+const transformedSvgSource = GOOD.replace(
+	'https://www.golfhomesinternational.com/email/logo-ivory@2x.png',
+	'https://cdn.sanity.io/images/s88o8sjb/development/abc-304x92.svg?fm=png&w=360'
+);
+const transformedSvgErrors = validate({ html: transformedSvgSource, name: 'explicit SVG-to-PNG transform' }).filter(
+	(f) => f.level === 'error' && f.check === 'assets'
+);
+if (transformedSvgErrors.length) {
+	console.error('  FAIL  SVG source with explicit fm=png should be delivered as PNG');
+	failures += 1;
+} else {
+	console.log('  ok    explicit fm=png transform permits an SVG source asset');
+}
+
 for (const testCase of cases) {
 	const findings = validate({ html: testCase.html, name: testCase.name });
 	const wanted = testCase.level || 'error';
@@ -202,7 +230,8 @@ for (const testCase of cases) {
 	}
 }
 
-console.log(`\n  ${cases.length - failures + 1}/${cases.length + 1} checks verified.`);
+const totalChecks = cases.length + 3;
+console.log(`\n  ${totalChecks - failures}/${totalChecks} checks verified.`);
 
 if (failures) {
 	console.error(`  ${failures} validator check(s) are not working.`);

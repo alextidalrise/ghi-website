@@ -1,0 +1,135 @@
+GOLF HOMES INTERNATIONAL
+https://www.golfhomesinternational.com/?utm_source=mailchimp&utm_medium=email
+========================================================================
+
+[Image: Example full-width destination hero]
+
+Component reference
+
+GHI EMAIL COMPONENT LIBRARY V1
+------------------------------
+
+This internal proving fixture displays every approved component once.
+
+Campaigns include only selected blocks. Sample copy in this fixture is
+never campaign approval.
+
+------------------------------------------------------------------------
+
+DESTINATION FEATURE
+-------------------
+
+[Image: Example destination landscape]
+
+Destination caption
+
+EXAMPLE DESTINATION
+-------------------
+
+Concise destination copy explains the buyer relevance of the setting.
+
+View the destination
+(https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+ADVISORY PROMPT
+---------------
+
+A quiet prompt supports the primary campaign journey without becoming a
+second dominant action.
+
+START AN ENQUIRY:
+https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+------------------------------------------------------------------------
+
+ENTITY CARDS
+------------
+
+Example commercial qualification appears in explicit plain text.
+
+[Image: Example development]
+
+Destination · Country
+
+EXAMPLE DEVELOPMENT
+-------------------
+https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+From €600,000
+
+Under construction
+
+Completion varies by phase
+
+[Image: Example golf course]
+
+Destination · Country
+
+EXAMPLE GOLF COURSE
+-------------------
+https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+------------------------------------------------------------------------
+
+PARTNER SERVICE GRID
+--------------------
+
+EXAMPLE PARTNER
+---------------
+https://www.golfhomesinternational.com/partners?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+Legal and tax
+
+EXAMPLE PARTNER TWO
+-------------------
+https://www.golfhomesinternational.com/partners?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+Currency exchange
+
+------------------------------------------------------------------------
+
+GUIDE CARDS
+-----------
+
+EXAMPLE BUYING GUIDE
+--------------------
+
+For buyersPractical preparation and purchase guidance. Read the guide
+(https://www.golfhomesinternational.com/guides?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+EXAMPLE INTERNATIONAL GUIDE
+---------------------------
+
+For international buyersA separate audience-specific introduction. Read
+the guide
+(https://www.golfhomesinternational.com/guides?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+------------------------------------------------------------------------
+
+DUAL-ACTION ENQUIRY
+-------------------
+
+The campaign’s principal action remains visually dominant; WhatsApp is
+subordinate.
+
+START AN ENQUIRY:
+https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+WhatsApp our team (https://wa.me/447496443109)
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+========================================================================
+
+You are receiving this because you asked us to keep you informed about
+property on and around the golf courses of southern Europe.
+
+*|LIST:COMPANY|*, *|LIST:ADDRESS|*
+
+View this email in your browser: *|ARCHIVE_PAGE_URL|*
+Update your preferences: *|UPDATE_PROFILE|*
+Unsubscribe: *|UNSUB|*
+
+(c) *|CURRENT_YEAR|* Golf Homes International. All rights reserved.

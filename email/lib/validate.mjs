@@ -377,11 +377,13 @@ function checkAssetProtocol(html, add) {
 			);
 		}
 
-		if (/\.svg(\?|$)/i.test(src)) {
+		const explicitLegacyTransform = /\bfm=(?:jpg|jpeg|png|gif)\b/i.test(src);
+		if (/\.svg(\?|$)/i.test(src) && !explicitLegacyTransform) {
 			add(ERROR, 'assets', `SVG image: ${src}. Neither Outlook for Windows nor Gmail renders it.`);
 		}
 
-		if (/\.(webp|avif)(\?|$)/i.test(src) || /\bfm=(webp|avif)\b/i.test(src)) {
+		const modernSourceWithoutLegacyTransform = /\.(webp|avif)(\?|$)/i.test(src) && !explicitLegacyTransform;
+		if (modernSourceWithoutLegacyTransform || /\bfm=(webp|avif)\b/i.test(src)) {
 			add(ERROR, 'assets', `Modern image format: ${src}. Classic Outlook renders neither WebP nor AVIF.`);
 		}
 

@@ -1,0 +1,9 @@
+<!-- Major editorial section opener with optional ruled top edge. -->
+<if condition="ruled">
+<tr><td height="1" bgcolor="{{ page.brand.border }}" class="dm-hairline" style="background-color: {{ page.brand.border }};height:1px;line-height:1px;font-size:0;mso-line-height-rule:exactly;">&nbsp;</td></tr>
+</if>
+<tr data-component="section-intro">
+  <td align="{{ page.start }}" bgcolor="{{ page.brand.white }}" class="dm-surface sm-gutter sm-section" style="background-color: {{ page.brand.white }}; padding: {{ pt === '' ? 48 : pt }}px 32px {{ pb === '' ? 32 : pb }}px;" mc:edit="{{ edit }}">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;"><yield></yield></table>
+  </td>
+</tr>

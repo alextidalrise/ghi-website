@@ -128,7 +128,8 @@ async function main() {
 		process.exit(1);
 	}
 
-	const browser = await chromium.launch();
+	const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+	const browser = await chromium.launch(executablePath ? { executablePath } : {});
 	const shots = [];
 
 	for (const file of files) {

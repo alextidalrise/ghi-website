@@ -1,0 +1,16 @@
+<!-- Quiet advisory CTA: subordinate to the final campaign action. -->
+<tr data-component="advisory-cta">
+  <td bgcolor="{{ page.brand.onGreen }}" class="dm-surface sm-gutter" style="background-color:{{ page.brand.onGreen }};padding:32px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
+      <tr>
+        <td width="64%" valign="middle" class="sm-stack" style="width:64%;padding:0 10px;">
+          <h3 class="dm-accent" style="margin:0 0 10px;font-family:{{ page.font.serif }};font-size:{{ page.scale.h3.size }}px;line-height:{{ page.scale.h3.leading }}px;mso-line-height-rule:exactly;font-weight:{{ page.weight.body }};color:{{ page.brand.green }};">{{ title }}</h3>
+          <div class="dm-ink" style="font-family:{{ page.font.sans }};font-size:{{ page.scale.ui.size }}px;line-height:{{ page.scale.ui.leading }}px;mso-line-height-rule:exactly;color:{{ page.brand.charcoal }};"><yield></yield></div>
+        </td>
+        <td width="36%" valign="middle" class="sm-stack sm-card-action" style="width:36%;padding:0 10px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="sm-full" style="border-collapse:separate;"><tr><td align="center" bgcolor="{{ page.brand.green }}" style="background-color:{{ page.brand.green }};padding:14px 18px;"><a href="{{ href }}" style="display:block;font-family:{{ page.font.sans }};font-size:{{ page.scale.ui.size }}px;line-height:20px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};color:{{ page.brand.onGreen }};text-decoration:none;">{{ cta }}</a></td></tr></table>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>

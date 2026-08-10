@@ -29,9 +29,12 @@ open email/qa/screens/index.html
 | `pnpm assets` | Regenerate logo PNGs and the reference photograph from source |
 | `pnpm validate` | All checks against the compiled output |
 | `pnpm validate:links` | Resolve every campaign link over HTTP (run before a send) |
-| `pnpm validate:self-test` | Prove the validator's 26 checks still fire |
+| `pnpm validate:template portugal-v15 --links` | Validate and resolve links for one campaign only |
+| `pnpm validate:self-test` | Prove the validator's 28 checks still fire |
+| `pnpm validate:components` | Prove the v1 semantic modules and Portugal retention contract |
 | `pnpm plaintext` | Generate `.txt` alternatives |
 | `pnpm qa` | Screenshot every template across 8 scenarios |
+| `pnpm qa:long portugal-v15` | Segment a long email at desktop, 375px and 320px |
 | `pnpm check` | Everything except live links. This is what CI runs. |
 
 Validating what Mailchimp actually delivered, which is the run that matters for
@@ -56,6 +59,9 @@ node bin/validate.mjs --delivered ~/Downloads/delivered.html
 | [07-agent-integration.md](docs/07-agent-integration.md) | What the foundation guarantees for programmatic campaign creation, and the sharp edges |
 | [08-known-limitations.md](docs/08-known-limitations.md) | Accepted degradation, real limitations, open questions |
 | [09-qa-report.md](docs/09-qa-report.md) | What was tested, what was fixed, what remains untested |
+| [10-portugal-v15-email-gap-matrix.md](docs/10-portugal-v15-email-gap-matrix.md) | Canonical target, retention choices and failed-build gaps |
+| [11-component-library-v1.md](docs/11-component-library-v1.md) | Semantic component contract and composition rules |
+| [12-portugal-v15-qa-and-mailchimp-readback.md](docs/12-portugal-v15-qa-and-mailchimp-readback.md) | Campaign QA, Mailchimp IDs, proof state and remaining gates |
 
 ---
 
@@ -91,5 +97,9 @@ node bin/validate.mjs --delivered ~/Downloads/delivered.html
 `src/templates/reference.html` (English) and `reference-ar.html` (Arabic, RTL)
 are the proving fixtures, not campaign templates. They exercise every primitive
 and every edge case the QA plan tests, so a system change shows up somewhere
-visible. Rebuild and read all 16 screenshots after any change to `lib/`,
+visible. Rebuild and read all 32 screenshots after any change to `lib/`,
 `src/layouts/`, `src/components/`, `src/css/` or `config*.js`.
+
+`src/templates/component-library-v1.html` is the separately versioned
+all-components showcase. It is not a production campaign recipe. Campaigns
+must include only the modules selected for that brief.

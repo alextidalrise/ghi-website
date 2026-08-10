@@ -98,7 +98,19 @@ export default {
 		height: '',
 		gap: '',
 		pt: '',
-		pb: ''
+		pb: '',
+		ruled: '',
+		title: '',
+		label: '',
+		cta: '',
+		price: '',
+		status: '',
+		completion: '',
+		side: '',
+		primary: '',
+		primarylabel: '',
+		secondary: '',
+		secondarylabel: ''
 	},
 
 	/*

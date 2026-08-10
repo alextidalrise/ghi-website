@@ -12,9 +12,12 @@
 		"validate": "node bin/validate.mjs",
 		"validate:links": "node bin/validate.mjs --links",
 		"validate:self-test": "node bin/validate-self-test.mjs",
+		"validate:components": "node bin/component-library-self-test.mjs",
+		"validate:template": "node bin/validate-template.mjs",
 		"plaintext": "node bin/plaintext.mjs",
 		"qa": "node bin/qa-screens.mjs",
-		"check": "pnpm validate:self-test && pnpm build && pnpm validate && node bin/plaintext.mjs --check && pnpm qa"
+		"qa:long": "node bin/qa-long-email.mjs",
+		"check": "pnpm validate:self-test && pnpm build && pnpm validate:components && pnpm validate && node bin/plaintext.mjs --check && pnpm qa"
 	},
 	"devDependencies": {
 		"@maizzle/framework": "^5.5.0",

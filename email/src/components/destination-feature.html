@@ -1,0 +1,22 @@
+<!-- Destination feature: image and copy are one coherent, responsive unit. -->
+<tr data-component="destination-feature">
+  <td bgcolor="{{ page.brand.white }}" class="dm-surface sm-gutter" style="background-color:{{ page.brand.white }};padding:0 32px {{ gap === '' ? 32 : gap }}px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="dm-border" style="width:100%;border:1px solid {{ page.brand.border }};">
+      <tr>
+        <td width="44%" valign="top" class="sm-stack" style="width:44%;padding:0;font-size:0;line-height:0;">
+          <a href="{{ href }}" style="text-decoration:none;border:0;">
+            <img src="{{ src }}" alt="{{ alt }}" width="236" height="236" class="sm-full" style="display:block;width:100%;max-width:236px;height:auto;border:0;outline:none;text-decoration:none;font-family:{{ page.font.sans }};font-size:{{ page.scale.ui.size }}px;line-height:{{ page.scale.ui.leading }}px;color:{{ page.brand.charcoal }};background-color:{{ page.brand.border }};">
+          </a>
+        </td>
+        <td width="56%" valign="middle" class="sm-stack sm-card-copy" style="width:56%;padding:24px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
+            <if condition="label"><tr><td class="dm-muted" style="padding:0 0 8px;font-family:{{ page.font.sans }};font-size:11px;line-height:15px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};letter-spacing:{{ page.track.normal }};color:{{ page.brand.muted }};">{{ label }}</td></tr></if>
+            <tr><td style="padding:0 0 12px;"><h3 class="dm-accent" style="margin:0;font-family:{{ page.font.serif }};font-size:{{ page.scale.h3.size }}px;line-height:{{ page.scale.h3.leading }}px;mso-line-height-rule:exactly;font-weight:{{ page.weight.body }};color:{{ page.brand.green }};">{{ title }}</h3></td></tr>
+            <tr><td class="dm-ink" style="padding:0 0 18px;font-family:{{ page.font.sans }};font-size:{{ page.scale.body.size }}px;line-height:{{ page.scale.body.leading }}px;mso-line-height-rule:exactly;font-weight:{{ page.weight.body }};color:{{ page.brand.charcoal }};"><yield></yield></td></tr>
+            <tr><td style="padding:0;"><a href="{{ href }}" class="dm-accent" style="font-family:{{ page.font.sans }};font-size:{{ page.scale.ui.size }}px;line-height:{{ page.scale.ui.leading }}px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};color:{{ page.brand.green }};text-decoration:underline;">{{ cta }}</a></td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>

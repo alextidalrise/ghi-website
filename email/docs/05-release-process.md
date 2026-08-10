@@ -60,7 +60,7 @@ pnpm --filter email check
 
 which is, in order:
 
-1. `validate:self-test` — proves the validator's 26 checks still fire
+1. `validate:self-test` — proves the validator's 28 checks still fire
 2. `build` — compile + regenerate plain text
 3. `validate` — all checks against the compiled output
 4. `plaintext --check` — fails if a committed `.txt` is stale

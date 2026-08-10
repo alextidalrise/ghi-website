@@ -43,6 +43,7 @@ export function generatePlaintext(html, { locale = 'en' } = {}) {
 			blocks.push('');
 			blocks.push(block.text.toUpperCase());
 			blocks.push(rule('-', Math.min(block.text.length, WRAP_AT)));
+			if (block.href) blocks.push(block.href);
 		} else if (block.type === 'paragraph') {
 			blocks.push('');
 			blocks.push(wrap(block.text));
@@ -79,7 +80,7 @@ export function generatePlaintext(html, { locale = 'en' } = {}) {
 	blocks.push('');
 	blocks.push(`(c) *|CURRENT_YEAR|* Golf Homes International. ${i18n.footerRights}`);
 
-	return `${blocks.join('\n').replace(/\n{3,}/g, '\n\n').trim()}\n`;
+	return blocks.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -140,7 +141,9 @@ function extractBody(html) {
  * only and then classifying each leaf avoids the whole problem.
  */
 function* walk(body) {
-	const emitted = new Set();
+	// Every leaf cell is emitted in source order. Repeated commercial fields such
+	// as “Under construction” are meaningful for each entity and must not be
+	// globally deduplicated.
 
 	// `(?:(?!<td)[\s\S])*?` refuses to cross another opening cell, so this only
 	// ever matches innermost cells.
@@ -175,7 +178,21 @@ function* walk(body) {
 		const heading = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/i.exec(inner);
 		if (heading) {
 			const text = clean(heading[2]);
-			if (text) yield { type: 'heading', text };
+			const anchor = /<a\b([^>]*)>/i.exec(heading[2]);
+			const href = anchor ? attrOf(anchor[1], 'href') : null;
+			if (text) {
+				yield {
+					type: 'heading',
+					text,
+					href: href ? decodeEntities(href) : null
+				};
+			}
+
+			// Semantic components can carry a label, description or inline CTA in
+			// the same leaf cell as the heading. Preserve that remainder rather than
+			// silently discarding it.
+			const remainder = withInlineLinks(inner.replace(heading[0], ''));
+			if (remainder) yield { type: 'paragraph', text: remainder };
 			continue;
 		}
 
@@ -197,10 +214,6 @@ function* walk(body) {
 
 		const text = withInlineLinks(inner);
 		if (!text) continue;
-
-		const key = text.slice(0, 60);
-		if (emitted.has(key)) continue;
-		emitted.add(key);
 
 		yield { type: 'paragraph', text };
 	}
