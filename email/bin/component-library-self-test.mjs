@@ -158,6 +158,9 @@ try {
 		&& entitySource.includes('height="{{ bodyheight }}"')
 		&& entitySource.includes('sm-equal-card-row')
 		&& guideSource.includes('height="281"')
+		&& source.split('tone="green"').length - 1 === 10
+		&& entitySource.includes("tone === 'green' ? page.brand.green")
+		&& entitySource.includes("tone === 'green' ? page.brand.onGreen")
 		&& source.split('cardheight="406" bodyheight="236"').length - 1 === 10
 		&& source.split('cardheight="329" bodyheight="159"').length - 1 === 4
 		&& cssSource.includes('.sm-equal-card')
