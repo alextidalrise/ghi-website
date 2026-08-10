@@ -56,11 +56,11 @@ The review caught and fixed:
 - the 24px white spacer row between the final CTA and footer, removed only for the flush light-footer treatment.
 - unequal visible card shells within the property, golf-course and buying-guide rows at tablet/desktop widths.
 
-No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence. The light footer was inspected at 700px, 375px and 320px: the green CTA meets the footer through one gold divider with no spacer row, while both linked dark-green icons and visible labels remain aligned, readable and unclipped. The component showcase was separately inspected at desktop and 320px and contains complete, labelled light and original dark-green variants. The restored masthead label and copy-first hero were inspected at desktop and 320px; the logo/label remained distinct and unclipped. All four restored course labels were inspected at 375px and 320px and remained readable within their cards. Final equal-height verification measured the visible inner card tables—not the naturally equal outer row cells—at both 1024px and 768px: all five property pairs were `374/374`, both course pairs were `331/331`, and the guide pair was `281/281`. Representative rows were visually inspected at tablet width with aligned borders/backgrounds, flush image tops and no clipping, overlap or broken actions. At 375px and 320px the desktop height rules reset and cards stack without horizontal overflow.
+No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence. The light footer was inspected at 700px, 375px and 320px: the green CTA meets the footer through one gold divider with no spacer row, while both linked dark-green icons and visible labels remain aligned, readable and unclipped. The component showcase was separately inspected at desktop and 320px and contains complete, labelled light and original dark-green variants. The restored masthead label and copy-first hero were inspected at desktop and 320px; the logo/label remained distinct and unclipped. All four restored course labels were inspected at 375px and 320px and remained readable within their cards. Final equal-height verification measured the visible inner card tables—not the naturally equal outer row cells—at both 1024px and 768px. After adding ten explicit development actions, every property pair remained aligned within `0.5px` at a visible shell height of approximately `408px`; both course pairs remained `331/331`, and the guide pair remained `281/281`. Representative rows were visually inspected at tablet width with aligned borders/backgrounds, flush image tops and no clipping, overlap or broken actions. At 375px and 320px the desktop height rules reset and cards stack without horizontal overflow.
 
 ### Accepted warnings before internal proof
 
-1. Compiled HTML is 94,038 bytes (91.8KB), above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 93,181 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
+1. Compiled HTML is 97,164 bytes (94.9KB), above the 60KB working target and only about 5KB below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 96,263 bytes. The ten new tracked development links reduce delivery headroom, so final delivered HTML must be checked for Gmail clipping before live-send approval.
 2. `Enquire about Portugal property` exceeds the validator's generic 28-character warning threshold, but the exact approved label was visually verified on one line at 320px.
 3. The WhatsApp URL has no UTM parameter. It is a direct `wa.me` action with a prefilled message, not a GHI website destination.
 
@@ -98,10 +98,10 @@ The approved plan's longer provisional name exceeded Mailchimp's 49-character ma
 
 ### Stored-content readback
 
-- Corrected source HTML SHA-256 before Mailchimp: `4b31fc4b65194d2f35d0ca22adf060899f0a512dd1d94e16bbde4c6a3d1e9c70`
-- Corrected Mailchimp-stored HTML SHA-256: `afe9456de8b1202f3981eac72c5aa48df43a355692ebccc80f7e38cbcb56d4d2`
-- Difference: Mailchimp normalisation; two consecutive GET readbacks were stable. Structural readback retained one H1, 30 images, 69 linked elements, one light footer, no campaign green footer, no 24px CTA/footer spacer row, one masthead edition label, four course actions, both social destinations, all 14 entity cards and both guide cards. The stored content retained ten 372px development-shell markers, four 329px course-shell markers, two 281px guide-shell markers and 43 responsive row/shell reset markers. The H1/standfirst/meta precede the hero image in stored reading order.
-- Audited explicit plain-text SHA-256: `d1fbcb24adb26c1b24142d84da79f67193592f714c380c210d2fe1a1bd20ce49`
+- Corrected source HTML SHA-256 before Mailchimp: `662a48452b19413db4ee6e4e86d90ef5b11593acd39fdc3baa03088c90c12790`
+- Corrected Mailchimp-stored HTML SHA-256: `edfccebcb13622ca3448c9143ef485d80878b74c5d11adfe80bd352b3d63e837`
+- Difference: Mailchimp normalisation; two consecutive GET readbacks were stable. Structural readback retained the approved hierarchy, six partner cells, ten explicit `View development →` actions, four course actions, the partner-introduction CTA, the green/white outlined WhatsApp button, one light footer and no CTA/footer spacer. Olive Grove Partners and Nueva Vida Group were absent from both stored HTML and plain text. The stored content retained ten 406px development-shell markers, four 329px course-shell markers and two 281px guide-shell markers.
+- Audited explicit plain-text SHA-256: `444590f6711af3c9cae593bcbc3238bfd831841e29ce48dde9b28e05e8763ad7`
 - Mailchimp-stored plain text matches the current source-controlled plain text exactly.
 - Mailchimp archive readback exposed the full destination, development, golf, partner, guide and enquiry hierarchy.
 
@@ -116,7 +116,7 @@ Mailchimp returned `Action executed successfully`. It did not expose a separate 
 
 After the proof action, Mailchimp regenerated the plain-text part. The source-controlled plain text was immediately restored and read back with exact SHA-256 equality. The campaign remained an audience-free draft with zero live delivery.
 
-The reusable social footers, Alex's accepted comparison changes, the light-footer/gap revision and equal-height tablet/desktop card treatment were added after that proof. Mailchimp content readback confirms the restored masthead label, copy-first hero, four course actions, light campaign footer, absence of the CTA/footer spacer row, both social icons, equal-height card markers and exact plain-text destinations. No further proof action was taken during implementation.
+The reusable social footers, Alex's accepted comparison changes, the light-footer/gap revision, equal-height tablet/desktop card treatment and James's partner/CTA revisions were added after that proof. Mailchimp content readback confirms the restored masthead label, copy-first hero, ten development actions, four course actions, six retained partners, partner-introduction CTA, green/white WhatsApp button, light campaign footer, absence of the CTA/footer spacer row, both social icons, equal-height card markers and exact plain-text destinations. No further proof action was taken during implementation.
 
 API acceptance is not evidence of inbox receipt. Alex and James must each confirm receipt of this same proof.
 

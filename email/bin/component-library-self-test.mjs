@@ -41,7 +41,7 @@ const expectedPortugalMarkers = [
 	'data-component="dual-action-enquiry"'
 ];
 
-const forbiddenPortugalCopy = ['A more useful way to compare the Algarve'];
+const forbiddenPortugalCopy = ['A more useful way to compare the Algarve', 'Olive Grove Partners', 'Nueva Vida Group'];
 const approvedPreview = 'Explore Vilamoura, Quinta do Lago, Monte Rei and Palmares, with current developments, golf and independent buyer support.';
 const expectedSocialLinks = [
 	['Instagram', 'https://www.instagram.com/golfhomesinternational/?utm_source=mailchimp&utm_medium=email', 'e94b0a42-1a48-ccb5-779b-a91f9b3168de.png', '2c920cce-3ac9-d4c1-b8fe-20d02fb2e113.png'],
@@ -147,7 +147,7 @@ try {
 	const lightFooterStart = html.indexOf('data-footer-variant="light"');
 	const closingBoundary = html.slice(closingStart, lightFooterStart);
 	const gapRemoved = closingStart >= 0 && lightFooterStart > closingStart && !closingBoundary.includes('height:24px');
-	const closingPlain = text.includes('ENQUIRE ABOUT GOLF PROPERTY IN PORTUGAL') && text.includes('WhatsApp our Portugal team');
+	const closingPlain = text.includes('ENQUIRE ABOUT GOLF PROPERTY IN PORTUGAL') && text.includes('WHATSAPP OUR PORTUGAL TEAM');
 	if (lightFooterSelected && greenFooterAvailable && lightFooterAvailable && gapRemoved && closingPlain) console.log('  ok    light footer selected, both footer blocks available, CTA/footer gap removed');
 	else {
 		console.error(`  FAIL  footer variant/gap contract (campaignLight=${lightFooterSelected}, libraryGreen=${greenFooterAvailable}, libraryLight=${lightFooterAvailable}, gapRemoved=${gapRemoved}, plainCTA=${closingPlain})`);
@@ -158,7 +158,7 @@ try {
 		&& entitySource.includes('height="{{ bodyheight }}"')
 		&& entitySource.includes('sm-equal-card-row')
 		&& guideSource.includes('height="281"')
-		&& source.split('cardheight="372" bodyheight="202"').length - 1 === 10
+		&& source.split('cardheight="406" bodyheight="236"').length - 1 === 10
 		&& source.split('cardheight="329" bodyheight="159"').length - 1 === 4
 		&& cssSource.includes('.sm-equal-card')
 		&& cssSource.includes('.sm-equal-card-row')
@@ -190,7 +190,7 @@ try {
 	const expectedCounts = new Map([
 		['data-component="destination-feature"', 4],
 		['data-component="entity-card"', 14],
-		['data-component="partner-cell"', 8],
+		['data-component="partner-cell"', 6],
 		['data-component="guide-card"', 2]
 	]);
 	for (const [marker, expected] of expectedCounts) {
@@ -202,7 +202,7 @@ try {
 		}
 	}
 
-	for (const required of ['Enquire about Portugal property', 'WhatsApp our Portugal team', 'Monte Rei Golf &amp; Country Club']) {
+	for (const required of ['Enquire about Portugal property', 'WhatsApp our Portugal team', 'Request an introduction', 'View development →', 'Monte Rei Golf &amp; Country Club']) {
 		if (normalizedHtml.includes(required)) console.log(`  ok    required compiled copy: ${required}`);
 		else {
 			console.error(`  FAIL  required compiled copy missing: ${required}`);
