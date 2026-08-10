@@ -25,6 +25,7 @@ Destination caption
 
 EXAMPLE DESTINATION
 -------------------
+https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
 
 Concise destination copy explains the buyer relevance of the setting.
 
@@ -49,7 +50,7 @@ Example commercial qualification appears in explicit plain text.
 
 [Image: Example development]
 
-Destination · Country
+Destination, Country
 
 EXAMPLE DEVELOPMENT
 -------------------
@@ -63,7 +64,7 @@ Completion varies by phase
 
 [Image: Example golf course]
 
-Destination · Country
+Destination, Country
 
 EXAMPLE GOLF COURSE
 -------------------

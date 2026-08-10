@@ -71,11 +71,12 @@ const builtHtmlPath = join(root, 'build_production', 'portugal-v15.html');
 const builtTextPath = join(root, 'build_production', 'portugal-v15.txt');
 
 try {
-	const [html, text, componentHtml, entitySource, guideSource, cssSource] = await Promise.all([
+	const [html, text, componentHtml, entitySource, destinationSource, guideSource, cssSource] = await Promise.all([
 		readFile(builtHtmlPath, 'utf8'),
 		readFile(builtTextPath, 'utf8'),
 		readFile(join(root, 'build_production', 'component-library-v1.html'), 'utf8'),
 		readFile(join(root, 'src', 'components', 'entity-card.html'), 'utf8'),
+		readFile(join(root, 'src', 'components', 'destination-feature.html'), 'utf8'),
 		readFile(join(root, 'src', 'components', 'guide-card.html'), 'utf8'),
 		readFile(join(root, 'src', 'css', 'main.css'), 'utf8')
 	]);
@@ -158,9 +159,12 @@ try {
 		&& entitySource.includes('height="{{ bodyheight }}"')
 		&& entitySource.includes('sm-equal-card-row')
 		&& guideSource.includes('height="281"')
-		&& source.split('tone="green"').length - 1 === 10
-		&& entitySource.includes("tone === 'green' ? page.brand.green")
-		&& entitySource.includes("tone === 'green' ? page.brand.onGreen")
+		&& !source.includes('tone="green"')
+		&& entitySource.includes('text-transform:uppercase')
+		&& entitySource.includes('background-color:{{ page.brand.white }}')
+		&& entitySource.includes('color:{{ page.brand.green }};text-decoration:none')
+		&& destinationSource.includes('text-transform:uppercase')
+		&& destinationSource.includes('color:{{ page.brand.green }};text-decoration:none')
 		&& source.split('cardheight="406" bodyheight="236"').length - 1 === 10
 		&& source.split('cardheight="329" bodyheight="159"').length - 1 === 4
 		&& cssSource.includes('.sm-equal-card')
