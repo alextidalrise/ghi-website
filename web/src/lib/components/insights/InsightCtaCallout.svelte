@@ -110,6 +110,21 @@
 		outline-offset: 3px;
 	}
 
+	/* Phones: stack the prompt and let the button take the full width. Side-by-side it is
+	   `flex-shrink: 0` with a long label ("Enquire about Portugal property"), which overflows a
+	   narrow viewport rather than wrapping. Stacked + stretched, the label always fits and the
+	   button reads as the section's action. Matches v15's advisory-prompt mobile behaviour. */
+	@media (max-width: 30rem) {
+		.inline-cta {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.inline-cta .inline-cta__button {
+			align-self: stretch;
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.inline-cta .inline-cta__button {
 			transition: none;

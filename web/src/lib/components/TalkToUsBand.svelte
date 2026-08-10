@@ -248,6 +248,21 @@
 		.talk__btn--outline {
 			grid-column: 1 / -1;
 		}
+
+		/*
+		 * Stack variant on mobile: one column of full-width buttons, not the two-up grid. That grid
+		 * is built for three short labels (Get in touch / WhatsApp / Browse); the insight close runs
+		 * two LONG ones (Enquire about Portugal property / WhatsApp our Portugal team), which jam
+		 * into the half-width cells and wrap into tall, cramped boxes. Full-width stacked (v15's
+		 * mobile close) gives each label its own line and restores comfortable side padding.
+		 */
+		.talk__actions--stack {
+			grid-template-columns: 1fr;
+		}
+
+		.talk__actions--stack .talk__btn {
+			padding-inline: 1.5rem;
+		}
 	}
 
 	@media (min-width: 760px) {
