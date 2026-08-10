@@ -15,7 +15,12 @@ export type InsightDevelopmentGridItemRaw = {
 	development?: RawDevelopmentCard | null;
 	/** Coalesced pricing/top-level completion date, gated with the reference. */
 	completionDate?: string | null;
+	/** How the date should read (month/quarter/year). Unset → inferred from the date. */
+	completionPrecision?: CompletionPrecision | null;
 };
+
+/** The editor's choice for how precisely a completion date is known. */
+export type CompletionPrecision = 'month' | 'quarter' | 'year';
 
 /**
  * A development resolved for the article grid. Every commercial field is derived from the live
@@ -53,23 +58,50 @@ const STATUS_LABELS: Record<string, string> = {
 	off_plan: 'Off plan'
 };
 
+// Fixed month names indexed by getUTCMonth(), so the label is timezone-stable (Intl on a bare Date
+// formats in local time, which can slip a UTC date to the previous month).
+const MONTH_NAMES = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December'
+];
+
 /**
- * A completion line derived from controlled data — never a year inferred from status. Quarter+year
- * normally; year-only when the date is a January-1 placeholder (the CMS's "just the year" convention);
- * nothing when the development is already available or carries no completion date.
+ * A completion line derived from controlled data — never a year inferred from status.
+ *
+ * The editor's `completionPrecision` chooses how the date reads: `month` → "July 2028",
+ * `quarter` → "Q1 2028", `year` → "2028". When it is unset the precision is INFERRED from the date,
+ * preserving the long-standing convention: a 1 January value is the CMS's "just the year is known"
+ * placeholder (reads year-only), any other day reads as its quarter. Nothing renders when the
+ * development is already available or carries no completion date.
  */
 export function formatCompletionLabel(
 	developmentStatus: string | null | undefined,
-	completionDateISO: string | null | undefined
+	completionDateISO: string | null | undefined,
+	completionPrecision?: CompletionPrecision | null
 ): string | null {
 	if (developmentStatus === 'completed') return null;
 	if (!completionDateISO) return null;
 	const d = new Date(completionDateISO);
 	if (Number.isNaN(d.getTime())) return null;
 	const year = d.getUTCFullYear();
-	if (d.getUTCMonth() === 0 && d.getUTCDate() === 1) {
-		return `Estimated completion: ${year}`;
-	}
+
+	// Unset → infer: 1 January is the year-only placeholder, otherwise the day's quarter.
+	const precision: CompletionPrecision =
+		completionPrecision ??
+		(d.getUTCMonth() === 0 && d.getUTCDate() === 1 ? 'year' : 'quarter');
+
+	if (precision === 'year') return `Estimated completion: ${year}`;
+	if (precision === 'month') return `Estimated completion: ${MONTH_NAMES[d.getUTCMonth()]} ${year}`;
 	const quarter = Math.floor(d.getUTCMonth() / 3) + 1;
 	return `Estimated completion: Q${quarter} ${year}`;
 }
@@ -114,7 +146,11 @@ export function toInsightDevelopmentCard(
 	const groupLabel = raw?.groupLabelOverride?.trim() || locationLabel || countryLabel || 'Other';
 
 	const statusLabel = base.developmentStatus ? (STATUS_LABELS[base.developmentStatus] ?? null) : null;
-	const completionLabel = formatCompletionLabel(base.developmentStatus, raw?.completionDate);
+	const completionLabel = formatCompletionLabel(
+		base.developmentStatus,
+		raw?.completionDate,
+		raw?.completionPrecision
+	);
 
 	return {
 		_id: base._id,

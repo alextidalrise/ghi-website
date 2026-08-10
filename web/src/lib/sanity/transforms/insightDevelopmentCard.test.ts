@@ -57,6 +57,24 @@ describe('formatCompletionLabel', () => {
 		expect(formatCompletionLabel('off_plan', '2028-01-01')).toBe('Estimated completion: 2028');
 	});
 
+	it('honours an explicit precision over the inferred one', () => {
+		// A 1-January date that is really a Q1 estimate (Springs) reads as the quarter, not year-only.
+		expect(formatCompletionLabel('under_construction', '2028-01-01', 'quarter')).toBe(
+			'Estimated completion: Q1 2028'
+		);
+		// A dated record shown to the month (The Uncommon "July 2028", Nobilus "October 2026").
+		expect(formatCompletionLabel('off_plan', '2028-07-01', 'month')).toBe(
+			'Estimated completion: July 2028'
+		);
+		expect(formatCompletionLabel('under_construction', '2026-10-21', 'month')).toBe(
+			'Estimated completion: October 2026'
+		);
+		// Year precision collapses a specific day back to the year.
+		expect(formatCompletionLabel('off_plan', '2028-05-31', 'year')).toBe(
+			'Estimated completion: 2028'
+		);
+	});
+
 	it('shows nothing when already available or when no date exists', () => {
 		expect(formatCompletionLabel('completed', '2028-07-01')).toBeNull();
 		expect(formatCompletionLabel('off_plan', null)).toBeNull();

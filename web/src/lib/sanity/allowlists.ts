@@ -600,7 +600,8 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
         "completionDate": select(
           ${DEVELOPMENT_REF_PUBLIC_GATE} =>
             coalesce(development->pricing.completionDate, development->completionDate)
-        )
+        ),
+        "completionPrecision": select(${DEVELOPMENT_REF_PUBLIC_GATE} => development->completionPrecision)
       }
     },
     _type == "insightCourseGrid" => {
