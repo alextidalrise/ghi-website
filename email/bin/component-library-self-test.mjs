@@ -162,7 +162,7 @@ try {
 	const equalHeightContract = entitySource.includes('height="{{ cardheight }}"')
 		&& entitySource.includes('height="{{ bodyheight }}"')
 		&& entitySource.includes('sm-equal-card-row')
-		&& guideSource.includes("layout === 'full' ? 500 : 460")
+		&& guideSource.includes("compact ? 320")
 		&& guideSource.includes('text-underline-offset:5px')
 		&& !source.includes('tone="green"')
 		&& entitySource.includes('text-transform:uppercase')
@@ -246,15 +246,13 @@ try {
 		}
 	}
 
-	const plainParagraphs = text.split(/\n{2,}/).map((part) => part.replace(/\n/g, ' ').trim()).filter(Boolean);
-	for (const [label, body] of [
-		['For UK buyers', 'A step-by-step introduction to the NIF, legal process, purchase costs, mortgages, tax and the 90-day rule.'],
-		['For international buyers', 'An overview of preparation, the legal process, purchase costs, finance, tax and residency boundaries.'],
+	for (const removed of [
+		'A step-by-step introduction to the NIF, legal process, purchase costs, mortgages, tax and the 90-day rule.',
+		'An overview of preparation, the legal process, purchase costs, finance, tax and residency boundaries.',
 	]) {
-		const labelIndex = plainParagraphs.indexOf(label);
-		if (labelIndex >= 0 && plainParagraphs[labelIndex + 1] === body) console.log(`  ok    plain-text block separation: ${label}`);
+		if (!html.includes(removed) && !text.includes(removed)) console.log('  ok    compact guide description removed from HTML and plain text');
 		else {
-			console.error(`  FAIL  plain-text block separation missing: ${label}`);
+			console.error(`  FAIL  compact guide description remains: ${removed}`);
 			failures += 1;
 		}
 	}
