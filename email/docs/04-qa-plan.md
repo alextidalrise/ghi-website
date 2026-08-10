@@ -17,7 +17,7 @@ means it renders correctly.**
 
 ## Layer 1: the validator
 
-28 checks, each with a self-test proving it fires
+29 checks, each with a self-test proving it fires
 (`pnpm validate:self-test`). A validator that only ever passes is worse than no
 validator, so the self-test is part of the pipeline.
 

@@ -8,23 +8,30 @@
  *   node bin/qa-long-email.mjs https://example.com/archive stored-preview
  */
 import { readFile, mkdir, rm, writeFile } from 'node:fs/promises';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { safeOutputName } from '../lib/safe-output-name.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
 const target = process.argv[2];
 if (!target) throw new Error('Pass a built template name or a preview URL.');
 const isUrl = /^https?:\/\//i.test(target);
-const name = isUrl ? (process.argv[3] || 'remote-preview') : target;
+const name = safeOutputName(isUrl ? (process.argv[3] || 'remote-preview') : target);
+
+const segmentsRoot = resolve(root, 'qa', 'segments');
+const outDir = resolve(segmentsRoot, name);
+const relativeOutput = relative(segmentsRoot, outDir);
+if (relativeOutput.startsWith('..') || relativeOutput === '') {
+  throw new Error('QA output directory must remain below qa/segments.');
+}
 
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
-const browser = await chromium.launch(executablePath ? { executablePath } : {});
 const html = isUrl ? null : await readFile(join(root, 'build_production', `${name}.html`), 'utf8');
-const outDir = join(root, 'qa', 'segments', name);
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
+const browser = await chromium.launch(executablePath ? { executablePath } : {});
 
 const views = [
   { id: 'desktop', width: 700, height: 1800 },

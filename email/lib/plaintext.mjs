@@ -191,8 +191,9 @@ function* walk(body) {
 			// Semantic components can carry a label, description or inline CTA in
 			// the same leaf cell as the heading. Preserve that remainder rather than
 			// silently discarding it.
-			const remainder = withInlineLinks(inner.replace(heading[0], ''));
-			if (remainder) yield { type: 'paragraph', text: remainder };
+			for (const remainder of withInlineLinkSegments(inner.replace(heading[0], ''))) {
+				yield { type: 'paragraph', text: remainder };
+			}
 			continue;
 		}
 
@@ -224,7 +225,14 @@ function* walk(body) {
  * is readable without losing the sentence it sat in.
  */
 function withInlineLinks(html) {
-	const resolved = html.replace(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi, (_, attrs, label) => {
+	return withInlineLinkSegments(html).join(' ');
+}
+
+function withInlineLinkSegments(html) {
+	const withoutImageLinks = html
+		// Linked card images have no useful plain-text label and must not leave a bare URL.
+		.replace(/<a\b[^>]*>\s*<img\b[^>]*>\s*<\/a>/gi, ' ');
+	const resolved = withoutImageLinks.replace(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi, (_, attrs, label) => {
 		const href = attrOf(attrs, 'href');
 		const text = clean(label);
 		if (!href || /^\*\|/.test(href)) return text;
@@ -232,7 +240,11 @@ function withInlineLinks(html) {
 		return `${text} (${decodeEntities(href)})`;
 	});
 
-	return clean(resolved);
+	return resolved
+		.replace(/<\/?(?:p|div|span|br|li|td|tr)\b[^>]*>/gi, '\n')
+		.split(/\n+/)
+		.map((segment) => clean(segment))
+		.filter(Boolean);
 }
 
 /** The destination behind the masthead logo, so it survives into plain text. */

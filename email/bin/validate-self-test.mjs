@@ -76,6 +76,11 @@ const cases = [
 		html: GOOD.replace('logo-ivory@2x.png', 'logo-ivory.svg')
 	},
 	{
+		name: 'lookalike fm value does not transform WebP',
+		check: 'assets',
+		html: GOOD.replace('logo-ivory@2x.png', 'logo-ivory.webp?fallback=fm=jpg')
+	},
+	{
 		name: 'Sanity URL with auto=format',
 		check: 'assets',
 		html: GOOD.replace(

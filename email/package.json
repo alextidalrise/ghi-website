@@ -17,7 +17,8 @@
 		"plaintext": "node bin/plaintext.mjs",
 		"qa": "node bin/qa-screens.mjs",
 		"qa:long": "node bin/qa-long-email.mjs",
-		"check": "pnpm validate:self-test && pnpm build && pnpm validate:components && pnpm validate && node bin/plaintext.mjs --check && pnpm qa"
+		"qa:path-self-test": "node bin/qa-path-self-test.mjs",
+		"check": "pnpm validate:self-test && pnpm qa:path-self-test && pnpm build && pnpm validate:components && pnpm validate && node bin/plaintext.mjs --check && pnpm qa"
 	},
 	"devDependencies": {
 		"@maizzle/framework": "^5.5.0",

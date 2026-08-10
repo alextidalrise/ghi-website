@@ -1,6 +1,6 @@
 # Portugal v15 QA and Mailchimp readback
 
-**State:** internally proofed; awaiting human inbox confirmation and design/content approval. Not authorised for a live audience or schedule.
+**State:** corrected internal proof accepted by Mailchimp after independent code/fidelity review; awaiting human inbox confirmation and design/content approval. Not authorised for a live audience or schedule.
 
 **Canonical design/content reference:** James's approved v15 preview at `/home/admin/GHI/knowledge-base/03-content/campaigns/2026-08-10-portugal-launch/web-preview/index.html`.
 
@@ -19,7 +19,8 @@
 ### Automated
 
 - Component-retention contract: PASS.
-- Validator self-test: 28/28 checks verified.
+- Validator self-test: 29/29 checks verified, including a lookalike `fm` query-value regression.
+- QA output-path self-test: unsafe traversal/path names rejected before any recursive deletion or browser launch.
 - Campaign validator: 0 errors.
 - Live-link resolution: 24 unique destinations, 0 errors.
 - Heading structure: one H1.
@@ -43,12 +44,17 @@ The review caught and fixed:
 - omitted Fiberpay and Vorto partner logos;
 - long-form screenshot coverage that initially captured only the opening viewport;
 - compact-button padding needed to keep the final CTA on one line at 320px.
+- the canonical Palmares destination/development image identities, which had been reversed in the first proof;
+- malformed semantic-card joins in explicit plain text;
+- hidden HTML preheader/Mailchimp preview-text mismatch;
+- an unsafe path-traversal route in the segmented QA renderer;
+- a query-parsing weakness in the legacy-image-format validator.
 
 No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence.
 
 ### Accepted warnings before internal proof
 
-1. Compiled HTML is 84.8KB, above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's stored HTML readback is 86,052 bytes.
+1. Compiled HTML is 84.9KB, above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 86,085 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
 2. `Enquire about Portugal property` exceeds the validator's generic 28-character warning threshold, but the exact approved label was visually verified on one line at 320px.
 3. The WhatsApp URL has no UTM parameter. It is a direct `wa.me` action with a prefilled message, not a GHI website destination.
 
@@ -56,13 +62,13 @@ No horizontal overflow was recorded. The final 31-character CTA remains one line
 
 ### Component template
 
-- Name: `GHI Email Components v1 – APPROVED BLOCKS`
+- Name: `GHI Email Components v1 – REVIEW BLOCKS`
 - ID: `11604907`
 - Type: user HTML template
 - Active: yes
 - Responsive: yes
 
-The approved plan's longer provisional name exceeded Mailchimp's 49-character maximum and was shortened without overwriting the existing GHI template.
+The approved plan's longer provisional name exceeded Mailchimp's 49-character maximum. The review-status name avoids implying component approval before Alex's visual gate and does not overwrite the existing GHI template.
 
 ### Portugal review campaign
 
@@ -84,16 +90,16 @@ The approved plan's longer provisional name exceeded Mailchimp's 49-character ma
 
 ### Stored-content readback
 
-- Source HTML SHA-256 before Mailchimp: `39c1e1537b9af051307c69201ec386f1da79da5f9eb672e20adc57c19d15e1db`
-- Mailchimp-stored HTML SHA-256: `cb756f899c540f4902f33e5a3420deab96c37446955a18a43fdfd0647c4cdefe`
+- Corrected source HTML SHA-256 before Mailchimp: `617437232376ee4b68a2cd19c756ea1c9314db070a720e9ee3a1ad59fd77e7d6`
+- Corrected Mailchimp-stored HTML SHA-256: `d7a11ed2488b3a736a5a397d792dc38e9060834cff4f207fd49d22904de39726`
 - Difference: Mailchimp normalisation; structural readback retained one H1, 28 images, 61 linked elements and all required sections/entities.
-- Explicit plain-text SHA-256: `f77a9b33bf64509fc06bb4002aef7f681044a3cb519b8a29d99333208a6e14c9`
+- Corrected explicit plain-text SHA-256: `dfb1e967efa0a4c47a5ba82858e2185e21c73e0b6cd80f36bf8153693a3d0052`
 - Mailchimp-stored plain text matches the current source-controlled plain text exactly.
 - Mailchimp archive readback exposed the full destination, development, golf, partner, guide and enquiry hierarchy.
 
 ## Internal proof
 
-A single HTML proof action was accepted by Mailchimp for the approved internal allowlist:
+The first proof is superseded because independent review identified a Palmares image-identity mismatch. After correction and authoritative Mailchimp readback, one corrected HTML proof action was accepted for the same approved internal allowlist:
 
 - `james@golfhomesinternational.com`
 - `alex@golfhomesinternational.com`

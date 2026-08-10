@@ -60,11 +60,13 @@ pnpm --filter email check
 
 which is, in order:
 
-1. `validate:self-test` — proves the validator's 28 checks still fire
-2. `build` — compile + regenerate plain text
-3. `validate` — all checks against the compiled output
-4. `plaintext --check` — fails if a committed `.txt` is stale
-5. `qa` — screenshots, fails on horizontal overflow
+1. `validate:self-test` — proves the validator's 29 checks still fire
+2. `qa:path-self-test` — proves long-form QA output cannot escape `qa/segments`
+3. `build` — compile + regenerate plain text
+4. `validate:components` — verify the semantic component/retention contract
+5. `validate` — all checks against the compiled output
+6. `plaintext --check` — fails if a committed `.txt` is stale
+7. `qa` — screenshots, fails on horizontal overflow
 
 `validate:links` is **not** in CI: it makes real network requests, and a
 transient outage on a third-party destination should not fail an unrelated

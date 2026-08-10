@@ -41,6 +41,7 @@ const expectedPortugalMarkers = [
 ];
 
 const forbiddenPortugalCopy = ['A more useful way to compare the Algarve'];
+const approvedPreview = 'Explore Vilamoura, Quinta do Lago, Monte Rei and Palmares, with current developments, golf and independent buyer support.';
 
 let failures = 0;
 
@@ -69,7 +70,26 @@ try {
 		readFile(builtHtmlPath, 'utf8'),
 		readFile(builtTextPath, 'utf8')
 	]);
+	const source = await readFile(join(root, 'src', 'templates', 'portugal-v15.html'), 'utf8');
 	const normalizedHtml = html.replace(/\s+/g, ' ');
+
+	const identityPairs = [
+		['Palmares destination', /<x-destination-feature\b[^>]*title="Palmares"[^>]*src="[^"]*\/1b476154ab3e9246b2573b889c362cc40dfdb8ba-1600x1066\.jpg/],
+		['Palmares development', /<x-entity-card\b[^>]*title="Palmares"[^>]*src="[^"]*\/637d376128a5a9b9282a334c1ed370485542f82c-5272x3948\.jpg/]
+	];
+	for (const [label, pattern] of identityPairs) {
+		if (pattern.test(source)) console.log(`  ok    approved image identity: ${label}`);
+		else {
+			console.error(`  FAIL  approved image identity: ${label}`);
+			failures += 1;
+		}
+	}
+
+	if (normalizedHtml.includes(approvedPreview)) console.log('  ok    hidden preheader matches Mailchimp preview setting');
+	else {
+		console.error('  FAIL  hidden preheader differs from Mailchimp preview setting');
+		failures += 1;
+	}
 
 	for (const heading of expectedPortugalHeadings) {
 		const htmlHas = normalizedHtml.includes(heading);
@@ -122,6 +142,22 @@ try {
 	else {
 		console.error(`  FAIL  repeated commercial statuses lost in plain text (${repeatedStatusCount})`);
 		failures += 1;
+	}
+
+	for (const malformed of [')Currency', ')Legal', 'buyersA step-by-step', 'buyersAn overview']) {
+		if (!text.includes(malformed)) console.log(`  ok    malformed plain-text join absent: ${malformed}`);
+		else {
+			console.error(`  FAIL  malformed plain-text join: ${malformed}`);
+			failures += 1;
+		}
+	}
+
+	for (const expected of ['For UK buyers\n\nA step-by-step', 'For international buyers\n\nAn overview']) {
+		if (text.includes(expected)) console.log(`  ok    plain-text block separation: ${expected.split('\n')[0]}`);
+		else {
+			console.error(`  FAIL  missing plain-text block separation: ${expected.split('\n')[0]}`);
+			failures += 1;
+		}
 	}
 
 	for (const forbidden of forbiddenPortugalCopy) {

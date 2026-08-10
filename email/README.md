@@ -30,11 +30,12 @@ open email/qa/screens/index.html
 | `pnpm validate` | All checks against the compiled output |
 | `pnpm validate:links` | Resolve every campaign link over HTTP (run before a send) |
 | `pnpm validate:template portugal-v15 --links` | Validate and resolve links for one campaign only |
-| `pnpm validate:self-test` | Prove the validator's 28 checks still fire |
+| `pnpm validate:self-test` | Prove the validator's 29 checks still fire |
 | `pnpm validate:components` | Prove the v1 semantic modules and Portugal retention contract |
 | `pnpm plaintext` | Generate `.txt` alternatives |
 | `pnpm qa` | Screenshot every template across 8 scenarios |
 | `pnpm qa:long portugal-v15` | Segment a long email at desktop, 375px and 320px |
+| `pnpm qa:path-self-test` | Prove long-QA output names cannot escape `qa/segments` |
 | `pnpm check` | Everything except live links. This is what CI runs. |
 
 Validating what Mailchimp actually delivered, which is the run that matters for

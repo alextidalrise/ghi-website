@@ -377,13 +377,19 @@ function checkAssetProtocol(html, add) {
 			);
 		}
 
-		const explicitLegacyTransform = /\bfm=(?:jpg|jpeg|png|gif)\b/i.test(src);
+		let explicitFormat = null;
+		try {
+			explicitFormat = new URL(src.replace(/&amp;/gi, '&')).searchParams.get('fm')?.toLowerCase() || null;
+		} catch {
+			// The absolute-URL check above reports malformed sources.
+		}
+		const explicitLegacyTransform = ['jpg', 'jpeg', 'png', 'gif'].includes(explicitFormat);
 		if (/\.svg(\?|$)/i.test(src) && !explicitLegacyTransform) {
 			add(ERROR, 'assets', `SVG image: ${src}. Neither Outlook for Windows nor Gmail renders it.`);
 		}
 
 		const modernSourceWithoutLegacyTransform = /\.(webp|avif)(\?|$)/i.test(src) && !explicitLegacyTransform;
-		if (modernSourceWithoutLegacyTransform || /\bfm=(webp|avif)\b/i.test(src)) {
+		if (modernSourceWithoutLegacyTransform || ['webp', 'avif'].includes(explicitFormat)) {
 			add(ERROR, 'assets', `Modern image format: ${src}. Classic Outlook renders neither WebP nor AVIF.`);
 		}
 
@@ -400,7 +406,7 @@ function checkAssetProtocol(html, add) {
 			);
 		}
 
-		if (/cdn\.sanity\.io/i.test(src) && !/[?&]fm=/i.test(src)) {
+		if (/cdn\.sanity\.io/i.test(src) && !explicitFormat) {
 			add(WARN, 'assets', `Sanity URL with no explicit fm= parameter: ${src.slice(0, 90)}`);
 		}
 	}
