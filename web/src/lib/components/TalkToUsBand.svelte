@@ -25,16 +25,23 @@
 		primary?: Action;
 		/** The "not ready to enquire" escape. Pass null to close on the primary alone. */
 		secondary?: Action | null;
+		/** Optional WhatsApp button label. The number is always the central one. */
+		whatsAppLabel?: string;
+		/** Optional prefilled WhatsApp message (text only). Falls back to the house message. */
+		whatsAppMessage?: string;
 	};
 
 	let {
 		heading = 'Talk to us',
 		body = 'No pressure and no obligation. Whether you are ready to view or just starting to think about it, we are happy to help.',
 		primary = { label: 'Get in touch', href: '/contact' },
-		secondary = { label: 'Browse properties', href: '/front-line-collection' }
+		secondary = { label: 'Browse properties', href: '/front-line-collection' },
+		whatsAppLabel = 'WhatsApp',
+		whatsAppMessage
 	}: Props = $props();
 
-	const whatsApp = whatsAppHref(GENERAL_WHATSAPP_MESSAGE);
+	// The href is always built through the central helper/number; only the message varies.
+	const whatsApp = $derived(whatsAppHref(whatsAppMessage?.trim() || GENERAL_WHATSAPP_MESSAGE));
 </script>
 
 <section class="talk on-dark" aria-labelledby="talk-heading">
@@ -66,7 +73,7 @@
 						d="M21.6 18.86c-.3-.16-1.78-.92-2.06-1.02-.28-.1-.48-.16-.68.15-.2.3-.78.96-.96 1.16-.18.2-.36.22-.66.07-.3-.15-1.27-.49-2.41-1.55-.89-.83-1.49-1.85-1.66-2.16-.18-.3-.02-.47.13-.62.14-.14.3-.36.46-.54.15-.18.2-.3.3-.51.1-.2.05-.38-.02-.54-.07-.15-.68-1.7-.93-2.32-.24-.6-.49-.52-.68-.53l-.58-.01c-.2 0-.53.08-.81.38-.28.3-1.06 1.06-1.06 2.58s1.09 3 1.24 3.2c.15.21 2.13 3.4 5.18 4.77.72.32 1.29.51 1.73.65.73.24 1.39.2 1.91.12.58-.09 1.78-.74 2.04-1.46.25-.71.25-1.32.18-1.45-.07-.13-.27-.21-.57-.36z"
 					/>
 				</svg>
-				<span>WhatsApp</span>
+				<span>{whatsAppLabel}</span>
 			</a>
 			{#if secondary}
 				<a class="talk__btn talk__btn--outline" href={secondary.href}>{secondary.label}</a>

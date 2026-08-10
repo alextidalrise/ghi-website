@@ -35,7 +35,13 @@
 			"Tell us what you have in mind and we'll help you compare the right villas, apartments and resort homes — no pressure, just guidance from people who know the market."
 	);
 	const ctaPrimary = $derived(toBandAction(insight.ctaPrimary));
-	const ctaSecondary = $derived(toBandAction(insight.ctaSecondary));
+	// `ctaShowSecondary === false` suppresses the alternative button entirely (null), which is
+	// distinct from an absent override (undefined) — the latter still shows TalkToUsBand's default.
+	const ctaSecondary = $derived(
+		insight.ctaShowSecondary === false ? null : toBandAction(insight.ctaSecondary)
+	);
+	const ctaWhatsAppLabel = $derived(insight.ctaWhatsAppLabel?.trim() || undefined);
+	const ctaWhatsAppMessage = $derived(insight.ctaWhatsAppMessage?.trim() || undefined);
 </script>
 
 <svelte:head>
@@ -115,7 +121,14 @@
   that argues its own route (e.g. "Register for Nobu updates") can close on that route instead
   of defaulting every reader into a property search.
 -->
-<TalkToUsBand heading={ctaHeading} body={ctaBody} primary={ctaPrimary} secondary={ctaSecondary} />
+<TalkToUsBand
+	heading={ctaHeading}
+	body={ctaBody}
+	primary={ctaPrimary}
+	secondary={ctaSecondary}
+	whatsAppLabel={ctaWhatsAppLabel}
+	whatsAppMessage={ctaWhatsAppMessage}
+/>
 
 {#if related.length > 0}
 	<section class="article__related content-wrap" aria-labelledby="insight-related-heading">

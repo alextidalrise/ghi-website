@@ -20,31 +20,44 @@
 
 	const kicker = $derived(insightKickerLabel(insight.insightCategory));
 	const titleParts = $derived(splitTitleEmphasis(insight.title, insight.titleEmphasis));
-	// Passing BOTH width and height fixes the crop ratio at 4:3 for every srcset candidate — with
-	// height alone the builder emitted 480×840 (portrait) through 1120×840 (4:3), a ragged set. The
-	// candidates run to 1920w because the plate now reaches ~850px on a wide desktop and doubles
-	// again on a 2× display; the source is 4096px, so these are real resolution, not upscales.
+
+	// The opt-in launch treatment: headline and a square photograph in equal columns, the caption
+	// overlaid on the image. The standard hero (narrow leading rail, 4:3 plate, caption below) stays
+	// the default and is untouched. See the `heroLayout` field on the insight document.
+	const isSplit = $derived(insight.heroLayout === 'splitSquare');
+
+	// Passing BOTH width and height fixes the crop ratio for every srcset candidate — with height
+	// alone the builder emits a ragged, drifting set. Standard is 4:3 (1200×900); the split plate is
+	// square (1200×1200). Candidates run to 1920w because the plate reaches ~850px on a wide desktop
+	// and doubles on a 2× display; the source is 4096px, so these are real resolution, not upscales.
+	const cropHeight = $derived(isSplit ? 1200 : 900);
 	const image = $derived(
-		buildPublicImageUrl(insight.heroImage, { width: 1200, height: 900, fit: 'crop', quality: 74 })
+		buildPublicImageUrl(insight.heroImage, { width: 1200, height: cropHeight, fit: 'crop', quality: 74 })
 	);
 	const srcset = $derived(
 		buildImageSrcset(insight.heroImage, [480, 640, 800, 1024, 1280, 1600, 1920], {
 			width: 1200,
-			height: 900,
+			height: cropHeight,
 			fit: 'crop',
 			quality: 74
 		})
 	);
 	// The plate's rendered width, mirrored for the browser's candidate pick and the preload. Stacked
-	// it is the full viewport; two-column it is the rail (≤28rem); past the content measure it spills
-	// into the gutter to ≈ 210px + 25vw. Understating this (it used to claim a flat 21rem) is exactly
-	// what made a small candidate stretch across the widened plate and look soft.
-	const HERO_SIZES = '(max-width: 57.99rem) 100vw, (max-width: 66.99rem) 28rem, calc(210px + 25vw)';
+	// it is the full viewport. Standard two-column: the rail (≤28rem), spilling into the gutter past
+	// the content measure. Split two-column: one of two equal columns of the content measure, ≈ 33rem
+	// at the 1060px cap. Understating this makes a small candidate stretch across the plate and go soft.
+	const HERO_SIZES = $derived(
+		isSplit
+			? '(max-width: 57.99rem) 100vw, min(33rem, 46vw)'
+			: '(max-width: 57.99rem) 100vw, (max-width: 66.99rem) 28rem, calc(210px + 25vw)'
+	);
 	const lqip = $derived(getImagePlaceholder(insight.heroImage));
 	const alt = $derived(insight.heroImage?.altText?.trim() || insight.title || 'Insight');
 	const caption = $derived(insight.heroCaption?.trim() || null);
+	// The thesis note belongs to the standard hero's rail. The split hero has no room beneath a
+	// square, full-column plate, and its launch design carries the point in the standfirst instead.
 	const note = $derived(
-		insight.heroNote?.heading?.trim() && insight.heroNote?.body?.trim()
+		!isSplit && insight.heroNote?.heading?.trim() && insight.heroNote?.body?.trim()
 			? { heading: insight.heroNote.heading.trim(), body: insight.heroNote.body.trim() }
 			: null
 	);
@@ -69,8 +82,16 @@
 	{/if}
 </svelte:head>
 
-<div class="article-hero-band" class:article-hero-band--with-rail={hasRail}>
-<header class="article-hero" class:article-hero--with-rail={hasRail}>
+<div
+	class="article-hero-band"
+	class:article-hero-band--with-rail={hasRail}
+	class:article-hero-band--split={isSplit}
+>
+<header
+	class="article-hero"
+	class:article-hero--with-rail={hasRail}
+	class:article-hero--split={isSplit}
+>
 	<div class="article-hero__text">
 		{#if breadcrumbs.length > 0}
 			<Breadcrumbs items={breadcrumbs} inline hideCurrent />
@@ -95,9 +116,10 @@
 	{#if hasRail}
 		<aside class="article-hero__rail">
 			{#if image}
-				<!-- Matted plate: the frame holds both the photograph and its caption, so the image
-				     reads as something placed on the page rather than dropped into it. -->
-				<figure class="article-hero__media">
+				<!-- Standard: a matted plate — the frame holds the photograph AND its caption below,
+				     so the image reads as placed on the page. Split: a square plate with the caption
+				     overlaid bottom-left in green, the launch-article treatment. -->
+				<figure class="article-hero__media" class:article-hero__media--overlay={isSplit}>
 					<div
 						class="article-hero__frame"
 						style:background-image={lqip ? `url(${lqip})` : undefined}
@@ -108,13 +130,20 @@
 							sizes={HERO_SIZES}
 							{alt}
 							width="1200"
-							height="900"
+							height={cropHeight}
 							loading="eager"
 							fetchpriority="high"
 							decoding="async"
 						/>
 					</div>
-					{#if caption}
+					{#if caption && isSplit}
+						<!-- Overlay caption: a direct child of the figure (a11y), positioned against it.
+						     In the split the frame fills the figure, so the figure's bottom-left is the
+						     image's bottom-left. -->
+						<figcaption class="article-hero__caption article-hero__caption--overlay">
+							{caption}
+						</figcaption>
+					{:else if caption}
 						<figcaption class="article-hero__caption">{caption}</figcaption>
 					{/if}
 				</figure>
@@ -295,11 +324,11 @@
 	   (at 52rem the column fell to 373px and the headline started stacking word by word).
 	   Stacked, there is no rail to ground, so the wash stays off and the hero is all white. */
 	@media (min-width: 58rem) {
-		.article-hero--with-rail {
+		.article-hero--with-rail:not(.article-hero--split) {
 			grid-template-columns: minmax(0, 1fr) var(--hero-rail);
 		}
 
-		.article-hero-band--with-rail {
+		.article-hero-band--with-rail:not(.article-hero-band--split) {
 			background: linear-gradient(
 				90deg,
 				var(--white) 0 var(--hero-split),
@@ -328,7 +357,7 @@
 	 * Tune the reach with `--hero-gutter-fill` (0 = today, 1 = plate meets the viewport edge).
 	 */
 	@media (min-width: 67rem) {
-		.article-hero--with-rail {
+		.article-hero--with-rail:not(.article-hero--split) {
 			--hero-gutter-fill: 0.5;
 			--edge: max(0px, calc((100% - var(--content-max)) / 2));
 			--hero-gutter: calc(var(--edge) + var(--content-padding));
@@ -341,6 +370,55 @@
 					var(--content-max) - 2 * var(--content-padding) - var(--hero-gap) - var(--hero-rail)
 				)
 				minmax(0, 1fr);
+		}
+	}
+
+	/*
+	 * Split-square hero — the opt-in launch treatment. The headline and a square photograph share
+	 * two equal columns; the caption overlays the image bottom-left in green; the tint band stays
+	 * off (white ground, hairline foot only). The standard hero above is untouched by default: this
+	 * whole block only engages when `heroLayout === 'splitSquare'`.
+	 */
+	.article-hero--split {
+		align-items: center;
+	}
+
+	/* No mat and no border in the split — the plate is the composition, with only its overlay
+	   caption on it. */
+	.article-hero--split .article-hero__media {
+		border: 0;
+		background: none;
+	}
+
+	/* Square at every width; v15 keeps the plate 1:1 on mobile too. The class-pair specificity
+	   (0,2,0) beats the stacked 16/10 element+class override above regardless of source order. */
+	.article-hero--split .article-hero__frame {
+		aspect-ratio: 1 / 1;
+	}
+
+	.article-hero__media--overlay {
+		position: relative;
+	}
+
+	/* Bottom-left green overlay caption. Later in source than `.article-hero__caption` (same
+	   specificity), so it overrides the standard below-frame padding/border/colour. */
+	.article-hero__caption--overlay {
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		margin: 0;
+		padding: 0.6rem 0.85rem;
+		border: 0;
+		background: var(--green);
+		color: var(--on-green);
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		line-height: 1.4;
+	}
+
+	@media (min-width: 58rem) {
+		.article-hero--split {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		}
 	}
 </style>

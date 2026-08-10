@@ -18,6 +18,11 @@
 	import InsightFaq from './InsightFaq.svelte';
 	import InsightCtaCallout from './InsightCtaCallout.svelte';
 	import InsightFrontlineRail from './InsightFrontlineRail.svelte';
+	import InsightDestinationGrid from './InsightDestinationGrid.svelte';
+	import InsightDevelopmentGrid from './InsightDevelopmentGrid.svelte';
+	import InsightCourseGrid from './InsightCourseGrid.svelte';
+	import InsightPartnerLogoGrid from './InsightPartnerLogoGrid.svelte';
+	import InsightGuideCards from './InsightGuideCards.svelte';
 
 	let { value }: { value: InsightBodyBlock[] | null | undefined } = $props();
 
@@ -46,7 +51,12 @@
 			insightTakeaways: InsightTakeaways,
 			insightFaq: InsightFaq,
 			insightCtaCallout: InsightCtaCallout,
-			insightFrontlineRail: InsightFrontlineRail
+			insightFrontlineRail: InsightFrontlineRail,
+			insightDestinationGrid: InsightDestinationGrid,
+			insightDevelopmentGrid: InsightDevelopmentGrid,
+			insightCourseGrid: InsightCourseGrid,
+			insightPartnerLogoGrid: InsightPartnerLogoGrid,
+			insightGuideCards: InsightGuideCards
 		}
 	};
 </script>

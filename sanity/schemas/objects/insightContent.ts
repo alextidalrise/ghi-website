@@ -691,6 +691,472 @@ export const insightFrontlineRail = defineType({
 	}
 });
 
+/**
+ * One destination panel: a place the article profiles. It bundles a canonical location — which
+ * owns the name, hub route and default photograph — with the article's own selling paragraph, an
+ * optional article-only image and overlay caption, and a contextual CTA. Identity is dereferenced
+ * live at render time, so it can never drift from the location record; only the editorial framing
+ * and any article-specific image live in the Insight.
+ */
+export const insightDestinationCard = defineType({
+	name: 'insightDestinationCard',
+	title: 'Destination',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'location',
+			title: 'Location',
+			type: 'reference',
+			to: [{ type: 'locationTaxonomy' }],
+			options: { filter: 'type == "location"' },
+			description:
+				'The place this panel profiles. Its name, hub URL and default photograph come from this record — pick a location, not a country or community.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'body',
+			title: 'Body',
+			type: 'text',
+			rows: 4,
+			description: "The article's selling paragraph for this destination.",
+			validation: (Rule) => Rule.required().max(600)
+		}),
+		defineField({
+			name: 'imageOverride',
+			title: 'Article image (override)',
+			type: 'mediaAssetMetadata',
+			description:
+				"Optional. A photograph used for this article only. Leave blank to use the location's own hero image. This never changes the location record or cards elsewhere on the site."
+		}),
+		defineField({
+			name: 'caption',
+			title: 'Image caption',
+			type: 'string',
+			description: 'Optional. Shown in a small green tab overlaid on the image.',
+			validation: (Rule) => Rule.max(120)
+		}),
+		defineField({
+			name: 'actionLabel',
+			title: 'CTA label (override)',
+			type: 'string',
+			description: 'Optional. Defaults to “See {location} properties”.',
+			validation: (Rule) => Rule.max(48)
+		}),
+		defineField({
+			name: 'actionHrefOverride',
+			title: 'CTA link (override)',
+			type: 'string',
+			description:
+				'Optional. Only needed when the canonical location hub URL cannot be used. Absolute path (/portugal/...) or a full URL.',
+			validation: (Rule) =>
+				Rule.custom((value) => {
+					if (!value) return true;
+					return /^(https?:\/\/|\/)/.test(value)
+						? true
+						: 'Use an absolute path (/portugal/...) or a full URL.';
+				})
+		})
+	],
+	preview: {
+		select: { title: 'location.name', subtitle: 'caption', media: 'imageOverride.asset' },
+		prepare({ title, subtitle, media }) {
+			return { title: title || 'Destination', subtitle: subtitle || 'Destination panel', media };
+		}
+	}
+});
+
+/**
+ * An ordered set of destination panels — the "four settings" module. Each item is a complete
+ * unit (place identity + article copy + image + CTA); the grid just holds the order and count.
+ * Two to six, because it is a curated tour of places, not a listing grid.
+ */
+export const insightDestinationGrid = defineType({
+	name: 'insightDestinationGrid',
+	title: 'Destination panels',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Optional. Leave blank when the section heading already names the module.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'items',
+			title: 'Destinations',
+			type: 'array',
+			of: [{ type: 'insightDestinationCard' }],
+			description: 'Two to six destination panels, in reading order.',
+			validation: (Rule) => Rule.required().min(2).max(6)
+		})
+	],
+	preview: {
+		select: { a: 'items.0.location.name', b: 'items.1.location.name', items: 'items' },
+		prepare({ a, b, items }) {
+			const count = Array.isArray(items) ? items.length : 0;
+			return {
+				title: [a, b].filter(Boolean).join(', ') || 'Destination panels',
+				subtitle: `${count} ${count === 1 ? 'destination' : 'destinations'}`
+			};
+		}
+	}
+});
+
+/**
+ * One development in the collection: a live reference to a canonical `development` record, plus an
+ * optional article-only image and alt, and an optional grouping label override. Title, route, price,
+ * status and completion are ALL read from the referenced record at render time — never copied here —
+ * so the collection can never show a stale price or a dead link.
+ */
+export const insightDevelopmentGridItem = defineType({
+	name: 'insightDevelopmentGridItem',
+	title: 'Development',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'development',
+			title: 'Development',
+			type: 'reference',
+			to: [{ type: 'development' }],
+			description:
+				'The development to feature. Its title, URL, price, status and completion are read live — withdrawn or unpublished picks drop out on their own.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'imageOverride',
+			title: 'Article image (override)',
+			type: 'mediaAssetMetadata',
+			description:
+				"Optional. A photograph for this article's card only. Leave blank to use the development's own approved image. Never changes the development record or its cards elsewhere."
+		}),
+		defineField({
+			name: 'altOverride',
+			title: 'Article image alt (override)',
+			type: 'string',
+			description: 'Optional. Alt text for the override image. Defaults to the development title.',
+			validation: (Rule) => Rule.max(160)
+		}),
+		defineField({
+			name: 'groupLabelOverride',
+			title: 'Group label (override)',
+			type: 'string',
+			description:
+				'Optional. The destination heading this card groups under on mobile. Defaults to the development’s location.',
+			validation: (Rule) => Rule.max(60)
+		})
+	],
+	preview: {
+		select: { title: 'development.title', subtitle: 'groupLabelOverride', media: 'imageOverride.asset' },
+		prepare({ title, subtitle, media }) {
+			return { title: title || 'Development', subtitle: subtitle || 'Development card', media };
+		}
+	}
+});
+
+/**
+ * An ordered, mobile-groupable collection of current developments with live commercial facts. The
+ * desktop layout is a flat two-column grid in editor order; on a narrow screen the cards group under
+ * their destination and collapse to one representative each behind a "See all" disclosure.
+ */
+export const insightDevelopmentGrid = defineType({
+	name: 'insightDevelopmentGrid',
+	title: 'Development collection',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Optional. Leave blank when the section heading already names the module.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'items',
+			title: 'Developments',
+			type: 'array',
+			of: [{ type: 'insightDevelopmentGridItem' }],
+			description: 'The developments, in the desktop reading order.',
+			validation: (Rule) => Rule.required().min(1).max(12)
+		}),
+		defineField({
+			name: 'mobileInitialMode',
+			title: 'Mobile — initially show',
+			type: 'string',
+			options: {
+				list: [
+					{ title: 'One per destination', value: 'onePerGroup' },
+					{ title: 'All developments', value: 'all' }
+				],
+				layout: 'radio'
+			},
+			initialValue: 'onePerGroup',
+			description:
+				'On narrow screens, whether to show one representative per destination behind a disclosure, or all cards outright.'
+		}),
+		defineField({
+			name: 'expandLabel',
+			title: 'Mobile — expand button label',
+			type: 'string',
+			initialValue: 'See all {count} developments',
+			description: 'Shown when collapsed on mobile. Use {count} for the live number of developments.',
+			validation: (Rule) => Rule.max(48)
+		}),
+		defineField({
+			name: 'collapseLabel',
+			title: 'Mobile — collapse button label',
+			type: 'string',
+			initialValue: 'Show fewer developments',
+			validation: (Rule) => Rule.max(48)
+		})
+	],
+	preview: {
+		select: { heading: 'heading', items: 'items' },
+		prepare({ heading, items }) {
+			const count = Array.isArray(items) ? items.length : 0;
+			return {
+				title: heading || 'Development collection',
+				subtitle: `${count} ${count === 1 ? 'development' : 'developments'}`
+			};
+		}
+	}
+});
+
+/**
+ * One course in the collection: a live reference to a canonical `golfCourse` record, plus an
+ * optional article-only image and alt, and an optional CTA label override. Name, route and
+ * destination are ALL read from the referenced record at render time — never copied here — so a
+ * card can never show a dead link or a renamed course.
+ */
+export const insightCourseGridItem = defineType({
+	name: 'insightCourseGridItem',
+	title: 'Course',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'golfCourse',
+			title: 'Golf course',
+			type: 'reference',
+			to: [{ type: 'golfCourse' }],
+			description:
+				'The course to feature. Its name, URL and destination are read live — an unpublished course drops out on its own.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'imageOverride',
+			title: 'Article image (override)',
+			type: 'mediaAssetMetadata',
+			description:
+				"Optional. A photograph for this article's card only. Leave blank to use the course's own first image. Never changes the course record."
+		}),
+		defineField({
+			name: 'altOverride',
+			title: 'Article image alt (override)',
+			type: 'string',
+			description: 'Optional. Alt text for the override image. Defaults to the course name.',
+			validation: (Rule) => Rule.max(160)
+		}),
+		defineField({
+			name: 'actionLabel',
+			title: 'CTA label (override)',
+			type: 'string',
+			description: 'Optional. Defaults to “View course”.',
+			validation: (Rule) => Rule.max(48)
+		})
+	],
+	preview: {
+		select: { title: 'golfCourse.name', subtitle: 'golfCourse.community.name', media: 'imageOverride.asset' },
+		prepare({ title, subtitle, media }) {
+			return { title: title || 'Course', subtitle: subtitle || 'Golf course', media };
+		}
+	}
+});
+
+/**
+ * An ordered collection of golf courses with live identity and routes. Two to six sit best in the
+ * two-column matrix; each card is a whole-surface link to the canonical course page.
+ */
+export const insightCourseGrid = defineType({
+	name: 'insightCourseGrid',
+	title: 'Course collection',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Optional. Leave blank when the section heading already names the module.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'items',
+			title: 'Courses',
+			type: 'array',
+			of: [{ type: 'insightCourseGridItem' }],
+			description: 'The courses, in reading order.',
+			validation: (Rule) => Rule.required().min(1).max(8)
+		})
+	],
+	preview: {
+		select: { heading: 'heading', a: 'items.0.golfCourse.name', b: 'items.1.golfCourse.name', items: 'items' },
+		prepare({ heading, a, b, items }) {
+			const count = Array.isArray(items) ? items.length : 0;
+			return {
+				title: heading || [a, b].filter(Boolean).join(', ') || 'Course collection',
+				subtitle: `${count} ${count === 1 ? 'course' : 'courses'}`
+			};
+		}
+	}
+});
+
+/**
+ * One partner cell: a live reference to a canonical `partner` record and an optional article
+ * service label. The name and logo are read from the record; the buyer-facing link always routes
+ * to the vetted-partner index — the partner's own `referralUrl` is the GHI team's internal handoff
+ * and is never projected to the browser.
+ */
+export const insightPartnerLogoItem = defineType({
+	name: 'insightPartnerLogoItem',
+	title: 'Partner',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'partner',
+			title: 'Partner',
+			type: 'reference',
+			to: [{ type: 'partner' }],
+			description:
+				'The partner to feature. Its name and logo are read live — a partner with no logo, or one that is unpublished, drops out on its own.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'serviceLabel',
+			title: 'Service label (override)',
+			type: 'string',
+			description: 'Optional. A short label under the logo, e.g. “Currency”. Defaults to the partner’s category.',
+			validation: (Rule) => Rule.max(40)
+		})
+	],
+	preview: {
+		select: { title: 'partner.name', subtitle: 'serviceLabel', media: 'partner.logo.asset' },
+		prepare({ title, subtitle, media }) {
+			return { title: title || 'Partner', subtitle: subtitle || 'Partner', media };
+		}
+	}
+});
+
+/**
+ * A ruled matrix of partner logos — the "who we work with" wall for a launch article. Names and
+ * logos are dereferenced live; every cell links to the vetted-partner index, so the introduction
+ * always runs through GHI. Cells whose partner has no logo drop out on their own.
+ */
+export const insightPartnerLogoGrid = defineType({
+	name: 'insightPartnerLogoGrid',
+	title: 'Partner logos',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Optional. Leave blank when the section heading already names the module.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'items',
+			title: 'Partners',
+			type: 'array',
+			of: [{ type: 'insightPartnerLogoItem' }],
+			description: 'The partners, in reading order.',
+			validation: (Rule) => Rule.required().min(2).max(12)
+		})
+	],
+	preview: {
+		select: { heading: 'heading', items: 'items' },
+		prepare({ heading, items }) {
+			const count = Array.isArray(items) ? items.length : 0;
+			return {
+				title: heading || 'Partner logos',
+				subtitle: `${count} ${count === 1 ? 'partner' : 'partners'}`
+			};
+		}
+	}
+});
+
+/**
+ * One guide card: a live reference to a canonical `guide` record and an optional summary override.
+ * Title, audience and route are read from the record; only the article's optional replacement
+ * summary lives here.
+ */
+export const insightGuideCardItem = defineType({
+	name: 'insightGuideCardItem',
+	title: 'Guide',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'guide',
+			title: 'Guide',
+			type: 'reference',
+			to: [{ type: 'guide' }],
+			description:
+				'The guide to feature. Its title, audience label and URL are read live — an unpublished guide drops out on its own.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'summaryOverride',
+			title: 'Summary (override)',
+			type: 'text',
+			rows: 3,
+			description: "Optional. Replaces the guide's own tagline on this card only.",
+			validation: (Rule) => Rule.max(200)
+		})
+	],
+	preview: {
+		select: { title: 'guide.title', subtitle: 'guide.audienceLabel' },
+		prepare({ title, subtitle }) {
+			return { title: title || 'Guide', subtitle: subtitle || 'Guide' };
+		}
+	}
+});
+
+/**
+ * Exactly two live-text guide cards — the "read next" pair that closes a launch article. Both
+ * cards are live references (title/audience/route come from the guide record); the text is real
+ * text, never baked into an image. Two, deliberately: a pair points somewhere, a wall is a hub.
+ */
+export const insightGuideCards = defineType({
+	name: 'insightGuideCards',
+	title: 'Guide cards',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Optional. Leave blank when the section heading already names the module.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'items',
+			title: 'Guides',
+			type: 'array',
+			of: [{ type: 'insightGuideCardItem' }],
+			description: 'Exactly two guides.',
+			validation: (Rule) => Rule.required().length(2)
+		})
+	],
+	preview: {
+		select: { a: 'items.0.guide.title', b: 'items.1.guide.title', items: 'items' },
+		prepare({ a, b, items }) {
+			const count = Array.isArray(items) ? items.length : 0;
+			return {
+				title: [a, b].filter(Boolean).join('  /  ') || 'Guide cards',
+				subtitle: `${count} ${count === 1 ? 'guide' : 'guides'}`
+			};
+		}
+	}
+});
+
 /** The rich-text body of an Insights section: prose plus the shared and journal blocks. */
 const insightSectionBody = defineField({
 	name: 'body',
@@ -754,7 +1220,14 @@ const insightSectionBody = defineField({
 		defineArrayMember({ type: 'insightTakeaways' }),
 		defineArrayMember({ type: 'insightFaq' }),
 		defineArrayMember({ type: 'insightCtaCallout' }),
-		defineArrayMember({ type: 'insightFrontlineRail' })
+		defineArrayMember({ type: 'insightFrontlineRail' }),
+		// Reference-led commercial modules (the launch-article vocabulary). Each dereferences a
+		// canonical entity live and never copies its volatile data into the article.
+		defineArrayMember({ type: 'insightDestinationGrid' }),
+		defineArrayMember({ type: 'insightDevelopmentGrid' }),
+		defineArrayMember({ type: 'insightCourseGrid' }),
+		defineArrayMember({ type: 'insightPartnerLogoGrid' }),
+		defineArrayMember({ type: 'insightGuideCards' })
 	],
 	validation: (Rule) => Rule.required().min(1)
 });
