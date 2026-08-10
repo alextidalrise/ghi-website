@@ -56,11 +56,11 @@ The review caught and fixed:
 - the 24px white spacer row between the final CTA and footer, removed only for the flush light-footer treatment.
 - unequal visible card shells within the property, golf-course and buying-guide rows at tablet/desktop widths.
 
-No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence. The light footer was inspected at 700px, 375px and 320px: the green CTA meets the footer through one gold divider with no spacer row, while both linked dark-green icons and visible labels remain aligned, readable and unclipped. The component showcase was separately inspected at desktop and 320px and contains complete, labelled light and original dark-green variants. The restored masthead label and copy-first hero were inspected at desktop and 320px; the logo/label remained distinct and unclipped. All four restored course labels were inspected at 375px and 320px and remained readable within their cards. All five property rows, both golf-course rows and the buying-guide row measured as equal-height pairs at 1024px desktop and 768px tablet widths. Representative rows were visually inspected at tablet width with aligned borders/backgrounds and no clipping, overlap or broken actions. At 375px the cards stacked at independent natural heights without artificial blank space.
+No horizontal overflow was recorded. The final 31-character CTA remains one line at 320px in the captured evidence. The light footer was inspected at 700px, 375px and 320px: the green CTA meets the footer through one gold divider with no spacer row, while both linked dark-green icons and visible labels remain aligned, readable and unclipped. The component showcase was separately inspected at desktop and 320px and contains complete, labelled light and original dark-green variants. The restored masthead label and copy-first hero were inspected at desktop and 320px; the logo/label remained distinct and unclipped. All four restored course labels were inspected at 375px and 320px and remained readable within their cards. Final equal-height verification measured the visible inner card tables—not the naturally equal outer row cells—at both 1024px and 768px: all five property pairs were `374/374`, both course pairs were `331/331`, and the guide pair was `281/281`. Representative rows were visually inspected at tablet width with aligned borders/backgrounds, flush image tops and no clipping, overlap or broken actions. At 375px and 320px the desktop height rules reset and cards stack without horizontal overflow.
 
 ### Accepted warnings before internal proof
 
-1. Compiled HTML is 92,454 bytes (90.3KB), above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 91,597 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
+1. Compiled HTML is 94,038 bytes (91.8KB), above the 60KB working target but below Gmail's 102KB clipping threshold. Mailchimp's corrected stored HTML readback is 93,181 bytes. Final delivered HTML must still be inspected before live-send approval because tracking rewrites reduce this headroom.
 2. `Enquire about Portugal property` exceeds the validator's generic 28-character warning threshold, but the exact approved label was visually verified on one line at 320px.
 3. The WhatsApp URL has no UTM parameter. It is a direct `wa.me` action with a prefilled message, not a GHI website destination.
 
@@ -74,7 +74,7 @@ No horizontal overflow was recorded. The final 31-character CTA remains one line
 - Active: yes
 - Responsive: yes
 - Reusable footer variants: labelled light and original dark-green blocks, each retaining compliance content, Instagram and LinkedIn, hosted 72px PNG assets rendered at 36px and visible fallback labels.
-- Last edited after the equal-height card revision: `2026-08-10T18:00:22+00:00`.
+- Last edited after the corrected visible-shell revision: `2026-08-10T18:19:56+00:00`.
 
 The approved plan's longer provisional name exceeded Mailchimp's 49-character maximum. The review-status name avoids implying component approval before Alex's visual gate and does not overwrite the existing GHI template.
 
@@ -98,9 +98,9 @@ The approved plan's longer provisional name exceeded Mailchimp's 49-character ma
 
 ### Stored-content readback
 
-- Corrected source HTML SHA-256 before Mailchimp: `ef5b818c8843278a31e25e1294152f42f1fd5ae6825d5fc6d4991e2cf52665b5`
-- Corrected Mailchimp-stored HTML SHA-256: `642c542ceedeb7ac97774dedc753de8e7e433cd53e9009e5bc37c2280c645cdc`
-- Difference: Mailchimp normalisation; two consecutive GET readbacks were stable. Structural readback retained one H1, 30 images, 69 linked elements, one light footer, no campaign green footer, no 24px CTA/footer spacer row, one masthead edition label, four course actions, both social destinations, all 14 entity cards, both guide cards and 33 equal-height contract markers. The H1/standfirst/meta precede the hero image in stored reading order.
+- Corrected source HTML SHA-256 before Mailchimp: `4b31fc4b65194d2f35d0ca22adf060899f0a512dd1d94e16bbde4c6a3d1e9c70`
+- Corrected Mailchimp-stored HTML SHA-256: `afe9456de8b1202f3981eac72c5aa48df43a355692ebccc80f7e38cbcb56d4d2`
+- Difference: Mailchimp normalisation; two consecutive GET readbacks were stable. Structural readback retained one H1, 30 images, 69 linked elements, one light footer, no campaign green footer, no 24px CTA/footer spacer row, one masthead edition label, four course actions, both social destinations, all 14 entity cards and both guide cards. The stored content retained ten 372px development-shell markers, four 329px course-shell markers, two 281px guide-shell markers and 43 responsive row/shell reset markers. The H1/standfirst/meta precede the hero image in stored reading order.
 - Audited explicit plain-text SHA-256: `d1fbcb24adb26c1b24142d84da79f67193592f714c380c210d2fe1a1bd20ce49`
 - Mailchimp-stored plain text matches the current source-controlled plain text exactly.
 - Mailchimp archive readback exposed the full destination, development, golf, partner, guide and enquiry hierarchy.

@@ -154,8 +154,15 @@ try {
 		failures += 1;
 	}
 
-	const equalHeightContract = [entitySource, guideSource].every((component) => component.includes('height="100%"') && component.includes('sm-equal-card'))
-		&& cssSource.includes('.sm-equal-card') && cssSource.includes('height: auto !important;');
+	const equalHeightContract = entitySource.includes('height="{{ cardheight }}"')
+		&& entitySource.includes('height="{{ bodyheight }}"')
+		&& entitySource.includes('sm-equal-card-row')
+		&& guideSource.includes('height="281"')
+		&& source.split('cardheight="372" bodyheight="202"').length - 1 === 10
+		&& source.split('cardheight="329" bodyheight="159"').length - 1 === 4
+		&& cssSource.includes('.sm-equal-card')
+		&& cssSource.includes('.sm-equal-card-row')
+		&& cssSource.includes('height: auto !important;');
 	if (equalHeightContract) console.log('  ok    entity and guide card pairs equalise above mobile and reset when stacked');
 	else {
 		console.error('  FAIL  equal-height paired-card contract');
