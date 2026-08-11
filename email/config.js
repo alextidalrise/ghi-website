@@ -161,8 +161,8 @@ export default {
 		social: {
 			instagram: 'https://www.instagram.com/golfhomesinternational/?utm_source=mailchimp&utm_medium=email',
 			linkedin: 'https://www.linkedin.com/company/golf-homes-international?utm_source=mailchimp&utm_medium=email',
-			instagramIcon: 'https://mcusercontent.com/29c8f4436bf0d21837847298b/images/2c920cce-3ac9-d4c1-b8fe-20d02fb2e113.png',
-			linkedinIcon: 'https://mcusercontent.com/29c8f4436bf0d21837847298b/images/fb1db59d-5a98-4778-cad5-7a6300e42056.png',
+			instagramIcon: 'https://mcusercontent.com/29c8f4436bf0d21837847298b/images/c2c03486-6b24-4c07-559e-5261398efc7b.png',
+			linkedinIcon: 'https://mcusercontent.com/29c8f4436bf0d21837847298b/images/079c018e-ac2d-576f-7600-17c341f282dc.png',
 			instagramIconGreen: 'https://mcusercontent.com/29c8f4436bf0d21837847298b/images/e94b0a42-1a48-ccb5-779b-a91f9b3168de.png',
 			linkedinIconGreen: 'https://mcusercontent.com/29c8f4436bf0d21837847298b/images/1a1bf10b-e0ae-24e9-0413-439834506287.png'
 		}

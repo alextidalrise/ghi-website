@@ -47,8 +47,8 @@ const expectedPortugalMarkers = [
 const forbiddenPortugalCopy = ['A more useful way to compare the Algarve', 'Olive Grove Partners', 'Nueva Vida Group'];
 const approvedPreview = 'Explore Vilamoura, Quinta do Lago, Monte Rei and Palmares, with current developments, golf and independent buyer support.';
 const expectedSocialLinks = [
-	['Instagram', 'https://www.instagram.com/golfhomesinternational/?utm_source=mailchimp&utm_medium=email', 'e94b0a42-1a48-ccb5-779b-a91f9b3168de.png', '2c920cce-3ac9-d4c1-b8fe-20d02fb2e113.png'],
-	['LinkedIn', 'https://www.linkedin.com/company/golf-homes-international?utm_source=mailchimp&utm_medium=email', '1a1bf10b-e0ae-24e9-0413-439834506287.png', 'fb1db59d-5a98-4778-cad5-7a6300e42056.png'],
+	['Instagram', 'https://www.instagram.com/golfhomesinternational/?utm_source=mailchimp&utm_medium=email', 'e94b0a42-1a48-ccb5-779b-a91f9b3168de.png', 'c2c03486-6b24-4c07-559e-5261398efc7b.png'],
+	['LinkedIn', 'https://www.linkedin.com/company/golf-homes-international?utm_source=mailchimp&utm_medium=email', '1a1bf10b-e0ae-24e9-0413-439834506287.png', '079c018e-ac2d-576f-7600-17c341f282dc.png'],
 ];
 
 let failures = 0;
@@ -117,7 +117,7 @@ try {
 	}
 
 	const editorialMastheadHtml = ['date', 'strapline', 'descriptor'].every((field) => html.split(`data-masthead-${field}`).length - 1 === 1);
-	const editorialMastheadText = text.includes('WEEK 33 | MONDAY, 10 AUGUST 2026')
+	const editorialMastheadText = text.includes('WEEK 33 | TUESDAY, 11 AUGUST 2026')
 		&& text.includes('The Home of Golf Property')
 		&& text.includes('YOUR SPECIALIST ESTATE AGENCY FOR GOLF PROPERTY IN SPAIN AND PORTUGAL');
 	const oldMetadataRemoved = !html.includes('10 August 2026 · Portugal · Golf property · Buyer guidance')
