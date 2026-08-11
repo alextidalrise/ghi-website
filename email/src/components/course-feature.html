@@ -1,21 +1,35 @@
-<!-- Full-width golf-course card using the approved captioned location treatment. -->
-<tr data-component="course-feature">
-  <td bgcolor="{{ page.brand.white }}" class="dm-surface sm-gutter" style="background-color:{{ page.brand.white }};padding:0 32px {{ gap === '' ? 32 : gap }}px;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="dm-border" style="width:100%;border:1px solid {{ page.brand.border }};">
-      <tr>
-        <td width="44%" valign="top" class="sm-stack" style="width:44%;padding:0;">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
-            <tr><td style="padding:0;font-size:0;line-height:0;"><a href="{{ href }}" style="text-decoration:none;border:0;"><img src="{{ src }}" alt="{{ alt }}" width="236" height="236" class="sm-full" style="display:block;width:100%;max-width:236px;height:auto;border:0;"></a></td></tr>
-            <if condition="label"><tr><td bgcolor="{{ page.brand.green }}" style="background-color:{{ page.brand.green }};padding:10px 12px;font-family:{{ page.font.sans }};font-size:12px;line-height:17px;color:{{ page.brand.onGreen }};">{{ label }}</td></tr></if>
-          </table>
-        </td>
-        <td width="56%" valign="middle" class="sm-stack sm-card-copy" style="width:56%;padding:24px;">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
-            <tr><td style="padding:0 0 24px;"><h3 style="margin:0;font-family:{{ page.font.serif }};font-size:30px;line-height:36px;font-weight:{{ page.weight.body }};"><a href="{{ href }}" class="dm-accent" style="color:{{ page.brand.green }};text-decoration:underline;text-underline-offset:5px;">{{ title }}</a></h3></td></tr>
-            <tr><td style="padding:0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;"><tr><td bgcolor="{{ page.brand.green }}" align="center" style="background-color:{{ page.brand.green }};padding:12px;font-family:{{ page.font.sans }};font-size:13px;line-height:18px;font-weight:{{ page.weight.medium }};letter-spacing:1px;text-transform:uppercase;"><a href="{{ href }}" style="display:block;color:{{ page.brand.onGreen }};text-decoration:none;">{{ cta }}</a></td></tr></table></td></tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </td>
-</tr>
+<!-- Paired golf-course card with an image-led field and lower-left dark-green information panel. -->
+<td data-component="course-feature" width="50%" valign="top" class="sm-stack" style="width:50%;padding:0 6px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
+    <tr>
+      <td background="{{ src }}" bgcolor="{{ page.brand.border }}" width="100%" height="300" valign="bottom" role="img" aria-label="{{ alt }}" style="width:100%;height:300px;background-image:url('{{ src }}');background-position:center bottom;background-size:cover;background-repeat:no-repeat;">
+        <!--[if gte mso 9]>
+        <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:262px;height:300px;">
+          <v:fill type="frame" src="{{ src }}" color="{{ page.brand.border }}" />
+          <v:textbox inset="0,0,0,0">
+        <![endif]-->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" height="300" style="width:100%;height:300px;">
+          <tr><td height="118" style="height:118px;padding:0;font-size:0;line-height:0;"><a href="{{ href }}" aria-label="View {{ title }}" style="display:block;height:118px;font-size:0;line-height:118px;color:transparent;text-decoration:none;">&nbsp;</a></td></tr>
+          <tr>
+            <td valign="bottom" style="padding:0;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="88%" style="width:88%;">
+                <tr>
+                  <td bgcolor="{{ page.brand.green }}" style="background-color:{{ page.brand.green }};padding:18px 20px;">
+                    <h3 style="margin:0 0 8px;font-family:{{ page.font.serif }};font-size:22px;line-height:28px;font-weight:{{ page.weight.body }};"><a href="{{ href }}" style="color:{{ page.brand.onGreen }};text-decoration:none;">{{ title }}</a></h3>
+                    <div style="font-family:{{ page.font.sans }};font-size:10px;line-height:16px;letter-spacing:1.5px;text-transform:uppercase;color:{{ page.brand.onGreen }};">{{ label }}</div>
+                    <div style="height:1px;margin:14px 0;background-color:{{ page.brand.border }};font-size:0;line-height:0;">&nbsp;</div>
+                    <a href="{{ href }}" style="font-family:{{ page.font.sans }};font-size:12px;line-height:18px;font-weight:{{ page.weight.medium }};letter-spacing:1.4px;text-transform:uppercase;color:{{ page.brand.onGreen }};text-decoration:none;">{{ cta }}</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <!--[if gte mso 9]>
+          </v:textbox>
+        </v:rect>
+        <![endif]-->
+      </td>
+    </tr>
+  </table>
+</td>

@@ -70,16 +70,23 @@ Completion varies by phase
 View development →
 (https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
 
-[Image: Example golf course]
-
-Destination, Country
-
 EXAMPLE GOLF COURSE
 -------------------
 https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
 
-VIEW COURSE →:
+Destination, Country
+
+View course →
+(https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+SECOND EXAMPLE COURSE
+---------------------
 https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+Destination, Country
+
+View course →
+(https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
 
 [Image: Example golf course]
 

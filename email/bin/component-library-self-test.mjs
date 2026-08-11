@@ -125,7 +125,7 @@ try {
 		failures += 1;
 	}
 
-	const courseCtaHtml = html.split('View course →').length - 1;
+	const courseCtaHtml = html.split('VIEW COURSE →').length - 1;
 	const courseCtaText = text.split('VIEW COURSE →').length - 1;
 	if (courseCtaHtml === 4 && courseCtaText === 4) console.log('  ok    four canonical course action labels retained in HTML and plain text');
 	else {
