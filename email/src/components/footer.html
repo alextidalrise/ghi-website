@@ -57,8 +57,8 @@
       </tr>
 
       <!--
-        Required actions. Gold on green measures 6.86:1, and each is underlined
-        at rest: there is no hover in email, so colour alone would be the only
+        Required actions. White on green remains high contrast, and each is
+        underlined at rest: there is no hover in email, so colour alone would be the only
         signal that these are links, which WCAG 1.4.1 does not allow.
 
         `*|ARCHIVE|*` emits a complete <a> element, not a URL, so it cannot be
@@ -72,17 +72,17 @@
         >
           <a
             href="*|ARCHIVE_PAGE_URL|*"
-            style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
+            style="color: #ffffff !important; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
           >{{ page.i18n.viewInBrowser }}</a>
           <span style="color: #ffffff !important;">&nbsp;&middot;&nbsp;</span>
           <a
             href="*|UPDATE_PROFILE|*"
-            style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
+            style="color: #ffffff !important; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
           >{{ page.i18n.updatePreferences }}</a>
           <span style="color: #ffffff !important;">&nbsp;&middot;&nbsp;</span>
           <a
             href="*|UNSUB|*"
-            style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
+            style="color: #ffffff !important; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px;"
           >{{ page.i18n.unsubscribe }}</a>
         </td>
       </tr>
@@ -105,7 +105,7 @@
                       </a>
                     </td>
                     <td valign="middle">
-                      <a href="{{ page.site.social.instagram }}" style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">Instagram</a>
+                      <a href="{{ page.site.social.instagram }}" style="color: #ffffff !important; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">Instagram</a>
                     </td>
                   </tr>
                 </table>
@@ -119,7 +119,7 @@
                       </a>
                     </td>
                     <td valign="middle">
-                      <a href="{{ page.site.social.linkedin }}" style="color: {{ page.brand.gold }}; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">LinkedIn</a>
+                      <a href="{{ page.site.social.linkedin }}" style="color: #ffffff !important; text-decoration: underline; text-underline-offset: 2px; font-family: {{ page.font.sans }}; font-size: {{ page.scale.legal.size }}px; line-height: {{ page.scale.legal.leading }}px;">LinkedIn</a>
                     </td>
                   </tr>
                 </table>

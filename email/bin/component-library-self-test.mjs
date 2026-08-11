@@ -155,11 +155,14 @@ try {
 	const closingStart = html.indexOf('data-component="dual-action-enquiry"');
 	const greenFooterStart = html.indexOf('data-footer-variant="green"');
 	const closingBoundary = html.slice(closingStart, greenFooterStart);
+	const greenFooterHtml = html.slice(greenFooterStart);
+	const whiteFooterActionLinks = (greenFooterHtml.match(/color:#ffffff!important;text-decoration:underline/g) || []).length === 5;
+	const goldFooterTextRemoved = !greenFooterHtml.includes('color:#d5bd7a');
 	const gapRemoved = closingStart >= 0 && greenFooterStart > closingStart && !closingBoundary.includes('height:24px');
 	const closingPlain = text.includes('ENQUIRE ABOUT GOLF PROPERTY IN PORTUGAL') && text.includes('WHATSAPP OUR PORTUGAL TEAM');
-	if (greenFooterSelected && greenFooterAvailable && lightFooterAvailable && gapRemoved && closingPlain) console.log('  ok    green footer selected, both footer blocks available, CTA/footer gap removed');
+	if (greenFooterSelected && greenFooterAvailable && lightFooterAvailable && whiteFooterActionLinks && goldFooterTextRemoved && gapRemoved && closingPlain) console.log('  ok    green footer selected, all five footer links white, CTA/footer gap removed');
 	else {
-		console.error(`  FAIL  footer variant/gap contract (campaignGreen=${greenFooterSelected}, libraryGreen=${greenFooterAvailable}, libraryLight=${lightFooterAvailable}, gapRemoved=${gapRemoved}, plainCTA=${closingPlain})`);
+		console.error(`  FAIL  footer variant/colour/gap contract (campaignGreen=${greenFooterSelected}, libraryGreen=${greenFooterAvailable}, libraryLight=${lightFooterAvailable}, whiteLinks=${whiteFooterActionLinks}, noGoldText=${goldFooterTextRemoved}, gapRemoved=${gapRemoved}, plainCTA=${closingPlain})`);
 		failures += 1;
 	}
 
