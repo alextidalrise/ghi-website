@@ -1,51 +1,63 @@
 <!--
   Masthead — LOCKED system content. Not campaign-editable.
 
-  The green ground is deliberate and is half of the dark-mode strategy: a dark
-  surface is what inverting clients leave alone, so the logo sits on a ground
-  that renders the same in every mode. It also spends the Emphasis Ladder's one
-  green band (DESIGN.md tier 4) at the top of the email, where the brand should
-  land first.
-
-  The logo is a flattened PNG rather than a transparent one. A transparent PNG
-  with light ink lands on a light ground the moment a client inverts the
-  surface behind it, and the wordmark disappears.
-
-  The inline `height` is `auto`, not the logo's pixel height, and the alt text
-  is sized to fit the 200px box on two lines. With images blocked, a fixed CSS
-  height clips the alt string: the reader sees "Golf Homes" and the rest is cut
-  off, so the brand name is wrong in exactly the situation where the alt text is
-  all there is. The `height` ATTRIBUTE stays, so clients that reserve space
-  still get the right box.
-
-  No `mc:edit` region here: nothing in the masthead may be changed per campaign.
+  The editorial variant follows GHI's date-led newsletter hierarchy: date line,
+  inset green brand panel, logo/strapline, then the specialist descriptor. The
+  original compact masthead remains available for other campaign recipes.
 -->
-<tr>
-  <td
-    align="{{ page.start }}"
-    bgcolor="{{ page.brand.green }}"
-    class="sm-gutter"
-    style="background-color: {{ page.brand.green }}; padding: 32px;"
-  >
-    <table data-email-masthead-table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%;">
-      <tr>
-        <td valign="middle" class="sm-stack" style="width: 62%;">
-          <a href="{{ page.site.origin }}/?utm_source=mailchimp&utm_medium=email" style="text-decoration: none; border: 0;">
-            <img
-              src="{{ page.site.logoIvory }}"
-              width="{{ page.site.logoWidth }}"
-              height="{{ page.site.logoHeight }}"
-              alt="{{ page.i18n.logoAlt }}"
-              style="display: block; width: {{ page.site.logoWidth }}px; height: auto; border: 0; outline: none; text-decoration: none; font-family: {{ page.font.serif }}; font-size: 17px; line-height: 22px; font-weight: {{ page.weight.display }}; color: {{ page.brand.onGreen }};"
-            >
-          </a>
-        </td>
-        <if condition="page.edition">
-          <td data-masthead-edition align="{{ page.end }}" valign="middle" class="sm-stack" style="width: 38%; font-family: {{ page.font.sans }}; font-size: {{ page.scale.ui.size }}px; line-height: {{ page.scale.ui.leading }}px; mso-line-height-rule: exactly; font-weight: {{ page.weight.medium }}; letter-spacing: {{ page.track.normal }}; color: {{ page.brand.gold }};">
-            {{ page.edition }}
+<if condition="page.mastheadVariant === 'editorial'">
+  <tr data-email-masthead-start>
+    <td data-masthead-date align="center" bgcolor="{{ page.brand.white }}" class="dm-surface sm-gutter" style="background-color:{{ page.brand.white }};padding:24px 32px 16px;font-family:{{ page.font.sans }};font-size:11px;line-height:16px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};letter-spacing:1.6px;text-transform:uppercase;color:{{ page.brand.muted }};">
+      {{ page.mastheadDate }}
+    </td>
+  </tr>
+  <tr>
+    <td align="center" bgcolor="{{ page.brand.white }}" class="dm-surface sm-gutter" style="background-color:{{ page.brand.white }};padding:0 32px;">
+      <table data-email-masthead-table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
+        <tr>
+          <td align="center" bgcolor="{{ page.brand.green }}" style="background-color:{{ page.brand.green }};padding:38px 24px 34px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
+              <tr>
+                <td align="center" style="padding:0 0 22px;">
+                  <a href="{{ page.site.origin }}/?utm_source=mailchimp&utm_medium=email" style="text-decoration:none;border:0;">
+                    <img src="{{ page.site.logoIvory }}" width="320" height="72" alt="{{ page.i18n.logoAlt }}" class="sm-full" style="display:block;width:100%;max-width:320px;height:auto;margin:0 auto;border:0;outline:none;text-decoration:none;font-family:{{ page.font.serif }};font-size:17px;line-height:22px;font-weight:{{ page.weight.display }};color:#ffffff;">
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td data-masthead-strapline align="center" style="padding:0;font-family:{{ page.font.serif }};font-size:20px;line-height:27px;mso-line-height-rule:exactly;font-weight:{{ page.weight.display }};color:#ffffff;">
+                  {{ page.mastheadStrapline }}
+                </td>
+              </tr>
+            </table>
           </td>
-        </if>
-      </tr>
-    </table>
-  </td>
-</tr>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr data-email-masthead-end>
+    <td data-masthead-descriptor align="center" bgcolor="{{ page.brand.white }}" class="dm-surface sm-gutter" style="background-color:{{ page.brand.white }};padding:18px 32px 22px;font-family:{{ page.font.sans }};font-size:11px;line-height:17px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};letter-spacing:1.3px;text-transform:uppercase;color:{{ page.brand.muted }};">
+      {{ page.mastheadDescriptor }}
+    </td>
+  </tr>
+</if>
+<else>
+  <tr>
+    <td align="{{ page.start }}" bgcolor="{{ page.brand.green }}" class="sm-gutter" style="background-color:{{ page.brand.green }};padding:32px;">
+      <table data-email-masthead-table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
+        <tr>
+          <td valign="middle" class="sm-stack" style="width:62%;">
+            <a href="{{ page.site.origin }}/?utm_source=mailchimp&utm_medium=email" style="text-decoration:none;border:0;">
+              <img src="{{ page.site.logoIvory }}" width="{{ page.site.logoWidth }}" height="{{ page.site.logoHeight }}" alt="{{ page.i18n.logoAlt }}" style="display:block;width:{{ page.site.logoWidth }}px;height:auto;border:0;outline:none;text-decoration:none;font-family:{{ page.font.serif }};font-size:17px;line-height:22px;font-weight:{{ page.weight.display }};color:{{ page.brand.onGreen }};">
+            </a>
+          </td>
+          <if condition="page.edition">
+            <td data-masthead-edition align="{{ page.end }}" valign="middle" class="sm-stack" style="width:38%;font-family:{{ page.font.sans }};font-size:{{ page.scale.ui.size }}px;line-height:{{ page.scale.ui.leading }}px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};letter-spacing:{{ page.track.normal }};color:{{ page.brand.gold }};">
+              {{ page.edition }}
+            </td>
+          </if>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</else>

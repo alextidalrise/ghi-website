@@ -40,8 +40,14 @@ export function generatePlaintext(html, { locale = 'en' } = {}) {
 	 */
 	blocks.push(i18n.plaintext.footerHeading.toUpperCase());
 	blocks.push(mastheadHref(html) ?? '');
-	const edition = mastheadEdition(html);
-	if (edition) blocks.push(edition);
+	const editorialMasthead = ['date', 'strapline', 'descriptor']
+		.map((field) => mastheadField(html, field))
+		.filter(Boolean);
+	if (editorialMasthead.length) blocks.push(...editorialMasthead);
+	else {
+		const edition = mastheadEdition(html);
+		if (edition) blocks.push(edition);
+	}
 	blocks.push(rule('='));
 
 	for (const block of walk(body)) {
@@ -118,12 +124,15 @@ function extractBody(html) {
 		.replace(/<!--[\s\S]*?-->/g, '')
 		.replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, '');
 
+	const editorialEnd = /<tr\b[^>]*data-email-masthead-end[^>]*>[\s\S]*?<\/tr>/i.exec(body);
 	const bands = [
 		...body.matchAll(/<td\b[^>]*(?:sm-gutter[^>]*background-color:\s*#1f3d34|background-color:\s*#1f3d34[^>]*sm-gutter)[^>]*>/gi)
 	];
 	const footer = /<td\b[^>]*data-footer-variant="(?:green|light)"[^>]*>/i.exec(body);
 
-	if (bands.length >= 1 && footer) {
+	if (editorialEnd && footer && footer.index > editorialEnd.index) {
+		body = body.slice(editorialEnd.index + editorialEnd[0].length, footer.index);
+	} else if (bands.length >= 1 && footer) {
 		const masthead = bands[0];
 
 		// Trim from the end of the masthead cell to the start of the footer's
@@ -272,6 +281,12 @@ function mastheadHref(html) {
 /** Optional campaign edition label carried by the locked masthead shell. */
 function mastheadEdition(html) {
 	const m = /<td\b[^>]*data-masthead-edition[^>]*>([\s\S]*?)<\/td>/i.exec(html);
+	return m ? clean(m[1]) : null;
+}
+
+/** Date, strapline or descriptor carried by the editorial masthead variant. */
+function mastheadField(html, field) {
+	const m = new RegExp(`<td\\b[^>]*data-masthead-${field}[^>]*>([\\s\\S]*?)<\\/td>`, 'i').exec(html);
 	return m ? clean(m[1]) : null;
 }
 

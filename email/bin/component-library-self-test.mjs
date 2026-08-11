@@ -116,12 +116,16 @@ try {
 		failures += 1;
 	}
 
-	const editionHtml = html.split('data-masthead-edition').length - 1;
-	const editionText = (text.match(/^Portugal collection$/gm) || []).length;
+	const editorialMastheadHtml = ['date', 'strapline', 'descriptor'].every((field) => html.split(`data-masthead-${field}`).length - 1 === 1);
+	const editorialMastheadText = text.includes('WEEK 33 | MONDAY, 10 AUGUST 2026')
+		&& text.includes('The Home of Golf Property')
+		&& text.includes('YOUR SPECIALIST ESTATE AGENCY FOR GOLF PROPERTY IN SPAIN AND PORTUGAL');
+	const oldMetadataRemoved = !html.includes('10 August 2026 · Portugal · Golf property · Buyer guidance')
+		&& !text.includes('10 August 2026 · Portugal · Golf property · Buyer guidance');
 	const overlineRemoved = !source.includes('<x-overline gap="12">Portugal</x-overline>');
-	if (editionHtml === 1 && editionText === 1 && overlineRemoved) console.log('  ok    canonical masthead edition restored without duplicate hero overline');
+	if (editorialMastheadHtml && editorialMastheadText && oldMetadataRemoved && overlineRemoved) console.log('  ok    editorial masthead and removed metadata row retained in HTML/plain text');
 	else {
-		console.error(`  FAIL  masthead edition/overline contract (html=${editionHtml}, text=${editionText}, overlineRemoved=${overlineRemoved})`);
+		console.error(`  FAIL  editorial masthead contract (html=${editorialMastheadHtml}, text=${editorialMastheadText}, oldMetadataRemoved=${oldMetadataRemoved}, overlineRemoved=${overlineRemoved})`);
 		failures += 1;
 	}
 
