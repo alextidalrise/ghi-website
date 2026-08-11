@@ -60,7 +60,7 @@ No horizontal overflow was recorded. The final 31-character CTA remains one line
 
 ### Accepted warnings before internal proof
 
-1. Compiled source HTML is 103,379 bytes, 979 bytes above Gmail's 102,400-byte clipping threshold because the campaign retains four Outlook VML course-background fallbacks and now includes the expanded editorial masthead. Mailchimp's authoritative normalised stored HTML readback is 98,009 bytes, leaving 4,391 bytes of stored-content headroom before delivery-time tracking expansion. The final delivered message must therefore still be checked for Gmail clipping before live-send approval.
+1. Compiled source HTML is 103,369 bytes, 969 bytes above Gmail's 102,400-byte clipping threshold because the campaign retains four Outlook VML course-background fallbacks and now includes the expanded editorial masthead. Mailchimp's authoritative normalised stored HTML readback is 97,999 bytes, leaving 4,401 bytes of stored-content headroom before delivery-time tracking expansion. The final delivered message must therefore still be checked for Gmail clipping before live-send approval.
 2. `Enquire about Portugal property` exceeds the validator's generic 28-character warning threshold, but the exact approved label was visually verified on one line at 320px.
 3. The WhatsApp URL has no UTM parameter. It is a direct `wa.me` action with a prefilled message, not a GHI website destination.
 
@@ -98,10 +98,10 @@ The approved plan's longer provisional name exceeded Mailchimp's 49-character ma
 
 ### Stored-content readback
 
-- Corrected source HTML SHA-256 before Mailchimp: `0b054a485283ca3febe438e4852674c805d8126cfb957c49d904677fd4dcb35a`
-- Corrected Mailchimp-stored HTML SHA-256: `24d1b6d0733b810016ff552464f6da87dca3807ea65f5f864525bd6ece368c85`
+- Corrected source HTML SHA-256 before Mailchimp: `d49213f56d8bf4a48a027dd4a7f8e229aeeffdcd14750ce6e962616d8654d3e8`
+- Corrected Mailchimp-stored HTML SHA-256: `aa619fe7995cc1e6f3eddbbab316760bd7589d24674f0e5c3eaf2b0b6025dfe8`
 - Difference: controlled Mailchimp normalisation, James's editorial masthead and removed metadata row, paired image-overlay course rows, top-aligned destination cards with Palmares-matched image-column balance, campaign-wide reduction of green-box treatments, and the dark-green compliance/social footer with all five text links forced to white. Structural readback retained four captioned location cards, ten full-width development cards, four course cards across two paired rows, six partner cells, two compact guide cards in two rows, two WhatsApp actions, ten explicit `View development →` actions, four course actions, the partner-introduction CTA, one dark-green footer and no CTA/footer spacer. Each course retained its title, location, underlying Sanity asset identity, alt text, canonical tracked link and `VIEW COURSE →` action. Stored course backgrounds read back at 640×640, 300px display height with 88%-width information panels and four Outlook VML fallbacks. The partner panel, guide cards, locations and developments retained their previously verified content and structure. Olive Grove Partners and Nueva Vida Group were absent from both stored HTML and plain text.
-- Audited Mailchimp-stored explicit plain-text SHA-256: `bbd0eea2a414fc1aabf4a2d67f51ebfc250c7e9ec0b0f3ac80aec962a0a9cf56`
+- Audited Mailchimp-stored explicit plain-text SHA-256: `60c48ba65408dfde306f4275ec0ac3228d14de810e283487d7b7cd3403b3b978`
 - Mailchimp-stored plain text matches the current source-controlled plain text after standard trailing-newline normalisation.
 - Mailchimp archive readback exposed the full destination, development, golf, partner, guide and enquiry hierarchy.
 
