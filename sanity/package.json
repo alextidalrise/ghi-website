@@ -141,10 +141,12 @@
 		"migrate:james-portrait:dry-run": "tsx migrations/insight-james-pryor-portrait-migrate.ts --dry-run",
 		"migrate:destinations-pair": "tsx migrations/insight-destinations-figure-pair-migrate.ts",
 		"migrate:destinations-pair:dry-run": "tsx migrations/insight-destinations-figure-pair-migrate.ts --dry-run",
+		"kyero:dry-run": "tsx importers/kyero/dry-run.ts",
 		"test": "vitest run"
 	},
 	"dependencies": {
 		"@sanity/client": "^7.14.0",
+		"fast-xml-parser": "^4.5.0",
 		"@sanity/icons": "^3.7.4",
 		"@sanity/ui": "^3.2.0",
 		"@sanity/vision": "^5.31.1",

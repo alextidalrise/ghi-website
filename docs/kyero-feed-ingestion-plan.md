@@ -75,26 +75,35 @@ for the importer: `sanity/fixtures/sample-development/seed.ts`.
 ## Sample feed — murciaservices (checked 2026-08-05)
 
 First real feed: `https://www.propertyportalmarketing.com/xml/murciaservices-kyero.xml` — a standard,
-well-formed Kyero V3 feed. Small and a good pilot.
+well-formed Kyero V3 feed. Numbers below are measured by the dry-run importer
+(`sanity/importers/kyero/dry-run.ts`) against the live feed, not estimated.
 
-- **Shape:** `<root>` / `feed_version` 3 · **27 properties** · all `currency` EUR · all `price_freq` sale.
+- **Shape:** `<root>` / `feed_version` 3 · **209 properties** · all `currency` EUR ·
+  `price_freq` = sale ×204 / **month ×5** (5 monthly rentals → `transactionType: rent`).
+- **new_build:** 117 off-plan / 92 resale — but every unit is a flat `<property>` (see D-1).
 - **Fields present:** `id`, `date`, `ref`, `notes`, `price`, `currency`, `price_freq`, `part_ownership`,
   `leasehold`, `new_build`, `type`, `town`, `province`, `country`, `location/latitude`, `location/longitude`,
-  `beds`, `baths`, `video_url` (some), `surface_area/built`, `surface_area/plot`, `desc/en` + `desc/pl`,
+  `beds`, `baths`, `video_url` (28%), `surface_area/built`, `surface_area/plot`, `desc/en` + `desc/pl`,
   `features/feature` (optional), `pool`, `images/image` (`id` + `url`), `url/en`.
 - **Note the tag names:** description is **`desc`** (not `description`), with `<en>` and `<pl>` (Polish
   usually empty → take `en`). There is a **`notes`** field — treat as agent-internal, never public copy.
-- **Region:** Costa Cálida / Costa Blanca South (Murcia + Alicante) — see D-3. New subtree required.
+- **Region:** Costa Cálida / Costa Blanca South (Murcia + Alicante) — see D-3. **68 distinct towns, none
+  in our taxonomy** — mostly golf-resort/urbanisation names (La Torre Golf Resort, La Manga Club, El Valle
+  Golf Resort…), with near-duplicates (Serena Golf vs La Serena Golf; Pilar de la Horadada vs Pilar De
+  Horadada) that a human must reconcile.
 
-**Data-quality gaps to defend against** (the importer must not trust the feed blindly):
+**Data-quality gaps, measured** (the importer must not trust the feed blindly):
 
-- Some `<type>` values are **empty** → cannot map to `propertyType`; route to reconciliation queue.
-- `<pool>` appears **empty across all entries**; some `<beds>`/`<baths>` are **0** despite the description
-  mentioning rooms → default + flag for review rather than publishing a false 0.
-- Several properties have **0/0 coordinates** → confirms per-listing pins are correctly dropped.
-- Descriptions contain **HTML entities** (`&#13;`) → sanitise on import.
-- Image URLs are **CDATA-wrapped** and served via an **Optimole CDN** → the parser must handle CDATA;
-  fetch + re-upload to Sanity as normal.
+- **22% (46/209) have an empty `<type>`** → cannot map to `propertyType`; block + route to queue.
+  Other raw types map cleanly (Villa, Apartment, Townhouse, Land - Building Plot, House/Villa).
+- **100% have empty `<built>` and `<plot>`** → this feed carries **no surface area at all**; `specs.builtArea`
+  / `plotSize` stay empty, flag for review. (Biggest single content gap.)
+- `<pool>` empty for **99%** → `specs.pool = unknown` (cannot infer none vs private).
+- **~3% (6/209)** have `beds`/`baths` = 0 → leave unset + review, don't publish a false 0.
+- **100% have 0/0 or absent coordinates** → confirms per-listing pins are correctly dropped.
+- Descriptions carry doubly-escaped entities (`&#13;`) even outside CDATA → sanitise on import (handled).
+- Image URLs are **CDATA-wrapped** via an **Optimole CDN**; **3,533 images total** (avg 17, max 50 per
+  listing) → each fetched + re-uploaded to Sanity. This is the heaviest runtime cost.
 
 ---
 
