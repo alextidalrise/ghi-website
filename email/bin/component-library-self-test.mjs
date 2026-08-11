@@ -169,7 +169,7 @@ try {
 		&& entitySource.includes('background-color:{{ page.brand.white }}')
 		&& entitySource.includes('color:{{ page.brand.green }};text-decoration:none')
 		&& destinationSource.includes('background-color:{{ page.brand.green }};padding:7px 9px')
-		&& destinationSource.includes('text-decoration:underline;text-underline-offset:5px')
+		&& destinationSource.includes('text-decoration:underline;text-underline-offset:4px')
 		&& destinationSource.includes('text-transform:uppercase')
 		&& developmentSource.includes('data-component="development-card"')
 		&& developmentSource.includes('font-size:28px')
