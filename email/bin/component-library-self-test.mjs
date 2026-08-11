@@ -135,27 +135,27 @@ try {
 
 	for (const [label, href, lightIcon, greenIcon] of expectedSocialLinks) {
 		const encodedHref = href.replace(/&/g, '&amp;');
-		const htmlHas = html.includes(`href="${encodedHref}"`) && html.includes(lightIcon);
+		const htmlHas = html.includes(`href="${encodedHref}"`) && html.includes(greenIcon);
 		const greenAvailable = componentHtml.includes(`href="${encodedHref}"`) && componentHtml.includes(greenIcon);
 		const textHas = text.includes(`${label}: ${href}`);
-		if (htmlHas && greenAvailable && textHas) console.log(`  ok    light/green footer social parity: ${label}`);
+		if (htmlHas && greenAvailable && textHas) console.log(`  ok    green footer social parity: ${label}`);
 		else {
 			console.error(`  FAIL  light/green footer social parity: ${label} (light=${htmlHas}, green=${greenAvailable}, text=${textHas})`);
 			failures += 1;
 		}
 	}
 
-	const lightFooterSelected = html.split('data-footer-variant="light"').length - 1 === 1 && !html.includes('data-footer-variant="green"');
+	const greenFooterSelected = html.split('data-footer-variant="green"').length - 1 === 1 && !html.includes('data-footer-variant="light"');
 	const greenFooterAvailable = componentHtml.split('data-footer-variant="green"').length - 1 === 1;
 	const lightFooterAvailable = componentHtml.split('data-footer-variant="light"').length - 1 === 1;
 	const closingStart = html.indexOf('data-component="dual-action-enquiry"');
-	const lightFooterStart = html.indexOf('data-footer-variant="light"');
-	const closingBoundary = html.slice(closingStart, lightFooterStart);
-	const gapRemoved = closingStart >= 0 && lightFooterStart > closingStart && !closingBoundary.includes('height:24px');
+	const greenFooterStart = html.indexOf('data-footer-variant="green"');
+	const closingBoundary = html.slice(closingStart, greenFooterStart);
+	const gapRemoved = closingStart >= 0 && greenFooterStart > closingStart && !closingBoundary.includes('height:24px');
 	const closingPlain = text.includes('ENQUIRE ABOUT GOLF PROPERTY IN PORTUGAL') && text.includes('WHATSAPP OUR PORTUGAL TEAM');
-	if (lightFooterSelected && greenFooterAvailable && lightFooterAvailable && gapRemoved && closingPlain) console.log('  ok    light footer selected, both footer blocks available, CTA/footer gap removed');
+	if (greenFooterSelected && greenFooterAvailable && lightFooterAvailable && gapRemoved && closingPlain) console.log('  ok    green footer selected, both footer blocks available, CTA/footer gap removed');
 	else {
-		console.error(`  FAIL  footer variant/gap contract (campaignLight=${lightFooterSelected}, libraryGreen=${greenFooterAvailable}, libraryLight=${lightFooterAvailable}, gapRemoved=${gapRemoved}, plainCTA=${closingPlain})`);
+		console.error(`  FAIL  footer variant/gap contract (campaignGreen=${greenFooterSelected}, libraryGreen=${greenFooterAvailable}, libraryLight=${lightFooterAvailable}, gapRemoved=${gapRemoved}, plainCTA=${closingPlain})`);
 		failures += 1;
 	}
 
