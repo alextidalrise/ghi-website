@@ -72,14 +72,44 @@ for the importer: `sanity/fixtures/sample-development/seed.ts`.
 
 ---
 
+## Sample feed — murciaservices (checked 2026-08-05)
+
+First real feed: `https://www.propertyportalmarketing.com/xml/murciaservices-kyero.xml` — a standard,
+well-formed Kyero V3 feed. Small and a good pilot.
+
+- **Shape:** `<root>` / `feed_version` 3 · **27 properties** · all `currency` EUR · all `price_freq` sale.
+- **Fields present:** `id`, `date`, `ref`, `notes`, `price`, `currency`, `price_freq`, `part_ownership`,
+  `leasehold`, `new_build`, `type`, `town`, `province`, `country`, `location/latitude`, `location/longitude`,
+  `beds`, `baths`, `video_url` (some), `surface_area/built`, `surface_area/plot`, `desc/en` + `desc/pl`,
+  `features/feature` (optional), `pool`, `images/image` (`id` + `url`), `url/en`.
+- **Note the tag names:** description is **`desc`** (not `description`), with `<en>` and `<pl>` (Polish
+  usually empty → take `en`). There is a **`notes`** field — treat as agent-internal, never public copy.
+- **Region:** Costa Cálida / Costa Blanca South (Murcia + Alicante) — see D-3. New subtree required.
+
+**Data-quality gaps to defend against** (the importer must not trust the feed blindly):
+
+- Some `<type>` values are **empty** → cannot map to `propertyType`; route to reconciliation queue.
+- `<pool>` appears **empty across all entries**; some `<beds>`/`<baths>` are **0** despite the description
+  mentioning rooms → default + flag for review rather than publishing a false 0.
+- Several properties have **0/0 coordinates** → confirms per-listing pins are correctly dropped.
+- Descriptions contain **HTML entities** (`&#13;`) → sanitise on import.
+- Image URLs are **CDATA-wrapped** and served via an **Optimole CDN** → the parser must handle CDATA;
+  fetch + re-upload to Sanity as normal.
+
+---
+
 ## Open decisions — resolve before building
 
-- [ ] **D-1 — Resale or new-build stock?** _(with partner)_
+- [x] **D-1 — Resale or new-build stock?** _(resolved for the murciaservices feed, 2026-08-05)_
 
   Determines the target shape. Individual resale properties → flat **`propertyListing`** (straightforward).
   Off-plan / new developments → the **`development` → `unitType` → `unit`** graph, which is materially more
-  importer code (build the parent, children, patch circular refs — see `seed.ts`). If the feed mixes both,
-  we need a rule to branch on (likely Kyero `new_build` flag + `<type>`).
+  importer code (build the parent, children, patch circular refs — see `seed.ts`).
+
+  **Resolved:** the murciaservices feed carries **both** (`new_build` = 0 and 1), but every unit is a flat
+  `<property>` — there is no development grouping in the feed. So **ingest everything as `propertyListing`**
+  and map `new_build=1` → `specs.buildStatus = off_plan`. No development graph for this partner. Revisit
+  only if a future partner supplies genuinely grouped off-plan schemes.
 
 - [ ] **D-2 — Auto-publish or editor-approved drafts?** _(with team)_
 
@@ -96,6 +126,15 @@ for the importer: `sanity/fixtures/sample-development/seed.ts`.
   the repo) needs a developer for every new town. Sanity keeps the location decision with the editors who
   make it. Note the taxonomy is **Spain/Portugal-only** today — an out-of-region feed needs the country
   tier extended first.
+
+  **This feed lands in a brand-new region.** The murciaservices towns are **Costa Cálida / Costa Blanca
+  South** (Murcia + Alicante provinces) — none of which exist in our taxonomy today (Costa del Sol /
+  Algarve only). So the first sync requires **seeding a new Murcia / Costa Cálida location subtree** before
+  reconciliation is meaningful. Worse, the feed's `<town>` values mix real municipalities (Torrevieja,
+  Torre Pacheco, Pilar de la Horadada) with **golf-resort / urbanisation names** (El Valle Golf Resort,
+  Lo Romero Golf, Serena Golf, Altaona Golf, Condado de Alhama) that each need a human parent-community
+  decision. **Expect the first sync to be an editorial pass, not a rubber stamp** — this is the real cost
+  for this partner, not the parsing.
 
 ---
 
@@ -150,7 +189,12 @@ document view via review items.
 - [ ] **1.1** Add `xml2js` (or `fast-xml-parser`) + a fetch step to a new `sanity/importers/kyero/` script,
   reusing the migration client/token/`--dry-run`/`--dataset` scaffolding. Refuse `production` by default.
 - [ ] **1.2** Parse the feed into normalized intermediate records (still Kyero-shaped).
-- [ ] **1.3** `kyero-map.ts` — field map + vocabulary lookup tables (type, pool).
+- [ ] **1.3** `kyero-map.ts` — field map + vocabulary lookup tables (type, pool). Use the real tag names:
+  `desc/en` → copy (strip HTML entities, drop `pl`), `notes` → internal only (never public),
+  `new_build=1` → `specs.buildStatus = off_plan`, `video_url` → `media.videoUrl`.
+- [ ] **1.3a** Defensive value handling for the known data-quality gaps: empty `type` → unresolved
+  (review item, no guess); empty `pool` → `unknown`; `beds`/`baths` of 0 → leave unset + review flag;
+  0/0 coordinates → ignored (community pin inherited).
 - [ ] **1.4** GHI id allocation: query current max `ghiListingId`, increment zero-padded; persist a
   `kyero-ref → GHI-id` map (a dedicated `feedImportMap` doc, or `sourceReference` lookups) so re-syncs
   patch existing docs instead of duplicating.
