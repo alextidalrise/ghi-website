@@ -5,7 +5,7 @@
       <tr>
         <td width="44%" valign="top" class="sm-stack" style="width:44%;padding:0;">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;">
-            <tr><td style="padding:0;font-size:0;line-height:0;"><a href="{{ href }}" style="text-decoration:none;border:0;"><img src="{{ src }}" alt="{{ alt }}" width="236" height="236" class="sm-full" style="display:block;width:100%;max-width:236px;height:auto;border:0;"></a></td></tr>
+            <tr><td style="padding:0;font-size:0;line-height:0;"><a href="{{ href }}" style="text-decoration:none;border:0;"><img src="{{ src }}" alt="{{ alt }}" width="236" height="{{ imageheight || 236 }}" class="sm-full" style="display:block;width:100%;max-width:236px;height:auto;border:0;"></a></td></tr>
             <if condition="label"><tr><td bgcolor="{{ page.brand.green }}" style="background-color:{{ page.brand.green }};padding:7px 9px;font-family:{{ page.font.sans }};font-size:10px;line-height:14px;color:{{ page.brand.onGreen }};">{{ label }}</td></tr></if>
           </table>
         </td>
