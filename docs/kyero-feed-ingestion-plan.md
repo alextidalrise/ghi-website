@@ -1,6 +1,6 @@
 # Kyero V3 feed ingestion — plan
 
-**Created:** 2026-08-05 · **Status:** proposal, blocked on decisions D-1, D-2, D-3
+**Created:** 2026-08-05 · **Status:** in progress — D-1 & D-2 resolved, D-3 deferred; Epic 1 dry-run shipped
 
 A prospective partner wants to supply their listings as a **Kyero V3 XML feed** (the de-facto
 Spain/Portugal property syndication format — a flat list of `<property>` blocks refreshed on a
@@ -120,16 +120,17 @@ well-formed Kyero V3 feed. Numbers below are measured by the dry-run importer
   and map `new_build=1` → `specs.buildStatus = off_plan`. No development graph for this partner. Revisit
   only if a future partner supplies genuinely grouped off-plan schemes.
 
-- [ ] **D-2 — Auto-publish or editor-approved drafts?** _(with team)_
+- [x] **D-2 — Auto-publish or editor-approved drafts?** _(resolved 2026-08-05: editor-approved drafts)_
 
-  **Recommendation: editor-approved drafts.** Our site is hand-curated and human-reviewed; the schema has
-  `humanReviewed` flags and a publish gate for exactly this reason. The importer should write **drafts**
-  with blocking review items and let an editor approve. Auto-publishing third-party copy onto our domain
-  forfeits that quality control and our editorial voice. Cost: a human touches each listing once.
+  Our site is hand-curated and human-reviewed; the schema has `humanReviewed` flags and a publish gate
+  for exactly this reason. The importer writes **drafts** with blocking review items and an editor
+  approves. **Never auto-publish** third-party copy onto our domain. Cost: a human touches each listing once.
 
-- [ ] **D-3 — Where do town→community mappings live?** _(with team)_
+- [ ] **D-3 — Where do town→community mappings live?** _(deferred 2026-08-05 — revisit before draft-writing)_
 
-  **Recommendation: in Sanity, as aliases on the community.** Add a `sourceAliases: string[]` to
+  Not settled yet, so the importer's draft-writing (Epic 1.6–1.7) and the alias field (Epic 2) are on
+  hold; the dry-run currently flags every town as unresolved. **Recommendation: in Sanity, as aliases on
+  the community.** Add a `sourceAliases: string[]` to
   `locationTaxonomy`; resolving "Estepona → this community" writes the alias, so future syncs resolve it
   automatically and only genuinely new towns ever reach a human. The alternative (a crosswalk config in
   the repo) needs a developer for every new town. Sanity keeps the location decision with the editors who
