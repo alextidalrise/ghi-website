@@ -262,3 +262,85 @@ Build only once the feed's real quirks are known and the queue is painful enough
 - New-build `development` graph, **unless** D-1 says the stock requires it.
 - Multiple partners / multiple feed formats — if this grows, revisit whether a standalone feed-management
   tool (or a SaaS like Channable) earns its keep. For one Kyero V3 partner, it does not.
+
+---
+
+## Appendix — places in the feed (D-3 placement backlog)
+
+Generated from the live murciaservices feed on 2026-08-05 (`sanity/importers/kyero/`), merging the
+same place written under different provinces. **58 distinct place names**, from **68** raw town+province
+combinations. This is the set that D-3 placement (resort-as-location vs town-as-location vs hybrid) and
+the launch threshold apply to. The resort/town split is auto-classified by name (contains
+golf/resort/club) — treat borderline entries as prompts, not gospel.
+
+**Merge these spelling variants to one canonical place first** (candidates for `sourceAliases`):
+Serena Golf = La Serena Golf · Santa Rosalía Lake & Life Resort = Santa Rosalía Resort ·
+La Manga Club ≈ La Manga Club Resort · Pilar de la Horadada = Pilar De Horadada.
+One entry — **"Country Club"** — is too vague to place; ask the partner.
+
+### Golf resorts / clubs — 20 places, 104 listings
+
+| Listings | Place | Province |
+|---:|---|---|
+| 24 | La Torre Golf Resort | Murcia |
+| 13 | Santa Rosalía Lake & Life Resort | Murcia |
+| 12 | El Valle Golf Resort | Murcia |
+| 11 | La Manga Club | Murcia |
+| 11 | Serena Golf | Murcia |
+| 6 | Peraleja Golf Resort | Murcia |
+| 5 | Altaona Golf & Country Club | Murcia |
+| 4 | Hacienda del Álamo Golf Resort | Murcia |
+| 3 | Roda Golf Resort | Murcia |
+| 2 | Corvera Golf Resort | Murcia |
+| 2 | La Manga Club Resort | Murcia / Cartagena |
+| 2 | Las Colinas Golf & Country Club | Alicante |
+| 2 | Mar Menor Golf Resort | Murcia |
+| 1 | Country Club | Murcia |
+| 1 | Hacienda Riquelme Golf Resort | Murcia |
+| 1 | La Finca Golf | — |
+| 1 | La Serena Golf | Murcia |
+| 1 | Lo Romero Golf | Alicante |
+| 1 | Santa Rosalía Resort | Murcia |
+| 1 | United Golf | Murcia |
+
+### Towns / areas — 38 places, 105 listings
+
+| Listings | Place | Province |
+|---:|---|---|
+| 9 | La Manga del Mar Menor | Murcia |
+| 9 | Los Alcázares | Murcia |
+| 8 | Roldán | Murcia |
+| 6 | Pilar de la Horadada | Murcia / Alicante |
+| 6 | San Pedro del Pinatar | Murcia |
+| 5 | Avileses | Murcia |
+| 5 | Las Terrazas de la Torre | Murcia |
+| 5 | Torrevieja | Alicante |
+| 4 | Condado de Alhama | Murcia |
+| 4 | Torre Pacheco | Murcia |
+| 3 | San Miguel de Salinas | Alicante |
+| 2 | Balsicas | Murcia |
+| 2 | Cabo de Palos | Murcia |
+| 2 | Calpe | Alicante |
+| 2 | Campoamor | Alicante |
+| 2 | Camposol | Murcia |
+| 2 | Isla Plana | Murcia |
+| 2 | La Manga – Playa Honda | Murcia |
+| 2 | Lo Pagán | Murcia |
+| 2 | Los Belones | Murcia |
+| 2 | San Javier | Murcia |
+| 2 | Santiago de la Ribera | Murcia |
+| 2 | Sucina | Murcia |
+| 2 | Torre de la Horadada | Alicante |
+| 2 | Valle del Sol | Murcia |
+| 1 | Algorfa | Alicante |
+| 1 | Beniel | Murcia |
+| 1 | Benijófar | Alicante |
+| 1 | Dolores | Alicante |
+| 1 | El Carmolí / Los Urrutias | Murcia |
+| 1 | Las Lomas | Murcia |
+| 1 | Los Montesinos | Alicante |
+| 1 | Murcia (city) | Murcia |
+| 1 | Pinar de Campoverde | Alicante |
+| 1 | Quesada | Alicante |
+| 1 | San Cayetano | Murcia |
+| 1 | _(blank town)_ | Murcia |
