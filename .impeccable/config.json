@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "web/src/lib/components/insights/InsightArticleHero.svelte"
+        ],
+        "createdAt": "2026-08-12T13:25:17.186Z",
+        "reason": "False positive (user-confirmed): detector anchors on the literal <img> inside an HTML comment; all hero <img> tags carry runtime Sanity src values guarded by {#if image}/{#if coBrandLogo}"
+      }
+    ]
+  }
+}
