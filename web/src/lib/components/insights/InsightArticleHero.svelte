@@ -25,12 +25,16 @@
 	// overlaid on the image. The standard hero (narrow leading rail, 4:3 plate, caption below) stays
 	// the default and is untouched. See the `heroLayout` field on the insight document.
 	const isSplit = $derived(insight.heroLayout === 'splitSquare');
+	// The partner-introduction treatment: the standfirst leads, then a full-width band runs a green
+	// partner brand plate beside a landscape photograph. Distinct from both above.
+	const isCoBrand = $derived(insight.heroLayout === 'coBrand');
 
 	// Passing BOTH width and height fixes the crop ratio for every srcset candidate — with height
 	// alone the builder emits a ragged, drifting set. Standard is 4:3 (1200×900); the split plate is
-	// square (1200×1200). Candidates run to 1920w because the plate reaches ~850px on a wide desktop
-	// and doubles on a 2× display; the source is 4096px, so these are real resolution, not upscales.
-	const cropHeight = $derived(isSplit ? 1200 : 900);
+	// square (1200×1200); the co-brand photo is landscape (1200×750, 16:10) — it fills a wide cell
+	// beside the brand plate. Candidates run to 1920w because the plate reaches ~850px on a wide
+	// desktop and doubles on a 2× display; the source is 4096px, so these are real resolution.
+	const cropHeight = $derived(isSplit ? 1200 : isCoBrand ? 750 : 900);
 	const image = $derived(
 		buildPublicImageUrl(insight.heroImage, { width: 1200, height: cropHeight, fit: 'crop', quality: 74 })
 	);
@@ -47,9 +51,11 @@
 	// the content measure. Split two-column: one of two equal columns of the content measure, ≈ 33rem
 	// at the 1060px cap. Understating this makes a small candidate stretch across the plate and go soft.
 	const HERO_SIZES = $derived(
-		isSplit
-			? '(max-width: 57.99rem) 100vw, min(33rem, 46vw)'
-			: '(max-width: 57.99rem) 100vw, (max-width: 66.99rem) 28rem, calc(210px + 25vw)'
+		isCoBrand
+			? '(max-width: 57.99rem) 100vw, min(40rem, 60vw)'
+			: isSplit
+				? '(max-width: 57.99rem) 100vw, min(33rem, 46vw)'
+				: '(max-width: 57.99rem) 100vw, (max-width: 66.99rem) 28rem, calc(210px + 25vw)'
 	);
 	const lqip = $derived(getImagePlaceholder(insight.heroImage));
 	const alt = $derived(insight.heroImage?.altText?.trim() || insight.title || 'Insight');
@@ -62,6 +68,21 @@
 			: null
 	);
 	const hasRail = $derived(Boolean(image || note));
+
+	// Co-brand plate: the partner's name and reversed mark (read live from the referenced partner),
+	// plus the label under the name and the optional sub-label under the headline. The plate uses the
+	// partner's `logoAlt` — the light, reversed mark made for dark surfaces — shown as-is on the brand
+	// green (NOT the wall `logo`, which is a dark wordmark for white cells). If no alt logo is set the
+	// plate runs name-only; if no partner is set at all the band runs photo-only.
+	const coBrandPartnerName = $derived(insight.heroPartner?.name?.trim() || null);
+	const coBrandPartnerLabel = $derived(insight.heroPartnerLabel?.trim() || 'GHI Partner');
+	const coBrandLogo = $derived(
+		buildPublicImageUrl(insight.heroPartner?.logoAlt, { width: 220, height: 220, fit: 'max', quality: 90 })
+	);
+	const coBrandLogoAlt = $derived(coBrandPartnerName ? `${coBrandPartnerName} logo` : '');
+	const coBrandSublabel = $derived(insight.heroSublabel?.trim() || null);
+	const hasCoBrandPlate = $derived(isCoBrand && Boolean(coBrandPartnerName || coBrandLogo));
+
 	const dateLabel = $derived(formatInsightDate(insight.publishedAt, 'long'));
 	const dateISO = $derived(insightDateISO(insight.publishedAt));
 	const reading = $derived(readingLabel(insight));
@@ -82,6 +103,86 @@
 	{/if}
 </svelte:head>
 
+{#if isCoBrand}
+	<!--
+	  Co-brand hero — the partner-introduction treatment. The text column leads with the standfirst
+	  (a step up from the standard deck), then a full-width band runs a green partner brand plate
+	  beside a landscape photograph, with the caption below. No leading rail; the composition is the
+	  band. Only engages when heroLayout === 'coBrand'.
+	-->
+	<header class="article-hero article-hero--cobrand">
+		<div class="article-hero__text">
+			{#if breadcrumbs.length > 0}
+				<Breadcrumbs items={breadcrumbs} inline hideCurrent />
+			{/if}
+
+			<div class="article-hero__kicker"><InsightKicker label={kicker} /></div>
+
+			{#if insight.subhead}
+				<!-- Standfirst leads in the co-brand hero: a serif thesis line above the headline. -->
+				<p class="article-hero__standfirst">{insight.subhead}</p>
+			{/if}
+
+			<h1 class="article-hero__title article-hero__title--cobrand">
+				<!-- prettier-ignore -->
+				{#each titleParts as part (part.text)}{#if part.emphasis}<em>{part.text}</em>{:else}{part.text}{/if}{/each}
+			</h1>
+
+			{#if coBrandSublabel}
+				<p class="article-hero__sublabel">{coBrandSublabel}</p>
+			{/if}
+
+			<div class="article-hero__byline">
+				<InsightMeta author={insight.author} {dateISO} {dateLabel} {reading} withAvatar />
+			</div>
+		</div>
+
+		<div class="cobrand-band" class:cobrand-band--plated={hasCoBrandPlate}>
+			{#if hasCoBrandPlate}
+				<div class="cobrand-plate">
+					{#if coBrandLogo}
+						<img
+							class="cobrand-plate__logo"
+							src={coBrandLogo}
+							alt={coBrandLogoAlt}
+							loading="eager"
+							decoding="async"
+						/>
+					{/if}
+					{#if coBrandPartnerName}
+						<span class="cobrand-plate__name">{coBrandPartnerName}</span>
+					{/if}
+					<span class="cobrand-plate__label">{coBrandPartnerLabel}</span>
+				</div>
+			{/if}
+
+			{#if image}
+				<figure class="cobrand-figure">
+					<div
+						class="cobrand-figure__frame"
+						style:background-image={lqip ? `url(${lqip})` : undefined}
+					>
+						<img
+							src={image}
+							srcset={srcset || undefined}
+							sizes={HERO_SIZES}
+							{alt}
+							width="1200"
+							height={cropHeight}
+							loading="eager"
+							fetchpriority="high"
+							decoding="async"
+						/>
+					</div>
+				</figure>
+			{/if}
+		</div>
+
+		{#if caption}
+			<p class="cobrand-caption">{caption}</p>
+		{/if}
+	</header>
+{:else}
 <div
 	class="article-hero-band"
 	class:article-hero-band--with-rail={hasRail}
@@ -161,6 +262,7 @@
 	{/if}
 </header>
 </div>
+{/if}
 
 <style>
 	/*
@@ -429,6 +531,143 @@
 	@media (min-width: 58rem) {
 		.article-hero--split {
 			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		}
+	}
+
+	/*
+	 * Co-brand hero — a single stacked column: the standfirst-led text block, then a full-width
+	 * band of the brand plate beside the photograph, then the caption. No tint band and no leading
+	 * rail; the plate is the one green object up here (the closing enquiry band remains the page's
+	 * green punctuation — this plate is a brand lockup, not a CTA).
+	 */
+	.article-hero--cobrand {
+		display: block;
+		max-width: var(--content-max);
+		margin-inline: auto;
+		padding-inline: var(--content-padding);
+		padding-block: var(--space-xl) var(--space-2xl);
+	}
+
+	/* The standfirst sits above the headline here and reads a step larger than the standard deck —
+	   it is doing the deck's job of stating the piece, but leading rather than trailing. */
+	.article-hero__standfirst {
+		margin: var(--space-md) 0 0;
+		font-family: var(--serif);
+		font-size: clamp(1.35rem, 1rem + 1.3vw, 1.85rem);
+		font-weight: 400;
+		line-height: 1.3;
+		color: var(--green);
+		max-width: 34ch;
+		text-wrap: pretty;
+	}
+
+	.article-hero__title--cobrand {
+		margin-top: var(--space-md);
+	}
+
+	/* The partner-insight marker under the headline. */
+	.article-hero__sublabel {
+		margin: var(--space-md) 0 0;
+		font-family: var(--sans);
+		font-size: var(--text-overline);
+		font-weight: 500;
+		letter-spacing: var(--tracking-overline);
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+
+	/* The brand band: on desktop the plate and photo share a row, the plate a fixed square-ish
+	   column and the photo filling the rest at equal height. Stacked on mobile (plate over photo). */
+	.cobrand-band {
+		margin-top: var(--space-xl);
+		display: grid;
+		gap: 0;
+	}
+
+	.cobrand-plate {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-sm);
+		padding: clamp(1.75rem, 5vw, 3rem);
+		min-height: 14rem;
+		background: var(--green);
+		color: var(--on-green);
+		text-align: center;
+	}
+
+	/* The reversed partner mark (`logoAlt`) is already light, so it sits on the green plate as-is —
+	   no knock-out filter. Sized generously; the mark is the plate's focal object. */
+	.cobrand-plate__logo {
+		width: auto;
+		height: clamp(3.5rem, 9vw, 5.5rem);
+		max-width: 78%;
+		object-fit: contain;
+	}
+
+	.cobrand-plate__name {
+		font-family: var(--serif);
+		font-size: var(--text-h3);
+		line-height: 1.15;
+		color: var(--on-green);
+	}
+
+	.cobrand-plate__label {
+		font-family: var(--sans);
+		font-size: var(--text-overline);
+		font-weight: 500;
+		letter-spacing: var(--tracking-overline);
+		text-transform: uppercase;
+		color: var(--gold);
+	}
+
+	.cobrand-figure {
+		margin: 0;
+	}
+
+	.cobrand-figure__frame {
+		aspect-ratio: 16 / 10;
+		overflow: hidden;
+		background: var(--green);
+		background-size: cover;
+		background-position: center;
+	}
+
+	.cobrand-figure__frame img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.cobrand-caption {
+		margin: var(--space-md) 0 0;
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		line-height: 1.55;
+		color: var(--muted);
+	}
+
+	/* Desktop: plate + photo share a row at equal height. `align-items: stretch` (grid default)
+	   lets the plate match the photo's height, so the band reads as one object. */
+	@media (min-width: 46rem) {
+		.cobrand-band--plated {
+			grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+		}
+
+		/* When the plate stretches to the photo's height its own min-height is irrelevant. */
+		.cobrand-band--plated .cobrand-plate {
+			min-height: 0;
+		}
+
+		/* The photo defines the row height; the plate stretches to it. */
+		.cobrand-band--plated .cobrand-figure {
+			display: flex;
+		}
+
+		.cobrand-band--plated .cobrand-figure__frame {
+			flex: 1;
+			aspect-ratio: auto;
 		}
 	}
 </style>

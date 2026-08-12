@@ -271,7 +271,15 @@ export const insightCardGrid = defineType({
 	}
 });
 
-/** A pulled-out editorial quote. Large Playfair, hairline-framed — never a side stripe. */
+/**
+ * A pulled-out editorial quote. Two looks, both large Playfair:
+ *   • `plain` (default) — hairline top-and-bottom rules on the page ground, italic. The house
+ *     quote; unchanged from the original block.
+ *   • `filled` — set on a tinted panel with a single green accent edge, upright. The partner-led
+ *     treatment (a named source speaking, e.g. an advisory firm), where the quote wants to read as
+ *     a placed card rather than a break in the prose.
+ * The variant only changes the frame; the quote and attribution are the same fields either way.
+ */
 export const insightPullQuote = defineType({
 	name: 'insightPullQuote',
 	title: 'Pull quote',
@@ -289,6 +297,21 @@ export const insightPullQuote = defineType({
 			title: 'Attribution',
 			type: 'string',
 			description: 'Optional source shown beneath the quote, e.g. a name or role.'
+		}),
+		defineField({
+			name: 'variant',
+			title: 'Style',
+			type: 'string',
+			options: {
+				list: [
+					{ title: 'Plain — hairline rules, italic (house default)', value: 'plain' },
+					{ title: 'Filled — tinted panel with an accent edge, upright', value: 'filled' }
+				],
+				layout: 'radio'
+			},
+			initialValue: 'plain',
+			description:
+				'Plain is the house quote (hairline rules on the page). Filled sets it on a tinted panel with a green accent edge — use it for a named external source, e.g. a partner firm.'
 		})
 	],
 	preview: {
@@ -388,7 +411,14 @@ export const insightFaqItem = defineType({
 	}
 });
 
-/** A frequently-asked-questions accordion. Also emits FAQPage structured data. */
+/**
+ * A frequently-asked-questions block. Also emits FAQPage structured data. Two displays:
+ *   • `accordion` (default) — each answer opens on demand; a reader can hold several open. Best
+ *     for a long list where the questions are a scannable index.
+ *   • `open` — every question and answer shown at once, separated by hairlines. Best for a short,
+ *     considered set meant to be read straight through (the partner-article treatment).
+ * Same items and same structured data either way; only the on-page behaviour changes.
+ */
 export const insightFaq = defineType({
 	name: 'insightFaq',
 	title: 'FAQ',
@@ -400,13 +430,32 @@ export const insightFaq = defineType({
 			type: 'array',
 			of: [{ type: 'insightFaqItem' }],
 			validation: (Rule) => Rule.required().min(1)
+		}),
+		defineField({
+			name: 'display',
+			title: 'Display',
+			type: 'string',
+			options: {
+				list: [
+					{ title: 'Accordion — answers open on demand (default)', value: 'accordion' },
+					{ title: 'Open — every answer shown, ruled list', value: 'open' }
+				],
+				layout: 'radio'
+			},
+			initialValue: 'accordion',
+			description:
+				'Accordion collapses answers behind their questions. Open shows every answer at once as a ruled list — better for a short set meant to be read straight through.'
 		})
 	],
 	preview: {
-		select: { items: 'items' },
-		prepare({ items }) {
+		select: { items: 'items', display: 'display' },
+		prepare({ items, display }) {
 			const count = Array.isArray(items) ? items.length : 0;
-			return { title: 'FAQ', subtitle: `${count} ${count === 1 ? 'question' : 'questions'}` };
+			const mode = display === 'open' ? 'open' : 'accordion';
+			return {
+				title: 'FAQ',
+				subtitle: `${count} ${count === 1 ? 'question' : 'questions'} · ${mode}`
+			};
 		}
 	}
 });
@@ -515,12 +564,42 @@ export const insightRoutes = defineType({
 	}
 });
 
-/** An inline enquiry prompt inside the body — distinct from the closing CTA band. */
+/**
+ * An inline enquiry prompt inside the body — distinct from the closing CTA band. Two looks:
+ *   • `button` (default) — a framed prompt with a solid button. The house inline CTA.
+ *   • `linkBand` — a quieter ruled band: heading and one line of copy on the left, a text link
+ *     (no filled button) trailing to the right. Use it to point sideways at another surface
+ *     mid-article (e.g. "Explore the Front Line Collection") without staging a full enquiry.
+ */
 export const insightCtaCallout = defineType({
 	name: 'insightCtaCallout',
 	title: 'Inline CTA',
 	type: 'object',
 	fields: [
+		defineField({
+			name: 'variant',
+			title: 'Style',
+			type: 'string',
+			options: {
+				list: [
+					{ title: 'Button — framed prompt with a solid button (default)', value: 'button' },
+					{ title: 'Link band — quiet ruled band with a text link', value: 'linkBand' }
+				],
+				layout: 'radio'
+			},
+			initialValue: 'button',
+			description:
+				'Button is the house enquiry prompt. Link band is a quieter cross-link — a heading, one line, and a trailing text link — for pointing at another surface without a filled button.'
+		}),
+		defineField({
+			name: 'eyebrow',
+			title: 'Eyebrow',
+			type: 'string',
+			description:
+				'Optional small label above the heading, shown in the Link band style, e.g. "Explore GHI property".',
+			hidden: ({ parent }) => parent?.variant !== 'linkBand',
+			validation: (Rule) => Rule.max(48)
+		}),
 		defineField({
 			name: 'heading',
 			title: 'Heading',
@@ -556,6 +635,244 @@ export const insightCtaCallout = defineType({
 	],
 	preview: {
 		select: { title: 'heading', subtitle: 'buttonLabel' }
+	}
+});
+
+/**
+ * One numbered point in an `insightNumberedList`. A point is a heading and one supporting line —
+ * a question and its steer, or a step and what it involves. The heading is the point; the body
+ * explains it. Keep the body to a sentence: this is an enumerated list, not a set of sections.
+ */
+export const insightNumberedItem = defineType({
+	name: 'insightNumberedItem',
+	title: 'Point',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'The point itself — a question or a step, e.g. "When exactly does my NHR period finish?"',
+			validation: (Rule) => Rule.required().max(120)
+		}),
+		defineField({
+			name: 'body',
+			title: 'Supporting line',
+			type: 'string',
+			description: 'One sentence that answers or expands the point.',
+			validation: (Rule) => Rule.max(240)
+		})
+	],
+	preview: {
+		select: { title: 'heading', subtitle: 'body' }
+	}
+});
+
+/**
+ * An ordered list where the sequence carries meaning — questions to work through, steps in order,
+ * a checklist to run. Big serif numerals lead each point, hairline-separated. Distinct from a
+ * card grid (parallel considerations, no order) and from a prose numbered list (no per-item
+ * heading, no display numerals). Two to eight points; a longer run wants sections instead.
+ */
+export const insightNumberedList = defineType({
+	name: 'insightNumberedList',
+	title: 'Numbered points',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Optional. Leave blank when the section heading already names the list.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'items',
+			title: 'Points',
+			type: 'array',
+			of: [{ type: 'insightNumberedItem' }],
+			description: 'The points, in order. Two to eight.',
+			validation: (Rule) => Rule.required().min(2).max(8)
+		})
+	],
+	preview: {
+		select: { heading: 'heading', a: 'items.0.heading', items: 'items' },
+		prepare({ heading, a, items }) {
+			const count = Array.isArray(items) ? items.length : 0;
+			return {
+				title: heading || a || 'Numbered points',
+				subtitle: `${count} ${count === 1 ? 'point' : 'points'}`
+			};
+		}
+	}
+});
+
+/**
+ * A pointer to a source the reader can go and read: the partner's own article, a regulator's
+ * page, a piece of research. A thumbnail, a heading, a line of context and a single outbound
+ * link. Distinct from the internal `insightGuideCards` (which cross-links GHI guides): this
+ * card carries an arbitrary external URL and its own image, so it can cite anything off-site.
+ */
+export const insightReferenceCard = defineType({
+	name: 'insightReferenceCard',
+	title: 'Reference card',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'eyebrow',
+			title: 'Eyebrow',
+			type: 'string',
+			description: 'Optional small label above the heading, e.g. "Further reading".',
+			validation: (Rule) => Rule.max(48)
+		}),
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'The title of the thing being referenced, e.g. "Read the original Atlas Bridge Wealth article".',
+			validation: (Rule) => Rule.required().max(120)
+		}),
+		defineField({
+			name: 'description',
+			title: 'Description',
+			type: 'text',
+			rows: 3,
+			description: 'A line or two of context — what the reader will find if they follow the link.',
+			validation: (Rule) => Rule.max(280)
+		}),
+		defineField({
+			name: 'image',
+			title: 'Thumbnail',
+			type: 'mediaAssetMetadata',
+			description: 'Optional. A small cover or preview image shown beside the text.'
+		}),
+		defineField({
+			name: 'linkLabel',
+			title: 'Link label',
+			type: 'string',
+			description: 'The link text, e.g. "Read on Atlas Bridge Wealth".',
+			validation: (Rule) => Rule.required().max(60)
+		}),
+		defineField({
+			name: 'linkHref',
+			title: 'Link destination',
+			type: 'string',
+			description: 'Where the link points — usually a full external URL.',
+			validation: (Rule) =>
+				Rule.required().custom((value) =>
+					typeof value === 'string' && /^(https?:\/\/|\/|mailto:|tel:)/.test(value)
+						? true
+						: 'Use a full URL (https://…) or an absolute path (/…).'
+				)
+		})
+	],
+	preview: {
+		select: { title: 'heading', subtitle: 'linkLabel', media: 'image.asset' },
+		prepare({ title, subtitle, media }) {
+			return { title: title || 'Reference card', subtitle: subtitle || 'Reference card', media };
+		}
+	}
+});
+
+/**
+ * A framed "meet the partner / meet the person" panel: a heading, a run of copy, and — set apart
+ * on a tinted ground — a portrait with a credential plate carrying the person's name, role and
+ * (optionally) the partner's logo mark. It introduces a named specialist inside an article without
+ * touching the byline (`author`) or the compact floated `insightPortrait`. The partner reference
+ * supplies the logo live; the person's name and role are article copy (the person is usually not
+ * the partner's whole name).
+ */
+export const insightPartnerProfile = defineType({
+	name: 'insightPartnerProfile',
+	title: 'Partner profile',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'e.g. "Our partnership with Atlas Bridge Wealth".',
+			validation: (Rule) => Rule.required().max(100)
+		}),
+		defineField({
+			name: 'body',
+			title: 'Body',
+			type: 'text',
+			rows: 8,
+			description: 'The profile copy. Blank lines split paragraphs.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'portrait',
+			title: 'Portrait',
+			type: 'mediaAssetMetadata',
+			description: 'A head-and-shoulders photograph of the person introduced. A portrait crop works best.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'personName',
+			title: 'Name',
+			type: 'string',
+			description: 'The person on the credential plate, e.g. "Steve Thompson".',
+			validation: (Rule) => Rule.required().max(80)
+		}),
+		defineField({
+			name: 'personRole',
+			title: 'Role',
+			type: 'string',
+			description: 'Their title, e.g. "Founder and Principal Adviser, Atlas Bridge Wealth".',
+			validation: (Rule) => Rule.max(120)
+		}),
+		defineField({
+			name: 'partner',
+			title: 'Partner',
+			type: 'reference',
+			to: [{ type: 'partner' }],
+			description:
+				"Optional. When set, the partner's logo mark is shown on the credential plate. Its logo is read live from the partner record."
+		})
+	],
+	preview: {
+		select: { title: 'heading', name: 'personName', media: 'portrait.asset' },
+		prepare({ title, name, media }) {
+			return { title: title || 'Partner profile', subtitle: name || 'Partner profile', media };
+		}
+	}
+});
+
+/**
+ * A titled fine-print note — the regulated-content disclaimer a partner article closes on
+ * ("Important information", tax/advice caveats). Distinct from the inline prose `note` style:
+ * this is a discrete block with its own overline and muted small-print type, so it reads as a
+ * standing legal statement rather than a passing aside, and can be reused verbatim across pieces.
+ */
+export const insightDisclaimer = defineType({
+	name: 'insightDisclaimer',
+	title: 'Disclaimer',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			initialValue: 'Important information',
+			description: 'The overline above the fine print.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'body',
+			title: 'Body',
+			type: 'text',
+			rows: 6,
+			description: 'The fine print. Blank lines split paragraphs.',
+			validation: (Rule) => Rule.required()
+		})
+	],
+	preview: {
+		select: { title: 'heading', subtitle: 'body' },
+		prepare({ title, subtitle }) {
+			return { title: title || 'Disclaimer', subtitle: subtitle || 'Fine print' };
+		}
 	}
 });
 
@@ -1217,11 +1534,20 @@ const insightSectionBody = defineField({
 		// The figure above is the full-width plate; this is the small personal-service treatment.
 		defineArrayMember({ type: 'insightPortrait' }),
 		defineArrayMember({ type: 'insightCardGrid' }),
+		// A sequenced, enumerated list (questions to work through, ordered steps) — display numerals,
+		// distinct from a card grid (parallel, no order) and a prose numbered list (no per-item heading).
+		defineArrayMember({ type: 'insightNumberedList' }),
 		defineArrayMember({ type: 'insightRoutes' }),
 		defineArrayMember({ type: 'insightPullQuote' }),
 		defineArrayMember({ type: 'insightTakeaways' }),
 		defineArrayMember({ type: 'insightFaq' }),
 		defineArrayMember({ type: 'insightCtaCallout' }),
+		// A boxed "meet the partner / person" panel: copy plus a portrait and a credential plate.
+		defineArrayMember({ type: 'insightPartnerProfile' }),
+		// A pointer to an external source (partner article, regulator, research): thumbnail + link.
+		defineArrayMember({ type: 'insightReferenceCard' }),
+		// A titled fine-print / compliance note the regulated-content pieces close on.
+		defineArrayMember({ type: 'insightDisclaimer' }),
 		defineArrayMember({ type: 'insightFrontlineRail' }),
 		// Reference-led commercial modules (the launch-article vocabulary). Each dereferences a
 		// canonical entity live and never copies its volatile data into the article.
@@ -1257,6 +1583,21 @@ export const insightSection = defineType({
 			options: { source: 'heading', maxLength: 96 },
 			description: 'URL anchor for this section (linked from the contents rail). Auto-filled from the heading.',
 			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'headingStyle',
+			title: 'Heading style',
+			type: 'string',
+			options: {
+				list: [
+					{ title: 'Serif — large Playfair heading (default)', value: 'serif' },
+					{ title: 'Eyebrow — small gold-marked label', value: 'eyebrow' }
+				],
+				layout: 'radio'
+			},
+			initialValue: 'serif',
+			description:
+				'Serif is the house section heading. Eyebrow demotes it to a small ◆ label — use it when the visible headings in the section body (the sub-heads) carry the structure, and the section title is just a marker. Either way it still drives the contents rail and the anchor.'
 		}),
 		insightSectionBody
 	],

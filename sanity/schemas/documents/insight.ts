@@ -140,14 +140,46 @@ export const insight = defineType({
 			options: {
 				list: [
 					{ title: 'Standard — leading rail plate', value: 'standard' },
-					{ title: 'Split — equal columns, square plate', value: 'splitSquare' }
+					{ title: 'Split — equal columns, square plate', value: 'splitSquare' },
+					{ title: 'Co-brand — partner plate beside the photo', value: 'coBrand' }
 				],
 				layout: 'radio'
 			},
 			initialValue: 'standard',
 			description:
-				'Standard is the house hero: a narrow leading plate beside the headline. Split gives the headline and a square photograph equal columns, with the caption overlaid on the image — the launch-article treatment. Leave on Standard unless a piece is designed for the split.',
+				'Standard is the house hero: a narrow leading plate beside the headline. Split gives the headline and a square photograph equal columns, with the caption overlaid on the image. Co-brand leads with the standfirst, then runs a full-width band of a partner brand plate beside the photograph — the partner-introduction treatment. Leave on Standard unless a piece is designed for another.',
 			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'heroPartner',
+			title: 'Hero partner',
+			type: 'reference',
+			group: 'content',
+			to: [{ type: 'partner' }],
+			description:
+				'Only used by the Co-brand hero. The partner whose logo and name form the brand plate beside the hero photograph — read live from the partner record.',
+			hidden: ({ document }) => document?.heroLayout !== 'coBrand'
+		}),
+		defineField({
+			name: 'heroPartnerLabel',
+			title: 'Hero partner label',
+			type: 'string',
+			group: 'content',
+			initialValue: 'GHI Partner',
+			description:
+				'The small label under the partner name on the co-brand brand plate. Defaults to "GHI Partner".',
+			hidden: ({ document }) => document?.heroLayout !== 'coBrand',
+			validation: (Rule) => Rule.max(40)
+		}),
+		defineField({
+			name: 'heroSublabel',
+			title: 'Hero sub-label',
+			type: 'string',
+			group: 'content',
+			description:
+				'Optional small label shown under the headline in the Co-brand hero, e.g. "GHI Partner Insight".',
+			hidden: ({ document }) => document?.heroLayout !== 'coBrand',
+			validation: (Rule) => Rule.max(60)
 		}),
 		defineField({
 			name: 'readingTimeOverride',

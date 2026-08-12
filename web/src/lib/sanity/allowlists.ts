@@ -301,13 +301,18 @@ export const PARTNER_CATEGORY_PUBLIC = /* groq */ `{
   ] | order(coalesce(order, 999) asc, name asc) ${PARTNER_PUBLIC}
 }`;
 
-/** Minimal partner projection for the homepage logo wall — only those with a logo. */
+/**
+ * Minimal partner projection for the homepage logo wall and the article partner plates.
+ * `logoAlt` (the reversed/mark version) rides along for the co-brand hero and partner-profile
+ * plates; surfaces that only want the wall logo simply ignore it.
+ */
 export const PARTNER_LOGO_PUBLIC = /* groq */ `{
   _id,
   name,
   "slug": slug.current,
   "category": category->name,
-  logo${MEDIA_ASSET_PUBLIC}
+  logo${MEDIA_ASSET_PUBLIC},
+  logoAlt${MEDIA_ASSET_PUBLIC}
 }`;
 
 /** Guide card projection — hub grid and related-guides cross-links. */
@@ -501,6 +506,7 @@ export const DEVELOPMENT_REF_PUBLIC_GATE = /* groq */ `
 export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
   heading,
   "anchor": anchor.current,
+  headingStyle,
   body[]{
     _type == "mediaAssetMetadata" => {
       _type,
@@ -648,6 +654,26 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
         "guide": guide->${GUIDE_CARD_PUBLIC}
       }
     },
+    _type == "insightPartnerProfile" => {
+      _type,
+      _key,
+      heading,
+      body,
+      personName,
+      personRole,
+      "portrait": portrait${MEDIA_ASSET_PUBLIC},
+      "partner": partner->${PARTNER_LOGO_PUBLIC}
+    },
+    _type == "insightReferenceCard" => {
+      _type,
+      _key,
+      eyebrow,
+      heading,
+      description,
+      linkLabel,
+      linkHref,
+      "image": image${MEDIA_ASSET_PUBLIC}
+    },
     _type != "mediaAssetMetadata"
       && _type != "insightFigure"
       && _type != "insightFigurePair"
@@ -657,7 +683,9 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
       && _type != "insightDevelopmentGrid"
       && _type != "insightCourseGrid"
       && _type != "insightPartnerLogoGrid"
-      && _type != "insightGuideCards" => { ... }
+      && _type != "insightGuideCards"
+      && _type != "insightPartnerProfile"
+      && _type != "insightReferenceCard" => { ... }
   }
 }`;
 
@@ -678,6 +706,9 @@ export const INSIGHT_DETAIL_FIELDS = /* groq */ `
   heroCaption,
   heroNote{ heading, body },
   heroLayout,
+  heroPartnerLabel,
+  heroSublabel,
+  "heroPartner": heroPartner->${PARTNER_LOGO_PUBLIC},
   author->${AUTHOR_PUBLIC},
   sections[]${INSIGHT_SECTION_PUBLIC},
   ctaHeading,
