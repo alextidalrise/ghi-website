@@ -159,6 +159,12 @@
 		letter-spacing: var(--tracking-wide);
 		text-transform: uppercase;
 		text-decoration: none;
+		/* A label long enough to wrap (e.g. "Ask GHI for an introduction") still reads centred.
+		   Without this the wrapped lines fall back to `start`, so a two-line label sat
+		   left-aligned inside an otherwise-centred, full-width button — ragged next to the
+		   single-line WhatsApp button beside it. */
+		text-align: center;
+		text-wrap: balance;
 		cursor: pointer;
 		border: 1px solid transparent;
 		transition:
