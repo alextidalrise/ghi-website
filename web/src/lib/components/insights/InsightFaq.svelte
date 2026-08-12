@@ -10,6 +10,11 @@
 		)
 	);
 
+	// `open` shows every question and answer at once as a ruled list; the default `accordion`
+	// discloses each answer on demand. The FAQPage structured data (built server-side) is the
+	// same for both, so switching the display never changes what the page emits for search.
+	const isOpen = $derived(portableText.value.display === 'open');
+
 	function paragraphs(answer: string | null | undefined): string[] {
 		return (answer ?? '')
 			.split(/\n\s*\n/)
@@ -19,28 +24,43 @@
 </script>
 
 {#if items.length > 0}
-	<div class="faq">
+	<div class="faq" class:faq--open={isOpen}>
 		{#each items as item, index (item._key ?? index)}
-			<!-- No `name`: the group is a set of independent disclosures, so a reader can hold
-			     several answers open at once. An exclusive accordion (shared `name`) would collapse
-			     the last answer whenever the next is opened — hostile when questions are compared. -->
-			<details class="faq__item">
-				<summary class="faq__q">
-					<!-- The question carries a real heading so it lands in the document outline one step
-					     below the section `h2`, letting screen-reader users jump the Q&A by heading. It
-					     sits inside `summary` (whose content model permits heading content) so the
-					     disclosure control and the heading remain one accessible node. -->
-					<h3 class="faq__q-text">{item.question}</h3>
-					<svg class="faq__mark" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-						<path d="M3 5.5 7 9.5 11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" fill="none" />
-					</svg>
-				</summary>
-				<div class="faq__a">
-					{#each paragraphs(item.answer) as para (para)}
-						<p>{para}</p>
-					{/each}
+			{#if isOpen}
+				<!-- Static: no disclosure control, every answer shown. The question stays an <h3> so it
+				     still lands in the document outline one step below the section heading. -->
+				<div class="faq__item faq__item--open">
+					<h3 class="faq__q faq__q--static">
+						<span class="faq__q-text">{item.question}</span>
+					</h3>
+					<div class="faq__a">
+						{#each paragraphs(item.answer) as para (para)}
+							<p>{para}</p>
+						{/each}
+					</div>
 				</div>
-			</details>
+			{:else}
+				<!-- No `name`: the group is a set of independent disclosures, so a reader can hold
+				     several answers open at once. An exclusive accordion (shared `name`) would collapse
+				     the last answer whenever the next is opened — hostile when questions are compared. -->
+				<details class="faq__item">
+					<summary class="faq__q">
+						<!-- The question carries a real heading so it lands in the document outline one step
+						     below the section `h2`, letting screen-reader users jump the Q&A by heading. It
+						     sits inside `summary` (whose content model permits heading content) so the
+						     disclosure control and the heading remain one accessible node. -->
+						<h3 class="faq__q-text">{item.question}</h3>
+						<svg class="faq__mark" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+							<path d="M3 5.5 7 9.5 11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" fill="none" />
+						</svg>
+					</summary>
+					<div class="faq__a">
+						{#each paragraphs(item.answer) as para (para)}
+							<p>{para}</p>
+						{/each}
+					</div>
+				</details>
+			{/if}
 		{/each}
 	</div>
 {/if}
@@ -113,6 +133,19 @@
 	.faq__q:hover,
 	.faq__item[open] .faq__q {
 		color: var(--green);
+	}
+
+	/* Open display: the question is a static heading (no disclosure control, no cursor/chevron)
+	   and its answer always shows. Padding mirrors the accordion's summary/answer rhythm so the
+	   two displays sit at the same vertical cadence. */
+	.faq__q--static {
+		display: block;
+		cursor: default;
+		padding-block: var(--space-md) var(--space-xs);
+	}
+
+	.faq--open .faq__a {
+		padding-bottom: var(--space-md);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

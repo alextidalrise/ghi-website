@@ -6,6 +6,8 @@
 	let { portableText }: { portableText: CustomBlockComponentProps<InsightCtaCalloutBlock> } = $props();
 
 	const value = $derived(portableText.value);
+	const linkBand = $derived(value.variant === 'linkBand');
+	const eyebrow = $derived(value.eyebrow?.trim() || null);
 	const heading = $derived(value.heading?.trim() || null);
 	const body = $derived(value.body?.trim() || null);
 	const label = $derived(value.buttonLabel?.trim() || 'Speak to GHI');
@@ -16,7 +18,32 @@
 	const external = $derived(/^https?:\/\//.test(href) && !isInternalHref(href));
 </script>
 
-{#if heading}
+{#if heading && linkBand}
+	<!-- Link-band variant: a quiet ruled cross-link. Heading + one line on the left, a trailing
+	     text link (no filled button) on the right — for pointing at another surface mid-article. -->
+	<aside class="inline-cta inline-cta--band">
+		<div class="inline-cta__text">
+			{#if eyebrow}
+				<p class="inline-cta__eyebrow">{eyebrow}</p>
+			{/if}
+			<p class="inline-cta__heading">{heading}</p>
+			{#if body}
+				<p class="inline-cta__body">{body}</p>
+			{/if}
+		</div>
+		<a
+			class="inline-cta__link"
+			{href}
+			target={external ? '_blank' : undefined}
+			rel={external ? 'noopener noreferrer' : undefined}
+		>
+			{label}
+			<svg class="inline-cta__arrow" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+				<path d="M3 7h8M7.5 3.5 11 7l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" fill="none" />
+			</svg>
+		</a>
+	</aside>
+{:else if heading}
 	<aside class="inline-cta">
 		<div class="inline-cta__text">
 			<p class="inline-cta__heading">{heading}</p>
@@ -125,8 +152,72 @@
 		}
 	}
 
+	/*
+	 * Link-band variant — a quiet cross-link, not an enquiry prompt. Ruled top and bottom on the
+	 * page ground (no fill, no button), a serif heading with a trailing text link. The gold top
+	 * rule keeps it kin to the button variant; everything else steps the emphasis down.
+	 */
+	.inline-cta--band {
+		align-items: baseline;
+		padding-inline: 0;
+		padding-block: clamp(1.25rem, 3vw, 1.5rem);
+		border: 0;
+		border-block: 1px solid var(--border);
+		border-block-start-color: var(--gold);
+		background: none;
+	}
+
+	.inline-cta--band .inline-cta__eyebrow {
+		font-family: var(--sans);
+		font-size: var(--text-overline);
+		font-weight: 500;
+		letter-spacing: var(--tracking-overline);
+		text-transform: uppercase;
+		color: var(--muted);
+		margin-bottom: var(--space-xs);
+	}
+
+	.inline-cta--band .inline-cta__heading {
+		font-size: var(--text-h3);
+	}
+
+	/* Scope with the container class so this wins over the body's prose-link rule (0,2,1). */
+	.inline-cta--band .inline-cta__link {
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--sans);
+		font-size: var(--text-overline);
+		font-weight: 500;
+		letter-spacing: var(--tracking-overline);
+		text-transform: uppercase;
+		color: var(--green);
+		text-decoration: none;
+	}
+
+	.inline-cta--band .inline-cta__arrow {
+		transition: transform var(--duration-hover) var(--ease);
+	}
+
+	.inline-cta--band .inline-cta__link:hover,
+	.inline-cta--band .inline-cta__link:focus-visible {
+		color: var(--green);
+	}
+
+	.inline-cta--band .inline-cta__link:hover .inline-cta__arrow,
+	.inline-cta--band .inline-cta__link:focus-visible .inline-cta__arrow {
+		transform: translateX(3px);
+	}
+
+	.inline-cta--band .inline-cta__link:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 3px;
+	}
+
 	@media (prefers-reduced-motion: reduce) {
-		.inline-cta .inline-cta__button {
+		.inline-cta .inline-cta__button,
+		.inline-cta--band .inline-cta__arrow {
 			transition: none;
 		}
 	}

@@ -12,11 +12,15 @@
 	import InsightFigurePair from './InsightFigurePair.svelte';
 	import InsightPortrait from './InsightPortrait.svelte';
 	import InsightCardGrid from './InsightCardGrid.svelte';
+	import InsightNumberedList from './InsightNumberedList.svelte';
 	import InsightRoutes from './InsightRoutes.svelte';
 	import InsightPullQuote from './InsightPullQuote.svelte';
 	import InsightTakeaways from './InsightTakeaways.svelte';
 	import InsightFaq from './InsightFaq.svelte';
 	import InsightCtaCallout from './InsightCtaCallout.svelte';
+	import InsightPartnerProfile from './InsightPartnerProfile.svelte';
+	import InsightReferenceCard from './InsightReferenceCard.svelte';
+	import InsightDisclaimer from './InsightDisclaimer.svelte';
 	import InsightFrontlineRail from './InsightFrontlineRail.svelte';
 	import InsightDestinationGrid from './InsightDestinationGrid.svelte';
 	import InsightDevelopmentGrid from './InsightDevelopmentGrid.svelte';
@@ -46,11 +50,15 @@
 			insightFigurePair: InsightFigurePair,
 			insightPortrait: InsightPortrait,
 			insightCardGrid: InsightCardGrid,
+			insightNumberedList: InsightNumberedList,
 			insightRoutes: InsightRoutes,
 			insightPullQuote: InsightPullQuote,
 			insightTakeaways: InsightTakeaways,
 			insightFaq: InsightFaq,
 			insightCtaCallout: InsightCtaCallout,
+			insightPartnerProfile: InsightPartnerProfile,
+			insightReferenceCard: InsightReferenceCard,
+			insightDisclaimer: InsightDisclaimer,
 			insightFrontlineRail: InsightFrontlineRail,
 			insightDestinationGrid: InsightDestinationGrid,
 			insightDevelopmentGrid: InsightDevelopmentGrid,

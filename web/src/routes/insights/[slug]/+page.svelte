@@ -3,6 +3,7 @@
 	import GuideContents from '$lib/components/guides/GuideContents.svelte';
 	import InsightArticleHero from '$lib/components/insights/InsightArticleHero.svelte';
 	import InsightBody from '$lib/components/insights/InsightBody.svelte';
+	import InsightKicker from '$lib/components/insights/InsightKicker.svelte';
 	import InsightAuthorBio from '$lib/components/insights/InsightAuthorBio.svelte';
 	import TalkToUsBand from '$lib/components/TalkToUsBand.svelte';
 	import InsightCard from '$lib/components/insights/InsightCard.svelte';
@@ -89,9 +90,21 @@
 					aria-labelledby={section.anchor ? `${section.anchor}-heading` : undefined}
 				>
 					{#if section.heading}
-						<h2 class="article-section__heading" id={section.anchor ? `${section.anchor}-heading` : undefined}>
-							{section.heading}
-						</h2>
+						{#if section.headingStyle === 'eyebrow'}
+							<!-- Eyebrow style: the section title is demoted to a small ◆ label (the sub-heads in
+							     the body carry the visible structure). Still an <h2> with the anchor id, so the
+							     document outline and the contents rail are unchanged. -->
+							<h2
+								class="article-section__heading article-section__heading--eyebrow"
+								id={section.anchor ? `${section.anchor}-heading` : undefined}
+							>
+								<InsightKicker label={section.heading} />
+							</h2>
+						{:else}
+							<h2 class="article-section__heading" id={section.anchor ? `${section.anchor}-heading` : undefined}>
+								{section.heading}
+							</h2>
+						{/if}
 					{/if}
 					<InsightBody value={section.body} />
 				</section>
@@ -179,6 +192,15 @@
 	   downward, so the eye groups it with its own text rather than floating between two. */
 	.article-section__heading {
 		margin-bottom: var(--space-md);
+	}
+
+	/* Eyebrow variant: the <h2> keeps the outline, but the InsightKicker span inside supplies the
+	   type (sans overline + ◆ mark), so strip the serif h2's own size/line-height and let the label
+	   sit close to the sub-heads it introduces. */
+	.article-section__heading--eyebrow {
+		font-size: var(--text-overline);
+		line-height: 1;
+		margin-bottom: var(--space-lg);
 	}
 
 	@media (min-width: 56rem) {

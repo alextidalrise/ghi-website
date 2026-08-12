@@ -23,6 +23,21 @@ export type InsightAuthor = {
 	avatar?: MediaAssetInput | null;
 };
 
+/**
+ * A partner dereferenced to its public logo-wall fields (PARTNER_LOGO_PUBLIC): the co-brand hero
+ * plate and the partner-profile credential plate both read the logo and name live from here.
+ * `referralUrl` is never projected — the buyer-facing route always runs through GHI.
+ */
+export type InsightPartnerLogo = {
+	_id?: string | null;
+	name?: string | null;
+	slug?: string | null;
+	category?: string | null;
+	logo?: MediaAssetInput | null;
+	/** Reversed/mark logo for dark surfaces — the co-brand hero and partner-profile plates use this. */
+	logoAlt?: MediaAssetInput | null;
+};
+
 /** A framed, captioned photograph in the body. */
 export type InsightFigureBlock = {
 	_type: 'insightFigure';
@@ -95,12 +110,28 @@ export type InsightRoutesBlock = {
 	routes?: InsightRouteItem[] | null;
 };
 
-/** Large pulled-out quote. */
+/** Large pulled-out quote. `filled` sets it on a tinted panel with a green accent edge. */
 export type InsightPullQuoteBlock = {
 	_type: 'insightPullQuote';
 	_key: string;
 	quote?: string | null;
 	attribution?: string | null;
+	variant?: 'plain' | 'filled' | null;
+};
+
+/** One numbered point: a heading (the question/step) and one supporting line. */
+export type InsightNumberedItem = {
+	_key?: string;
+	heading?: string | null;
+	body?: string | null;
+};
+
+/** An ordered list where the sequence carries meaning — display numerals, hairline-separated. */
+export type InsightNumberedListBlock = {
+	_type: 'insightNumberedList';
+	_key: string;
+	heading?: string | null;
+	items?: InsightNumberedItem[] | null;
 };
 
 /** Boxed "what this covers / key takeaways" summary. */
@@ -122,21 +153,63 @@ export type InsightFaqItem = {
 	answer?: string | null;
 };
 
-/** FAQ accordion (also drives FAQPage structured data). */
+/** FAQ (also drives FAQPage structured data). `open` shows every answer as a ruled list. */
 export type InsightFaqBlock = {
 	_type: 'insightFaq';
 	_key: string;
 	items?: InsightFaqItem[] | null;
+	display?: 'accordion' | 'open' | null;
 };
 
-/** Inline enquiry prompt inside the body. */
+/**
+ * Inline enquiry prompt inside the body. `linkBand` is the quieter cross-link look: an eyebrow,
+ * heading and one line on the left, a trailing text link (no filled button) on the right.
+ */
 export type InsightCtaCalloutBlock = {
 	_type: 'insightCtaCallout';
 	_key: string;
+	variant?: 'button' | 'linkBand' | null;
+	eyebrow?: string | null;
 	heading?: string | null;
 	body?: string | null;
 	buttonLabel?: string | null;
 	buttonHref?: string | null;
+};
+
+/**
+ * A "meet the partner / person" panel: heading + copy, plus a portrait and a credential plate
+ * (name, role, optional partner logo). The partner is dereferenced to its live logo; the person's
+ * name and role are article copy.
+ */
+export type InsightPartnerProfileBlock = {
+	_type: 'insightPartnerProfile';
+	_key: string;
+	heading?: string | null;
+	body?: string | null;
+	portrait?: MediaAssetInput | null;
+	personName?: string | null;
+	personRole?: string | null;
+	partner?: InsightPartnerLogo | null;
+};
+
+/** A pointer to an external source: thumbnail, heading, context and a single outbound link. */
+export type InsightReferenceCardBlock = {
+	_type: 'insightReferenceCard';
+	_key: string;
+	eyebrow?: string | null;
+	heading?: string | null;
+	description?: string | null;
+	image?: MediaAssetInput | null;
+	linkLabel?: string | null;
+	linkHref?: string | null;
+};
+
+/** A titled fine-print / compliance note (the regulated-content disclaimer). */
+export type InsightDisclaimerBlock = {
+	_type: 'insightDisclaimer';
+	_key: string;
+	heading?: string | null;
+	body?: string | null;
 };
 
 /**
@@ -250,11 +323,15 @@ export type InsightBodyBlock =
 	| InsightFigurePairBlock
 	| InsightPortraitBlock
 	| InsightCardGridBlock
+	| InsightNumberedListBlock
 	| InsightRoutesBlock
 	| InsightPullQuoteBlock
 	| InsightTakeawaysBlock
 	| InsightFaqBlock
 	| InsightCtaCalloutBlock
+	| InsightPartnerProfileBlock
+	| InsightReferenceCardBlock
+	| InsightDisclaimerBlock
 	| InsightFrontlineRailBlock
 	| InsightDestinationGridBlock
 	| InsightDevelopmentGridBlock
@@ -265,6 +342,8 @@ export type InsightBodyBlock =
 export type InsightSection = {
 	heading?: string | null;
 	anchor?: string | null;
+	/** `eyebrow` demotes the section heading to a small ◆ label; default `serif` is the house H2. */
+	headingStyle?: 'serif' | 'eyebrow' | null;
 	body?: InsightBodyBlock[] | null;
 };
 
@@ -327,8 +406,18 @@ export type InsightDetail = {
 	heroImage?: MediaAssetInput | null;
 	heroCaption?: string | null;
 	heroNote?: InsightHeroNote | null;
-	/** Hero composition. `splitSquare` is the opt-in equal-column, square-plate launch treatment. */
-	heroLayout?: 'standard' | 'splitSquare' | null;
+	/**
+	 * Hero composition. `splitSquare` is the equal-column, square-plate launch treatment; `coBrand`
+	 * leads with the standfirst and runs a partner brand plate beside the photo (the
+	 * partner-introduction hero, which reads `heroPartner` / `heroPartnerLabel` / `heroSublabel`).
+	 */
+	heroLayout?: 'standard' | 'splitSquare' | 'coBrand' | null;
+	/** Co-brand hero only: the partner whose logo + name form the brand plate beside the photo. */
+	heroPartner?: InsightPartnerLogo | null;
+	/** Co-brand hero only: the small label under the partner name (default "GHI Partner"). */
+	heroPartnerLabel?: string | null;
+	/** Co-brand hero only: an optional small label under the headline (e.g. "GHI Partner Insight"). */
+	heroSublabel?: string | null;
 	author?: InsightAuthor | null;
 	sections?: InsightSection[] | null;
 	ctaHeading?: string | null;

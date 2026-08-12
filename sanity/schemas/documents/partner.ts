@@ -61,6 +61,13 @@ export const partner = defineType({
 				'Partner logo. Rendered grayscale at rest and resolving to colour on hover, against a white cell. A transparent PNG or SVG works best.'
 		}),
 		defineField({
+			name: 'logoAlt',
+			title: 'Logo — reversed / mark',
+			type: 'mediaAssetMetadata',
+			description:
+				'Optional alternate logo for dark surfaces — a LIGHT-coloured version (often the icon/mark on its own). Used on the co-brand article hero plate and the partner-profile credential plate, shown as-is on the brand green. Leave blank to fall back to the partner name in those places.'
+		}),
+		defineField({
 			name: 'description',
 			title: 'Description',
 			type: 'text',
