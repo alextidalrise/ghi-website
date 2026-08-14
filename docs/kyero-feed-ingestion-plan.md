@@ -1,6 +1,6 @@
 # Kyero V3 feed ingestion — plan
 
-**Created:** 2026-08-05 · **Status:** in progress — D-1 & D-2 resolved, D-3 deferred; Epic 1 dry-run shipped
+**Created:** 2026-08-05 · **Status:** in progress — D-1, D-2 & D-3 resolved; Epic 1 dry-run shipped. Draft-writing (Epic 1.6–1.8) + alias field (Epic 2) now unblocked.
 
 A prospective partner wants to supply their listings as a **Kyero V3 XML feed** (the de-facto
 Spain/Portugal property syndication format — a flat list of `<property>` blocks refreshed on a
@@ -126,25 +126,34 @@ well-formed Kyero V3 feed. Numbers below are measured by the dry-run importer
   for exactly this reason. The importer writes **drafts** with blocking review items and an editor
   approves. **Never auto-publish** third-party copy onto our domain. Cost: a human touches each listing once.
 
-- [ ] **D-3 — Where do town→community mappings live?** _(deferred 2026-08-05 — revisit before draft-writing)_
+- [x] **D-3 — Where do feed towns/resorts land in the taxonomy?** _(resolved 2026-08-14)_
 
-  Not settled yet, so the importer's draft-writing (Epic 1.6–1.7) and the alias field (Epic 2) are on
-  hold; the dry-run currently flags every town as unresolved. **Recommendation: in Sanity, as aliases on
-  the community.** Add a `sourceAliases: string[]` to
-  `locationTaxonomy`; resolving "Estepona → this community" writes the alias, so future syncs resolve it
-  automatically and only genuinely new towns ever reach a human. The alternative (a crosswalk config in
-  the repo) needs a developer for every new town. Sanity keeps the location decision with the editors who
-  make it. Note the taxonomy is **Spain/Portugal-only** today — an out-of-region feed needs the country
-  tier extended first.
+  **Decision:** the two provinces — **Murcia and Alicante — become `location` nodes** under Spain
+  (indexable browse pages at `/spain/murcia`, `/spain/alicante`). **Every golf resort and town becomes a
+  `community`** parented to its province-location. Listings resolve to
+  `/spain/{province}/{community}/golf/{slug}`. There is **no region ("Costa Cálida") tier** — the browse-hub
+  question is moot.
 
-  **This feed lands in a brand-new region.** The murciaservices towns are **Costa Cálida / Costa Blanca
-  South** (Murcia + Alicante provinces) — none of which exist in our taxonomy today (Costa del Sol /
-  Algarve only). So the first sync requires **seeding a new Murcia / Costa Cálida location subtree** before
-  reconciliation is meaningful. Worse, the feed's `<town>` values mix real municipalities (Torrevieja,
-  Torre Pacheco, Pilar de la Horadada) with **golf-resort / urbanisation names** (El Valle Golf Resort,
-  Lo Romero Golf, Serena Golf, Altaona Golf, Condado de Alhama) that each need a human parent-community
-  decision. **Expect the first sync to be an editorial pass, not a rubber stamp** — this is the real cost
-  for this partner, not the parsing.
+  **Consequences:**
+  - **Province → location is deterministic** (read straight from `<province>`), so only the town/resort →
+    community step needs a human. A handful of feed rows carry an ambiguous province — *Pilar de la
+    Horadada* appears under both Murcia and Alicante; *La Finca Golf* is blank — and those get a human
+    parent-location decision.
+  - **Communities get no indexable page** (`buildTaxonomyPath` returns null below the location tier,
+    `web/src/lib/listing/sitemap.ts:39`). Branded resort terms — "La Manga Club", "El Valle Golf Resort" —
+    will **not** have their own landing page; the resort name lives only in the listing URL and as a filter
+    facet. This is the SEO cost of community-placement over resort-as-location; it's reversible later by
+    promoting a specific resort to a `location`, or giving it a `golfCourse` doc (which does get a page).
+  - **~58 communities to seed** (see Appendix), each parented to `murcia` or `alicante`. Merge spelling
+    variants first (Appendix) so we don't create duplicate communities.
+  - The taxonomy was **Spain/Portugal-only** and had **Costa del Sol / Algarve** only — so this still means
+    **seeding a new Murcia + Alicante location subtree** under Spain before the first sync's reconciliation
+    is meaningful. **Expect the first sync to be an editorial pass, not a rubber stamp.**
+
+  **Alias persistence (Epic 2) still applies:** resolving a `<town>`/resort string to its community writes a
+  `sourceAlias`, so re-syncs and spelling variants resolve automatically and only genuinely new places ever
+  reach a human. This keeps the location decision with the editors who make it, rather than a repo-side
+  crosswalk that needs a developer per town.
 
 ---
 
@@ -162,9 +171,11 @@ Three stages sit **before** Sanity; drafts are a fourth stage on top.
    - **Vocabulary** (closed sets, static lookup tables): Kyero `type` → our `propertyType` enum
      (villa/apartment/penthouse/townhouse/plot/finca), `pool` yes/no → our `pool` enum. Extend a table
      when the feed shows a new value. Low cost.
-   - **Reference resolution** (needs a human, must persist): town/province → `location.community`. The
-     importer resolves via community `sourceAliases`; unknowns go to a queue for a one-time human decision
-     (D-3). This is the only recurring human cost, and the alias mechanism makes it *decreasing* over time.
+   - **Reference resolution** (D-3): `<province>` → `location` is **deterministic** (Murcia/Alicante only);
+     `<town>`/resort → `community` under that location needs a human the first time, then persists. The
+     importer resolves via community `sourceAliases`; unknowns (and ambiguous/blank provinces) queue for a
+     one-time decision. This is the only recurring human cost, and the alias mechanism makes it *decreasing*
+     over time.
 
 3. **Build draft docs** — write `status: draft` with review items for anything unresolved or requiring
    human judgement (imported copy, unconfirmed price, dropped coordinates).
@@ -211,8 +222,10 @@ document view via review items.
 - [ ] **1.5** Image ingest: for each `<image><url>`, fetch bytes → `client.assets.upload('image', …)` →
   wrap in `mediaAssetMetadata`; record provenance in `sourceFileName`/`sourceMediaFolderUrl`. Skip
   already-uploaded images on re-sync (hash or url-map).
-- [ ] **1.6** Location resolution: match `town` against community `sourceAliases`; on miss, attach a
-  **blocking** review item ("Assign community for '<town>'") rather than guessing.
+- [ ] **1.6** Location resolution: map `<province>` → `murcia`/`alicante` location (D-3, deterministic);
+  match `<town>`/resort against community `sourceAliases` under it; on miss, attach a **blocking** review
+  item ("Assign community for '<town>'") rather than guessing. Ambiguous or blank province (Pilar de la
+  Horadada, La Finca Golf) also blocks for a human parent-location decision.
 - [ ] **1.7** Write `status: draft` docs (`createOrReplace`) with review items: unresolved location
   (blocking), imported copy → review (blocking), dropped coordinates (info).
 - [ ] **1.8** Removal handling: listings absent from the feed since last sync → flag (not auto-delete) for
@@ -265,13 +278,13 @@ Build only once the feed's real quirks are known and the queue is painful enough
 
 ---
 
-## Appendix — places in the feed (D-3 placement backlog)
+## Appendix — communities to seed (D-3 resolved)
 
 Generated from the live murciaservices feed on 2026-08-05 (`sanity/importers/kyero/`), merging the
 same place written under different provinces. **58 distinct place names**, from **68** raw town+province
-combinations. This is the set that D-3 placement (resort-as-location vs town-as-location vs hybrid) and
-the launch threshold apply to. The resort/town split is auto-classified by name (contains
-golf/resort/club) — treat borderline entries as prompts, not gospel.
+combinations. **Per D-3 (resolved 2026-08-14) every place below becomes a `community`** parented to its
+province-`location` (Murcia or Alicante). The resort/town split is cosmetic now — both are communities —
+and is kept only to show the naming mix. **Merge the spelling variants first** so we don't seed duplicates.
 
 **Merge these spelling variants to one canonical place first** (candidates for `sourceAliases`):
 Serena Golf = La Serena Golf · Santa Rosalía Lake & Life Resort = Santa Rosalía Resort ·
