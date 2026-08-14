@@ -216,34 +216,37 @@ listings from the normal document view.
 Proves the pipeline end-to-end on machinery we already have. Editors finish listings in the normal
 document view via review items.
 
-- [ ] **1.1** Add `xml2js` (or `fast-xml-parser`) + a fetch step to a new `sanity/importers/kyero/` script,
-  reusing the migration client/token/`--dry-run`/`--dataset` scaffolding. Refuse `production` by default.
-- [ ] **1.2** Parse the feed into normalized intermediate records (still Kyero-shaped).
-- [ ] **1.3** `kyero-map.ts` — field map + vocabulary lookup tables (type, pool). Use the real tag names:
-  `desc/en` → copy (strip HTML entities, drop `pl`), `notes` → internal only (never public),
-  `new_build=1` → `specs.buildStatus = off_plan`, `video_url` → `media.videoUrl`.
-- [ ] **1.3a** Defensive value handling for the known data-quality gaps: empty `type` → unresolved
-  (review item, no guess); empty `pool` → `unknown`; `beds`/`baths` of 0 → leave unset + review flag;
-  0/0 coordinates → ignored (community pin inherited).
-- [ ] **1.4** GHI id allocation: query current max `ghiListingId`, increment zero-padded; persist a
-  `kyero-ref → GHI-id` map (a dedicated `feedImportMap` doc, or `sourceReference` lookups) so re-syncs
-  patch existing docs instead of duplicating.
-- [ ] **1.5** Image ingest: for each `<image><url>`, fetch bytes → `client.assets.upload('image', …)` →
-  wrap in `mediaAssetMetadata`; record provenance in `sourceFileName`/`sourceMediaFolderUrl`. Skip
-  already-uploaded images on re-sync (hash or url-map).
-- [ ] **1.6** Province → location only: map `<province>` → `murcia`/`alicante` (deterministic), including
-  the two pinned overrides (Pilar de la Horadada → Alicante, La Finca Golf → Alicante). Store the raw
-  `<town>` verbatim as `sourceTown`; leave the community reference **empty** with a **blocking** review item
-  ("Community not yet assigned"). Do **not** attempt town→community matching — that is done downstream by
-  external AI agents.
-- [ ] **1.7** Write `status: draft` docs (`createOrReplace`) with review items: unresolved location
-  (blocking), imported copy → review (blocking), dropped coordinates (info).
+- [x] **1.1** `fast-xml-parser` + fetch in `sanity/importers/kyero/` (`parse.ts`, `import.ts`), reusing the
+  migration client/token/`--dataset` scaffolding. Refuses `production`; dry-run is the DEFAULT (`--write` opts in).
+- [x] **1.2** `parse.ts` → normalized `KyeroProperty` records (still Kyero-shaped).
+- [x] **1.3** `kyero-map.ts` — field map + vocab tables (type, pool, transaction, build status), real tag
+  names (`desc/en`, `notes` → internal, `new_build=1` → `off_plan`, `video_url` → `media.videoUrl`).
+- [x] **1.3a** Defensive value handling: empty `type` → unresolved (blocking, no guess); empty `pool` →
+  `unknown`; `beds`/`baths` 0 → unset + flag; 0/0 coords → ignored (community pin inherited).
+- [x] **1.4** GHI id — **left to the external pipeline** (per memory: assigned out-of-repo; uniqueness not
+  schema-enforced, so allocating in-repo risks collisions). `ghiListingId` is left unset with a blocking
+  review item. Re-sync idempotency instead comes from a stable doc id: `kyero-import-<ref>` (`draftId()`),
+  so `createOrReplace` updates in place — no duplicates, no `feedImportMap` doc needed.
+- [ ] **1.5** Image ingest — **deferred (next).** Each draft currently carries a blocking "Import media (N
+  images not yet ingested)" review item. To build: for each `<image><url>`, fetch → `client.assets.upload`
+  → wrap in `mediaAssetMetadata` gallery member; skip already-uploaded on re-sync (url/hash map).
+- [x] **1.6** Province → location: `mapProvince()` maps `<province>` → `murcia`/`alicante` (deterministic),
+  with the two pinned overrides and a **feed-wide town→province consensus** that backfills blank-province
+  rows from the same town's other rows (15 blank/`Spain` rows → 1 genuine residual: *Sucina*, flagged, not
+  guessed). Stores raw town + province in `internal.feedImport`; leaves `location.community` empty (native
+  block). No town→community matching — external agents do that.
+- [x] **1.7** `build-draft.ts` (pure) + `import.ts` (writer) produce `status: draft` docs via
+  `createOrReplace`, each with blocking review items: assign community, assign GHI id, review imported copy,
+  map type (if unresolved), import media, plus non-blocking specs notes. **Validated in dry-run against the
+  live 209-property feed** (`pnpm kyero:import`): 209 drafts, 881 blocking items, `pnpm check` clean. Live
+  write (`--write`) is wired but not yet run — awaiting go.
 - [ ] **1.8** Removal handling: listings absent from the feed since last sync → flag (not auto-delete) for
-  human decision.
+  human decision. (Query by `kyero-import-` id prefix vs current feed refs.)
 
   **Done when:** a sample Kyero feed produces correct draft `propertyListing` docs in `development`
-  dataset; images are uploaded; unknown towns and imported copy hold publishing via review items; a
-  second run of the same feed updates in place with zero duplicates.
+  dataset (✓ shapes validated in dry-run); images are uploaded (1.5, pending); unknown towns and imported
+  copy hold publishing via review items (✓); a second run updates in place with zero duplicates (✓ by
+  stable id — to confirm live under `--write`).
 
 ## Epic 2 — Expose the resolution surface for the external agents (was: alias resolution)
 

@@ -142,6 +142,7 @@
 		"migrate:destinations-pair": "tsx migrations/insight-destinations-figure-pair-migrate.ts",
 		"migrate:destinations-pair:dry-run": "tsx migrations/insight-destinations-figure-pair-migrate.ts --dry-run",
 		"kyero:dry-run": "tsx importers/kyero/dry-run.ts",
+		"kyero:import": "tsx importers/kyero/import.ts",
 		"test": "vitest run"
 	},
 	"dependencies": {

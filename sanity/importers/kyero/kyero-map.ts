@@ -84,6 +84,39 @@ export function mapBuildStatus(newBuild: string | undefined | null): PropertyBui
 	return (newBuild ?? '').trim() === '1' ? 'off_plan' : 'built';
 }
 
+/** The two location-tier slugs this feed's provinces map to (D-3). */
+export type ProvinceSlug = 'murcia' | 'alicante';
+
+/**
+ * Feed rows whose `<province>` is ambiguous or blank, pinned by the team (2026-08-14).
+ * Keyed by lower-cased `<town>`. Both resolve to Alicante. See D-3 in the plan.
+ */
+const PROVINCE_TOWN_OVERRIDES: Record<string, ProvinceSlug> = {
+	'pilar de la horadada': 'alicante',
+	'pilar de horadada': 'alicante',
+	'la finca golf': 'alicante'
+};
+
+/**
+ * `<province>` → our location-tier slug. Deterministic (the importer's whole job on
+ * location); the town → community step is left to the external agents. Returns null
+ * when neither an override nor the province string resolves — the caller blocks and a
+ * human assigns the parent location.
+ */
+export function mapProvince(
+	town: string | undefined | null,
+	province: string | undefined | null
+): ProvinceSlug | null {
+	const t = (town ?? '').trim().toLowerCase();
+	if (t in PROVINCE_TOWN_OVERRIDES) return PROVINCE_TOWN_OVERRIDES[t];
+
+	const p = (province ?? '').trim().toLowerCase();
+	if (p.includes('alicante')) return 'alicante';
+	// Cartagena is a municipality within Murcia province; the feed uses it as a province value.
+	if (p.includes('murcia') || p.includes('cartagena')) return 'murcia';
+	return null;
+}
+
 /** Kyero areas are square metres. */
 export const DEFAULT_AREA_UNIT: AreaUnit = 'sqm';
 
