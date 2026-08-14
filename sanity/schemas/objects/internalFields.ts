@@ -174,6 +174,36 @@ export const internalFields = defineType({
 			title: 'Legal docs Drive folder ID',
 			type: 'string',
 			description: 'Internal Drive folder ID for legal documents.'
+		}),
+		defineField({
+			name: 'feedImport',
+			title: 'Feed import',
+			type: 'object',
+			description:
+				'Provenance from an automated feed import (e.g. Kyero). The importer writes these; the external resolution agents read them to assign the community. Never shown on the website.',
+			options: { collapsible: true, collapsed: true },
+			fields: [
+				defineField({
+					name: 'sourceTown',
+					title: 'Source town (raw)',
+					type: 'string',
+					description:
+						"The feed's <town> value, stored verbatim. The importer never resolves it; the external agents map this to a community."
+				}),
+				defineField({
+					name: 'sourceProvince',
+					title: 'Source province',
+					type: 'string',
+					description:
+						'Normalized province slug the importer derived deterministically (e.g. "murcia", "alicante"). Fixes the parent location for the community the agents assign.'
+				}),
+				defineField({
+					name: 'importedAt',
+					title: 'Imported at',
+					type: 'datetime',
+					description: 'When the importer last wrote this listing from the feed.'
+				})
+			]
 		})
 	]
 });

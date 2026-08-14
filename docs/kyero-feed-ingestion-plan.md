@@ -250,15 +250,20 @@ document view via review items.
 Resolution logic lives outside this repo now; our job is just to give the external agents clean fields to
 read from and write into.
 
-- [ ] **2.1** Add `sourceTown: string` to the listing schema (raw feed town, provenance) so the importer can
-  store it and the external agents can read it.
-- [ ] **2.2** Confirm the community reference field the agents write into, and that an empty reference holds
-  a **blocking** review item so an unresolved draft cannot publish.
+- [x] **2.1** Provenance seam added: `internal.feedImport` object on the listing (`internalFields.ts`) with
+  `sourceTown` (raw feed `<town>`, verbatim), `sourceProvince` (normalized `murcia`/`alicante`), and
+  `importedAt`. Lives inside the `internal` namespace, which GROQ allowlists never project — private by
+  construction. Importer writes it; external agents read it. `pnpm check` clean.
+- [x] **2.2** Confirmed the block is **native — nothing to build**: `location.community` is `Rule.required()`
+  (`locationFields.ts:27`) and the document runs `validatePublishGate` (`propertyListing.ts:199`). An empty
+  community therefore cannot publish. Note: `location`/`country` **derive from** the chosen community
+  (`LocationFieldsInput` + `locationFieldsSync`), so the importer must NOT pre-write them — the agent picks
+  the community and the chain auto-fills. That is why province lives in `feedImport`, not `location`.
 - [ ] **2.3** *(optional, the agents' call)* `sourceAliases: string[]` on `locationTaxonomy` — only if the
   external agents want to persist learned town→community mappings in Sanity rather than in their own store.
 
-  **Done when:** the importer stores `sourceTown`, an empty community blocks publish, and an external agent
-  can resolve a draft by writing the reference (which clears the block).
+  **Done when:** the importer stores `feedImport`, an empty community blocks publish (✓ native), and an
+  external agent can resolve a draft by writing the community reference (which clears the block).
 
 ## Epic 3 — "Feed" reconciliation tool (likely superseded — see note)
 
