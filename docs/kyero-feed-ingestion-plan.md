@@ -136,9 +136,9 @@ well-formed Kyero V3 feed. Numbers below are measured by the dry-run importer
 
   **Consequences:**
   - **Province → location is deterministic** (read straight from `<province>`), so only the town/resort →
-    community step needs a human. A handful of feed rows carry an ambiguous province — *Pilar de la
-    Horadada* appears under both Murcia and Alicante; *La Finca Golf* is blank — and those get a human
-    parent-location decision.
+    community step needs a human. A couple of feed rows carried an ambiguous province and are now pinned
+    (2026-08-14): *Pilar de la Horadada* (feed had both Murcia and Alicante) → **Alicante**; *La Finca Golf*
+    (feed blank) → **Alicante**. The importer should hard-code these two overrides so re-syncs don't re-ask.
   - **Communities get no indexable page** (`buildTaxonomyPath` returns null below the location tier,
     `web/src/lib/listing/sitemap.ts:39`). Branded resort terms — "La Manga Club", "El Valle Golf Resort" —
     will **not** have their own landing page; the resort name lives only in the listing URL and as a filter
@@ -224,8 +224,8 @@ document view via review items.
   already-uploaded images on re-sync (hash or url-map).
 - [ ] **1.6** Location resolution: map `<province>` → `murcia`/`alicante` location (D-3, deterministic);
   match `<town>`/resort against community `sourceAliases` under it; on miss, attach a **blocking** review
-  item ("Assign community for '<town>'") rather than guessing. Ambiguous or blank province (Pilar de la
-  Horadada, La Finca Golf) also blocks for a human parent-location decision.
+  item ("Assign community for '<town>'") rather than guessing. Hard-code the two resolved province
+  overrides (Pilar de la Horadada → Alicante, La Finca Golf → Alicante) so re-syncs don't re-ask.
 - [ ] **1.7** Write `status: draft` docs (`createOrReplace`) with review items: unresolved location
   (blocking), imported copy → review (blocking), dropped coordinates (info).
 - [ ] **1.8** Removal handling: listings absent from the feed since last sync → flag (not auto-delete) for
@@ -310,7 +310,7 @@ One entry — **"Country Club"** — is too vague to place; ask the partner.
 | 2 | Mar Menor Golf Resort | Murcia |
 | 1 | Country Club | Murcia |
 | 1 | Hacienda Riquelme Golf Resort | Murcia |
-| 1 | La Finca Golf | — |
+| 1 | La Finca Golf | Alicante |
 | 1 | La Serena Golf | Murcia |
 | 1 | Lo Romero Golf | Alicante |
 | 1 | Santa Rosalía Resort | Murcia |
@@ -323,7 +323,7 @@ One entry — **"Country Club"** — is too vague to place; ask the partner.
 | 9 | La Manga del Mar Menor | Murcia |
 | 9 | Los Alcázares | Murcia |
 | 8 | Roldán | Murcia |
-| 6 | Pilar de la Horadada | Murcia / Alicante |
+| 6 | Pilar de la Horadada | Alicante |
 | 6 | San Pedro del Pinatar | Murcia |
 | 5 | Avileses | Murcia |
 | 5 | Las Terrazas de la Torre | Murcia |
