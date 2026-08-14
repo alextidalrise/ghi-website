@@ -1,6 +1,9 @@
 # Kyero V3 feed ingestion — plan
 
-**Created:** 2026-08-05 · **Status:** in progress — D-1, D-2 & D-3 resolved; Epic 1 dry-run shipped. Draft-writing (Epic 1.6–1.8) + alias field (Epic 2) now unblocked.
+**Created:** 2026-08-05 · **Status:** in progress — D-1, D-2 & D-3 resolved; Epic 1 dry-run shipped.
+**Community resolution is owned by external AI agents** (decided 2026-08-14) — this repo's importer just
+stores the raw town and blocks until the reference is filled. Draft-writing (Epic 1.6–1.8) unblocked;
+Epic 2 reduced to exposing fields; Epic 3 (Studio reconciliation UI) likely superseded.
 
 A prospective partner wants to supply their listings as a **Kyero V3 XML feed** (the de-facto
 Spain/Portugal property syndication format — a flat list of `<property>` blocks refreshed on a
@@ -23,17 +26,22 @@ with a model built for hand-curated content, and (b) a modest amount of custom S
 is exotic. We reuse the existing migration-script scaffolding, the existing `reviewItems` / publish
 gate, and current Studio (`sanity ^5.31.1`, React 19, `@sanity/ui ^3`).
 
-The single most important framing: **this is two halves.**
+The single most important framing: **three parties, clean seams.**
 
 ```
-Backend importer (Node)                          Sanity Studio (browser)
-  fetch XML → field-map → value-map      ───►      humans finish + approve
-  → upload images → allocate GHI ids               drafts carry review flags;
-  → write DRAFT docs + review items                publish gate holds them
+Our importer (Node)          External AI agents        Our editors (Studio)
+  fetch XML → field-map   →    read raw sourceTown  →    approve + publish
+  → upload images             research + assign          drafts carry review
+  → allocate GHI ids          the community              flags; the publish
+  → write DRAFT docs          (lives OUTSIDE this repo)  gate holds unresolved
+  (raw town kept,                                        drafts back
+   community left empty)
 ```
 
-The importer does **not** run inside Studio — Studio never fetches feeds. Studio is only the surface
-where humans resolve what the importer couldn't and give final sign-off.
+The importer does **not** resolve town→community and does **not** run inside Studio. It produces
+deterministic drafts with the feed's raw `<town>` preserved (`sourceTown`) and the community reference
+left empty — which blocks publish. Community assignment is handled by **AI agents that live outside this
+project**; our editors give final sign-off in Studio.
 
 ---
 
@@ -150,10 +158,10 @@ well-formed Kyero V3 feed. Numbers below are measured by the dry-run importer
     **seeding a new Murcia + Alicante location subtree** under Spain before the first sync's reconciliation
     is meaningful. **Expect the first sync to be an editorial pass, not a rubber stamp.**
 
-  **Alias persistence (Epic 2) still applies:** resolving a `<town>`/resort string to its community writes a
-  `sourceAlias`, so re-syncs and spelling variants resolve automatically and only genuinely new places ever
-  reach a human. This keeps the location decision with the editors who make it, rather than a repo-side
-  crosswalk that needs a developer per town.
+  **Who assigns the community (updated 2026-08-14):** not the importer, and not a Studio reconciliation UI —
+  **AI agents external to this project** read the stored raw `sourceTown` and assign the community. The
+  importer's only job is to preserve the raw string and block publish until the reference is filled. This
+  supersedes the earlier "resolve via `sourceAliases` inside the importer" recommendation (see Epic 2/3).
 
 ---
 
@@ -171,14 +179,15 @@ Three stages sit **before** Sanity; drafts are a fourth stage on top.
    - **Vocabulary** (closed sets, static lookup tables): Kyero `type` → our `propertyType` enum
      (villa/apartment/penthouse/townhouse/plot/finca), `pool` yes/no → our `pool` enum. Extend a table
      when the feed shows a new value. Low cost.
-   - **Reference resolution** (D-3): `<province>` → `location` is **deterministic** (Murcia/Alicante only);
-     `<town>`/resort → `community` under that location needs a human the first time, then persists. The
-     importer resolves via community `sourceAliases`; unknowns (and ambiguous/blank provinces) queue for a
-     one-time decision. This is the only recurring human cost, and the alias mechanism makes it *decreasing*
-     over time.
+   - **Reference resolution** (D-3): `<province>` → `location` is **deterministic** and done by the importer
+     (Murcia/Alicante only, plus the two pinned overrides). `<town>`/resort → `community` is **not the
+     importer's job** — the raw string is stored verbatim as `sourceTown` and resolved downstream by
+     **external AI agents**. The importer leaves the community reference empty and blocks publish until it's
+     filled. No alias lookup, no matching, no AI inside the importer.
 
-3. **Build draft docs** — write `status: draft` with review items for anything unresolved or requiring
-   human judgement (imported copy, unconfirmed price, dropped coordinates).
+3. **Build draft docs** — write `status: draft`, storing the raw `<town>` as `sourceTown` and leaving the
+   community reference empty (a **blocking** review item until an external agent assigns it). Review items
+   also cover imported copy, unconfirmed price, and dropped coordinates.
 
 4. **Editorial review in Studio** — resolve blocking review items, approve, publish (the existing gate).
 
@@ -222,10 +231,11 @@ document view via review items.
 - [ ] **1.5** Image ingest: for each `<image><url>`, fetch bytes → `client.assets.upload('image', …)` →
   wrap in `mediaAssetMetadata`; record provenance in `sourceFileName`/`sourceMediaFolderUrl`. Skip
   already-uploaded images on re-sync (hash or url-map).
-- [ ] **1.6** Location resolution: map `<province>` → `murcia`/`alicante` location (D-3, deterministic);
-  match `<town>`/resort against community `sourceAliases` under it; on miss, attach a **blocking** review
-  item ("Assign community for '<town>'") rather than guessing. Hard-code the two resolved province
-  overrides (Pilar de la Horadada → Alicante, La Finca Golf → Alicante) so re-syncs don't re-ask.
+- [ ] **1.6** Province → location only: map `<province>` → `murcia`/`alicante` (deterministic), including
+  the two pinned overrides (Pilar de la Horadada → Alicante, La Finca Golf → Alicante). Store the raw
+  `<town>` verbatim as `sourceTown`; leave the community reference **empty** with a **blocking** review item
+  ("Community not yet assigned"). Do **not** attempt town→community matching — that is done downstream by
+  external AI agents.
 - [ ] **1.7** Write `status: draft` docs (`createOrReplace`) with review items: unresolved location
   (blocking), imported copy → review (blocking), dropped coordinates (info).
 - [ ] **1.8** Removal handling: listings absent from the feed since last sync → flag (not auto-delete) for
@@ -235,16 +245,27 @@ document view via review items.
   dataset; images are uploaded; unknown towns and imported copy hold publishing via review items; a
   second run of the same feed updates in place with zero duplicates.
 
-## Epic 2 — Community alias resolution (D-3)
+## Epic 2 — Expose the resolution surface for the external agents (was: alias resolution)
 
-- [ ] **2.1** Add `sourceAliases: string[]` to `locationTaxonomy` (`sanity/schemas/documents/locationTaxonomy.ts`).
-- [ ] **2.2** Importer reads aliases during location resolution (1.6).
+Resolution logic lives outside this repo now; our job is just to give the external agents clean fields to
+read from and write into.
 
-  **Done when:** resolving a town once (via alias) means the next sync resolves it with no human step.
+- [ ] **2.1** Add `sourceTown: string` to the listing schema (raw feed town, provenance) so the importer can
+  store it and the external agents can read it.
+- [ ] **2.2** Confirm the community reference field the agents write into, and that an empty reference holds
+  a **blocking** review item so an unresolved draft cannot publish.
+- [ ] **2.3** *(optional, the agents' call)* `sourceAliases: string[]` on `locationTaxonomy` — only if the
+  external agents want to persist learned town→community mappings in Sanity rather than in their own store.
 
-## Epic 3 — "Feed" reconciliation tool (efficiency layer, after MVP proves out)
+  **Done when:** the importer stores `sourceTown`, an empty community blocks publish, and an external agent
+  can resolve a draft by writing the reference (which clears the block).
 
-Build only once the feed's real quirks are known and the queue is painful enough to justify it.
+## Epic 3 — "Feed" reconciliation tool (likely superseded — see note)
+
+**Superseded (2026-08-14):** this bespoke in-Studio queue existed to give humans an efficient way to
+resolve town→community. With external AI agents now owning resolution, it is probably unnecessary. Keep it
+only as a **manual fallback** for drafts the agents can't confidently resolve — and build it only if that
+tail proves painful in practice. The MVP does not need it.
 
 - [ ] **3.1** Custom Studio Tool (`tools:[]`): **overview** — last sync, new/updated/removed counts,
   "N listings blocked".
