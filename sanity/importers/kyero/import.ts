@@ -1,23 +1,28 @@
 #!/usr/bin/env tsx
 /**
- * Kyero feed → DRAFT propertyListing documents.
+ * Kyero feed → DRAFT propertyListing documents (idempotent, change-aware sync).
  *
- * Dry-run by DEFAULT: it parses the feed, builds the exact documents, and prints what
- * WOULD be written — no client, no token, no writes. Pass `--write` to actually
- * `createOrReplace` the drafts into a NON-production dataset.
+ * First sight of a listing → createOrReplace a fresh draft. On re-sync it NEVER replaces an
+ * existing doc (that would wipe communities, GHI ids, ingested galleries and edited copy).
+ * Instead it detects what the FEED changed since the last sync and surfaces every change as a
+ * pending change + a blocking review item for HUMAN APPROVAL — nothing is auto-applied. See
+ * sync.ts and docs/kyero-feed-ingestion-plan.md (Epic 1.8).
+ *
+ * Per existing listing the sync does one of:
+ *   - baseline  : doc has no stored snapshot yet → adopt the current feed as the baseline (no flags)
+ *   - unchanged : feed identical to the stored snapshot → skip (no write)
+ *   - changed   : feed moved → record pendingChanges + blocking review items (patch, no overwrite)
+ * Listings absent from the feed → flagged as removal candidates (never deleted).
  *
  *   pnpm --filter sanity kyero:import                          # dry-run, default feed URL
  *   pnpm --filter sanity kyero:import -- --file path/to.xml    # dry-run a local fixture
- *   pnpm --filter sanity kyero:import -- --limit 5             # only the first 5
- *   pnpm --filter sanity kyero:import -- --write               # WRITE drafts → development
+ *   pnpm --filter sanity kyero:import -- --limit 5             # only the first 5 (skips removal scan)
+ *   pnpm --filter sanity kyero:import -- --write               # WRITE → development
  *   pnpm --filter sanity kyero:import -- --write --dataset development
  *
- * Not handled here (by design): community resolution (external AI agents), GHI-ID
- * assignment (external pipeline), and media upload (Epic 1.5). Each is left unset and
- * flagged with a blocking review item, so nothing can publish until it is done.
- *
- * Auth for --write: SANITY_API_TOKEN (write), or a logged-in Sanity CLI (`sanity login`).
- * Refuses the production dataset outright.
+ * Reads the dataset in BOTH modes (to diff against existing docs), so a token is required
+ * either way; dry-run writes nothing. Auth: SANITY_API_TOKEN (write), or a logged-in Sanity
+ * CLI. Refuses the production dataset outright.
  */
 
 import { readFileSync, existsSync } from 'node:fs';
@@ -25,13 +30,8 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { createClient } from '@sanity/client';
 import { parseFeed } from './parse';
-import {
-	buildDraft,
-	buildProvinceConsensus,
-	countBlocking,
-	DRAFT_ID_PREFIX,
-	type DraftListing
-} from './build-draft';
+import { buildDraft, buildProvinceConsensus, draftId, type DraftListing } from './build-draft';
+import { reconcileExisting, reconcileRemoval, type ExistingDraft } from './sync';
 
 const DEFAULT_URL = 'https://www.propertyportalmarketing.com/xml/murciaservices-kyero.xml';
 const PROJECT_ID = process.env.SANITY_STUDIO_PROJECT_ID ?? 's88o8sjb';
@@ -51,8 +51,7 @@ function readSanityCliAuthToken(): string | undefined {
 	const configPath = join(homedir(), '.config/sanity/config.json');
 	if (!existsSync(configPath)) return undefined;
 	try {
-		const config = JSON.parse(readFileSync(configPath, 'utf8')) as { authToken?: string };
-		return config.authToken;
+		return (JSON.parse(readFileSync(configPath, 'utf8')) as { authToken?: string }).authToken;
 	} catch {
 		return undefined;
 	}
@@ -67,95 +66,152 @@ async function loadXml(): Promise<{ source: string; xml: string }> {
 	return { source: url, xml: await res.text() };
 }
 
+const EXISTING_PROJECTION = `*[_type=="propertyListing" && _id match "kyero-import-*"]{
+	_id,
+	"snapshotJson": internal.feedImport.snapshotJson,
+	"pendingChanges": internal.feedImport.pendingChanges,
+	reviewItems,
+	"current": {
+		"price": pricing.price,
+		"transactionType": transactionType,
+		"propertyType": propertyType,
+		"buildStatus": specs.buildStatus,
+		"bedrooms": specs.bedrooms,
+		"bathrooms": specs.bathrooms,
+		"builtArea": specs.builtArea,
+		"plotSize": specs.plotSize,
+		"pool": specs.pool,
+		"videoUrl": media.videoUrl,
+		"shortDescription": content.shortDescription
+	}
+}`;
+
 async function main() {
 	if (dataset === 'production') {
 		console.error('Refusing to run against the production dataset.');
 		process.exit(1);
 	}
 
-	const { source, xml } = await loadXml();
-	const { properties } = parseFeed(xml);
-	const slice = limit != null ? properties.slice(0, limit) : properties;
-
-	const importedAt = new Date().toISOString();
-	// Consensus is built from the WHOLE feed so blank-province rows resolve even under --limit.
-	const provinceConsensus = buildProvinceConsensus(properties);
-	const docs: DraftListing[] = slice.map((p) =>
-		buildDraft(p, {
-			importedAt,
-			provinceHint: provinceConsensus.get((p.town ?? '').trim().toLowerCase())
-		})
-	);
-
-	// ---- report ----
-	const H = (s: string) => `\n\x1b[1m${s}\x1b[0m`;
-	const mode = write ? '\x1b[31mWRITE\x1b[0m' : '\x1b[32mdry-run\x1b[0m';
-	console.log(`\x1b[1m\x1b[36mKYERO IMPORT\x1b[0m  (${mode})`);
-	console.log(`source        : ${source}`);
-	console.log(`target        : ${PROJECT_ID}/${dataset}`);
-	console.log(`building       : ${docs.length}${limit != null ? ` (of ${properties.length}, --limit ${limit})` : ''} draft(s)`);
-
-	let totalBlocking = 0;
-	let unresolvedType = 0;
-	let unresolvedProvince = 0;
-	for (const d of docs) {
-		totalBlocking += countBlocking(d);
-		if (d.propertyType == null) unresolvedType++;
-		const internal = d.internal as { feedImport?: { sourceProvince?: string } } | undefined;
-		if (!internal?.feedImport?.sourceProvince) unresolvedProvince++;
-	}
-
-	console.log(H('WHAT EACH DRAFT CARRIES'));
-	console.log(`  status='draft', listingKind='property'; community + ghiListingId left unset`);
-	console.log(`  blocking review items (total) : ${totalBlocking}  → every draft is held from publish`);
-	console.log(`  unresolved property type      : ${unresolvedType}`);
-	console.log(`  unresolved province (no map)  : ${unresolvedProvince}  → needs manual parent location`);
-
-	console.log(H('SAMPLE — first 3 draft documents'));
-	for (const d of docs.slice(0, 3)) {
-		const specs = d.specs as { bedrooms?: number; bathrooms?: number; buildStatus?: string; pool?: string };
-		const pricing = d.pricing as { price?: number; currency?: string };
-		const internal = d.internal as { feedImport?: { sourceTown?: string; sourceProvince?: string } };
-		console.log(`  \x1b[36m${d._id}\x1b[0m`);
-		console.log(`     title   ${d.title as string}`);
-		console.log(`     type    ${(d.propertyType as string) ?? '\x1b[33mUNRESOLVED\x1b[0m'} · ${d.transactionType as string}`);
-		console.log(`     price   ${pricing.price != null ? `€${pricing.price.toLocaleString('en-GB')}` : '—'} ${pricing.currency}`);
-		console.log(`     specs   ${specs.bedrooms ?? '?'} bed · ${specs.bathrooms ?? '?'} bath · pool ${specs.pool} · ${specs.buildStatus}`);
-		console.log(`     place   feedImport.sourceTown="${internal.feedImport?.sourceTown ?? ''}" → province ${internal.feedImport?.sourceProvince ?? '\x1b[33m?\x1b[0m'} (community: unset)`);
-		console.log(`     review  ${countBlocking(d)} blocking item(s)`);
-	}
-
-	if (!write) {
-		console.log(H('DRY RUN — nothing written'));
-		console.log('  no client created, no token read, no documents written.');
-		console.log('  re-run with --write to createOrReplace these drafts into the dataset above.\n');
-		return;
-	}
-
-	// ---- write ----
 	const token =
 		process.env.SANITY_API_TOKEN ?? process.env.SANITY_AUTH_TOKEN ?? readSanityCliAuthToken();
 	if (!token) {
 		console.error(
-			'\x1b[31mMissing write credentials.\x1b[0m Export SANITY_API_TOKEN=… or run `pnpm exec sanity login`.'
+			'\x1b[31mMissing credentials.\x1b[0m This sync reads the dataset in both modes. Export SANITY_API_TOKEN=… or run `pnpm exec sanity login`.'
 		);
 		process.exit(1);
 	}
-
 	const client = createClient({ projectId: PROJECT_ID, dataset, apiVersion: API_VERSION, token, useCdn: false });
 
-	console.log(H(`WRITING ${docs.length} draft(s) → ${PROJECT_ID}/${dataset}`));
-	let ok = 0;
-	for (const doc of docs) {
-		await client.createOrReplace(doc);
-		ok++;
-		if (ok % 25 === 0 || ok === docs.length) console.log(`  ✓ ${ok}/${docs.length}`);
+	const { source, xml } = await loadXml();
+	const { properties } = parseFeed(xml);
+	const slice = limit != null ? properties.slice(0, limit) : properties;
+
+	const now = new Date().toISOString();
+	const provinceConsensus = buildProvinceConsensus(properties);
+	const existingRows = await client.fetch<ExistingDraft[]>(EXISTING_PROJECTION);
+	const existingById = new Map(existingRows.map((r) => [r._id, r]));
+	const allFeedIds = new Set(properties.map((p) => draftId(p.ref || p.id)));
+
+	// ---- classify ----
+	const creates: DraftListing[] = [];
+	const patches: { id: string; set: Record<string, unknown> }[] = [];
+	const tally = { new: 0, baseline: 0, unchanged: 0, changed: 0, removed: 0, fieldUpdates: 0, fieldConflicts: 0, imageFlags: 0 };
+	const changedSamples: string[] = [];
+	const removedSamples: string[] = [];
+
+	for (const p of slice) {
+		const id = draftId(p.ref || p.id);
+		const existing = existingById.get(id);
+		if (!existing) {
+			tally.new++;
+			creates.push(
+				buildDraft(p, { importedAt: now, provinceHint: provinceConsensus.get((p.town ?? '').trim().toLowerCase()) })
+			);
+			continue;
+		}
+		const r = reconcileExisting(existing, p, now);
+		if (r.action === 'unchanged') {
+			tally.unchanged++;
+			continue;
+		}
+		if (r.action === 'baseline') {
+			tally.baseline++;
+			patches.push({ id, set: r.set });
+			continue;
+		}
+		tally.changed++;
+		tally.fieldUpdates += r.updates;
+		tally.fieldConflicts += r.conflicts;
+		if (r.imageFlag) tally.imageFlags++;
+		patches.push({ id, set: r.set });
+		if (changedSamples.length < 5) changedSamples.push(`  ${id}\n     ${r.notes.join('\n     ')}`);
 	}
-	console.log(`\nDone. ${ok} draft(s) written with prefix "${DRAFT_ID_PREFIX}".`);
-	console.log('Each is held from publish by blocking review items until a human/agent resolves them.\n');
+
+	// ---- removals (full-feed only; a --limit run is a partial view, so it never flags removals) ----
+	const removalPatches: { id: string; set: Record<string, unknown> }[] = [];
+	if (limit == null) {
+		for (const row of existingRows) {
+			if (allFeedIds.has(row._id)) continue;
+			tally.removed++;
+			removalPatches.push({ id: row._id, set: reconcileRemoval(row, now) });
+			if (removedSamples.length < 5) removedSamples.push(`  ${row._id}`);
+		}
+	}
+
+	// ---- report ----
+	const H = (t: string) => `\n\x1b[1m${t}\x1b[0m`;
+	const mode = write ? '\x1b[31mWRITE\x1b[0m' : '\x1b[32mdry-run\x1b[0m';
+	console.log(`\x1b[1m\x1b[36mKYERO SYNC\x1b[0m  (${mode})`);
+	console.log(`source        : ${source}`);
+	console.log(`target        : ${PROJECT_ID}/${dataset}`);
+	console.log(`feed listings : ${properties.length}${limit != null ? `  (processing first ${slice.length})` : ''}`);
+	console.log(`existing drafts: ${existingRows.length}`);
+
+	console.log(H('RUN SUMMARY'));
+	console.log(`  new (created)          : ${tally.new}`);
+	console.log(`  baselined (snapshot)   : ${tally.baseline}`);
+	console.log(`  unchanged (skipped)    : ${tally.unchanged}`);
+	console.log(`  changed (flagged)      : ${tally.changed}  → field updates ${tally.fieldUpdates}, conflicts ${tally.fieldConflicts}, image flags ${tally.imageFlags}`);
+	console.log(`  removed (flagged)      : ${tally.removed}${limit != null ? '  \x1b[33m(removal scan skipped under --limit)\x1b[0m' : ''}`);
+	console.log('  \x1b[2m(changes are surfaced for human approval — nothing is auto-applied)\x1b[0m');
+
+	if (changedSamples.length) {
+		console.log(H('SAMPLE — changed listings'));
+		console.log(changedSamples.join('\n'));
+	}
+	if (removedSamples.length) {
+		console.log(H('SAMPLE — removal candidates'));
+		console.log(removedSamples.join('\n'));
+	}
+
+	if (!write) {
+		console.log(H('DRY RUN — nothing written'));
+		console.log(`  would create ${creates.length}, patch ${patches.length + removalPatches.length}. Re-run with --write.\n`);
+		return;
+	}
+
+	// ---- write ----
+	console.log(H(`WRITING → ${PROJECT_ID}/${dataset}`));
+	let done = 0;
+	const totalWrites = creates.length + patches.length + removalPatches.length;
+	const tick = () => {
+		done++;
+		if (done % 25 === 0 || done === totalWrites) console.log(`  ✓ ${done}/${totalWrites}`);
+	};
+	for (const doc of creates) {
+		await client.createOrReplace(doc);
+		tick();
+	}
+	for (const { id, set } of [...patches, ...removalPatches]) {
+		await client.patch(id).set(set).commit({ autoGenerateArrayKeys: false });
+		tick();
+	}
+	console.log(
+		`\nDone. ${tally.new} created, ${tally.baseline} baselined, ${tally.changed} changed, ${tally.removed} removal-flagged, ${tally.unchanged} unchanged (untouched).\n`
+	);
 }
 
 main().catch((err) => {
-	console.error('\x1b[31mImport failed:\x1b[0m', err instanceof Error ? err.message : err);
+	console.error('\x1b[31mSync failed:\x1b[0m', err instanceof Error ? err.message : err);
 	process.exit(1);
 });

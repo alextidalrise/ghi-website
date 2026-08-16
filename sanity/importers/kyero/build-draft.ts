@@ -17,6 +17,7 @@
  * until they are done.
  */
 
+import { createHash } from 'node:crypto';
 import type { KyeroProperty } from './types';
 import {
 	mapPropertyType,
@@ -29,6 +30,57 @@ import {
 	cleanDescription,
 	type ProvinceSlug
 } from './kyero-map';
+
+/**
+ * The feed-owned values a re-sync tracks for change detection. These are the fields the
+ * FEED is authoritative for; a snapshot of them is stored on the doc so the next sync can
+ * tell what the feed changed (vs what a human edited). See sync.ts and Epic 1.8.
+ *
+ * Values here MUST match exactly what buildDraft writes to the document, so a field can be
+ * compared apples-to-apples against the live doc value (both use the same map functions).
+ */
+export interface FeedSnapshot {
+	price: number | null;
+	transactionType: string;
+	propertyType: string | null;
+	buildStatus: string;
+	bedrooms: number | null;
+	bathrooms: number | null;
+	builtArea: number | null;
+	plotSize: number | null;
+	pool: string;
+	videoUrl: string | null;
+	shortDescription: string | null;
+	imageUrls: string[];
+}
+
+/** Feed-owned values for a listing, transformed exactly as buildDraft stores them. */
+export function buildSnapshot(p: KyeroProperty): FeedSnapshot {
+	const shortDesc = cleanDescription(p.descEn);
+	return {
+		price: positiveNumberOrNull(p.price),
+		transactionType: mapTransactionType(p.priceFreq),
+		propertyType: mapPropertyType(p.type),
+		buildStatus: mapBuildStatus(p.newBuild),
+		bedrooms: positiveIntOrNull(p.beds),
+		bathrooms: positiveIntOrNull(p.baths),
+		builtArea: positiveNumberOrNull(p.built),
+		plotSize: positiveNumberOrNull(p.plot),
+		pool: mapPool(p.pool),
+		videoUrl: p.videoUrl || null,
+		shortDescription: shortDesc ? shortDesc.slice(0, 240) : null,
+		imageUrls: Array.from(new Set(p.imageUrls.filter(Boolean))).sort()
+	};
+}
+
+/** Stable content hash of a snapshot for the cheap "did the feed change at all?" check. */
+export function snapshotFingerprint(s: FeedSnapshot): string {
+	const stable = JSON.stringify([
+		s.price, s.transactionType, s.propertyType, s.buildStatus, s.bedrooms, s.bathrooms,
+		s.builtArea, s.plotSize, s.pool, s.videoUrl, s.shortDescription, s.imageUrls
+	]);
+	return createHash('sha1').update(stable).digest('hex');
+}
 
 /**
  * Build a town → province consensus from the whole feed. Many rows leave `<province>`
@@ -243,7 +295,10 @@ export function buildDraft(p: KyeroProperty, opts: BuildDraftOptions): DraftList
 			feedImport: {
 				sourceTown: p.town || undefined,
 				sourceProvince: province ?? undefined,
-				importedAt: opts.importedAt
+				importedAt: opts.importedAt,
+				lastSeenAt: opts.importedAt,
+				// Baseline for change detection on the next sync (see sync.ts).
+				snapshotJson: JSON.stringify(buildSnapshot(p))
 			}
 		},
 		reviewItems
