@@ -227,9 +227,15 @@ document view via review items.
   schema-enforced, so allocating in-repo risks collisions). `ghiListingId` is left unset with a blocking
   review item. Re-sync idempotency instead comes from a stable doc id: `kyero-import-<ref>` (`draftId()`),
   so `createOrReplace` updates in place — no duplicates, no `feedImportMap` doc needed.
-- [ ] **1.5** Image ingest — **deferred (next).** Each draft currently carries a blocking "Import media (N
-  images not yet ingested)" review item. To build: for each `<image><url>`, fetch → `client.assets.upload`
-  → wrap in `mediaAssetMetadata` gallery member; skip already-uploaded on re-sync (url/hash map).
+- [x] **1.5** Image ingest — **DONE (commit 33d8f57).** `ingest-media.ts` (`kyero:ingest-media`) reconciles
+  each draft's `media.gallery` against the feed `<image>` URLs: fetches + uploads only missing images
+  (concurrency-limited), appends `mediaAssetMetadata` members with the **nested** image shape
+  (`asset:{_type:image, asset:{_ref}}` — bare refs render blank), records the source feed URL in
+  `sourceFileName` as an idempotency key (re-sync skips already-ingested without re-fetch; Sanity also
+  dedupes the asset by content hash), and clears the blocking "Import media" item once a gallery is complete
+  (leaving a non-blocking "add alt text" note). Dry-run by default. **Full run done vs live feed:** 3,449
+  images uploaded at `--concurrency 8`, 0 failed, 206 blockers cleared; all 209 drafts now have galleries
+  (3,484 imgs), 0 broken refs, 0 still media-blocked, 0 publishable.
 - [x] **1.6** Province → location: `mapProvince()` maps `<province>` → `murcia`/`alicante` (deterministic),
   with the two pinned overrides and a **feed-wide town→province consensus** that backfills blank-province
   rows from the same town's other rows (15 blank/`Spain` rows → 1 genuine residual: *Sucina*, flagged, not
@@ -240,13 +246,47 @@ document view via review items.
   map type (if unresolved), import media, plus non-blocking specs notes. **Validated in dry-run against the
   live 209-property feed** (`pnpm kyero:import`): 209 drafts, 881 blocking items, `pnpm check` clean. Live
   write (`--write`) is wired but not yet run — awaiting go.
-- [ ] **1.8** Removal handling: listings absent from the feed since last sync → flag (not auto-delete) for
-  human decision. (Query by `kyero-import-` id prefix vs current feed refs.)
+- [ ] **1.8** **Idempotent re-sync — change-aware, human-approved** *(design settled 2026-08-16; supersedes
+  the narrow "removal handling" scope; NOT yet built).*
 
-  **Done when:** a sample Kyero feed produces correct draft `propertyListing` docs in `development`
-  dataset (✓ shapes validated in dry-run); images are uploaded (1.5, pending); unknown towns and imported
-  copy hold publishing via review items (✓); a second run updates in place with zero duplicates (✓ by
-  stable id — to confirm live under `--write`).
+  **Why the current write path is unsafe on a 2nd run:** `import.ts` uses `createOrReplace` on the stable id,
+  and `buildDraft` only emits feed-derived fields — so a re-run would *replace the whole doc*, wiping
+  `location.community` (agent-assigned), `ghiListingId` (pipeline), `media.gallery` (1.5's 3,484 images),
+  editor-rewritten copy, cleared blockers and `status`. So a second sync **must not** `createOrReplace` an
+  existing doc.
+
+  **Model — feed is a change-notification source, never an overwriter of human work:**
+  - **Snapshot for change detection.** Store the feed-owned values (or a hash) in `internal.feedImport` at
+    each sync. Re-sync: hash matches → **skip** (fast path, most listings). Hash differs → diff to find which
+    feed fields moved.
+  - **Human-touched gate (field-level, NOT published/draft).** For each feed-owned field: if the current doc
+    value still equals the last-imported snapshot value → **untouched** → auto-apply the feed change. If it
+    differs → **human-touched** → never overwrite; surface for review. (Chosen over a coarse published/draft
+    gate because much curation happens on drafts *before* publish; `community`/`ghiListingId`/`status` are
+    never feed-owned, so always safe.)
+  - **Everything waits for human approval.** Agents surface and prepare; they do **not** auto-apply. A human
+    approves (accept feed value) or alters (edit), then clears the marker.
+  - **Two surfaces per change:** (1) structured `internal.feedImport.pendingChanges[] {field, oldValue,
+    newValue, detectedAt}` — machine-readable, so the external agents poll for it exactly as they already
+    poll for community-assignment work (no new pipe); (2) a **blocking** review item with the human-readable
+    diff (`Feed price €445k → €429k`). Blocking gates the *next publish*, not the live page (the gate runs on
+    the publish action; an already-live doc keeps serving).
+  - **Images:** additions flow via `ingest-media` (already incremental by source URL). *Removed* feed images
+    and *reordered* galleries are human curation → **flag, never auto-swap**.
+  - **Removals (the original 1.8):** ref absent from feed (via `lastSeenAt` / id-prefix vs current refs) →
+    flag as removal candidate, never auto-delete.
+  - **Accept mechanism v1** = set field + clear `pendingChanges` entry + drop the review item (agent or human
+    can do it). A one-click "accept" **Studio Tool is Epic 3**, deferred — not needed to function.
+  - **Human notification** = a **run-summary digest** after each sync (*"12 price · 3 copy · 5 new · 2
+    removed · 190 unchanged"*); channel (Slack/email) TBD by the team. Agents need no push — the doc markers
+    are their queue.
+
+  **Done when:** a second `--write` sync (a) skips unchanged listings, (b) auto-applies feed changes only to
+  untouched fields, (c) records `pendingChanges` + a blocking diff review item for every human-touched field
+  the feed changed, (d) flags feed-absent listings as removal candidates, (e) never mutates community,
+  ghiListingId, gallery ordering or published copy, and (f) prints a run-summary digest. First run already
+  satisfied (Epics 1.1–1.7 + 1.5): correct drafts in `development` (✓), images uploaded (✓ 1.5), unknown
+  towns + imported copy hold publish via review items (✓), stable id gives zero duplicates (✓).
 
 ## Epic 2 — Expose the resolution surface for the external agents (was: alias resolution)
 
