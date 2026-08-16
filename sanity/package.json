@@ -144,6 +144,7 @@
 		"kyero:dry-run": "tsx importers/kyero/dry-run.ts",
 		"kyero:import": "tsx importers/kyero/import.ts",
 		"kyero:seed-locations": "tsx importers/kyero/seed-locations.ts",
+		"kyero:ingest-media": "tsx importers/kyero/ingest-media.ts",
 		"test": "vitest run"
 	},
 	"dependencies": {
