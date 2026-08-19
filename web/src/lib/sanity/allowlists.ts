@@ -657,10 +657,12 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
     _type == "insightPartnerProfile" => {
       _type,
       _key,
+      layout,
       heading,
       body,
       personName,
       personRole,
+      "teamImage": teamImage${MEDIA_ASSET_PUBLIC},
       "portrait": portrait${MEDIA_ASSET_PUBLIC},
       "partner": partner->${PARTNER_LOGO_PUBLIC}
     },
@@ -708,6 +710,7 @@ export const INSIGHT_DETAIL_FIELDS = /* groq */ `
   heroLayout,
   heroPartnerLabel,
   heroSublabel,
+  heroPartnerPlate,
   "heroPartner": heroPartner->${PARTNER_LOGO_PUBLIC},
   author->${AUTHOR_PUBLIC},
   sections[]${INSIGHT_SECTION_PUBLIC},

@@ -1,12 +1,20 @@
 <script lang="ts">
 	import type { CustomBlockComponentProps } from '@portabletext/svelte';
 	import type { InsightPartnerProfileBlock } from '$lib/insights/types';
-	import { buildPublicImageUrl, buildImageSrcset, getImagePlaceholder } from '$lib/sanity/image';
+	import {
+		buildPublicImageUrl,
+		buildImageSrcset,
+		getImagePlaceholder,
+		getImageDimensions
+	} from '$lib/sanity/image';
 
 	let { portableText }: { portableText: CustomBlockComponentProps<InsightPartnerProfileBlock> } =
 		$props();
 
 	const value = $derived(portableText.value);
+	// The team layout swaps the portrait + credential plate for a single uncropped landscape team
+	// photo, stacked between the heading and the copy. Same panel shell either way.
+	const isTeam = $derived(value.layout === 'teamLandscape');
 	const heading = $derived(value.heading?.trim() || null);
 	const personName = $derived(value.personName?.trim() || null);
 	const personRole = $derived(value.personRole?.trim() || null);
@@ -39,9 +47,55 @@
 		buildPublicImageUrl(value.partner?.logoAlt, { width: 120, height: 120, fit: 'max', quality: 90 })
 	);
 	const logoAlt = $derived(value.partner?.name ? `${value.partner.name} logo` : '');
+
+	// The team photograph is shown UNCROPPED: width only, no height and no crop fit, so the CDN scales
+	// it to its natural landscape ratio. Intrinsic dimensions set width/height for CLS, and the frame
+	// takes the ratio from those attributes rather than a forced aspect-ratio.
+	const teamImage = $derived(
+		buildPublicImageUrl(value.teamImage, { width: 1280, quality: 82 })
+	);
+	const teamSrcset = $derived(
+		buildImageSrcset(value.teamImage, [480, 640, 800, 1024, 1280, 1600, 1920], { width: 1280, quality: 82 })
+	);
+	const teamLqip = $derived(getImagePlaceholder(value.teamImage));
+	const teamDims = $derived(getImageDimensions(value.teamImage));
+	const teamAlt = $derived(value.teamImage?.altText?.trim() || heading || '');
 </script>
 
-{#if heading && paragraphs.length > 0}
+{#if isTeam}
+	{#if heading && paragraphs.length > 0}
+		<!-- Team layout: same panel shell (tinted ground, hairline border, heading + body type,
+		     spacing), but a single column — heading, then an uncropped landscape team photograph,
+		     then the partnership copy. No credential plate: this introduces a firm, not one person. -->
+		<section class="partner-profile partner-profile--team" aria-label={heading}>
+			<h3 class="partner-profile__heading">{heading}</h3>
+			{#if teamImage}
+				<figure class="partner-profile__team">
+					<div
+						class="partner-profile__team-frame"
+						style:background-image={teamLqip ? `url(${teamLqip})` : undefined}
+					>
+						<img
+							src={teamImage}
+							srcset={teamSrcset || undefined}
+							sizes="(max-width: 46rem) 88vw, min(58rem, 66vw)"
+							alt={teamAlt}
+							width={teamDims?.width ?? undefined}
+							height={teamDims?.height ?? undefined}
+							loading="lazy"
+							decoding="async"
+						/>
+					</div>
+				</figure>
+			{/if}
+			<div class="partner-profile__body">
+				{#each paragraphs as para (para)}
+					<p>{para}</p>
+				{/each}
+			</div>
+		</section>
+	{/if}
+{:else if heading && paragraphs.length > 0}
 	<section class="partner-profile" aria-label={heading}>
 		<h3 class="partner-profile__heading">{heading}</h3>
 		<div class="partner-profile__grid">
@@ -108,6 +162,27 @@
 	.partner-profile__grid {
 		display: grid;
 		gap: clamp(1.5rem, 4vw, 2.5rem);
+	}
+
+	/* Team layout: the uncropped landscape team photo between the heading and the copy. No forced
+	   aspect-ratio — the frame takes its ratio from the image's width/height attributes, so the photo
+	   is never cropped. A hairline frame defines it against the tinted panel ground. */
+	.partner-profile__team {
+		margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+	}
+
+	.partner-profile__team-frame {
+		overflow: hidden;
+		border: 1px solid var(--border);
+		background: var(--green);
+		background-size: cover;
+		background-position: center;
+	}
+
+	.partner-profile__team-frame img {
+		display: block;
+		width: 100%;
+		height: auto;
 	}
 
 	.partner-profile__body {

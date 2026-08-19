@@ -775,12 +775,16 @@ export const insightReferenceCard = defineType({
 });
 
 /**
- * A framed "meet the partner / meet the person" panel: a heading, a run of copy, and — set apart
- * on a tinted ground — a portrait with a credential plate carrying the person's name, role and
- * (optionally) the partner's logo mark. It introduces a named specialist inside an article without
- * touching the byline (`author`) or the compact floated `insightPortrait`. The partner reference
- * supplies the logo live; the person's name and role are article copy (the person is usually not
- * the partner's whole name).
+ * A framed "meet the partner / meet the person" panel on a tinted ground. Two layouts share the
+ * same shell (border, tinted background, heading and body typography, spacing):
+ *   • `portrait` (default) — a run of copy beside a portrait with a credential plate carrying the
+ *     person's name, role and (optionally) the partner's logo mark. Introduces a named specialist
+ *     without touching the byline (`author`) or the compact floated `insightPortrait`.
+ *   • `teamLandscape` — the heading, then an uncropped landscape team photograph, then the
+ *     partnership copy in a single column. No credential plate: it introduces a firm/team rather
+ *     than one named person (the Franke & de la Fuente treatment).
+ * The partner reference supplies the credential-plate logo live in the portrait layout; the
+ * person's name and role are article copy.
  */
 export const insightPartnerProfile = defineType({
 	name: 'insightPartnerProfile',
@@ -788,11 +792,40 @@ export const insightPartnerProfile = defineType({
 	type: 'object',
 	fields: [
 		defineField({
+			name: 'layout',
+			title: 'Layout',
+			type: 'string',
+			options: {
+				list: [
+					{ title: 'Portrait — copy beside a portrait & credential plate (default)', value: 'portrait' },
+					{ title: 'Team — heading, an uncropped landscape team photo, then copy', value: 'teamLandscape' }
+				],
+				layout: 'radio'
+			},
+			initialValue: 'portrait',
+			description:
+				'Portrait is the house "meet the partner" panel: copy beside a portrait and a name/role plate. Team keeps the same panel shell but stacks a full-width, uncropped landscape team photograph between the heading and the copy, with no credential plate — for introducing a firm rather than one person.'
+		}),
+		defineField({
 			name: 'heading',
 			title: 'Heading',
 			type: 'string',
 			description: 'e.g. "Our partnership with Atlas Bridge Wealth".',
 			validation: (Rule) => Rule.required().max(100)
+		}),
+		defineField({
+			name: 'teamImage',
+			title: 'Team photograph',
+			type: 'mediaAssetMetadata',
+			description:
+				'Team layout only. A landscape photograph of the partner team, shown uncropped at full panel width above the copy.',
+			hidden: ({ parent }) => (parent as { layout?: string })?.layout !== 'teamLandscape',
+			validation: (Rule) =>
+				Rule.custom((value, context) => {
+					const layout = (context.parent as { layout?: string } | undefined)?.layout;
+					if (layout !== 'teamLandscape') return true;
+					return value ? true : 'Add a landscape team photograph for the Team layout.';
+				})
 		}),
 		defineField({
 			name: 'body',
@@ -807,20 +840,33 @@ export const insightPartnerProfile = defineType({
 			title: 'Portrait',
 			type: 'mediaAssetMetadata',
 			description: 'A head-and-shoulders photograph of the person introduced. A portrait crop works best.',
-			validation: (Rule) => Rule.required()
+			hidden: ({ parent }) => (parent as { layout?: string })?.layout === 'teamLandscape',
+			validation: (Rule) =>
+				Rule.custom((value, context) => {
+					const layout = (context.parent as { layout?: string } | undefined)?.layout;
+					if (layout === 'teamLandscape') return true;
+					return value ? true : 'Add a portrait, or switch the panel to the Team layout.';
+				})
 		}),
 		defineField({
 			name: 'personName',
 			title: 'Name',
 			type: 'string',
 			description: 'The person on the credential plate, e.g. "Steve Thompson".',
-			validation: (Rule) => Rule.required().max(80)
+			hidden: ({ parent }) => (parent as { layout?: string })?.layout === 'teamLandscape',
+			validation: (Rule) =>
+				Rule.max(80).custom((value, context) => {
+					const layout = (context.parent as { layout?: string } | undefined)?.layout;
+					if (layout === 'teamLandscape') return true;
+					return value ? true : 'Add a name, or switch the panel to the Team layout.';
+				})
 		}),
 		defineField({
 			name: 'personRole',
 			title: 'Role',
 			type: 'string',
 			description: 'Their title, e.g. "Founder and Principal Adviser, Atlas Bridge Wealth".',
+			hidden: ({ parent }) => (parent as { layout?: string })?.layout === 'teamLandscape',
 			validation: (Rule) => Rule.max(120)
 		}),
 		defineField({
@@ -829,13 +875,25 @@ export const insightPartnerProfile = defineType({
 			type: 'reference',
 			to: [{ type: 'partner' }],
 			description:
-				"Optional. When set, the partner's logo mark is shown on the credential plate. Its logo is read live from the partner record."
+				"Optional. When set, the partner's logo mark is shown on the credential plate (Portrait layout). Its logo is read live from the partner record.",
+			hidden: ({ parent }) => (parent as { layout?: string })?.layout === 'teamLandscape'
 		})
 	],
 	preview: {
-		select: { title: 'heading', name: 'personName', media: 'portrait.asset' },
-		prepare({ title, name, media }) {
-			return { title: title || 'Partner profile', subtitle: name || 'Partner profile', media };
+		select: {
+			title: 'heading',
+			name: 'personName',
+			layout: 'layout',
+			portraitMedia: 'portrait.asset',
+			teamMedia: 'teamImage.asset'
+		},
+		prepare({ title, name, layout, portraitMedia, teamMedia }) {
+			const isTeam = layout === 'teamLandscape';
+			return {
+				title: title || 'Partner profile',
+				subtitle: isTeam ? 'Team panel' : name || 'Partner profile',
+				media: isTeam ? teamMedia : portraitMedia
+			};
 		}
 	}
 });

@@ -18,6 +18,7 @@ const studioUrl =
 const STEGA_SKIP_KEYS = new Set([
 	'headingStyle',
 	'heroLayout',
+	'heroPartnerPlate',
 	'variant',
 	'display',
 	'style',

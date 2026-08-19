@@ -182,6 +182,23 @@ export const insight = defineType({
 			validation: (Rule) => Rule.max(60)
 		}),
 		defineField({
+			name: 'heroPartnerPlate',
+			title: 'Hero partner plate',
+			type: 'string',
+			group: 'content',
+			options: {
+				list: [
+					{ title: 'Green — reversed mark on brand green (default)', value: 'green' },
+					{ title: 'Light — dark logo on a light plate', value: 'light' }
+				],
+				layout: 'radio'
+			},
+			initialValue: 'green',
+			description:
+				'Only used by the Co-brand hero. Green shows the partner\'s reversed mark (Logo — reversed / mark) on the brand-green plate. Light shows the partner\'s normal dark Logo on a light plate — use it when the approved partner logo is dark and needs a light ground to stay legible (e.g. Franke & de la Fuente).',
+			hidden: ({ document }) => document?.heroLayout !== 'coBrand'
+		}),
+		defineField({
 			name: 'readingTimeOverride',
 			title: 'Reading time override (minutes)',
 			type: 'number',
