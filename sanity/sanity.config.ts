@@ -5,6 +5,7 @@ import { visionTool } from '@sanity/vision';
 import { deskStructure } from './deskStructure';
 import { resolve } from './presentation/resolve';
 import { schemaTypes } from './schemas';
+import { feedChangesTool } from './tools/feedChanges';
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? 's88o8sjb';
 const previewOrigin = process.env.SANITY_STUDIO_PREVIEW_ORIGIN ?? 'http://localhost:5173';
@@ -15,10 +16,12 @@ const sharedAuth = {
 
 const sharedWorkspace: Pick<
 	WorkspaceOptions,
-	'projectId' | 'auth' | 'plugins' | 'schema'
+	'projectId' | 'auth' | 'plugins' | 'schema' | 'tools'
 > = {
 	projectId,
 	auth: sharedAuth,
+	// Append our custom tool to whatever the plugins contribute (structure, presentation, vision).
+	tools: (prev) => [...prev, feedChangesTool],
 	plugins: [
 		structureTool({ structure: deskStructure }),
 		presentationTool({

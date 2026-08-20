@@ -174,6 +174,95 @@ export const internalFields = defineType({
 			title: 'Legal docs Drive folder ID',
 			type: 'string',
 			description: 'Internal Drive folder ID for legal documents.'
+		}),
+		defineField({
+			name: 'feedImport',
+			title: 'Feed import',
+			type: 'object',
+			description:
+				'Provenance from an automated feed import (e.g. Kyero). The importer writes these; the external resolution agents read them to assign the community. Never shown on the website.',
+			options: { collapsible: true, collapsed: true },
+			fields: [
+				defineField({
+					name: 'sourceTown',
+					title: 'Source town (raw)',
+					type: 'string',
+					description:
+						"The feed's <town> value, stored verbatim. The importer never resolves it; the external agents map this to a community."
+				}),
+				defineField({
+					name: 'sourceProvince',
+					title: 'Source province',
+					type: 'string',
+					description:
+						'Normalized province slug the importer derived deterministically (e.g. "murcia", "alicante"). Fixes the parent location for the community the agents assign.'
+				}),
+				defineField({
+					name: 'importedAt',
+					title: 'Imported at',
+					type: 'datetime',
+					description: 'When the importer last wrote this listing from the feed.'
+				}),
+				defineField({
+					name: 'lastSeenAt',
+					title: 'Last seen in feed',
+					type: 'datetime',
+					readOnly: true,
+					description:
+						'The most recent sync in which this listing was still present in the feed. Machine-written.'
+				}),
+				defineField({
+					name: 'snapshotJson',
+					title: 'Feed snapshot (machine)',
+					type: 'text',
+					rows: 3,
+					readOnly: true,
+					description:
+						'JSON of the feed-owned field values as of the last sync. The re-sync uses this to detect what the FEED changed (vs what a human edited). Do not edit by hand.'
+				}),
+				defineField({
+					name: 'pendingChanges',
+					title: 'Pending feed changes',
+					type: 'array',
+					description:
+						'Changes the feed has made since the last sync, awaiting human approval. The sync never auto-applies these — accept a change by editing the real field, then delete the row here.',
+					of: [
+						defineArrayMember({
+							type: 'object',
+							name: 'feedPendingChange',
+							fields: [
+								defineField({ name: 'field', title: 'Field', type: 'string' }),
+								defineField({
+									name: 'changeType',
+									title: 'Change type',
+									type: 'string',
+									options: {
+										list: [
+											{ title: 'Update (field was untouched)', value: 'update' },
+											{ title: 'Conflict (you had edited this field)', value: 'conflict' },
+											{ title: 'Removed from feed', value: 'removed' }
+										]
+									},
+									description:
+										'"update" = the feed changed a field nobody had edited. "conflict" = the feed changed a field a human had already edited.'
+								}),
+								defineField({ name: 'oldValue', title: 'Current value', type: 'text', rows: 2 }),
+								defineField({ name: 'newValue', title: 'New feed value', type: 'text', rows: 2 }),
+								defineField({ name: 'detectedAt', title: 'Detected at', type: 'datetime' })
+							],
+							preview: {
+								select: { field: 'field', changeType: 'changeType', newValue: 'newValue' },
+								prepare({ field, changeType, newValue }) {
+									return {
+										title: `${field} — ${changeType}`,
+										subtitle: newValue ? `→ ${newValue}` : undefined
+									};
+								}
+							}
+						})
+					]
+				})
+			]
 		})
 	]
 });
