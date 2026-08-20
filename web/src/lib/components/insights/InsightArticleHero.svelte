@@ -69,15 +69,30 @@
 	);
 	const hasRail = $derived(Boolean(image || note));
 
-	// Co-brand plate: the partner's name and reversed mark (read live from the referenced partner),
-	// plus the label under the name and the optional sub-label under the headline. The plate uses the
-	// partner's `logoAlt` — the light, reversed mark made for dark surfaces — shown as-is on the brand
-	// green (NOT the wall `logo`, which is a dark wordmark for white cells). If no alt logo is set the
-	// plate runs name-only; if no partner is set at all the band runs photo-only.
+	// Co-brand plate: the partner's name and logo (read live from the referenced partner), plus the
+	// label under the name and the optional sub-label under the headline. Two plate treatments,
+	// chosen by `heroPartnerPlate`:
+	//   • green (default) — the partner's `logoAlt` (the light, reversed mark made for dark surfaces)
+	//     shown as-is on the brand-green plate.
+	//   • light — the partner's normal dark `logo` (the wall wordmark) on a light plate, for a partner
+	//     whose approved logo is dark and needs a light ground to stay legible (e.g. Franke & de la
+	//     Fuente). The light plate centres the dark logo above the name and label.
+	// If the chosen logo is absent the plate runs name-only; if no partner is set at all the band
+	// runs photo-only.
+	const coBrandPlateLight = $derived(insight.heroPartnerPlate === 'light');
 	const coBrandPartnerName = $derived(insight.heroPartner?.name?.trim() || null);
 	const coBrandPartnerLabel = $derived(insight.heroPartnerLabel?.trim() || 'GHI Partner');
+	// The green plate's reversed mark is compact (roughly square), so a 220-box fits it. The light
+	// plate carries the partner's full wordmark, which is typically wide (Franke's is ~6.3:1) — fetch
+	// it by width alone (no square box) so the source is crisp across the plate; `fit: 'max'` never
+	// crops, and the CSS below sizes it at its natural aspect ratio.
 	const coBrandLogo = $derived(
-		buildPublicImageUrl(insight.heroPartner?.logoAlt, { width: 220, height: 220, fit: 'max', quality: 90 })
+		buildPublicImageUrl(
+			coBrandPlateLight ? insight.heroPartner?.logo : insight.heroPartner?.logoAlt,
+			coBrandPlateLight
+				? { width: 640, fit: 'max', quality: 90 }
+				: { width: 220, height: 220, fit: 'max', quality: 90 }
+		)
 	);
 	const coBrandLogoAlt = $derived(coBrandPartnerName ? `${coBrandPartnerName} logo` : '');
 	const coBrandSublabel = $derived(insight.heroSublabel?.trim() || null);
@@ -139,7 +154,7 @@
 
 		<div class="cobrand-band" class:cobrand-band--plated={hasCoBrandPlate}>
 			{#if hasCoBrandPlate}
-				<div class="cobrand-plate">
+				<div class="cobrand-plate" class:cobrand-plate--light={coBrandPlateLight}>
 					{#if coBrandLogo}
 						<img
 							class="cobrand-plate__logo"
@@ -620,6 +635,35 @@
 		letter-spacing: var(--tracking-overline);
 		text-transform: uppercase;
 		color: var(--gold);
+	}
+
+	/* Light plate: the partner's normal dark logo on a white plate with a hairline frame, so a dark
+	   approved logo (e.g. Franke & de la Fuente) reads at full contrast instead of being lost on the
+	   brand green. The logo is dark already, so it is shown as-is — no knock-out. Name in green and
+	   label in --muted (clears AA on white); --gold would fail contrast here. */
+	.cobrand-plate--light {
+		background: var(--white);
+		border: 1px solid var(--border);
+		color: var(--charcoal);
+	}
+
+	.cobrand-plate--light .cobrand-plate__name {
+		color: var(--green);
+	}
+
+	.cobrand-plate--light .cobrand-plate__label {
+		color: var(--muted);
+	}
+
+	/* The light plate carries a wide wordmark (Franke's lockup is ~6.3:1), not the green plate's
+	   compact reversed mark. Size it by WIDTH at its natural aspect ratio — spanning the plate with a
+	   capped height — rather than the fixed-height, square-ish sizing above, which boxes a wide logo
+	   into a cropped-looking sliver. `height: auto` + the two maxes let the image keep its own ratio. */
+	.cobrand-plate--light .cobrand-plate__logo {
+		width: auto;
+		height: auto;
+		max-width: min(90%, 20rem);
+		max-height: 4.25rem;
 	}
 
 	.cobrand-figure {

@@ -184,8 +184,15 @@ export type InsightCtaCalloutBlock = {
 export type InsightPartnerProfileBlock = {
 	_type: 'insightPartnerProfile';
 	_key: string;
+	/**
+	 * `portrait` (default) is the copy-beside-a-portrait panel; `teamLandscape` stacks an uncropped
+	 * landscape team photo between the heading and the copy, with no credential plate.
+	 */
+	layout?: 'portrait' | 'teamLandscape' | null;
 	heading?: string | null;
 	body?: string | null;
+	/** Team layout only: the uncropped landscape team photograph shown above the copy. */
+	teamImage?: MediaAssetInput | null;
 	portrait?: MediaAssetInput | null;
 	personName?: string | null;
 	personRole?: string | null;
@@ -418,6 +425,11 @@ export type InsightDetail = {
 	heroPartnerLabel?: string | null;
 	/** Co-brand hero only: an optional small label under the headline (e.g. "GHI Partner Insight"). */
 	heroSublabel?: string | null;
+	/**
+	 * Co-brand hero only: the brand plate treatment. `green` (default) shows the partner's reversed
+	 * mark on brand green; `light` shows the partner's normal dark logo on a light plate.
+	 */
+	heroPartnerPlate?: 'green' | 'light' | null;
 	author?: InsightAuthor | null;
 	sections?: InsightSection[] | null;
 	ctaHeading?: string | null;
