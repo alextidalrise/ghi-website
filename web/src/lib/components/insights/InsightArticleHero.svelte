@@ -82,10 +82,16 @@
 	const coBrandPlateLight = $derived(insight.heroPartnerPlate === 'light');
 	const coBrandPartnerName = $derived(insight.heroPartner?.name?.trim() || null);
 	const coBrandPartnerLabel = $derived(insight.heroPartnerLabel?.trim() || 'GHI Partner');
+	// The green plate's reversed mark is compact (roughly square), so a 220-box fits it. The light
+	// plate carries the partner's full wordmark, which is typically wide (Franke's is ~6.3:1) — fetch
+	// it by width alone (no square box) so the source is crisp across the plate; `fit: 'max'` never
+	// crops, and the CSS below sizes it at its natural aspect ratio.
 	const coBrandLogo = $derived(
 		buildPublicImageUrl(
 			coBrandPlateLight ? insight.heroPartner?.logo : insight.heroPartner?.logoAlt,
-			{ width: 220, height: 220, fit: 'max', quality: 90 }
+			coBrandPlateLight
+				? { width: 640, fit: 'max', quality: 90 }
+				: { width: 220, height: 220, fit: 'max', quality: 90 }
 		)
 	);
 	const coBrandLogoAlt = $derived(coBrandPartnerName ? `${coBrandPartnerName} logo` : '');
@@ -647,6 +653,17 @@
 
 	.cobrand-plate--light .cobrand-plate__label {
 		color: var(--muted);
+	}
+
+	/* The light plate carries a wide wordmark (Franke's lockup is ~6.3:1), not the green plate's
+	   compact reversed mark. Size it by WIDTH at its natural aspect ratio — spanning the plate with a
+	   capped height — rather than the fixed-height, square-ish sizing above, which boxes a wide logo
+	   into a cropped-looking sliver. `height: auto` + the two maxes let the image keep its own ratio. */
+	.cobrand-plate--light .cobrand-plate__logo {
+		width: auto;
+		height: auto;
+		max-width: min(90%, 20rem);
+		max-height: 4.25rem;
 	}
 
 	.cobrand-figure {
