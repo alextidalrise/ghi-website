@@ -391,3 +391,68 @@ cold start is paid; this reduces what each one costs. They are complementary.
 - Analytics is gated to production hosts, so Vercel previews and localhost emit
   `<!-- analytics off -->`. **Local Lighthouse is not predictive** for anything involving
   document size or bandwidth. Measure on production.
+
+## Purge-on-publish (shipped)
+
+The follow-up deferred above was built once a UAE listing published in the CMS but did not
+appear on its grid for want of a revalidation. `s-maxage` was raised **60 s → 3600 s** at
+the same time: with purge handling freshness, the TTL is now only a safety net, and the
+longer window wins more edge hits.
+
+Mechanism — **tag-based invalidation** (Vercel supports it for all responses, not just
+Next.js ISR; 128 tags/response, 256 chars/tag, 16 tags per bulk API call):
+
+- **Read side (automatic).** Each cacheable page emits a `Vercel-Cache-Tag` header listing
+  the documents it renders. `lib/cache/tagContext.ts` binds an `AsyncLocalStorage` store per
+  request in `cacheHandle`; `lib/sanity/queries/fetch.ts` deep-scans every result for `_id`
+  and records `doc:<id>`. A handful of loads add structural tags (`grid:loc:*`,
+  `grid:country:*`, `rail:frontline*`, `hub:*`, `col:partners`, `nav`, `home`, `country:*`)
+  for the "new document" case a `doc:` tag can't cover. Tag names live in `lib/cache/tags.ts`.
+- **Write side.** `routes/api/cache-purge/+server.ts` verifies the Sanity webhook HMAC
+  (`@sanity/webhook`), maps the changed doc → tags via the pure `lib/cache/purgeTags.ts`, and
+  invalidates them with `@vercel/functions` `invalidateByTag` (runs in-context, no Vercel
+  token needed). Off Vercel it computes tags without purging.
+
+### Sanity webhook config (manual — set in the Sanity console)
+
+- **URL**: `https://www.golfhomesinternational.com/api/cache-purge`
+- **Dataset**: `development` (the one production serves)
+- **Trigger**: Create / Update / Delete
+- **Filter**: `_type in ["propertyListing","development","unit","unitType","locationTaxonomy","insight","guide","author","partner","partnerCategory","golfCourse","siteSettings","aboutPage","contactPage","guidesHubPage"]`
+- **Projection** (computes the structural fields so the endpoint needs no Sanity round-trip,
+  and so delete events still carry them):
+
+  ```groq
+  {
+    _id,
+    _type,
+    "countrySlug": coalesce(
+      location.country->slug.current,
+      location.community->parent->parent->slug.current,
+      parentDevelopment->location.country->slug.current,
+      parentDevelopment->location.community->parent->parent->slug.current,
+      country,
+      select(_type == "locationTaxonomy" && type == "country" => slug.current),
+      select(_type == "locationTaxonomy" && type == "location" => parent->slug.current)
+    ),
+    "locationId": coalesce(
+      location.location._ref,
+      location.community->parent->_id,
+      parentDevelopment->location.location._ref,
+      select(_type == "locationTaxonomy" && type == "location" => _id)
+    ),
+    "parentDevelopmentId": parentDevelopment._ref,
+    "isFrontline": coalesce(golf.golfRelevance, parentDevelopment->golf.golfRelevance) == "frontline_golf",
+    "golfCourseIds": golf.linkedGolfCourses[]._ref,
+    "taxonomyType": select(_type == "locationTaxonomy" => type),
+    "parentLocationId": select(_type == "locationTaxonomy" && type == "community" => parent._ref),
+    "partnerCountrySlugs": countries
+  }
+  ```
+
+- **Secret**: set the same value as `SANITY_WEBHOOK_SECRET` in Vercel env
+  (`vercel env add SANITY_WEBHOOK_SECRET production` / `preview`). The endpoint returns 503
+  and refuses to purge if it is unset.
+
+Verify on production: publish an edit → `curl -sI https://www.golfhomesinternational.com/<path>`
+shows `x-vercel-cache: STALE` then `HIT` with fresh content, unrelated pages untouched.

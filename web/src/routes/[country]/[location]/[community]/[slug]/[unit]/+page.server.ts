@@ -12,6 +12,8 @@ import {
 	unitByDevPathQuery
 } from '$lib/sanity/queries';
 import { toPublicUnitListing, type RawUnitListing } from '$lib/sanity/transforms';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 // The enquiry rail on nested unit pages posts here.
 export const actions: Actions = {
@@ -24,6 +26,9 @@ export const actions: Actions = {
  * which ride along on the unit's own `ctas`.
  */
 export const load: PageServerLoad = async (event) => {
+	// Enquiry shelf renders the country's default guide + partners (see sibling routes).
+	addCacheTags(cacheTag.country(event.params.country));
+
 	const [listing, reviews, shelfDefaults] = await Promise.all([
 		loadListing(event),
 		loadReviews(event.fetch),

@@ -7,6 +7,14 @@
 	 * Portugal ship hand-drawn fallbacks; any other country gets a neutral green field
 	 * until its flag is added. The country name carries the meaning, so the flag is
 	 * decorative (empty alt / aria-hidden).
+	 *
+	 * Flag SVG convention (matters when adding a country — e.g. UAE):
+	 * the <img> below is a fixed 3:2 box (48x32), so uploaded flags MUST be authored
+	 * at 3:2 or they distort — a 4:3 flag-icons file or a 2:1 official flag gets
+	 * squished here. The Spain (750x500) and Portugal (600x400) Sanity assets are both
+	 * normalized to 3:2 for this reason; match that. Use the flag-icons palette
+	 * (github.com/lipis/flag-icons, keyed by ISO alpha-2) as the colour source.
+	 * See the `flag` field description in sanity/schemas/documents/locationTaxonomy.ts.
 	 */
 	type Props = {
 		slug: string;

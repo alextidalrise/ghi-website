@@ -21,6 +21,8 @@ import {
 } from '$lib/sanity/queries';
 import { toGolfCourseCards, type RawGolfCourse } from '$lib/sanity/transforms';
 import { buildLocationGridIds } from '$lib/sanity/queries/listingSearch';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 import { resolveTaxonomyHero } from '$lib/sanity/transforms/taxonomyHero';
 import type { MediaAssetInput } from '$lib/sanity/transforms/mediaFilter';
 import type { CountryBySlugQueryResult } from '$lib/sanity/types';
@@ -116,6 +118,16 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 		: { ...parsedSearchParams, community: null };
 
 	const locationIds = buildLocationGridIds(locationPage._id, linkedLocations);
+
+	/* Structural tags for the "new listing" case: this page's grid and frontline rail are
+	   live queries over `locationIds` (its own location plus any linked-in ones), so a
+	   brand-new listing in any of those locations — which no `doc:` tag could cover — must
+	   purge this page. Tagging every id also handles listings that surface here via a linked
+	   location's `includeInGrid`. */
+	for (const id of locationIds) {
+		addCacheTags(cacheTag.gridLocation(id), cacheTag.frontlineLocation(id));
+	}
+
 	const listingScope = {
 		type: 'location' as const,
 		countrySlug: params.country,

@@ -2,6 +2,8 @@ import { redirect, type Cookies } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
 import { fetchHeaderNav, fetchFooter } from '$lib/sanity/queries';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 // Paths that must stay reachable even during a launch takeover: the holding page
 // itself, plus internal tooling, the API, and the Sanity preview entry points.
@@ -72,6 +74,10 @@ export const load: LayoutServerLoad = async ({
 			redirect(307, '/soon');
 		}
 	}
+
+	// Header + footer render on every page, so their docs are a global dependency. `nav`
+	// lets an edit to either purge the whole site; their `doc:` tags are collected too.
+	addCacheTags(cacheTag.nav);
 
 	const [footer, headerNav] = await Promise.all([fetchFooter(), fetchHeaderNav()]);
 

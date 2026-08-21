@@ -19,6 +19,8 @@ import {
 	locationsByCountryQuery
 } from '$lib/sanity/queries';
 import type { CountryBySlugQueryResult } from '$lib/sanity/types';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 type LocationTaxonomyPage = LocationTaxonomyRef & {
 	seoTitle?: string | null;
@@ -75,6 +77,11 @@ export const load: PageServerLoad = async ({
 	if (!country?.slug) {
 		error(404, 'Location not found.');
 	}
+
+	/* Structural tags for new documents this page's live queries would surface: a new
+	   country-wide listing and a new frontline listing in this country. Curated featured
+	   listings/locations are already covered by their `doc:` tags (and the country doc's). */
+	addCacheTags(cacheTag.gridCountry(country.slug), cacheTag.frontlineCountry(country.slug));
 
 	const canonicalPath = `/${country.slug}`;
 

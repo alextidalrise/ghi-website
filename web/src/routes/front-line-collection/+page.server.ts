@@ -10,10 +10,16 @@ import {
 	fetchListingCards
 } from '$lib/sanity/queries';
 import { resolveFrontlineContent } from '$lib/sanity/transforms/pageContent';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 const BASE_PATH = FRONTLINE_COLLECTION_PATH;
 
 export const load: PageServerLoad = async ({ url }) => {
+	// The grid is the global "newest frontline_golf" query, so a new frontline listing
+	// anywhere must purge this page.
+	addCacheTags(cacheTag.frontline);
+
 	const searchParams = parseListingSearchParams(url);
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
 

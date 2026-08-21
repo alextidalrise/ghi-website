@@ -15,6 +15,8 @@ import {
 	toPublicGolfCourse,
 	type RawGolfCourse
 } from '$lib/sanity/transforms';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
 	const raw = await fetchMaybePreview<RawGolfCourse | null>(
@@ -33,6 +35,10 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 	if (!course) {
 		error(404, 'Golf course not found.');
 	}
+
+	// The listing grid below is a live query for listings that link this course, so a new
+	// such listing — which no `doc:` tag on the stale page covers — must purge it.
+	addCacheTags(cacheTag.golf(course._id));
 
 	const canonicalPath = `/${params.country}/${params.location}/${params.community}/golf/${params.slug}`;
 	const canonicalUrl = `${url.origin}${canonicalPath}`;

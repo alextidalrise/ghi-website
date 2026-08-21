@@ -29,6 +29,8 @@ import {
 	type RawDevelopment,
 	type RawPropertyListing
 } from '$lib/sanity/transforms';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 type LegacyPathRow = {
 	countrySlug?: string | null;
@@ -62,6 +64,11 @@ function catchAllPathParams(
  * reason: its defaults need only the country slug, so they never wait on the listing.
  */
 export const load: PageServerLoad = async (event) => {
+	// Enquiry shelf renders the country's default guide + partners (see sibling routes). A
+	// community-redirect (301) or 404 here is never cached, so the tag only lands on a
+	// resolved 3-segment listing.
+	addCacheTags(cacheTag.country(event.params.country));
+
 	const [listing, reviews, shelfDefaults] = await Promise.all([
 		loadListing(event),
 		loadReviews(event.fetch),

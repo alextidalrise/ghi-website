@@ -1,11 +1,17 @@
 import type { PageServerLoad } from './$types';
 import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcrumbs';
 import { fetchPartnerCategories } from '$lib/sanity/queries';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 const BASE_PATH = '/partners';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
+
+	// The directory is a live query over partners/categories, so a newly published partner
+	// must purge it.
+	addCacheTags(cacheTag.partners);
 
 	const categories = await fetchPartnerCategories();
 

@@ -3,6 +3,7 @@ import type { LoadQuery } from '@sanity/svelte-loader';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 import { previewClient, publicClient } from '../client';
+import { collectDocTags } from '$lib/cache/tagContext';
 import { PUBLIC_QUERY_PARAMS } from '../constants';
 import {
 	toPublicDevelopment,
@@ -64,7 +65,11 @@ export async function fetchPublic<T>(
 	query: string,
 	options: PublicFetchOptions = {}
 ): Promise<T | null> {
-	return activeClient().fetch<T | null>(query, withPublicParams(options.params ?? {}));
+	const result = await activeClient().fetch<T | null>(query, withPublicParams(options.params ?? {}));
+	// Record a `doc:<_id>` cache tag for every document in the result, so a Sanity publish
+	// can purge exactly the pages that rendered it. No-op outside a request (see tagContext).
+	collectDocTags(result);
+	return result;
 }
 
 /** Fetch taxonomy or other docs via preview drafts when preview mode is active. */

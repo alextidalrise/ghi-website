@@ -12,6 +12,8 @@ import {
 	resolveEnquiryTopic
 } from '$lib/contact/enquiryTopics';
 import { resolveContactContent } from '$lib/sanity/transforms/pageContent';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 const BASE_PATH = '/contact';
 
@@ -23,6 +25,9 @@ export const prerender = false;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const load: PageServerLoad = async ({ url, fetch }) => {
+	// Renders the partner logo wall, so a newly published partner must purge this page.
+	addCacheTags(cacheTag.partners);
+
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
 
 	const breadcrumbs: BreadcrumbItem[] = [

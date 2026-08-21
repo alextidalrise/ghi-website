@@ -169,8 +169,13 @@ export const locationTaxonomy = defineType({
 			name: 'flag',
 			title: 'Flag',
 			type: 'image',
+			// Rendered by web CountryFlagArt.svelte in a fixed 3:2 (48x32) stamp, so the
+			// uploaded SVG must be authored at a 3:2 aspect ratio or it distorts — a 4:3
+			// flag-icons file or a 2:1 official flag gets squished. Spain (750x500) and
+			// Portugal (600x400) are both normalized to 3:2; match that. flag-icons
+			// (github.com/lipis/flag-icons) is the colour-palette source.
 			description:
-				'Country flag for the homepage "Explore by country" selector. Upload an SVG so it stays crisp at any size. Shown as a small framed stamp, not a background — a simple national flag works best.',
+				'Country flag for the homepage "Explore by country" selector and country page hero. Upload an SVG (so it stays crisp at any size) authored at a 3:2 aspect ratio — it renders in a small 3:2 framed stamp, so other ratios get squished. A simple national flag works best.',
 			options: { accept: 'image/svg+xml' },
 			hidden: ({ document }) => document?.type !== 'country'
 		}),

@@ -70,18 +70,35 @@ export const BROWSER_CACHE_CONTROL = 'public, max-age=0, must-revalidate';
  * `CDN-Cache-Control` and `Cache-Control`, and Vercel consumes it rather than forwarding
  * it, so the browser-facing header above survives untouched.
  *
- * The window is short-TTL, long-stale-while-revalidate. On a low-traffic site a long
- * `s-maxage` is not what produces hits — SWR is: a visitor arriving after the 60 s TTL
- * still gets an instant stale response while the edge revalidates behind them, so the
- * next visitor gets fresh content. Only the very first request, or one after the whole SWR
- * window lapses, pays full TTFB. For an editor that means: publish, reload once (may be
- * stale), reload again (fresh).
- *
- * 604800 s is 7 days. If the publish-to-live delay turns out to be unacceptable, the
- * follow-up is a Sanity webhook that purges on publish — not a shorter window, which
- * would only trade away hit rate.
+ * Freshness now comes from **purge-on-publish**: a Sanity webhook invalidates the
+ * `Vercel-Cache-Tag`s a page carries the moment its content changes (see `tagContext.ts`,
+ * `purgeTags.ts`, and `routes/api/cache-purge`). So `s-maxage` no longer has to be short
+ * to keep content current — a longer TTL just wins more edge hits and lower TTFB. It was
+ * raised from 60 s to 3600 s (1 hour) once purge existed; the hour is now only a safety
+ * net for a webhook that never fired, and `stale-while-revalidate` (7 days) still serves an
+ * instant stale response while the edge revalidates behind the reader.
  */
-export const EDGE_CACHE_CONTROL = 'public, s-maxage=60, stale-while-revalidate=604800';
+export const EDGE_CACHE_CONTROL = 'public, s-maxage=3600, stale-while-revalidate=604800';
+
+/**
+ * Vercel caps a response at 128 cache tags (256 chars each). Structural tags (grids,
+ * rails, hubs, nav) are few and load-bearing for the "new document" case, so they are
+ * kept first; `doc:` tags fill the remaining budget. If a page ever renders more than the
+ * budget of documents, the dropped `doc:` tags still self-heal within `s-maxage`, and any
+ * grid/hub page keeps its structural backstop tag regardless.
+ */
+export const MAX_CACHE_TAGS = 128;
+
+/** Build the comma-joined `Vercel-Cache-Tag` header value, honouring the 128-tag cap. */
+export function buildCacheTagHeader(tags: Iterable<string>): string {
+	const all = [...tags];
+	if (all.length <= MAX_CACHE_TAGS) return all.join(',');
+
+	const structural = all.filter((t) => !t.startsWith('doc:'));
+	const docs = all.filter((t) => t.startsWith('doc:'));
+	const kept = [...structural, ...docs].slice(0, MAX_CACHE_TAGS);
+	return kept.join(',');
+}
 
 export interface CachePolicyInput {
 	/** HTTP method of the request. */
