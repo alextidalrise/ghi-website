@@ -29,7 +29,15 @@
 	const price = $derived(formatListingPrice(card.pricing));
 	// Community name only — the area/country are already established by the page
 	// context (e.g. the Nueva Andalucia page), so repeating them would be redundant.
-	const locationLine = $derived(card.location?.community?.name ?? card.location?.addressDisplay ?? null);
+	// Some Murcia/Alicante listings have no unique title and borrow their community
+	// name as the title; suppress the community line when it just echoes the title.
+	const locationLine = $derived.by(() => {
+		const community = card.location?.community?.name;
+		if (community && community.trim().toLowerCase() === card.title?.trim().toLowerCase()) {
+			return null;
+		}
+		return community ?? card.location?.addressDisplay ?? null;
+	});
 	const specsLine = $derived(formatSpecs(card.specs));
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Property listing');
 
