@@ -81,7 +81,15 @@
 		const parts = locationParts.filter(
 			(part, i) => i === 0 || part.toLowerCase() !== locationParts[i - 1].toLowerCase()
 		);
-		return parts.length > 0 ? parts.join(', ') : (listing.location?.addressDisplay ?? null);
+		// Some Murcia/Alicante listings have no unique title and borrow their
+		// community name as the title; drop any segment (e.g. the leading community)
+		// that just echoes the heading rather than repeating it under the title.
+		const withoutTitleEcho = parts.filter(
+			(part) => part.toLowerCase() !== displayTitle.toLowerCase()
+		);
+		return withoutTitleEcho.length > 0
+			? withoutTitleEcho.join(', ')
+			: (listing.location?.addressDisplay ?? null);
 	});
 
 	/** CMS titles often append the location ("Arco Iris — Marbella", "Villa

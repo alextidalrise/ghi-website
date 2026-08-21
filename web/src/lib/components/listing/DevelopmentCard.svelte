@@ -32,8 +32,16 @@
 			? formatDevelopmentCardPrice(card.pricing)
 			: null
 	);
-	// Match PropertyCard: prefer the community name, falling back to the full address.
-	const locationLine = $derived(card.location?.community?.name ?? card.location?.addressDisplay ?? null);
+	// Match PropertyCard: prefer the community name, falling back to the full
+	// address. Suppress the community line when it just echoes the title (some
+	// Murcia/Alicante listings borrow their community name as the title).
+	const locationLine = $derived.by(() => {
+		const community = card.location?.community?.name;
+		if (community && community.trim().toLowerCase() === card.title?.trim().toLowerCase()) {
+			return null;
+		}
+		return community ?? card.location?.addressDisplay ?? null;
+	});
 	const specsLine = $derived(buildDevelopmentMetaParts(card).join(' · ') || null);
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Development');
 </script>
