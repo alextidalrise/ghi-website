@@ -163,8 +163,8 @@ export const siteSettings = defineType({
 			type: 'array',
 			of: [featuredLocationMember],
 			description:
-				'Hand-picked locations for the homepage featured grid (up to 10). Order here is preserved on the site.',
-			validation: (Rule) => Rule.max(10).custom(noDuplicateLocations)
+				'Hand-picked locations for the homepage featured grid (up to 20). The homepage groups them by country automatically, so raising the cap leaves room for new markets. Order here is preserved on the site.',
+			validation: (Rule) => Rule.max(20).custom(noDuplicateLocations)
 		}),
 		defineField({
 			name: 'homepageSeo',
