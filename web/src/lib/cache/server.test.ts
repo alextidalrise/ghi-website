@@ -1,6 +1,7 @@
 import type { Handle, RequestEvent } from '@sveltejs/kit';
 import { describe, expect, it } from 'vitest';
 import { cacheHandle } from './server';
+import { addCacheTags } from './tagContext';
 
 /**
  * These tests exist for one bug, which unit tests on `isCacheable` cannot see.
@@ -56,14 +57,14 @@ describe('cacheHandle ordering', () => {
 	it('is defeated by the reverse order — which is why hooks.server.ts lists it first', async () => {
 		const response = await nest(noStoreHandle, cacheHandle)({ event: eventFor(), resolve: render });
 
-		expect(response.headers.get('vercel-cdn-cache-control')).toContain('s-maxage=60');
+		expect(response.headers.get('vercel-cdn-cache-control')).toContain('s-maxage=3600');
 	});
 
 	it('caches a normal response that nobody opted out', async () => {
 		const response = await cacheHandle({ event: eventFor(), resolve: render });
 
 		expect(response.headers.get('cache-control')).toBe('public, max-age=0, must-revalidate');
-		expect(response.headers.get('vercel-cdn-cache-control')).toContain('s-maxage=60');
+		expect(response.headers.get('vercel-cdn-cache-control')).toContain('s-maxage=3600');
 	});
 
 	it('leaves a non-allowlisted route alone', async () => {
@@ -79,5 +80,46 @@ describe('cacheHandle ordering', () => {
 		const response = await cacheHandle({ event: eventFor(), resolve: setsCookie });
 
 		expect(response.headers.has('vercel-cdn-cache-control')).toBe(false);
+	});
+});
+
+describe('cacheHandle cache tags', () => {
+	/* A load/fetch running inside `resolve` records tags via the AsyncLocalStorage store that
+	   `cacheHandle` binds around the render. Simulate that from the resolver. */
+	const renderWithTags =
+		(...tags: string[]) =>
+		async () => {
+			addCacheTags(...tags);
+			return new Response('<html></html>', { status: 200 });
+		};
+
+	it('emits Vercel-Cache-Tag from tags collected during the render', async () => {
+		// eventFor('/') → route id '/', which is in the cacheable allowlist.
+		const response = await cacheHandle({
+			event: eventFor('/'),
+			resolve: renderWithTags('doc:ghi00369', 'grid:loc:dubai', 'nav')
+		});
+
+		const header = response.headers.get('vercel-cache-tag');
+		expect(header).toBeTruthy();
+		const tags = header!.split(',');
+		expect(tags).toContain('doc:ghi00369');
+		expect(tags).toContain('grid:loc:dubai');
+		expect(tags).toContain('nav');
+	});
+
+	it('does not emit tags on a non-cacheable route', async () => {
+		const response = await cacheHandle({
+			event: eventFor('/internal/design-system'),
+			resolve: renderWithTags('doc:secret')
+		});
+
+		expect(response.headers.has('vercel-cache-tag')).toBe(false);
+	});
+
+	it('emits no tag header when nothing was collected', async () => {
+		const response = await cacheHandle({ event: eventFor('/'), resolve: render });
+
+		expect(response.headers.has('vercel-cache-tag')).toBe(false);
 	});
 });

@@ -14,8 +14,14 @@ import {
 import { loadReviews } from '$lib/reviews';
 import { resolveHomepageHeroImage } from '$lib/sanity/transforms/taxonomyHero';
 import { resolveHomepageContent } from '$lib/sanity/transforms/pageContent';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 export const load: PageServerLoad = async ({ fetch, url }) => {
+	// `home` covers the query-driven homepage rails (featured, frontline, partners,
+	// countries); `frontline` also fires on any new frontline listing site-wide.
+	addCacheTags(cacheTag.home, cacheTag.frontline);
+
 	const [
 		nav,
 		featuredCards,

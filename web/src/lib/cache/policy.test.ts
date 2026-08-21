@@ -111,10 +111,10 @@ describe('header values', () => {
 		expect(BROWSER_CACHE_CONTROL).not.toContain('s-maxage');
 	});
 
-	/* Vercel requires s-maxage to cache a function response at all, and SWR is what
-	   actually produces hits at this traffic level. */
-	it('gives the edge a short TTL and a long stale window', () => {
-		expect(EDGE_CACHE_CONTROL).toContain('s-maxage=60');
+	/* Purge-on-publish now handles freshness, so the TTL can be an hour (more edge hits)
+	   with SWR still smoothing revalidation. */
+	it('gives the edge an hour TTL and a long stale window', () => {
+		expect(EDGE_CACHE_CONTROL).toContain('s-maxage=3600');
 		expect(EDGE_CACHE_CONTROL).toContain('stale-while-revalidate=604800');
 	});
 });

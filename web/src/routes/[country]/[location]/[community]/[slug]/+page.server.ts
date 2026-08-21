@@ -32,6 +32,8 @@ import {
 	type RawDevelopment,
 	type RawPropertyListing
 } from '$lib/sanity/transforms';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 type StalePathRow = {
 	countrySlug?: string | null;
@@ -46,6 +48,11 @@ export const actions: Actions = {
 };
 
 export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
+	// The enquiry shelf renders the country's default buying guide + partners, so a change
+	// to those must refresh every listing page in the country. Non-200 resolutions (404 /
+	// redirect) never emit the tag — cacheHandle only tags cacheable 200s.
+	addCacheTags(cacheTag.country(params.country));
+
 	const pathParams: ListingPathParams = {
 		countrySlug: params.country,
 		locationSlug: params.location,

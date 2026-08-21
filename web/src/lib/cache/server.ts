@@ -1,6 +1,7 @@
 import { env } from '$env/dynamic/private';
 import type { Handle } from '@sveltejs/kit';
-import { BROWSER_CACHE_CONTROL, EDGE_CACHE_CONTROL, isCacheable } from './policy';
+import { BROWSER_CACHE_CONTROL, EDGE_CACHE_CONTROL, buildCacheTagHeader, isCacheable } from './policy';
+import { runWithCacheTags } from './tagContext';
 
 /**
  * Opt public content responses into Vercel's CDN cache.
@@ -11,7 +12,11 @@ import { BROWSER_CACHE_CONTROL, EDGE_CACHE_CONTROL, isCacheable } from './policy
  * shared cache. See `isCacheable` for the full set of conditions and why each exists.
  */
 export const cacheHandle: Handle = async ({ event, resolve }) => {
-	const response = await resolve(event);
+	/* Bind a tag store for the whole render so the Sanity fetch layer and load functions
+	   (which run inside `resolve`) can record which documents this page depends on. Read
+	   back below, after the cacheability gate, to emit `Vercel-Cache-Tag`. */
+	const store = { tags: new Set<string>() };
+	const response = await runWithCacheTags(store, () => resolve(event));
 
 	const cacheable = isCacheable({
 		method: event.request.method,
@@ -26,6 +31,11 @@ export const cacheHandle: Handle = async ({ event, resolve }) => {
 
 	response.headers.set('cache-control', BROWSER_CACHE_CONTROL);
 	response.headers.set('vercel-cdn-cache-control', EDGE_CACHE_CONTROL);
+
+	/* Tags let a Sanity publish purge exactly the pages that render the changed document.
+	   Only set when we have some — a cacheable page with no tags just relies on the TTL. */
+	const tagHeader = buildCacheTagHeader(store.tags);
+	if (tagHeader) response.headers.set('vercel-cache-tag', tagHeader);
 
 	return response;
 };

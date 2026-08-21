@@ -4,8 +4,13 @@ import { fetchPublic, guidesHubQuery, fetchGuidesHubPage } from '$lib/sanity/que
 import { GUIDES_PATH, buildGuidesBreadcrumbs, groupGuidesByCategory } from '$lib/guides';
 import type { GuideCard } from '$lib/guides';
 import { resolveGuidesHubContent } from '$lib/sanity/transforms/pageContent';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 export const load: PageServerLoad = async ({ url }) => {
+	// Lists every guide, so a newly published one must purge this hub.
+	addCacheTags(cacheTag.hubGuides);
+
 	const [cards, rawPage] = await Promise.all([
 		fetchPublic<GuideCard[]>(guidesHubQuery).then((r) => r ?? []),
 		fetchGuidesHubPage()

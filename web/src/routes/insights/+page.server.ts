@@ -8,11 +8,16 @@ import {
 	isInsightCategory
 } from '$lib/insights';
 import type { InsightCard, InsightCategory } from '$lib/insights';
+import { addCacheTags } from '$lib/cache/tagContext';
+import { cacheTag } from '$lib/cache/tags';
 
 /** Grid cards shown per page; "Load more" grows the visible count by this step. */
 const PAGE_SIZE = 9;
 
 export const load: PageServerLoad = async ({ url }) => {
+	// Lists every insight, so a newly published one must purge this hub.
+	addCacheTags(cacheTag.hubInsights);
+
 	const cards = (await fetchPublic<InsightCard[]>(insightsHubQuery)) ?? [];
 
 	const categoryParam = url.searchParams.get('category');
