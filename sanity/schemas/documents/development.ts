@@ -156,7 +156,7 @@ export const development = defineType({
 			type: 'array',
 			group: 'development',
 			of: [{ type: 'string' }],
-			description: 'Summary of what the development comprises (e.g. "45 villas, clubhouse, spa").'
+			description: 'Short labels for what the development comprises (e.g. "Apartments", "Penthouses"). Each entry shows as its own badge in the summary header, in order — add as many or as few as you want. Keep each label short so the row reads cleanly.'
 		}),
 		defineField({
 			name: 'pricing',
