@@ -497,6 +497,21 @@ export const DEVELOPMENT_REF_PUBLIC_GATE = /* groq */ `
 `;
 
 /**
+ * Publish gate for a SINGLE `propertyListing` reference (the insight listing grid), applied via
+ * `select(GATE => listing->{...})` — the exact single-reference counterpart to
+ * DEVELOPMENT_REF_PUBLIC_GATE above (see its note for why a `select()` gate on the dereferenced
+ * status is required rather than an array-style `@->` filter). The `listingKind` clause mirrors
+ * LISTING_REF_PUBLIC_FILTER's doc-type rule, so a listing surfaces here only when it would surface
+ * anywhere else public.
+ */
+export const PROPERTY_REF_PUBLIC_GATE = /* groq */ `
+  (
+    listing->listingKind in ["property", "unit"]
+    && (coalesce(listing->status, "") == $publishedStatus || $previewAll)
+  )
+`;
+
+/**
  * Insight section body. Image members — the bare media block, the framed `insightFigure`, and
  * the compact `insightPortrait` — are reshaped to the public media projection (as in
  * GUIDE_SECTION_PUBLIC) so provenance fields never leak; the inline Front Line rail dereferences
@@ -612,6 +627,21 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
         "completionNote": select(${DEVELOPMENT_REF_PUBLIC_GATE} => development->completionNote)
       }
     },
+    _type == "insightListingGrid" => {
+      _type,
+      _key,
+      heading,
+      mobileInitialMode,
+      expandLabel,
+      collapseLabel,
+      items[]{
+        _key,
+        altOverride,
+        groupLabelOverride,
+        "imageOverride": imageOverride${MEDIA_ASSET_PUBLIC},
+        "listing": select(${PROPERTY_REF_PUBLIC_GATE} => listing->${PROPERTY_CARD_PUBLIC})
+      }
+    },
     _type == "insightCourseGrid" => {
       _type,
       _key,
@@ -684,6 +714,7 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
       && _type != "insightFrontlineRail"
       && _type != "insightDestinationGrid"
       && _type != "insightDevelopmentGrid"
+      && _type != "insightListingGrid"
       && _type != "insightCourseGrid"
       && _type != "insightPartnerLogoGrid"
       && _type != "insightGuideCards"

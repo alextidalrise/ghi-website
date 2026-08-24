@@ -13,6 +13,11 @@ import {
 	type InsightDevelopmentGridItemRaw
 } from '$lib/sanity/transforms/insightDevelopmentCard';
 import {
+	toInsightListingCards,
+	toInsightListingGroups,
+	type InsightListingGridItemRaw
+} from '$lib/sanity/transforms/insightListingCard';
+import {
 	buildInsightArticleJsonLd,
 	buildInsightBreadcrumbs,
 	buildInsightFaqJsonLd,
@@ -23,6 +28,7 @@ import {
 import type { InsightBodyBlock, InsightDetail } from '$lib/insights';
 import type {
 	InsightDevelopmentGridBlock,
+	InsightListingGridBlock,
 	InsightFrontlineRailBlock
 } from '$lib/insights/types';
 
@@ -97,6 +103,40 @@ function hydrateDevelopmentGrids(insight: InsightDetail): InsightDetail {
 	};
 }
 
+/**
+ * The individual-property collection (`insightListingGrid`) — the single-home counterpart to the
+ * development grid above. The projection dereferences each hand-picked `propertyListing`
+ * (publish-gated) into a raw card row; here we resolve those into render-ready cards, flat in editor
+ * order (desktop) and grouped by destination (mobile), reusing the site's own property-card
+ * transforms so no price/location literal is ever copied into the article. Items whose target is
+ * unpublished (raw `listing` is null) drop out, preserving order.
+ */
+function hydrateListingGrids(insight: InsightDetail): InsightDetail {
+	const sections = insight.sections;
+	if (!sections?.length) return insight;
+	return {
+		...insight,
+		sections: sections.map((section) => {
+			const body = section.body;
+			if (!body?.length) return section;
+			return {
+				...section,
+				body: body.map((block): InsightBodyBlock => {
+					if (block?._type !== 'insightListingGrid') return block;
+					const grid = block as InsightListingGridBlock;
+					const items = (block as { items?: Array<InsightListingGridItemRaw | null> | null })
+						.items;
+					return {
+						...grid,
+						cards: toInsightListingCards(items),
+						groups: toInsightListingGroups(items)
+					};
+				})
+			};
+		})
+	};
+}
+
 export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
 	const fetched = await fetchMaybePreview<InsightDetail>(
 		insightBySlugQuery,
@@ -112,7 +152,7 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 	// Map each inline Front Line rail's hand-picked, publish-gated listing refs into render-ready
 	// cards, then resolve every development collection's live references the same way. Both are cheap
 	// and in-memory — the refs came down with the single by-slug fetch.
-	const insight = hydrateDevelopmentGrids(hydrateFrontlineRails(fetched));
+	const insight = hydrateListingGrids(hydrateDevelopmentGrids(hydrateFrontlineRails(fetched)));
 
 	const canonicalUrl = `${url.origin}${insightPath(fetched.slug)}`;
 	const breadcrumbs = buildInsightBreadcrumbs(insight);
