@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { trackListingSelected, type AnalyticsItem } from '$lib/analytics';
 	import { buildListingHref } from '$lib/listing/canonicalPath';
+	import { resolveCardLocationLine } from '$lib/listing/cardLocationLine';
 	import { formatListingPrice } from '$lib/listing/formatPrice';
 	import {
 		CARD_HERO_IMAGE,
@@ -27,17 +28,11 @@
 		})
 	);
 	const price = $derived(formatListingPrice(card.pricing));
-	// Community name only — the area/country are already established by the page
-	// context (e.g. the Nueva Andalucia page), so repeating them would be redundant.
-	// Some Murcia/Alicante listings have no unique title and borrow their community
-	// name as the title; suppress the community line when it just echoes the title.
-	const locationLine = $derived.by(() => {
-		const community = card.location?.community?.name;
-		if (community && community.trim().toLowerCase() === card.title?.trim().toLowerCase()) {
-			return null;
-		}
-		return community ?? card.location?.addressDisplay ?? null;
-	});
+	// Prefer the community name — the area/country are usually established by the
+	// page context (e.g. the Nueva Andalucia page). When the community just echoes
+	// the title (some Murcia/Alicante listings borrow it as the title), fall back to
+	// the wider area so the card still shows a location instead of nothing.
+	const locationLine = $derived(resolveCardLocationLine(card.location, card.title));
 	const specsLine = $derived(formatSpecs(card.specs));
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Property listing');
 

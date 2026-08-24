@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { trackListingSelected, type AnalyticsItem } from '$lib/analytics';
 	import { buildListingHref } from '$lib/listing/canonicalPath';
+	import { resolveCardLocationLine } from '$lib/listing/cardLocationLine';
 	import {
 		buildDevelopmentMetaParts,
 		formatDevelopmentCardPrice
@@ -32,16 +33,10 @@
 			? formatDevelopmentCardPrice(card.pricing)
 			: null
 	);
-	// Match PropertyCard: prefer the community name, falling back to the full
-	// address. Suppress the community line when it just echoes the title (some
+	// Match PropertyCard: prefer the community name, then the wider area, then the
+	// full address — skipping any segment that just echoes the title (some
 	// Murcia/Alicante listings borrow their community name as the title).
-	const locationLine = $derived.by(() => {
-		const community = card.location?.community?.name;
-		if (community && community.trim().toLowerCase() === card.title?.trim().toLowerCase()) {
-			return null;
-		}
-		return community ?? card.location?.addressDisplay ?? null;
-	});
+	const locationLine = $derived(resolveCardLocationLine(card.location, card.title));
 	const specsLine = $derived(buildDevelopmentMetaParts(card).join(' · ') || null);
 	const imageAlt = $derived(card.heroImageAlt ?? card.title ?? 'Development');
 </script>
