@@ -216,242 +216,11 @@ export type Slug = {
   source?: string;
 };
 
-export type PropertyListing = {
-  _id: string;
-  _type: "propertyListing";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  ghiListingId: string;
-  title: string;
-  slug: Slug;
-  listingKind: "property" | "unit";
-  propertyType:
-    | "villa"
-    | "apartment"
-    | "penthouse"
-    | "townhouse"
-    | "plot"
-    | "finca"
-    | "development";
-  transactionType: "sale" | "rent" | "short_term" | "other";
-  sourceReference?: string;
-  developerReference?: string;
-  location?: LocationFields;
-  pricing?: PropertyPricingFields;
-  specs?: SpecsFields;
-  golf?: GolfFields;
-  content?: PropertyContentFields;
-  marketing?: MarketingFields;
-  media?: PropertyMediaFields;
-  related?: RelatedContentFields;
-  ctas?: CtaFields;
-  seo?: SeoFields;
-  status: "draft" | "in_review" | "published" | "unpublished" | "archived";
-  reviewItems?: Array<
-    {
-      _key: string;
-    } & ReviewItem
-  >;
-  internal?: InternalFields;
-};
-
-export type InternalFields = {
-  _type: "internalFields";
-  notes?: string;
-  commission?: InternalCommission;
-  feesTax?: InternalFeesTax;
-  sources?: Array<
-    {
-      _key: string;
-    } & InternalSourceEntry
-  >;
-  sourceFolderUrl?: string;
-  legalDocsDriveFolderId?: string;
-  feedImport?: FeedImport;
-};
-
-export type CtaFields = {
-  _type: "ctaFields";
-  primaryCtaLabel?: string;
-  secondaryCtaLabel?: string;
-  formIntroText?: string;
-  responseTimeText?: string;
-  brochureCtaText?: string;
-  brochureCtaEnabled?: boolean;
-  railGuide?: GuideReference;
-  railPartners?: Array<
-    {
-      _key: string;
-    } & PartnerReference
-  >;
-};
-
-export type PropertyListingReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "propertyListing";
-};
-
 export type DevelopmentReference = {
   _ref: string;
   _type: "reference";
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: "development";
-};
-
-export type RelatedContentFields = {
-  _type: "relatedContentFields";
-  similarPropertiesMode?: "automatic" | "manual" | "tags" | "disabled";
-  manualSimilarProperties?: ArrayOf<
-    PropertyListingReference | DevelopmentReference
-  >;
-  similarityTags?: Array<string>;
-};
-
-export type PropertyMediaFields = {
-  _type: "propertyMediaFields";
-  gallery?: Array<
-    {
-      _key: string;
-    } & MediaAssetMetadata
-  >;
-  floorplans?: Array<
-    {
-      _key: string;
-    } & MediaAssetMetadata
-  >;
-  videoUrl?: string;
-  virtualTourUrl?: string;
-  brochure?: MediaAssetMetadata;
-  brochurePublic?: boolean;
-};
-
-export type MarketingFields = {
-  _type: "marketingFields";
-  marketingDescription?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  keyHooks?: Array<string>;
-  instagramPost?: InstagramPost;
-};
-
-export type PropertyContentFields = {
-  _type: "propertyContentFields";
-  shortDescription: string;
-  aboutDescription?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }>;
-  featureHighlights?: Array<
-    {
-      _key: string;
-    } & FeatureHighlight
-  >;
-  humanReviewed?: boolean;
-  reviewer?: string;
-  reviewDate?: string;
-};
-
-export type GolfCourseReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "golfCourse";
-};
-
-export type GolfFields = {
-  _type: "golfFields";
-  golfRelevance:
-    | "frontline_golf"
-    | "golf_view"
-    | "golf_resort"
-    | "near_golf"
-    | "close_to_golf"
-    | "manual_enrichment_needed"
-    | "none"
-    | "unknown";
-  linkedGolfCourses?: Array<
-    {
-      _key: string;
-    } & GolfCourseReference
-  >;
-};
-
-export type SpecsFields = {
-  _type: "specsFields";
-  buildStatus?: "built" | "off_plan";
-  bedrooms?: number;
-  bathrooms?: number;
-  builtArea?: number;
-  builtAreaUnit?: "sqm" | "sqft";
-  plotSize?: number;
-  plotSizeUnit?: "sqm" | "sqft";
-  terraceSize?: number;
-  interiorArea?: number;
-  exteriorArea?: number;
-  gardenArea?: number;
-  levels?: number;
-  pool?: "private" | "communal" | "none" | "unknown";
-  garden?: "private" | "communal" | "none" | "unknown";
-  orientation?:
-    | "north"
-    | "north_east"
-    | "east"
-    | "south_east"
-    | "south"
-    | "south_west"
-    | "west"
-    | "north_west"
-    | "unknown";
-  views?: Array<
-    "golf" | "sea" | "mountain" | "countryside" | "pool" | "garden" | "unknown"
-  >;
-};
-
-export type PropertyPricingFields = {
-  _type: "propertyPricingFields";
-  price?: number;
-  priceDisplay?: string;
-  currency?: string;
-};
-
-export type LocationFields = {
-  _type: "locationFields";
-  community: LocationTaxonomyReference;
-  location?: LocationTaxonomyReference;
-  country?: LocationTaxonomyReference;
-  addressDisplay: string;
 };
 
 export type UnitTypeReference = {
@@ -493,6 +262,45 @@ export type Unit = {
     } & ReviewItem
   >;
   internal?: InternalFields;
+};
+
+export type InternalFields = {
+  _type: "internalFields";
+  notes?: string;
+  commission?: InternalCommission;
+  feesTax?: InternalFeesTax;
+  sources?: Array<
+    {
+      _key: string;
+    } & InternalSourceEntry
+  >;
+  sourceFolderUrl?: string;
+  legalDocsDriveFolderId?: string;
+  feedImport?: FeedImport;
+};
+
+export type MarketingFields = {
+  _type: "marketingFields";
+  marketingDescription?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  keyHooks?: Array<string>;
+  instagramPost?: InstagramPost;
 };
 
 export type ContentFields = {
@@ -560,6 +368,37 @@ export type ContentFields = {
   humanReviewed?: boolean;
   reviewer?: string;
   reviewDate?: string;
+};
+
+export type SpecsFields = {
+  _type: "specsFields";
+  buildStatus?: "built" | "off_plan";
+  bedrooms?: number;
+  bathrooms?: number;
+  builtArea?: number;
+  builtAreaUnit?: "sqm" | "sqft";
+  plotSize?: number;
+  plotSizeUnit?: "sqm" | "sqft";
+  terraceSize?: number;
+  interiorArea?: number;
+  exteriorArea?: number;
+  gardenArea?: number;
+  levels?: number;
+  pool?: "private" | "communal" | "none" | "unknown";
+  garden?: "private" | "communal" | "none" | "unknown";
+  orientation?:
+    | "north"
+    | "north_east"
+    | "east"
+    | "south_east"
+    | "south"
+    | "south_west"
+    | "west"
+    | "north_west"
+    | "unknown";
+  views?: Array<
+    "golf" | "sea" | "mountain" | "countryside" | "pool" | "garden" | "unknown"
+  >;
 };
 
 export type PricingFields = {
@@ -743,6 +582,13 @@ export type GuidesHubPage = {
   seo?: SeoFields;
 };
 
+export type PropertyListingReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "propertyListing";
+};
+
 export type SiteSettings = {
   _id: string;
   _type: "siteSettings";
@@ -841,6 +687,49 @@ export type NavMenuChild = {
   link: NavLink;
 };
 
+export type RelatedContentFields = {
+  _type: "relatedContentFields";
+  similarPropertiesMode?: "automatic" | "manual" | "tags" | "disabled";
+  manualSimilarProperties?: ArrayOf<
+    PropertyListingReference | DevelopmentReference
+  >;
+  similarityTags?: Array<string>;
+};
+
+export type CtaFields = {
+  _type: "ctaFields";
+  primaryCtaLabel?: string;
+  secondaryCtaLabel?: string;
+  formIntroText?: string;
+  responseTimeText?: string;
+  brochureCtaText?: string;
+  brochureCtaEnabled?: boolean;
+  railGuide?: GuideReference;
+  railPartners?: Array<
+    {
+      _key: string;
+    } & PartnerReference
+  >;
+};
+
+export type PropertyMediaFields = {
+  _type: "propertyMediaFields";
+  gallery?: Array<
+    {
+      _key: string;
+    } & MediaAssetMetadata
+  >;
+  floorplans?: Array<
+    {
+      _key: string;
+    } & MediaAssetMetadata
+  >;
+  videoUrl?: string;
+  virtualTourUrl?: string;
+  brochure?: MediaAssetMetadata;
+  brochurePublic?: boolean;
+};
+
 export type MediaFields = {
   _type: "mediaFields";
   gallery?: Array<
@@ -863,6 +752,77 @@ export type MediaFields = {
   virtualTourUrl?: string;
   brochure?: MediaAssetMetadata;
   brochurePublic?: boolean;
+};
+
+export type PropertyContentFields = {
+  _type: "propertyContentFields";
+  shortDescription: string;
+  aboutDescription?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  featureHighlights?: Array<
+    {
+      _key: string;
+    } & FeatureHighlight
+  >;
+  humanReviewed?: boolean;
+  reviewer?: string;
+  reviewDate?: string;
+};
+
+export type GolfCourseReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "golfCourse";
+};
+
+export type GolfFields = {
+  _type: "golfFields";
+  golfRelevance:
+    | "frontline_golf"
+    | "golf_view"
+    | "golf_resort"
+    | "near_golf"
+    | "close_to_golf"
+    | "manual_enrichment_needed"
+    | "none"
+    | "unknown";
+  linkedGolfCourses?: Array<
+    {
+      _key: string;
+    } & GolfCourseReference
+  >;
+};
+
+export type PropertyPricingFields = {
+  _type: "propertyPricingFields";
+  price?: number;
+  priceDisplay?: string;
+  currency?: string;
+};
+
+export type LocationFields = {
+  _type: "locationFields";
+  community: LocationTaxonomyReference;
+  location?: LocationTaxonomyReference;
+  country?: LocationTaxonomyReference;
+  addressDisplay: string;
 };
 
 export type SocialLink = {
@@ -971,6 +931,9 @@ export type InsightSection = {
     | ({
         _key: string;
       } & InsightDevelopmentGrid)
+    | ({
+        _key: string;
+      } & InsightListingGrid)
     | ({
         _key: string;
       } & InsightCourseGrid)
@@ -1089,6 +1052,67 @@ export type Geopoint = {
   lat?: number;
   lng?: number;
   alt?: number;
+};
+
+export type InsightListingGrid = {
+  _type: "insightListingGrid";
+  heading?: string;
+  items: Array<
+    {
+      _key: string;
+    } & InsightListingGridItem
+  >;
+  mobileInitialMode?: "onePerGroup" | "all";
+  expandLabel?: string;
+  collapseLabel?: string;
+};
+
+export type InsightListingGridItem = {
+  _type: "insightListingGridItem";
+  listing: PropertyListingReference;
+  imageOverride?: MediaAssetMetadata;
+  altOverride?: string;
+  groupLabelOverride?: string;
+};
+
+export type PropertyListing = {
+  _id: string;
+  _type: "propertyListing";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  ghiListingId: string;
+  title: string;
+  slug: Slug;
+  listingKind: "property" | "unit";
+  propertyType:
+    | "villa"
+    | "apartment"
+    | "penthouse"
+    | "townhouse"
+    | "plot"
+    | "finca"
+    | "development";
+  transactionType: "sale" | "rent" | "short_term" | "other";
+  sourceReference?: string;
+  developerReference?: string;
+  location?: LocationFields;
+  pricing?: PropertyPricingFields;
+  specs?: SpecsFields;
+  golf?: GolfFields;
+  content?: PropertyContentFields;
+  marketing?: MarketingFields;
+  media?: PropertyMediaFields;
+  related?: RelatedContentFields;
+  ctas?: CtaFields;
+  seo?: SeoFields;
+  status: "draft" | "in_review" | "published" | "unpublished" | "archived";
+  reviewItems?: Array<
+    {
+      _key: string;
+    } & ReviewItem
+  >;
+  internal?: InternalFields;
 };
 
 export type InsightDevelopmentGrid = {
@@ -1732,33 +1756,32 @@ export type AllSanitySchemaTypes =
   | MediaAssetMetadata
   | Author
   | Slug
-  | PropertyListing
-  | InternalFields
-  | CtaFields
-  | PropertyListingReference
   | DevelopmentReference
-  | RelatedContentFields
-  | PropertyMediaFields
-  | MarketingFields
-  | PropertyContentFields
-  | GolfCourseReference
-  | GolfFields
-  | SpecsFields
-  | PropertyPricingFields
-  | LocationFields
   | UnitTypeReference
   | Unit
+  | InternalFields
+  | MarketingFields
   | ContentFields
+  | SpecsFields
   | PricingFields
   | UnitType
   | ContactPage
   | AboutPage
   | GuidesHubPage
+  | PropertyListingReference
   | SiteSettings
   | FrontlineContent
   | HomepageContent
   | NavMenuChild
+  | RelatedContentFields
+  | CtaFields
+  | PropertyMediaFields
   | MediaFields
+  | PropertyContentFields
+  | GolfCourseReference
+  | GolfFields
+  | PropertyPricingFields
+  | LocationFields
   | SocialLink
   | FooterColumn
   | NavMenuItem
@@ -1772,6 +1795,9 @@ export type AllSanitySchemaTypes =
   | InsightCourseGridItem
   | GolfCourse
   | Geopoint
+  | InsightListingGrid
+  | InsightListingGridItem
+  | PropertyListing
   | InsightDevelopmentGrid
   | InsightDevelopmentGridItem
   | UnitReference
@@ -5811,7 +5837,7 @@ export type HeaderNavQueryResult = {
 
 // Source: ../web/src/lib/sanity/queries/insight.ts
 // Variable: insightBySlugQuery
-// Query: *[_type == "insight" && slug.current == $slug][0]{      _id,  _type,  title,  titleEmphasis,  "slug": slug.current,  insightCategory,  subhead,  publishedAt,  featured,  readingTimeOverride,  "bodyChars": length(pt::text(sections[].body[])),  heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  heroCaption,  heroNote{ heading, body },  "heroLinkHref": select(		heroLink.linkType == "external" => heroLink.externalUrl,		heroLink.linkType == "internal" => heroLink.internalPath,		heroLink.linkType == "reference" && heroLink.reference->_type == "guide" => "/guides/" + heroLink.reference->slug.current,		heroLink.linkType == "reference" && heroLink.reference->type == "country" => "/" + heroLink.reference->slug.current,		heroLink.linkType == "reference" && heroLink.reference->type == "location" => "/" + heroLink.reference->parent->slug.current + "/" + heroLink.reference->slug.current,		heroLink.linkType == "reference" && heroLink.reference->type == "community" => "/" + heroLink.reference->parent->parent->slug.current + "/" + heroLink.reference->parent->slug.current + "?community=" + heroLink.reference->slug.current	),  heroLayout,  heroPartnerLabel,  heroSublabel,  heroPartnerPlate,  "heroPartner": heroPartner->{  _id,  name,  "slug": slug.current,  "category": category->name,  logo{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  logoAlt{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}},  author->{  _id,  name,  "slug": slug.current,  role,  bio,  avatar{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}},  sections[]{  heading,  "anchor": anchor.current,  headingStyle,  body[]{    _type == "mediaAssetMetadata" => {      _type,      _key,      asset,      altText,      "lqip": asset.asset->metadata.lqip,      "dimensions": asset.asset->metadata.dimensions    },    _type == "insightFigure" => {      _type,      _key,      caption,      "image": image{        asset,        altText,        "lqip": asset.asset->metadata.lqip,        "dimensions": asset.asset->metadata.dimensions      }    },    _type == "insightFigurePair" => {      _type,      _key,      items[]{        _key,        caption,        linkLabel,        linkHref,        "image": image{          asset,          altText,          "lqip": asset.asset->metadata.lqip,          "dimensions": asset.asset->metadata.dimensions        }      }    },    _type == "insightPortrait" => {      _type,      _key,      name,      role,      "image": image{        asset,        altText,        "lqip": asset.asset->metadata.lqip,        "dimensions": asset.asset->metadata.dimensions      }    },    _type == "insightFrontlineRail" => {      _type,      _key,      heading,      summary,      summaryCountSingular,      summaryCountPlural,      showViewAll,      viewAllLabel,      viewAllHref,      "listings": listings[          (    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])    || @->_type == "development"  )  && (coalesce(@->status, "") == $publishedStatus || $previewAll)      ]->{  _type == "development" => {  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceConfirmed,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  "unitsAvailable": count((units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ]),  "bedroomsFrom": math::min(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  "bedroomsTo": math::max(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},    thumbnailOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }},  _type == "propertyListing" => {  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceDisplay,  currency},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }}}    },    _type == "insightDestinationGrid" => {      _type,      _key,      heading,      items[]{        _key,        body,        caption,        actionLabel,        actionHrefOverride,        "imageOverride": imageOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},        location->{          _id,          name,          "slug": slug.current,          type,          "countrySlug": parent->slug.current,          "heroImage": heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}        }      }    },    _type == "insightDevelopmentGrid" => {      _type,      _key,      heading,      mobileInitialMode,      expandLabel,      collapseLabel,      items[]{        _key,        altOverride,        groupLabelOverride,        "imageOverride": imageOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},        "development": select(  (coalesce(development->status, "") == $publishedStatus || $previewAll) => development->{  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceConfirmed,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  "unitsAvailable": count((units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ]),  "bedroomsFrom": math::min(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  "bedroomsTo": math::max(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},    thumbnailOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }}),        "completionDate": select(            (coalesce(development->status, "") == $publishedStatus || $previewAll) =>            coalesce(development->pricing.completionDate, development->completionDate)        ),        "completionPrecision": select(  (coalesce(development->status, "") == $publishedStatus || $previewAll) => development->completionPrecision),        "completionNote": select(  (coalesce(development->status, "") == $publishedStatus || $previewAll) => development->completionNote)      }    },    _type == "insightCourseGrid" => {      _type,      _key,      heading,      items[]{        _key,        altOverride,        actionLabel,        "imageOverride": imageOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},        "golfCourse": golfCourse->{          _id,          name,          "slug": slug.current,          tagline,          "communityName": community->name,          "communitySlug": community->slug.current,          "locationSlug": community->parent->slug.current,          "countryName": community->parent->parent->name,          "countrySlug": community->parent->parent->slug.current,          "media": media[0]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}        }      }    },    _type == "insightPartnerLogoGrid" => {      _type,      _key,      heading,      items[]{        _key,        serviceLabel,        "partner": partner->{  _id,  name,  "slug": slug.current,  "category": category->name,  logo{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  logoAlt{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}      }    },    _type == "insightGuideCards" => {      _type,      _key,      heading,      items[]{        _key,        summaryOverride,        "guide": guide->{  _id,  title,  "slug": slug.current,  guideCategory,  audienceLabel,  tagline,  heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}      }    },    _type == "insightPartnerProfile" => {      _type,      _key,      layout,      heading,      body,      personName,      personRole,      "teamImage": teamImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},      "portrait": portrait{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},      "partner": partner->{  _id,  name,  "slug": slug.current,  "category": category->name,  logo{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  logoAlt{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}    },    _type == "insightReferenceCard" => {      _type,      _key,      eyebrow,      heading,      description,      linkLabel,      linkHref,      "image": image{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}    },    _type != "mediaAssetMetadata"      && _type != "insightFigure"      && _type != "insightFigurePair"      && _type != "insightPortrait"      && _type != "insightFrontlineRail"      && _type != "insightDestinationGrid"      && _type != "insightDevelopmentGrid"      && _type != "insightCourseGrid"      && _type != "insightPartnerLogoGrid"      && _type != "insightGuideCards"      && _type != "insightPartnerProfile"      && _type != "insightReferenceCard" => { ... }  }},  ctaHeading,  ctaBody,  ctaPrimary{ label, href },  ctaSecondary{ label, href },  ctaShowSecondary,  ctaWhatsAppLabel,  ctaWhatsAppMessage,  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},    "related": select(      count(relatedInsights) > 0 =>        relatedInsights[defined(@->slug.current)]->{  _id,  title,  "slug": slug.current,  insightCategory,  subhead,  publishedAt,  featured,  readingTimeOverride,  "bodyChars": length(pt::text(sections[].body[])),  heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  author->{  _id,  name,  "slug": slug.current,  role,  bio,  avatar{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}},      *[        _type == "insight"        && insightCategory == ^.insightCategory        && defined(slug.current)        && defined(publishedAt)        && slug.current != ^.slug.current      ] | order(publishedAt desc)[0...3] {  _id,  title,  "slug": slug.current,  insightCategory,  subhead,  publishedAt,  featured,  readingTimeOverride,  "bodyChars": length(pt::text(sections[].body[])),  heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  author->{  _id,  name,  "slug": slug.current,  role,  bio,  avatar{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}}    )  }
+// Query: *[_type == "insight" && slug.current == $slug][0]{      _id,  _type,  title,  titleEmphasis,  "slug": slug.current,  insightCategory,  subhead,  publishedAt,  featured,  readingTimeOverride,  "bodyChars": length(pt::text(sections[].body[])),  heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  heroCaption,  heroNote{ heading, body },  "heroLinkHref": select(		heroLink.linkType == "external" => heroLink.externalUrl,		heroLink.linkType == "internal" => heroLink.internalPath,		heroLink.linkType == "reference" && heroLink.reference->_type == "guide" => "/guides/" + heroLink.reference->slug.current,		heroLink.linkType == "reference" && heroLink.reference->type == "country" => "/" + heroLink.reference->slug.current,		heroLink.linkType == "reference" && heroLink.reference->type == "location" => "/" + heroLink.reference->parent->slug.current + "/" + heroLink.reference->slug.current,		heroLink.linkType == "reference" && heroLink.reference->type == "community" => "/" + heroLink.reference->parent->parent->slug.current + "/" + heroLink.reference->parent->slug.current + "?community=" + heroLink.reference->slug.current	),  heroLayout,  heroPartnerLabel,  heroSublabel,  heroPartnerPlate,  "heroPartner": heroPartner->{  _id,  name,  "slug": slug.current,  "category": category->name,  logo{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  logoAlt{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}},  author->{  _id,  name,  "slug": slug.current,  role,  bio,  avatar{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}},  sections[]{  heading,  "anchor": anchor.current,  headingStyle,  body[]{    _type == "mediaAssetMetadata" => {      _type,      _key,      asset,      altText,      "lqip": asset.asset->metadata.lqip,      "dimensions": asset.asset->metadata.dimensions    },    _type == "insightFigure" => {      _type,      _key,      caption,      "image": image{        asset,        altText,        "lqip": asset.asset->metadata.lqip,        "dimensions": asset.asset->metadata.dimensions      }    },    _type == "insightFigurePair" => {      _type,      _key,      items[]{        _key,        caption,        linkLabel,        linkHref,        "image": image{          asset,          altText,          "lqip": asset.asset->metadata.lqip,          "dimensions": asset.asset->metadata.dimensions        }      }    },    _type == "insightPortrait" => {      _type,      _key,      name,      role,      "image": image{        asset,        altText,        "lqip": asset.asset->metadata.lqip,        "dimensions": asset.asset->metadata.dimensions      }    },    _type == "insightFrontlineRail" => {      _type,      _key,      heading,      summary,      summaryCountSingular,      summaryCountPlural,      showViewAll,      viewAllLabel,      viewAllHref,      "listings": listings[          (    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])    || @->_type == "development"  )  && (coalesce(@->status, "") == $publishedStatus || $previewAll)      ]->{  _type == "development" => {  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceConfirmed,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  "unitsAvailable": count((units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ]),  "bedroomsFrom": math::min(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  "bedroomsTo": math::max(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},    thumbnailOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }},  _type == "propertyListing" => {  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceDisplay,  currency},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }}}    },    _type == "insightDestinationGrid" => {      _type,      _key,      heading,      items[]{        _key,        body,        caption,        actionLabel,        actionHrefOverride,        "imageOverride": imageOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},        location->{          _id,          name,          "slug": slug.current,          type,          "countrySlug": parent->slug.current,          "heroImage": heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}        }      }    },    _type == "insightDevelopmentGrid" => {      _type,      _key,      heading,      mobileInitialMode,      expandLabel,      collapseLabel,      items[]{        _key,        altOverride,        groupLabelOverride,        "imageOverride": imageOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},        "development": select(  (coalesce(development->status, "") == $publishedStatus || $previewAll) => development->{  _id,  _type,  ghiListingId,  title,  "slug": slug.current,  listingKind,  developmentDisplayMode,  developmentStatus,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceFrom,  priceTo,  priceDisplay,  currency,  priceQualifier,  priceConfirmed,  availabilityStatus,  completionStatus,  completionDate,  buildStatus},  "unitsAvailable": count((units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ]),  "bedroomsFrom": math::min(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  "bedroomsTo": math::max(    (unitTypes[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms    + (units[]->)[   (coalesce(status, "") == $publishedStatus || $previewAll) ].specs.bedrooms  ),  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},    thumbnailOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }}),        "completionDate": select(            (coalesce(development->status, "") == $publishedStatus || $previewAll) =>            coalesce(development->pricing.completionDate, development->completionDate)        ),        "completionPrecision": select(  (coalesce(development->status, "") == $publishedStatus || $previewAll) => development->completionPrecision),        "completionNote": select(  (coalesce(development->status, "") == $publishedStatus || $previewAll) => development->completionNote)      }    },    _type == "insightListingGrid" => {      _type,      _key,      heading,      mobileInitialMode,      expandLabel,      collapseLabel,      items[]{        _key,        altOverride,        groupLabelOverride,        "imageOverride": imageOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},        "listing": select(  (    listing->listingKind in ["property", "unit"]    && (coalesce(listing->status, "") == $publishedStatus || $previewAll)  ) => listing->{  _id,  ghiListingId,  title,  "slug": slug.current,  listingKind,  propertyType,  transactionType,  "countrySlug": coalesce(  location.country->slug.current,  location.community->parent->parent->slug.current),  "locationSlug": coalesce(  location.location->slug.current,  location.community->parent->slug.current),  "communitySlug": coalesce(  location.community->slug.current,  select(    location.community->_id match "places-community-*" =>      string::split(location.community->_id, "places-community-")[1],    location.community->_id match "location.community.*" =>      string::split(location.community->_id, "location.community.")[1]  )),  "isCatchAll": coalesce(location.community->isCatchAll, false),  location{    country->{ name, "slug": slug.current },    location->{ name, "slug": slug.current },    community->{ _id, name, "slug": slug.current, isCatchAll },    addressDisplay  },  pricing{  price,  priceDisplay,  currency},  specs{    bedrooms,    bathrooms,    builtArea,    builtAreaUnit  },  media{    gallery[0...1]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}  }})      }    },    _type == "insightCourseGrid" => {      _type,      _key,      heading,      items[]{        _key,        altOverride,        actionLabel,        "imageOverride": imageOverride{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},        "golfCourse": golfCourse->{          _id,          name,          "slug": slug.current,          tagline,          "communityName": community->name,          "communitySlug": community->slug.current,          "locationSlug": community->parent->slug.current,          "countryName": community->parent->parent->name,          "countrySlug": community->parent->parent->slug.current,          "media": media[0]{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}        }      }    },    _type == "insightPartnerLogoGrid" => {      _type,      _key,      heading,      items[]{        _key,        serviceLabel,        "partner": partner->{  _id,  name,  "slug": slug.current,  "category": category->name,  logo{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  logoAlt{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}      }    },    _type == "insightGuideCards" => {      _type,      _key,      heading,      items[]{        _key,        summaryOverride,        "guide": guide->{  _id,  title,  "slug": slug.current,  guideCategory,  audienceLabel,  tagline,  heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}      }    },    _type == "insightPartnerProfile" => {      _type,      _key,      layout,      heading,      body,      personName,      personRole,      "teamImage": teamImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},      "portrait": portrait{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},      "partner": partner->{  _id,  name,  "slug": slug.current,  "category": category->name,  logo{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  logoAlt{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}    },    _type == "insightReferenceCard" => {      _type,      _key,      eyebrow,      heading,      description,      linkLabel,      linkHref,      "image": image{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}    },    _type != "mediaAssetMetadata"      && _type != "insightFigure"      && _type != "insightFigurePair"      && _type != "insightPortrait"      && _type != "insightFrontlineRail"      && _type != "insightDestinationGrid"      && _type != "insightDevelopmentGrid"      && _type != "insightListingGrid"      && _type != "insightCourseGrid"      && _type != "insightPartnerLogoGrid"      && _type != "insightGuideCards"      && _type != "insightPartnerProfile"      && _type != "insightReferenceCard" => { ... }  }},  ctaHeading,  ctaBody,  ctaPrimary{ label, href },  ctaSecondary{ label, href },  ctaShowSecondary,  ctaWhatsAppLabel,  ctaWhatsAppMessage,  seo{  seoTitle,  metaDescription,  openGraphTitle,  openGraphDescription,  openGraphImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  noindex,  schemaType,  backLinks[]{    label,    url  },  supportingArticles},    "related": select(      count(relatedInsights) > 0 =>        relatedInsights[defined(@->slug.current)]->{  _id,  title,  "slug": slug.current,  insightCategory,  subhead,  publishedAt,  featured,  readingTimeOverride,  "bodyChars": length(pt::text(sections[].body[])),  heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  author->{  _id,  name,  "slug": slug.current,  role,  bio,  avatar{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}},      *[        _type == "insight"        && insightCategory == ^.insightCategory        && defined(slug.current)        && defined(publishedAt)        && slug.current != ^.slug.current      ] | order(publishedAt desc)[0...3] {  _id,  title,  "slug": slug.current,  insightCategory,  subhead,  publishedAt,  featured,  readingTimeOverride,  "bodyChars": length(pt::text(sections[].body[])),  heroImage{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions},  author->{  _id,  name,  "slug": slug.current,  role,  bio,  avatar{  asset,  fileAsset,  altText,  "lqip": asset.asset->metadata.lqip,  "dimensions": asset.asset->metadata.dimensions}}}    )  }
 export type InsightBySlugQueryResult = {
   _id: string;
   _type: "insight";
@@ -6543,6 +6569,105 @@ export type InsightBySlugQueryResult = {
                 altText: string | null;
                 lqip: string | null;
                 dimensions: SanityImageDimensions | null;
+              } | null;
+            };
+          }>;
+        }
+      | {
+          _type: "insightListingGrid";
+          _key: string;
+          heading: string | null;
+          mobileInitialMode: "all" | "onePerGroup" | null;
+          expandLabel: string | null;
+          collapseLabel: string | null;
+          items: Array<{
+            _key: string;
+            altOverride: string | null;
+            groupLabelOverride: string | null;
+            imageOverride: {
+              asset: {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt?: string;
+                _type: "image";
+              } | null;
+              fileAsset: {
+                asset?: SanityFileAssetReference;
+                media?: unknown;
+                _type: "file";
+              } | null;
+              altText: string | null;
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+            listing: {
+              _id: string;
+              ghiListingId: string;
+              title: string;
+              slug: string;
+              listingKind: "property" | "unit";
+              propertyType:
+                | "apartment"
+                | "development"
+                | "finca"
+                | "penthouse"
+                | "plot"
+                | "townhouse"
+                | "villa";
+              transactionType: "other" | "rent" | "sale" | "short_term";
+              countrySlug: string | null;
+              locationSlug: string | null;
+              communitySlug: string | null;
+              isCatchAll: boolean | false;
+              location: {
+                country: {
+                  name: string;
+                  slug: string;
+                } | null;
+                location: {
+                  name: string;
+                  slug: string;
+                } | null;
+                community: {
+                  _id: string;
+                  name: string;
+                  slug: string;
+                  isCatchAll: boolean | null;
+                };
+                addressDisplay: string;
+              } | null;
+              pricing: {
+                price: number | null;
+                priceDisplay: string | null;
+                currency: string | null;
+              } | null;
+              specs: {
+                bedrooms: number | null;
+                bathrooms: number | null;
+                builtArea: number | null;
+                builtAreaUnit: "sqft" | "sqm" | null;
+              } | null;
+              media: {
+                gallery: Array<{
+                  asset: {
+                    asset?: SanityImageAssetReference;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    alt?: string;
+                    _type: "image";
+                  } | null;
+                  fileAsset: {
+                    asset?: SanityFileAssetReference;
+                    media?: unknown;
+                    _type: "file";
+                  } | null;
+                  altText: string | null;
+                  lqip: string | null;
+                  dimensions: SanityImageDimensions | null;
+                }> | null;
               } | null;
             };
           }>;
@@ -13464,7 +13589,7 @@ declare module "@sanity/client" {
     '\n  *[_type == "guide" && defined(slug.current)]\n    | order(coalesce(order, 999) asc, title asc) {\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n': GuidesHubQueryResult;
     '\n  *[\n    _type == "guide"\n    && defined(slug.current)\n    && coalesce(seo.noindex, false) != true\n  ]{\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapGuidesQueryResult;
     '\n\t*[_type == "siteSettings" && _id == "siteSettings"][0]{\n\t\t"items": coalesce(headerNav, [])[]{\n\t\t\tlabel,\n\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t"external": link.linkType == "external",\n\t\t\t"children": coalesce(children, [])[]{\n\t\t\t\tlabel,\n\t\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t\t"external": link.linkType == "external"\n\t\t\t}\n\t\t},\n\t\t"cta": headerCta{\n\t\t\tlabel,\n\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t"external": link.linkType == "external"\n\t\t}\n\t}\n': HeaderNavQueryResult;
-    '\n  *[_type == "insight" && slug.current == $slug][0]{\n    \n  _id,\n  _type,\n  title,\n  titleEmphasis,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  heroCaption,\n  heroNote{ heading, body },\n  "heroLinkHref": select(\n\t\theroLink.linkType == "external" => heroLink.externalUrl,\n\t\theroLink.linkType == "internal" => heroLink.internalPath,\n\t\theroLink.linkType == "reference" && heroLink.reference->_type == "guide" => "/guides/" + heroLink.reference->slug.current,\n\t\theroLink.linkType == "reference" && heroLink.reference->type == "country" => "/" + heroLink.reference->slug.current,\n\t\theroLink.linkType == "reference" && heroLink.reference->type == "location" => "/" + heroLink.reference->parent->slug.current + "/" + heroLink.reference->slug.current,\n\t\theroLink.linkType == "reference" && heroLink.reference->type == "community" => "/" + heroLink.reference->parent->parent->slug.current + "/" + heroLink.reference->parent->slug.current + "?community=" + heroLink.reference->slug.current\n\t),\n  heroLayout,\n  heroPartnerLabel,\n  heroSublabel,\n  heroPartnerPlate,\n  "heroPartner": heroPartner->{\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  logoAlt{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n},\n  sections[]{\n  heading,\n  "anchor": anchor.current,\n  headingStyle,\n  body[]{\n    _type == "mediaAssetMetadata" => {\n      _type,\n      _key,\n      asset,\n      altText,\n      "lqip": asset.asset->metadata.lqip,\n      "dimensions": asset.asset->metadata.dimensions\n    },\n    _type == "insightFigure" => {\n      _type,\n      _key,\n      caption,\n      "image": image{\n        asset,\n        altText,\n        "lqip": asset.asset->metadata.lqip,\n        "dimensions": asset.asset->metadata.dimensions\n      }\n    },\n    _type == "insightFigurePair" => {\n      _type,\n      _key,\n      items[]{\n        _key,\n        caption,\n        linkLabel,\n        linkHref,\n        "image": image{\n          asset,\n          altText,\n          "lqip": asset.asset->metadata.lqip,\n          "dimensions": asset.asset->metadata.dimensions\n        }\n      }\n    },\n    _type == "insightPortrait" => {\n      _type,\n      _key,\n      name,\n      role,\n      "image": image{\n        asset,\n        altText,\n        "lqip": asset.asset->metadata.lqip,\n        "dimensions": asset.asset->metadata.dimensions\n      }\n    },\n    _type == "insightFrontlineRail" => {\n      _type,\n      _key,\n      heading,\n      summary,\n      summaryCountSingular,\n      summaryCountPlural,\n      showViewAll,\n      viewAllLabel,\n      viewAllHref,\n      "listings": listings[\n        \n  (\n    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])\n    || @->_type == "development"\n  )\n  && (coalesce(@->status, "") == $publishedStatus || $previewAll)\n\n      ]->{\n  _type == "development" => {\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n},\n  _type == "propertyListing" => {\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}\n}\n    },\n    _type == "insightDestinationGrid" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        body,\n        caption,\n        actionLabel,\n        actionHrefOverride,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        location->{\n          _id,\n          name,\n          "slug": slug.current,\n          type,\n          "countrySlug": parent->slug.current,\n          "heroImage": heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n        }\n      }\n    },\n    _type == "insightDevelopmentGrid" => {\n      _type,\n      _key,\n      heading,\n      mobileInitialMode,\n      expandLabel,\n      collapseLabel,\n      items[]{\n        _key,\n        altOverride,\n        groupLabelOverride,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        "development": select(\n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n => development->{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}),\n        "completionDate": select(\n          \n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n =>\n            coalesce(development->pricing.completionDate, development->completionDate)\n        ),\n        "completionPrecision": select(\n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n => development->completionPrecision),\n        "completionNote": select(\n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n => development->completionNote)\n      }\n    },\n    _type == "insightCourseGrid" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        altOverride,\n        actionLabel,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        "golfCourse": golfCourse->{\n          _id,\n          name,\n          "slug": slug.current,\n          tagline,\n          "communityName": community->name,\n          "communitySlug": community->slug.current,\n          "locationSlug": community->parent->slug.current,\n          "countryName": community->parent->parent->name,\n          "countrySlug": community->parent->parent->slug.current,\n          "media": media[0]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n        }\n      }\n    },\n    _type == "insightPartnerLogoGrid" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        serviceLabel,\n        "partner": partner->{\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  logoAlt{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n      }\n    },\n    _type == "insightGuideCards" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        summaryOverride,\n        "guide": guide->{\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n      }\n    },\n    _type == "insightPartnerProfile" => {\n      _type,\n      _key,\n      layout,\n      heading,\n      body,\n      personName,\n      personRole,\n      "teamImage": teamImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n      "portrait": portrait{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n      "partner": partner->{\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  logoAlt{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n    },\n    _type == "insightReferenceCard" => {\n      _type,\n      _key,\n      eyebrow,\n      heading,\n      description,\n      linkLabel,\n      linkHref,\n      "image": image{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n    },\n    _type != "mediaAssetMetadata"\n      && _type != "insightFigure"\n      && _type != "insightFigurePair"\n      && _type != "insightPortrait"\n      && _type != "insightFrontlineRail"\n      && _type != "insightDestinationGrid"\n      && _type != "insightDevelopmentGrid"\n      && _type != "insightCourseGrid"\n      && _type != "insightPartnerLogoGrid"\n      && _type != "insightGuideCards"\n      && _type != "insightPartnerProfile"\n      && _type != "insightReferenceCard" => { ... }\n  }\n},\n  ctaHeading,\n  ctaBody,\n  ctaPrimary{ label, href },\n  ctaSecondary{ label, href },\n  ctaShowSecondary,\n  ctaWhatsAppLabel,\n  ctaWhatsAppMessage,\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n,\n    "related": select(\n      count(relatedInsights) > 0 =>\n        relatedInsights[defined(@->slug.current)]->{\n  _id,\n  title,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n},\n      *[\n        _type == "insight"\n        && insightCategory == ^.insightCategory\n        && defined(slug.current)\n        && defined(publishedAt)\n        && slug.current != ^.slug.current\n      ] | order(publishedAt desc)[0...3] {\n  _id,\n  title,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n}\n    )\n  }\n': InsightBySlugQueryResult;
+    '\n  *[_type == "insight" && slug.current == $slug][0]{\n    \n  _id,\n  _type,\n  title,\n  titleEmphasis,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  heroCaption,\n  heroNote{ heading, body },\n  "heroLinkHref": select(\n\t\theroLink.linkType == "external" => heroLink.externalUrl,\n\t\theroLink.linkType == "internal" => heroLink.internalPath,\n\t\theroLink.linkType == "reference" && heroLink.reference->_type == "guide" => "/guides/" + heroLink.reference->slug.current,\n\t\theroLink.linkType == "reference" && heroLink.reference->type == "country" => "/" + heroLink.reference->slug.current,\n\t\theroLink.linkType == "reference" && heroLink.reference->type == "location" => "/" + heroLink.reference->parent->slug.current + "/" + heroLink.reference->slug.current,\n\t\theroLink.linkType == "reference" && heroLink.reference->type == "community" => "/" + heroLink.reference->parent->parent->slug.current + "/" + heroLink.reference->parent->slug.current + "?community=" + heroLink.reference->slug.current\n\t),\n  heroLayout,\n  heroPartnerLabel,\n  heroSublabel,\n  heroPartnerPlate,\n  "heroPartner": heroPartner->{\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  logoAlt{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n},\n  sections[]{\n  heading,\n  "anchor": anchor.current,\n  headingStyle,\n  body[]{\n    _type == "mediaAssetMetadata" => {\n      _type,\n      _key,\n      asset,\n      altText,\n      "lqip": asset.asset->metadata.lqip,\n      "dimensions": asset.asset->metadata.dimensions\n    },\n    _type == "insightFigure" => {\n      _type,\n      _key,\n      caption,\n      "image": image{\n        asset,\n        altText,\n        "lqip": asset.asset->metadata.lqip,\n        "dimensions": asset.asset->metadata.dimensions\n      }\n    },\n    _type == "insightFigurePair" => {\n      _type,\n      _key,\n      items[]{\n        _key,\n        caption,\n        linkLabel,\n        linkHref,\n        "image": image{\n          asset,\n          altText,\n          "lqip": asset.asset->metadata.lqip,\n          "dimensions": asset.asset->metadata.dimensions\n        }\n      }\n    },\n    _type == "insightPortrait" => {\n      _type,\n      _key,\n      name,\n      role,\n      "image": image{\n        asset,\n        altText,\n        "lqip": asset.asset->metadata.lqip,\n        "dimensions": asset.asset->metadata.dimensions\n      }\n    },\n    _type == "insightFrontlineRail" => {\n      _type,\n      _key,\n      heading,\n      summary,\n      summaryCountSingular,\n      summaryCountPlural,\n      showViewAll,\n      viewAllLabel,\n      viewAllHref,\n      "listings": listings[\n        \n  (\n    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])\n    || @->_type == "development"\n  )\n  && (coalesce(@->status, "") == $publishedStatus || $previewAll)\n\n      ]->{\n  _type == "development" => {\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n},\n  _type == "propertyListing" => {\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}\n}\n    },\n    _type == "insightDestinationGrid" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        body,\n        caption,\n        actionLabel,\n        actionHrefOverride,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        location->{\n          _id,\n          name,\n          "slug": slug.current,\n          type,\n          "countrySlug": parent->slug.current,\n          "heroImage": heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n        }\n      }\n    },\n    _type == "insightDevelopmentGrid" => {\n      _type,\n      _key,\n      heading,\n      mobileInitialMode,\n      expandLabel,\n      collapseLabel,\n      items[]{\n        _key,\n        altOverride,\n        groupLabelOverride,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        "development": select(\n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n => development->{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}),\n        "completionDate": select(\n          \n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n =>\n            coalesce(development->pricing.completionDate, development->completionDate)\n        ),\n        "completionPrecision": select(\n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n => development->completionPrecision),\n        "completionNote": select(\n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n => development->completionNote)\n      }\n    },\n    _type == "insightListingGrid" => {\n      _type,\n      _key,\n      heading,\n      mobileInitialMode,\n      expandLabel,\n      collapseLabel,\n      items[]{\n        _key,\n        altOverride,\n        groupLabelOverride,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        "listing": select(\n  (\n    listing->listingKind in ["property", "unit"]\n    && (coalesce(listing->status, "") == $publishedStatus || $previewAll)\n  )\n => listing->{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n})\n      }\n    },\n    _type == "insightCourseGrid" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        altOverride,\n        actionLabel,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        "golfCourse": golfCourse->{\n          _id,\n          name,\n          "slug": slug.current,\n          tagline,\n          "communityName": community->name,\n          "communitySlug": community->slug.current,\n          "locationSlug": community->parent->slug.current,\n          "countryName": community->parent->parent->name,\n          "countrySlug": community->parent->parent->slug.current,\n          "media": media[0]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n        }\n      }\n    },\n    _type == "insightPartnerLogoGrid" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        serviceLabel,\n        "partner": partner->{\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  logoAlt{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n      }\n    },\n    _type == "insightGuideCards" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        summaryOverride,\n        "guide": guide->{\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n      }\n    },\n    _type == "insightPartnerProfile" => {\n      _type,\n      _key,\n      layout,\n      heading,\n      body,\n      personName,\n      personRole,\n      "teamImage": teamImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n      "portrait": portrait{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n      "partner": partner->{\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  logoAlt{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n    },\n    _type == "insightReferenceCard" => {\n      _type,\n      _key,\n      eyebrow,\n      heading,\n      description,\n      linkLabel,\n      linkHref,\n      "image": image{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n    },\n    _type != "mediaAssetMetadata"\n      && _type != "insightFigure"\n      && _type != "insightFigurePair"\n      && _type != "insightPortrait"\n      && _type != "insightFrontlineRail"\n      && _type != "insightDestinationGrid"\n      && _type != "insightDevelopmentGrid"\n      && _type != "insightListingGrid"\n      && _type != "insightCourseGrid"\n      && _type != "insightPartnerLogoGrid"\n      && _type != "insightGuideCards"\n      && _type != "insightPartnerProfile"\n      && _type != "insightReferenceCard" => { ... }\n  }\n},\n  ctaHeading,\n  ctaBody,\n  ctaPrimary{ label, href },\n  ctaSecondary{ label, href },\n  ctaShowSecondary,\n  ctaWhatsAppLabel,\n  ctaWhatsAppMessage,\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n,\n    "related": select(\n      count(relatedInsights) > 0 =>\n        relatedInsights[defined(@->slug.current)]->{\n  _id,\n  title,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n},\n      *[\n        _type == "insight"\n        && insightCategory == ^.insightCategory\n        && defined(slug.current)\n        && defined(publishedAt)\n        && slug.current != ^.slug.current\n      ] | order(publishedAt desc)[0...3] {\n  _id,\n  title,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n}\n    )\n  }\n': InsightBySlugQueryResult;
     '\n  *[_type == "insight" && defined(slug.current) && defined(publishedAt)]\n    | order(publishedAt desc) {\n  _id,\n  title,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n}\n': InsightsHubQueryResult;
     '\n  *[\n    _type == "insight"\n    && defined(slug.current)\n    && defined(publishedAt)\n    && coalesce(seo.noindex, false) != true\n  ]{\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapInsightsQueryResult;
     '\n  *[\n    _type in ["propertyListing", "development"]\n    && \n  coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n) == $countrySlug\n  && coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n) == $locationSlug\n  && coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n) == $communitySlug\n  && slug.current == $slug\n\n    && (\n      (_type == "propertyListing" && listingKind in ["property", "unit"])\n      || _type == "development"\n    )\n    && \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n\n  ][0]{\n    _type,\n    listingKind,\n    \n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  "slug": slug.current,\n  listingKind\n\n  }\n': ListingByPathQueryResult;

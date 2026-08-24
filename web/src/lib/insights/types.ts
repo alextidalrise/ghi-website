@@ -7,6 +7,11 @@ import type {
 	InsightDevelopmentGridItemRaw,
 	InsightDevelopmentGroup
 } from '$lib/sanity/transforms/insightDevelopmentCard';
+import type {
+	InsightListingCard,
+	InsightListingGridItemRaw,
+	InsightListingGroup
+} from '$lib/sanity/transforms/insightListingCard';
 import type { InsightCourseGridItemRaw } from '$lib/sanity/transforms/insightCourseCard';
 import type { InsightPartnerLogoItemRaw } from '$lib/sanity/transforms/insightPartnerLogoCard';
 import type { InsightGuideCardItemRaw } from '$lib/sanity/transforms/insightGuideCard';
@@ -288,6 +293,23 @@ export type InsightDevelopmentGridBlock = {
 };
 
 /**
+ * A collection of individual property listings. Same shape and server-hydration contract as the
+ * development grid — raw publish-gated `items` in, resolved `cards` (flat) and `groups` (by
+ * destination, for mobile) out — but each card resolves a single `propertyListing`.
+ */
+export type InsightListingGridBlock = {
+	_type: 'insightListingGrid';
+	_key: string;
+	heading?: string | null;
+	mobileInitialMode?: 'onePerGroup' | 'all' | null;
+	expandLabel?: string | null;
+	collapseLabel?: string | null;
+	items?: InsightListingGridItemRaw[] | null;
+	cards?: InsightListingCard[] | null;
+	groups?: InsightListingGroup[] | null;
+};
+
+/**
  * A collection of golf courses. The projection carries raw `items` (each with a dereferenced
  * canonical course); the renderer resolves them to cards. Identity and route are always live.
  */
@@ -342,6 +364,7 @@ export type InsightBodyBlock =
 	| InsightFrontlineRailBlock
 	| InsightDestinationGridBlock
 	| InsightDevelopmentGridBlock
+	| InsightListingGridBlock
 	| InsightCourseGridBlock
 	| InsightPartnerLogoGridBlock
 	| InsightGuideCardsBlock;

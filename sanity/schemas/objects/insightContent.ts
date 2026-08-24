@@ -1298,6 +1298,129 @@ export const insightDevelopmentGrid = defineType({
 });
 
 /**
+ * One property in the collection: a live reference to a canonical `propertyListing` record, plus an
+ * optional article-only image and alt, and an optional grouping label override. Title, route,
+ * price, location and specs are ALL read from the referenced record at render time — never copied
+ * here — so the collection can never show a stale price or a dead link. This is the individual-home
+ * counterpart to `insightDevelopmentGrid`: same card format, but each card is a single listing
+ * rather than a whole development.
+ */
+export const insightListingGridItem = defineType({
+	name: 'insightListingGridItem',
+	title: 'Property',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'listing',
+			title: 'Property',
+			type: 'reference',
+			to: [{ type: 'propertyListing' }],
+			description:
+				'The property to feature. Its title, URL, price, location and specs are read live — withdrawn or unpublished picks drop out on their own.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'imageOverride',
+			title: 'Article image (override)',
+			type: 'mediaAssetMetadata',
+			description:
+				"Optional. A photograph for this article's card only. Leave blank to use the property's own approved image. Never changes the property record or its cards elsewhere."
+		}),
+		defineField({
+			name: 'altOverride',
+			title: 'Article image alt (override)',
+			type: 'string',
+			description: 'Optional. Alt text for the override image. Defaults to the property title.',
+			validation: (Rule) => Rule.max(160)
+		}),
+		defineField({
+			name: 'groupLabelOverride',
+			title: 'Group label (override)',
+			type: 'string',
+			description:
+				'Optional. The destination heading this card groups under on mobile. Defaults to the property’s resort or area.',
+			validation: (Rule) => Rule.max(60)
+		})
+	],
+	preview: {
+		select: { title: 'listing.title', subtitle: 'groupLabelOverride', media: 'imageOverride.asset' },
+		prepare({ title, subtitle, media }) {
+			return { title: title || 'Property', subtitle: subtitle || 'Property card', media };
+		}
+	}
+});
+
+/**
+ * An ordered, mobile-groupable collection of individual property listings with live commercial
+ * facts. Visually identical to `insightDevelopmentGrid` (a flat two-column grid on desktop; grouped
+ * under their destination and collapsed to one representative each behind a "See all" disclosure on
+ * a narrow screen), but each card resolves a single `propertyListing` rather than a development —
+ * the module for a hand-picked set of homes that share no parent development.
+ */
+export const insightListingGrid = defineType({
+	name: 'insightListingGrid',
+	title: 'Property collection',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Optional. Leave blank when the section heading already names the module.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'items',
+			title: 'Properties',
+			type: 'array',
+			of: [{ type: 'insightListingGridItem' }],
+			description: 'The properties, in the desktop reading order.',
+			validation: (Rule) => Rule.required().min(1).max(12)
+		}),
+		defineField({
+			name: 'mobileInitialMode',
+			title: 'Mobile — initially show',
+			type: 'string',
+			options: {
+				list: [
+					{ title: 'One per destination', value: 'onePerGroup' },
+					{ title: 'All properties', value: 'all' }
+				],
+				layout: 'radio'
+			},
+			initialValue: 'onePerGroup',
+			description:
+				'On narrow screens, whether to show one representative per destination behind a disclosure, or all cards outright.'
+		}),
+		defineField({
+			name: 'expandLabel',
+			title: 'Mobile — expand button label',
+			type: 'string',
+			initialValue: 'See all {count} properties',
+			description: 'Shown when collapsed on mobile. Use {count} for the live number of properties.',
+			validation: (Rule) => Rule.max(48)
+		}),
+		defineField({
+			name: 'collapseLabel',
+			title: 'Mobile — collapse button label',
+			type: 'string',
+			initialValue: 'Show fewer properties',
+			validation: (Rule) => Rule.max(48)
+		})
+	],
+	preview: {
+		select: { heading: 'heading', items: 'items' },
+		prepare({ heading, items }) {
+			const count = Array.isArray(items) ? items.length : 0;
+			return {
+				title: heading || 'Property collection',
+				subtitle: `${count} ${count === 1 ? 'property' : 'properties'}`
+			};
+		}
+	}
+});
+
+/**
  * One course in the collection: a live reference to a canonical `golfCourse` record, plus an
  * optional article-only image and alt, and an optional CTA label override. Name, route and
  * destination are ALL read from the referenced record at render time — never copied here — so a
@@ -1611,6 +1734,7 @@ const insightSectionBody = defineField({
 		// canonical entity live and never copies its volatile data into the article.
 		defineArrayMember({ type: 'insightDestinationGrid' }),
 		defineArrayMember({ type: 'insightDevelopmentGrid' }),
+		defineArrayMember({ type: 'insightListingGrid' }),
 		defineArrayMember({ type: 'insightCourseGrid' }),
 		defineArrayMember({ type: 'insightPartnerLogoGrid' }),
 		defineArrayMember({ type: 'insightGuideCards' })

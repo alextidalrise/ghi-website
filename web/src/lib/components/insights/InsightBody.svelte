@@ -24,6 +24,7 @@
 	import InsightFrontlineRail from './InsightFrontlineRail.svelte';
 	import InsightDestinationGrid from './InsightDestinationGrid.svelte';
 	import InsightDevelopmentGrid from './InsightDevelopmentGrid.svelte';
+	import InsightListingGrid from './InsightListingGrid.svelte';
 	import InsightCourseGrid from './InsightCourseGrid.svelte';
 	import InsightPartnerLogoGrid from './InsightPartnerLogoGrid.svelte';
 	import InsightGuideCards from './InsightGuideCards.svelte';
@@ -62,6 +63,7 @@
 			insightFrontlineRail: InsightFrontlineRail,
 			insightDestinationGrid: InsightDestinationGrid,
 			insightDevelopmentGrid: InsightDevelopmentGrid,
+			insightListingGrid: InsightListingGrid,
 			insightCourseGrid: InsightCourseGrid,
 			insightPartnerLogoGrid: InsightPartnerLogoGrid,
 			insightGuideCards: InsightGuideCards
