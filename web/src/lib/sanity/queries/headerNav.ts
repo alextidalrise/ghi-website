@@ -1,5 +1,6 @@
 import { defineQuery } from 'groq';
 import { withoutCampaignParams } from '../href';
+import { navHref, navExternal } from './navHref';
 import { fetchPublic } from './fetch';
 
 // Resolves a navLink to a concrete href. References become canonical paths derived from
@@ -7,16 +8,10 @@ import { fetchPublic } from './fetch';
 // /spain/marbella?community=…, guide -> /guides/…); the manual styles pass straight
 // through. The field is always named `link`, so the same fragment serves every level —
 // the header items and the footer's labelled links alike (the footer query reuses these).
-export const NAV_HREF = `select(
-		link.linkType == "external" => link.externalUrl,
-		link.linkType == "internal" => link.internalPath,
-		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,
-		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,
-		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,
-		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current
-	)`;
+// The resolution itself lives in ./navHref so the insight hero link can reuse it verbatim.
+export const NAV_HREF = navHref('link.');
 
-export const NAV_EXTERNAL = `link.linkType == "external"`;
+export const NAV_EXTERNAL = navExternal('link.');
 
 export const headerNavQuery = defineQuery(`
 	*[_type == "siteSettings" && _id == "siteSettings"][0]{

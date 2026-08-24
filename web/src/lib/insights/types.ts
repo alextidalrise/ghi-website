@@ -414,6 +414,13 @@ export type InsightDetail = {
 	heroCaption?: string | null;
 	heroNote?: InsightHeroNote | null;
 	/**
+	 * Optional hero link, resolved to a concrete href at query time (see `navHref`). When set, the
+	 * hero image and the caption + note beneath it become one clickable link to this destination.
+	 * A `navLink` on the document authored exactly like a menu link — page reference, internal path,
+	 * or external URL — so a reference stays correct if its slug changes.
+	 */
+	heroLinkHref?: string | null;
+	/**
 	 * Hero composition. `splitSquare` is the equal-column, square-plate launch treatment; `coBrand`
 	 * leads with the standfirst and runs a partner brand plate beside the photo (the
 	 * partner-introduction hero, which reads `heroPartner` / `heroPartnerLabel` / `heroSublabel`).

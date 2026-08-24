@@ -9,6 +9,7 @@ import {
 	UNIT_DEV_IS_CATCH_ALL,
 	UNIT_DEV_LOCATION_SLUG
 } from './queries/filters';
+import { navHref } from './queries/navHref';
 
 /**
  * Explicit public field allowlists per template.
@@ -707,6 +708,7 @@ export const INSIGHT_DETAIL_FIELDS = /* groq */ `
   heroImage${MEDIA_ASSET_PUBLIC},
   heroCaption,
   heroNote{ heading, body },
+  "heroLinkHref": ${navHref('heroLink.')},
   heroLayout,
   heroPartnerLabel,
   heroSublabel,

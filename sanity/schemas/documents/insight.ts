@@ -133,6 +133,17 @@ export const insight = defineType({
 				'Optional framed note under the hero image: the article\'s thesis in one line, before the reader has scrolled. Leave blank and the hero runs image-only.'
 		}),
 		defineField({
+			name: 'heroLink',
+			title: 'Hero link',
+			type: 'navLink',
+			group: 'content',
+			description:
+				'Optional. Make the hero image — and the caption and note beneath it — one clickable link. Authored exactly like a menu link: pick a page on this site, a hand-typed internal path, or an external URL. A page reference stays correct if its slug changes. Leave the link style unset for the standard, non-clickable hero. (Standard and Split heroes only.)',
+			// The co-brand band composes its plate and photo differently and does not render the hero
+			// link, so hide the field there rather than let an editor set config that does nothing.
+			hidden: ({ document }) => document?.heroLayout === 'coBrand'
+		}),
+		defineField({
 			name: 'heroLayout',
 			title: 'Hero layout',
 			type: 'string',
