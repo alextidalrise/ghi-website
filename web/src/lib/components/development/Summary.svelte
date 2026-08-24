@@ -73,12 +73,12 @@
 	);
 
 	// Outline badges come from the curated composition summary (e.g. "Apartments",
-	// "Penthouses"), capped so the row stays calm.
+	// "Penthouses"). How many show is controlled in the CMS by the number of
+	// entries added — the row is not capped here.
 	const outlineBadges = $derived(
 		(development.developmentComposition ?? [])
 			.map((item) => item?.trim())
 			.filter((item): item is string => Boolean(item))
-			.slice(0, 2)
 	);
 </script>
 
