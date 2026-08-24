@@ -2,6 +2,7 @@
 	import type { BreadcrumbItem } from '$lib/listing/breadcrumbs';
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import { buildImageSrcset, buildPublicImageUrl, getImagePlaceholder } from '$lib/sanity/image';
+	import { isInternalHref, withoutCampaignParams } from '$lib/sanity/href';
 	import { insightKickerLabel } from '$lib/insights/categories';
 	import {
 		formatInsightDate,
@@ -68,6 +69,20 @@
 			: null
 	);
 	const hasRail = $derived(Boolean(image || note));
+
+	// Optional hero link: when set, the whole rail — image, its caption and the note beneath —
+	// becomes one link. The href is already resolved from the `navLink` at query time (page
+	// reference / internal path / external URL); we only clean campaign params off our own URLs
+	// (an internal utm_* would re-attribute the GA4 session, exactly as the nav does) and detect
+	// external targets for target/rel, mirroring InsightReferenceCard. Wired for the standard and
+	// split heroes; the co-brand band composes its plate + photo differently and is left plain.
+	const heroHref = $derived.by(() => {
+		const raw = insight.heroLinkHref?.trim();
+		return raw ? withoutCampaignParams(raw) : null;
+	});
+	const heroLinkExternal = $derived(
+		Boolean(heroHref && /^https?:\/\//.test(heroHref) && !isInternalHref(heroHref))
+	);
 
 	// Co-brand plate: the partner's name and logo (read live from the referenced partner), plus the
 	// label under the name and the optional sub-label under the headline. Two plate treatments,
@@ -231,6 +246,16 @@
 
 	{#if hasRail}
 		<aside class="article-hero__rail">
+			<!-- When a hero link is set the whole rail is one anchor (image + caption + note); with no
+			     link it is a plain <div> and nothing about the layout changes. -->
+			<svelte:element
+				this={heroHref ? 'a' : 'div'}
+				class="article-hero__rail-inner"
+				class:article-hero__rail-inner--link={Boolean(heroHref)}
+				href={heroHref || undefined}
+				target={heroHref && heroLinkExternal ? '_blank' : undefined}
+				rel={heroHref && heroLinkExternal ? 'noopener noreferrer' : undefined}
+			>
 			{#if image}
 				<!-- Standard: a matted plate — the frame holds the photograph AND its caption below,
 				     so the image reads as placed on the page. Split: a square plate with the caption
@@ -273,6 +298,7 @@
 					<p class="article-hero__note-body">{note.body}</p>
 				</div>
 			{/if}
+			</svelte:element>
 		</aside>
 	{/if}
 </header>
@@ -367,6 +393,55 @@
 
 	.article-hero__rail {
 		min-width: 0;
+	}
+
+	/* The rail's link wrapper is layout-transparent by default (a plain block); the layout is
+	   identical whether it renders as a <div> or an <a>. */
+	.article-hero__rail-inner {
+		display: block;
+	}
+
+	/*
+	 * Linked hero. The whole rail is one anchor, so inherit the colour and drop the underline —
+	 * otherwise the caption and note would pick up the body's prose-link styling. The affordance is
+	 * a quiet one, matching InsightCard: the framed image (its frame already clips) eases up on
+	 * hover/focus, and the note heading underlines so the text reads as part of the same target.
+	 */
+	.article-hero__rail-inner--link {
+		color: inherit;
+		text-decoration: none;
+		cursor: pointer;
+	}
+
+	.article-hero__rail-inner--link .article-hero__frame img {
+		transition: transform 0.4s ease;
+	}
+
+	.article-hero__rail-inner--link:hover .article-hero__frame img,
+	.article-hero__rail-inner--link:focus-visible .article-hero__frame img {
+		transform: scale(1.04);
+	}
+
+	.article-hero__rail-inner--link:hover .article-hero__note-heading,
+	.article-hero__rail-inner--link:focus-visible .article-hero__note-heading {
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+
+	.article-hero__rail-inner--link:focus-visible {
+		outline: 2px solid var(--green);
+		outline-offset: 3px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.article-hero__rail-inner--link .article-hero__frame img {
+			transition: none;
+		}
+
+		.article-hero__rail-inner--link:hover .article-hero__frame img,
+		.article-hero__rail-inner--link:focus-visible .article-hero__frame img {
+			transform: none;
+		}
 	}
 
 	.article-hero__media {
