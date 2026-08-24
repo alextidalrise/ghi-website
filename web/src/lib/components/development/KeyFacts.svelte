@@ -61,6 +61,8 @@
 		const courseName = development.golf?.linkedGolfCourses?.[0]?.name;
 		if (courseName) items.push({ label: 'Golf course', value: courseName });
 
+		if (development.ghiListingId) items.push({ label: 'Listing ID', value: development.ghiListingId });
+
 		return items;
 	});
 </script>
