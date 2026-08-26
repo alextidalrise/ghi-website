@@ -1,40 +1,26 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { subscribeToNewsletter } from '$lib/server/mailchimp';
 
-// Stubbed newsletter + buyer-guide signup. The footer newsletter form and the
-// homepage buyer-guide cards both post here and render real
-// idle/submitting/success/error states against it. When the HubSpot list is
-// ready, replace the body of the `try` block with the HubSpot Forms API call
-// (POST to https://api.hsforms.com/submissions/v3/integration/submit/{portalId}/{formGuid})
-// and keep the same JSON success/error contract so the clients need no changes.
+// Footer newsletter signup. Adds the address to the Mailchimp audience as a double opt-in
+// (`pending`) member; Mailchimp sends the confirmation email. See $lib/server/mailchimp.
 //
-// ANALYTICS: deliberately silent. Because this endpoint returns `{ok:true}` without
-// contacting HubSpot, neither the footer newsletter nor the buyer-guide cards emit any
-// event — reporting a conversion for a subscription that was never delivered would be
-// worse than reporting nothing. `buyer_guide_request` is likewise absent from `LeadType`
-// in $lib/analytics/types.ts for the same reason.
+// A buyer-guide request is a different intent — a lead requesting a specific PDF, not a
+// newsletter sub — so it posts to /api/guide (HubSpot, the CRM), not here.
 //
-// When this is wired up for real, add — in the same change:
-//   • `sign_up` (NOT generate_lead) from Footer.svelte on a confirmed newsletter success
-//   • `buyer_guide_request` to LeadType, and generate_lead from BuyerGuideCard.svelte
-// Emit from the client's success branch only, never from a derived success state, and
-// update docs/analytics.md's event dictionary to match.
+// ANALYTICS: deliberately silent here. When we add `sign_up`, emit it from the client's
+// success branch (Footer.svelte) only, never from a derived success state, and update
+// docs/analytics.md's event dictionary in the same change.
 
-// Deliberately forgiving: catches the obvious typos without rejecting the long
-// tail of valid addresses a stricter regex would.
+// Deliberately forgiving: catches the obvious typos without rejecting the long tail of
+// valid addresses a stricter regex would.
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// Which buyer guide an email is requesting, when posted from the homepage cards.
-// Absent for a plain newsletter signup. Anything else is ignored as untrusted.
-const GUIDES = ['spain', 'portugal'] as const;
-type Guide = (typeof GUIDES)[number];
 
 export const POST: RequestHandler = async ({ request }) => {
 	let email: unknown;
-	let guide: unknown;
 
 	try {
-		({ email, guide } = await request.json());
+		({ email } = await request.json());
 	} catch {
 		return json({ error: 'Could not read your request. Please try again.' }, { status: 400 });
 	}
@@ -43,20 +29,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ error: 'Please enter a valid email address.' }, { status: 422 });
 	}
 
-	const requestedGuide: Guide | undefined = GUIDES.includes(guide as Guide)
-		? (guide as Guide)
-		: undefined;
-
-	try {
-		// TODO: forward `email.trim()` to HubSpot once the list ID is provisioned.
-		// When `requestedGuide` is set, trigger the matching guide-delivery workflow
-		// (HubSpot emails the PDF) instead of a plain list subscription.
-		void requestedGuide;
-		return json({ ok: true });
-	} catch {
-		return json(
-			{ error: 'Something went wrong on our end. Please try again shortly.' },
-			{ status: 502 }
-		);
-	}
+	const result = await subscribeToNewsletter(email.trim());
+	if (result.ok) return json({ ok: true });
+	return json({ error: result.error }, { status: result.status });
 };

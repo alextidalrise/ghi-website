@@ -38,7 +38,7 @@
 		message = '';
 
 		try {
-			const response = await fetch('/api/newsletter', {
+			const response = await fetch('/api/guide', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({ email, guide })
