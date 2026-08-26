@@ -28,7 +28,7 @@
  * Deliberately absent:
  * - `/soon` — the launch holding page, whose output depends on the `launch_bypass` cookie.
  * - `/internal/*` — team tooling, not public.
- * - `/api/*` — not documents; `/api/newsletter` is a POST form target.
+ * - `/api/*` — not documents; `/api/newsletter` and `/api/guide` are POST form targets.
  * - `/d/[ghiId]`, `/p/[ghiId]`, `/u/[ghiId]` — short-link redirects. Vercel will cache a
  *   301/302/307, but these are cheap already and a wrongly-cached redirect is annoying to
  *   flush, so they stay out until someone wants them in.
