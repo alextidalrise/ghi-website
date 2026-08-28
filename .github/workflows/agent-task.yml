@@ -1,0 +1,86 @@
+name: Agent tasks
+
+# Two ways to put an agent on an issue:
+#   1. Apply the `agent-task` label — the gate. Only people with triage rights can
+#      label, so a human glance always sits between "issue filed" and "agent spends
+#      budget / follows instructions". Never trigger on `opened`.
+#   2. Mention @claude in an issue or PR comment for ad-hoc steering; the action
+#      itself verifies the commenter has write access before running.
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: agent-task-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  agent:
+    if: >
+      (github.event_name == 'issues' && github.event.label.name == 'agent-task') ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Action labeled issue
+        if: github.event_name == 'issues'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            You are actioning a site-update request from the GHI team, filed as issue
+            #${{ github.event.issue.number }} in this repository.
+
+            1. Read the issue and any comments: `gh issue view ${{ github.event.issue.number }} --comments`.
+            2. Decide what kind of request it is:
+               - A code change in this repo: implement it on a new branch named
+                 `agent/issue-${{ github.event.issue.number }}`.
+               - A CMS content change (copy, images, listings that live in Sanity, not
+                 in this repo): do NOT attempt it. Comment on the issue explaining it
+                 is a Sanity content change and spell out exactly what to edit in
+                 Studio (document type, field, new value), then stop.
+               - Ambiguous, out of scope, or missing information: do not guess.
+                 Comment your specific questions on the issue and stop.
+            3. For code changes: run `pnpm --filter web test`, and if you touched
+               TypeScript or Svelte files also run `pnpm --filter web check`. Fix
+               what breaks.
+            4. Push the branch and open a pull request. The body must explain what
+               changed and why, note anything you were unsure about, and include
+               `Closes #${{ github.event.issue.number }}`.
+
+            Constraints: never push to main. Match the conventions of DESIGN.md and
+            the surrounding code. Small, reviewable diffs — if the request is really
+            several changes, say so on the issue rather than shipping a grab-bag PR.
+          claude_args: |
+            --allowedTools "Read,Glob,Grep,Edit,Write,Bash(pnpm install:*),Bash(pnpm --filter:*),Bash(pnpm test:*),Bash(pnpm check:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git add:*),Bash(git commit:*),Bash(git checkout -b:*),Bash(git push:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh pr create:*)"
+
+      - name: Respond to mention
+        if: github.event_name == 'issue_comment'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --allowedTools "Read,Glob,Grep,Edit,Write,Bash(pnpm install:*),Bash(pnpm --filter:*),Bash(pnpm test:*),Bash(pnpm check:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git add:*),Bash(git commit:*),Bash(git checkout -b:*),Bash(git push:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr comment:*)"

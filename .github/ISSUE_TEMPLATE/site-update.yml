@@ -1,0 +1,44 @@
+name: Site update request
+description: Ask for a change to the GHI website. Well-specified requests can be picked up and actioned automatically.
+title: "Site update: "
+labels:
+  - site-update
+body:
+  - type: input
+    id: pages
+    attributes:
+      label: Where on the site?
+      description: The page or pages this affects — paste the full URL if you can.
+      placeholder: e.g. https://www.golfhomesinternational.com/spain/marbella
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What should change?
+      description: >-
+        Be as concrete as you can — current wording vs. desired wording, what a new
+        section should contain, what looks wrong and on which device. The more
+        specific this is, the more likely the change lands right first time.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: How will we know it's right?
+      description: >-
+        What should the page look like, say, or do when this is done? Screenshots
+        and reference links welcome — drag images straight into this box.
+    validations:
+      required: false
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency
+      options:
+        - Whenever
+        - This week
+        - Urgent (blocking something)
+      default: 0
+    validations:
+      required: false
