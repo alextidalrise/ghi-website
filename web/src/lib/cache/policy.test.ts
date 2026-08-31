@@ -88,11 +88,13 @@ describe('isCacheable', () => {
 		}
 	});
 
-	// Deliberately deferred to their own change; asserted so nobody adds them by accident.
-	it('does not yet cache sitemap or robots', () => {
-		for (const routeId of ['/sitemap.xml', '/robots.txt']) {
-			expect(isCacheable(cacheableInput({ routeId }))).toBe(false);
-		}
+	it('caches the sitemap (it carries the sitemap purge tag)', () => {
+		expect(isCacheable(cacheableInput({ routeId: '/sitemap.xml' }))).toBe(true);
+	});
+
+	// robots.txt is still deferred to its own change; asserted so nobody adds it by accident.
+	it('does not yet cache robots', () => {
+		expect(isCacheable(cacheableInput({ routeId: '/robots.txt' }))).toBe(false);
 	});
 
 	it('caches every allowlisted route', () => {

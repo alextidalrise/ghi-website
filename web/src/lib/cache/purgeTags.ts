@@ -72,6 +72,8 @@ export function tagsForDoc(payload: PurgePayload): string[] {
 			add(countrySlug && cacheTag.gridCountry(countrySlug));
 			addFrontline();
 			for (const id of golfCourseIds ?? []) add(id && cacheTag.golf(id));
+			// Listing/development URLs are sitemap members; publish/unpublish/delete shifts the set.
+			add(cacheTag.sitemap);
 			break;
 		}
 		case 'unit':
@@ -82,10 +84,15 @@ export function tagsForDoc(payload: PurgePayload): string[] {
 			add(locationId && cacheTag.gridLocation(locationId));
 			add(countrySlug && cacheTag.gridCountry(countrySlug));
 			addFrontline();
+			// A unit is its own sitemap URL; a unit type is not (it has no page of its own).
+			add(_type === 'unit' && cacheTag.sitemap);
 			break;
 		}
 		case 'locationTaxonomy': {
 			add(cacheTag.nav);
+			// Country/location nodes are sitemap URLs, and any node's slug or isCatchAll feeds the
+			// listing/unit path segments the sitemap emits — so every taxonomy change purges it.
+			add(cacheTag.sitemap);
 			if (taxonomyType === 'country') {
 				add(countrySlug && cacheTag.gridCountry(countrySlug));
 				add(cacheTag.home);
@@ -101,11 +108,21 @@ export function tagsForDoc(payload: PurgePayload): string[] {
 		case 'author': {
 			// author bylines render on insight pages/cards; the hub relists them.
 			add(cacheTag.hubInsights);
+			// An insight is a sitemap URL; an author is not.
+			add(_type === 'insight' && cacheTag.sitemap);
 			break;
 		}
 		case 'guide': {
 			add(cacheTag.hubGuides);
 			add(countrySlug && cacheTag.country(countrySlug));
+			// Guide detail pages are sitemap URLs.
+			add(cacheTag.sitemap);
+			break;
+		}
+		case 'golfCourse': {
+			// A golf course's own page carries its `doc:` tag already; the sitemap lists its URL,
+			// so a create/publish/delete must also purge the sitemap.
+			add(cacheTag.sitemap);
 			break;
 		}
 		case 'partner': {
@@ -124,8 +141,6 @@ export function tagsForDoc(payload: PurgePayload): string[] {
 			add(cacheTag.nav);
 			break;
 		}
-		// golfCourse: its own page, the location golf list, and listings embedding it all carry
-		// its `doc:` tag, so no structural tag is needed.
 		// aboutPage / contactPage / guidesHubPage: single pages covered by their `doc:` tag.
 	}
 
