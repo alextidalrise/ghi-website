@@ -149,7 +149,7 @@ export {
 	type CourseFilterOption
 } from './frontline';
 
-export { sitemapListingsQuery, sitemapTaxonomyQuery } from './sitemap';
+export { sitemapListingsQuery, sitemapTaxonomyQuery, sitemapUnitsQuery } from './sitemap';
 
 export { guideBySlugQuery, guidesHubQuery, sitemapGuidesQuery } from './guide';
 

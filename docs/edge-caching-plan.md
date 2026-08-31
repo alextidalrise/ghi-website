@@ -232,8 +232,9 @@ Cacheable — public, CMS-driven, identical for everyone:
 
 Never cache: `/internal/*` (tooling), `/soon` (holding page, cookie-dependent), `/api/*`.
 
-Consider separately, not in the first PR: `/sitemap.xml` and `/robots.txt` — both good
-candidates but with different TTLs, and worth their own thought.
+Now cached: `/sitemap.xml` — opted into the allowlist once units were added to it; it carries
+the `sitemap` tag so any indexable-doc publish purges it. `/robots.txt` is still deferred to
+its own change.
 
 Prefer an explicit allowlist to a denylist. A new route should default to uncached and be
 opted in deliberately.
@@ -407,7 +408,9 @@ Next.js ISR; 128 tags/response, 256 chars/tag, 16 tags per bulk API call):
   request in `cacheHandle`; `lib/sanity/queries/fetch.ts` deep-scans every result for `_id`
   and records `doc:<id>`. A handful of loads add structural tags (`grid:loc:*`,
   `grid:country:*`, `rail:frontline*`, `hub:*`, `col:partners`, `nav`, `home`, `country:*`)
-  for the "new document" case a `doc:` tag can't cover. Tag names live in `lib/cache/tags.ts`.
+  for the "new document" case a `doc:` tag can't cover. `/sitemap.xml` is query-built from
+  every indexable doc, so it carries the single `sitemap` tag instead of per-doc tags. Tag
+  names live in `lib/cache/tags.ts`.
 - **Write side.** `routes/api/cache-purge/+server.ts` verifies the Sanity webhook HMAC
   (`@sanity/webhook`), maps the changed doc → tags via the pure `lib/cache/purgeTags.ts`, and
   invalidates them with `@vercel/functions` `invalidateByTag` (runs in-context, no Vercel

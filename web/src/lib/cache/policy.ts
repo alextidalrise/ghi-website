@@ -32,10 +32,14 @@
  * - `/d/[ghiId]`, `/p/[ghiId]`, `/u/[ghiId]` — short-link redirects. Vercel will cache a
  *   301/302/307, but these are cheap already and a wrongly-cached redirect is annoying to
  *   flush, so they stay out until someone wants them in.
- * - `/sitemap.xml`, `/robots.txt` — good candidates, but they want their own TTL and their
- *   own thought. Separate change.
+ * - `/robots.txt` — a good candidate, but it wants its own thought. Separate change.
+ *
+ * `/sitemap.xml` is cached here (opted in): it is a public, visitor-invariant GET, and it
+ * carries the `sitemap` structural tag so a Sanity publish purges it precisely rather than
+ * leaving it stale until the TTL lapses (see routes/sitemap.xml/+server.ts and purgeTags.ts).
  */
 export const CACHEABLE_ROUTE_IDS: ReadonlySet<string> = new Set([
+	'/sitemap.xml',
 	'/',
 	'/[country]',
 	'/[country]/[location]',

@@ -125,8 +125,38 @@ describe('tagsForDoc', () => {
 		);
 	});
 
-	it('gives a golf course only its doc tag (pages carry it already)', () => {
-		expect(tagsForDoc(base({ _id: 'gc-1', _type: 'golfCourse' }))).toEqual(['doc:gc-1']);
+	it('gives a golf course its doc tag plus the sitemap tag', () => {
+		expect(tagsForDoc(base({ _id: 'gc-1', _type: 'golfCourse' }))).toEqual(
+			expect.arrayContaining(['doc:gc-1', 'sitemap'])
+		);
+	});
+
+	describe('sitemap tag', () => {
+		// The sitemap lists every indexable listing, development, unit, taxonomy node, golf
+		// course, guide and insight, with a per-URL lastmod — so a change to any of those must
+		// purge it, while doc types that contribute no sitemap URL must not.
+		it.each([
+			['propertyListing'],
+			['development'],
+			['unit'],
+			['locationTaxonomy'],
+			['golfCourse'],
+			['guide'],
+			['insight']
+		])('purges the sitemap for %s', (_type) => {
+			expect(tagsForDoc(base({ _type }))).toContain('sitemap');
+		});
+
+		it.each([
+			['unitType'],
+			['author'],
+			['partner'],
+			['partnerCategory'],
+			['siteSettings'],
+			['aboutPage']
+		])('does not purge the sitemap for %s', (_type) => {
+			expect(tagsForDoc(base({ _type }))).not.toContain('sitemap');
+		});
 	});
 
 	it('returns unique tags', () => {

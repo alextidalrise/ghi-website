@@ -34,5 +34,12 @@ export const cacheTag = {
 	/** A golf-course page's listing grid (listings linking that course). */
 	golf: (golfCourseId: string) => `golf:${golfCourseId}`,
 	/** Everything scoped to a country, e.g. listing-detail enquiry shelves by country. */
-	country: (countrySlug: string) => `country:${countrySlug}`
+	country: (countrySlug: string) => `country:${countrySlug}`,
+	/**
+	 * The `/sitemap.xml` document. Its URL set and per-URL `lastmod` derive from every
+	 * indexable listing, development, unit, taxonomy node, golf course, guide and insight, so
+	 * a create/publish/unpublish/delete of any of those purges it (see purgeTags.ts). It is a
+	 * single query-built response, so one structural tag — not per-doc tags — covers it.
+	 */
+	sitemap: 'sitemap'
 } as const;
