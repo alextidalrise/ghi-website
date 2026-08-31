@@ -3,10 +3,11 @@ import {
 	buildGolfCoursePath,
 	buildListingPath,
 	buildTaxonomyPath,
+	buildUnitPath,
 	collectSitemapEntries,
 	renderSitemapXml
 } from './sitemap';
-import { sitemapListingsQuery } from '$lib/sanity/queries';
+import { sitemapListingsQuery, sitemapUnitsQuery } from '$lib/sanity/queries';
 
 describe('buildTaxonomyPath', () => {
 	it('builds country and location paths; community taxonomy is not indexed', () => {
@@ -199,6 +200,186 @@ describe('buildListingPath', () => {
 				isCatchAll: true
 			})
 		).toBe('/spain/nueva-andalucia/villa-example');
+	});
+});
+
+describe('buildUnitPath', () => {
+	it('builds a standard nested unit URL under its community', () => {
+		expect(
+			buildUnitPath({
+				countrySlug: 'spain',
+				locationSlug: 'costa-del-sol',
+				communitySlug: 'marbella',
+				developmentSlug: 'palo-alto',
+				unitSlug: 'apartment-3b'
+			})
+		).toBe('/spain/costa-del-sol/marbella/palo-alto/apartment-3b');
+	});
+
+	it('builds a catch-all nested unit URL without the community segment', () => {
+		expect(
+			buildUnitPath({
+				countrySlug: 'portugal',
+				locationSlug: 'vilamoura',
+				communitySlug: 'vilamoura',
+				isCatchAll: true,
+				developmentSlug: 'monte-rei',
+				unitSlug: 'villa-12'
+			})
+		).toBe('/portugal/vilamoura/monte-rei/villa-12');
+	});
+
+	it('returns null when a parent path segment is missing', () => {
+		expect(
+			buildUnitPath({
+				countrySlug: 'spain',
+				locationSlug: null,
+				communitySlug: 'marbella',
+				developmentSlug: 'palo-alto',
+				unitSlug: 'apartment-3b'
+			})
+		).toBeNull();
+	});
+
+	it('returns null when the unit slug is missing', () => {
+		expect(
+			buildUnitPath({
+				countrySlug: 'spain',
+				locationSlug: 'costa-del-sol',
+				communitySlug: 'marbella',
+				developmentSlug: 'palo-alto',
+				unitSlug: null
+			})
+		).toBeNull();
+	});
+
+	it('returns null for a standard (non-catch-all) unit missing its community', () => {
+		expect(
+			buildUnitPath({
+				countrySlug: 'spain',
+				locationSlug: 'costa-del-sol',
+				communitySlug: null,
+				developmentSlug: 'palo-alto',
+				unitSlug: 'apartment-3b'
+			})
+		).toBeNull();
+	});
+});
+
+describe('collectSitemapEntries units', () => {
+	it('includes standard and catch-all unit URLs and carries lastmod', () => {
+		const entries = collectSitemapEntries(
+			[],
+			[],
+			[],
+			[],
+			[],
+			[
+				{
+					countrySlug: 'spain',
+					locationSlug: 'costa-del-sol',
+					communitySlug: 'marbella',
+					developmentSlug: 'palo-alto',
+					unitSlug: 'apartment-3b',
+					_updatedAt: '2026-07-01T00:00:00.000Z'
+				},
+				{
+					countrySlug: 'portugal',
+					locationSlug: 'vilamoura',
+					communitySlug: 'vilamoura',
+					isCatchAll: true,
+					developmentSlug: 'monte-rei',
+					unitSlug: 'villa-12',
+					_updatedAt: '2026-07-02T00:00:00.000Z'
+				}
+			]
+		);
+
+		const paths = entries.map((entry) => entry.path);
+		expect(paths).toContain('/spain/costa-del-sol/marbella/palo-alto/apartment-3b');
+		expect(paths).toContain('/portugal/vilamoura/monte-rei/villa-12');
+
+		const unit = entries.find((entry) => entry.path.endsWith('/apartment-3b'));
+		expect(unit?.lastmod).toBe('2026-07-01T00:00:00.000Z');
+	});
+
+	it('drops units whose parent path or unit slug cannot resolve', () => {
+		const entries = collectSitemapEntries(
+			[],
+			[],
+			[],
+			[],
+			[],
+			[
+				// Missing locationSlug — parent path cannot resolve.
+				{
+					countrySlug: 'spain',
+					locationSlug: null,
+					communitySlug: 'marbella',
+					developmentSlug: 'palo-alto',
+					unitSlug: 'apartment-3b'
+				},
+				// Missing unit slug.
+				{
+					countrySlug: 'spain',
+					locationSlug: 'costa-del-sol',
+					communitySlug: 'marbella',
+					developmentSlug: 'palo-alto',
+					unitSlug: null
+				}
+			]
+		);
+
+		expect(entries.map((entry) => entry.path)).toEqual(
+			expect.not.arrayContaining([expect.stringContaining('palo-alto')])
+		);
+	});
+
+	it('de-duplicates a unit path shared across rows, keeping the latest lastmod', () => {
+		const row = {
+			countrySlug: 'spain',
+			locationSlug: 'costa-del-sol',
+			communitySlug: 'marbella',
+			developmentSlug: 'palo-alto',
+			unitSlug: 'apartment-3b'
+		};
+		const entries = collectSitemapEntries(
+			[],
+			[],
+			[],
+			[],
+			[],
+			[
+				{ ...row, _updatedAt: '2026-07-01T00:00:00.000Z' },
+				{ ...row, _updatedAt: '2026-07-05T00:00:00.000Z' }
+			]
+		);
+
+		const matches = entries.filter(
+			(entry) => entry.path === '/spain/costa-del-sol/marbella/palo-alto/apartment-3b'
+		);
+		expect(matches).toHaveLength(1);
+		expect(matches[0].lastmod).toBe('2026-07-05T00:00:00.000Z');
+	});
+});
+
+describe('sitemapUnitsQuery', () => {
+	// The GROQ gate — not the path builder — is what keeps draft, in-review, archived, and
+	// parent-unpublished units out of the sitemap. UNIT_PUBLISHABLE_FILTER requires both the
+	// unit's own status and its parent development's status to be published (mirrored by
+	// $publishedStatus). Assert the query composes that gate so the exclusion can't silently
+	// regress to emitting non-200 unit URLs.
+	it('selects only standalone unit documents', () => {
+		expect(sitemapUnitsQuery).toContain('_type == "unit"');
+	});
+
+	it('gates on both the unit and its parent development being published', () => {
+		expect(sitemapUnitsQuery).toContain('$publishedStatus');
+		expect(sitemapUnitsQuery).toContain('parentDevelopment->status');
+	});
+
+	it('projects isCatchAll so catch-all unit paths match the 301 canonical', () => {
+		expect(sitemapUnitsQuery).toContain('isCatchAll');
 	});
 });
 
