@@ -477,6 +477,8 @@ export type InsightDetail = {
 	 * mark on brand green; `light` shows the partner's normal dark logo on a light plate.
 	 */
 	heroPartnerPlate?: 'green' | 'light' | null;
+	/** Co-brand hero only: hide the separately-typed partner name on the plate (logo + label stay). */
+	hideHeroPartnerName?: boolean | null;
 	author?: InsightAuthor | null;
 	sections?: InsightSection[] | null;
 	ctaHeading?: string | null;
