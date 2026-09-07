@@ -13,6 +13,8 @@ import {
 	insightDevelopmentGrid,
 	insightDevelopmentGridItem,
 	insightDisclaimer,
+	insightExternalPropertyCard,
+	insightExternalPropertyGrid,
 	insightFaq,
 	insightFaqItem,
 	insightFigure,
@@ -116,6 +118,10 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	insightPartnerLogoGrid,
 	insightGuideCardItem,
 	insightGuideCards,
+	// Externally managed partner rentals (card registered before its parent grid). Article-owned;
+	// dereferences nothing, unlike the reference-led modules above.
+	insightExternalPropertyCard,
+	insightExternalPropertyGrid,
 	insightSection,
 	// Header navigation (navLink registered before the items that nest it)
 	navLink,
@@ -189,6 +195,8 @@ export {
 	insightPartnerLogoGrid,
 	insightGuideCardItem,
 	insightGuideCards,
+	insightExternalPropertyCard,
+	insightExternalPropertyGrid,
 	insightSection,
 	footerColumn,
 	socialLink,

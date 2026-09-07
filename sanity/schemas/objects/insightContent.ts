@@ -1655,6 +1655,181 @@ export const insightGuideCards = defineType({
 	}
 });
 
+/**
+ * One externally managed partner-property card. Unlike every reference-led module above, NOTHING
+ * here dereferences a canonical GHI record: these are partner-managed rentals, so the reader-facing
+ * facts, image and outbound link are all article-owned and explicit. `fromPrice` is a display
+ * string on purpose — partner sources quote "per night", which is not a GHI inventory price and must
+ * never be treated as one. The internal `sourceNote`/`checkedAt` fields are approval scaffolding for
+ * the editor and are deliberately excluded from the public projection (see INSIGHT_SECTION_PUBLIC).
+ */
+export const insightExternalPropertyCard = defineType({
+	name: 'insightExternalPropertyCard',
+	title: 'External property',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'name',
+			title: 'Property name',
+			type: 'string',
+			description: 'The partner’s own name for the property, e.g. "Herdade do Sol".',
+			validation: (Rule) => Rule.required().max(100)
+		}),
+		defineField({
+			name: 'location',
+			title: 'Location',
+			type: 'string',
+			description: 'Reader-facing place line, e.g. "Comporta, Portugal". Free text — not a GHI location.',
+			validation: (Rule) => Rule.required().max(100)
+		}),
+		defineField({
+			name: 'guests',
+			title: 'Guests',
+			type: 'number',
+			description: 'Maximum guests the partner lists for this property.',
+			validation: (Rule) => Rule.required().integer().positive()
+		}),
+		defineField({
+			name: 'bedrooms',
+			title: 'Bedrooms',
+			type: 'number',
+			validation: (Rule) => Rule.required().integer().positive()
+		}),
+		defineField({
+			name: 'fromPrice',
+			title: 'From price (display)',
+			type: 'string',
+			description:
+				'A display string exactly as the partner quotes it, e.g. "€2,250 per night". Kept as text — it is not a GHI inventory price and is never parsed as one.',
+			validation: (Rule) => Rule.required().max(48)
+		}),
+		defineField({
+			name: 'description',
+			title: 'Description',
+			type: 'text',
+			rows: 4,
+			description: 'The article’s copy for this property. Recommended 40–70 words.',
+			validation: (Rule) => Rule.required().max(700)
+		}),
+		defineField({
+			name: 'features',
+			title: 'Features',
+			type: 'array',
+			of: [{ type: 'string' }],
+			description: 'Up to three short feature chips, e.g. "Private pool".',
+			validation: (Rule) => Rule.max(3).custom((value) => {
+				if (!Array.isArray(value)) return true;
+				const tooLong = value.find((f) => typeof f === 'string' && f.length > 72);
+				return tooLong ? 'Keep each feature to 72 characters or fewer.' : true;
+			})
+		}),
+		defineField({
+			name: 'image',
+			title: 'Image',
+			type: 'mediaAssetMetadata',
+			description:
+				'The approved photograph for this card, with alt text. Rendered 3:2 with hotspot/crop support.',
+			validation: (Rule) =>
+				Rule.required().custom((value) => {
+					const media = value as { asset?: unknown; altText?: string } | undefined;
+					if (!media?.asset) return 'Add an approved image.';
+					if (!media.altText?.trim()) return 'Add alt text for the image.';
+					return true;
+				})
+		}),
+		defineField({
+			name: 'linkLabel',
+			title: 'Link label',
+			type: 'string',
+			description: 'The CTA text, e.g. "View on Albany Global Property".',
+			validation: (Rule) => Rule.required().max(48)
+		}),
+		defineField({
+			name: 'linkHref',
+			title: 'Link destination',
+			type: 'url',
+			description: 'The partner property page. Must be an absolute HTTPS URL.',
+			validation: (Rule) =>
+				Rule.required().uri({ scheme: ['https'], allowRelative: false })
+		}),
+		defineField({
+			name: 'sourceNote',
+			title: 'Source note (internal)',
+			type: 'string',
+			description:
+				'Internal only. Never shown on the website or exposed to the browser — provenance/approval note for the editor.',
+			validation: (Rule) => Rule.max(280)
+		}),
+		defineField({
+			name: 'checkedAt',
+			title: 'Facts last checked (internal)',
+			type: 'date',
+			description: 'Internal only. Never published — when the partner facts were last confirmed.'
+		})
+	],
+	preview: {
+		select: { title: 'name', subtitle: 'location', media: 'image.asset' },
+		prepare({ title, subtitle, media }) {
+			return { title: title || 'External property', subtitle: subtitle || 'Partner rental', media };
+		}
+	}
+});
+
+/**
+ * An ordered set of externally managed partner-property cards — the module for partner-managed
+ * rentals that are NOT GHI sale stock. Distinct from `insightListingGrid` on purpose: that module
+ * dereferences canonical `propertyListing` records and derives GHI sale routes/prices; this one
+ * carries article-owned content and explicit external links, and never touches GHI inventory. Two
+ * to six, so it reads as a curated partner set rather than a listing feed.
+ */
+export const insightExternalPropertyGrid = defineType({
+	name: 'insightExternalPropertyGrid',
+	title: 'External property grid',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'heading',
+			title: 'Heading',
+			type: 'string',
+			description: 'Optional. Leave blank when the section heading already names the module.',
+			validation: (Rule) => Rule.max(80)
+		}),
+		defineField({
+			name: 'items',
+			title: 'Properties',
+			type: 'array',
+			of: [{ type: 'insightExternalPropertyCard' }],
+			description: 'Two to six external properties, in reading order.',
+			validation: (Rule) => Rule.required().min(2).max(6)
+		}),
+		defineField({
+			name: 'priceNote',
+			title: 'Price volatility note',
+			type: 'string',
+			description:
+				'Required whenever cards show a price (they always do). Shown once beneath the grid, e.g. "Prices and availability are provided by the partner and may change."',
+			validation: (Rule) =>
+				Rule.max(180).custom((value, context) => {
+					const items = (context.parent as { items?: Array<{ fromPrice?: string }> } | undefined)
+						?.items;
+					const anyPrice = Array.isArray(items) && items.some((i) => i?.fromPrice?.trim());
+					if (anyPrice && !value?.trim()) return 'Add a price volatility note when any card shows a price.';
+					return true;
+				})
+		})
+	],
+	preview: {
+		select: { heading: 'heading', a: 'items.0.name', b: 'items.1.name', items: 'items' },
+		prepare({ heading, a, b, items }) {
+			const count = Array.isArray(items) ? items.length : 0;
+			return {
+				title: heading || [a, b].filter(Boolean).join(', ') || 'External property grid',
+				subtitle: `${count} ${count === 1 ? 'property' : 'properties'}`
+			};
+		}
+	}
+});
+
 /** The rich-text body of an Insights section: prose plus the shared and journal blocks. */
 const insightSectionBody = defineField({
 	name: 'body',
@@ -1737,7 +1912,10 @@ const insightSectionBody = defineField({
 		defineArrayMember({ type: 'insightListingGrid' }),
 		defineArrayMember({ type: 'insightCourseGrid' }),
 		defineArrayMember({ type: 'insightPartnerLogoGrid' }),
-		defineArrayMember({ type: 'insightGuideCards' })
+		defineArrayMember({ type: 'insightGuideCards' }),
+		// Externally managed partner rentals. Fully article-owned — no GHI record is dereferenced,
+		// no GHI sale route is derived. A sibling to the listing grid, never a widening of it.
+		defineArrayMember({ type: 'insightExternalPropertyGrid' })
 	],
 	validation: (Rule) => Rule.required().min(1)
 });
