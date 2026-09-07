@@ -642,6 +642,25 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
         "listing": select(${PROPERTY_REF_PUBLIC_GATE} => listing->${PROPERTY_CARD_PUBLIC})
       }
     },
+    _type == "insightExternalPropertyGrid" => {
+      _type,
+      _key,
+      heading,
+      priceNote,
+      items[]{
+        _key,
+        name,
+        location,
+        guests,
+        bedrooms,
+        fromPrice,
+        description,
+        features,
+        linkLabel,
+        linkHref,
+        "image": image${MEDIA_ASSET_PUBLIC}
+      }
+    },
     _type == "insightCourseGrid" => {
       _type,
       _key,
@@ -715,6 +734,7 @@ export const INSIGHT_SECTION_PUBLIC = /* groq */ `{
       && _type != "insightDestinationGrid"
       && _type != "insightDevelopmentGrid"
       && _type != "insightListingGrid"
+      && _type != "insightExternalPropertyGrid"
       && _type != "insightCourseGrid"
       && _type != "insightPartnerLogoGrid"
       && _type != "insightGuideCards"

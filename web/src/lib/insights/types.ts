@@ -12,6 +12,7 @@ import type {
 	InsightListingGridItemRaw,
 	InsightListingGroup
 } from '$lib/sanity/transforms/insightListingCard';
+import type { InsightExternalPropertyCardRaw } from '$lib/sanity/transforms/insightExternalPropertyCard';
 import type { InsightCourseGridItemRaw } from '$lib/sanity/transforms/insightCourseCard';
 import type { InsightPartnerLogoItemRaw } from '$lib/sanity/transforms/insightPartnerLogoCard';
 import type { InsightGuideCardItemRaw } from '$lib/sanity/transforms/insightGuideCard';
@@ -310,6 +311,21 @@ export type InsightListingGridBlock = {
 };
 
 /**
+ * A collection of externally managed partner properties. Unlike every reference-led module, this
+ * carries article-owned `items` in the render-ready projected shape — nothing is dereferenced. The
+ * renderer resolves them to validated cards with `toInsightExternalPropertyCards`, dropping any
+ * invalid card. Deliberately NOT `insightListingGrid`: these are partner rentals, never GHI sale
+ * stock, with explicit external links and no GHI routes.
+ */
+export type InsightExternalPropertyGridBlock = {
+	_type: 'insightExternalPropertyGrid';
+	_key: string;
+	heading?: string | null;
+	priceNote?: string | null;
+	items?: InsightExternalPropertyCardRaw[] | null;
+};
+
+/**
  * A collection of golf courses. The projection carries raw `items` (each with a dereferenced
  * canonical course); the renderer resolves them to cards. Identity and route are always live.
  */
@@ -365,6 +381,7 @@ export type InsightBodyBlock =
 	| InsightDestinationGridBlock
 	| InsightDevelopmentGridBlock
 	| InsightListingGridBlock
+	| InsightExternalPropertyGridBlock
 	| InsightCourseGridBlock
 	| InsightPartnerLogoGridBlock
 	| InsightGuideCardsBlock;

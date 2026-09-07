@@ -25,6 +25,7 @@
 	import InsightDestinationGrid from './InsightDestinationGrid.svelte';
 	import InsightDevelopmentGrid from './InsightDevelopmentGrid.svelte';
 	import InsightListingGrid from './InsightListingGrid.svelte';
+	import InsightExternalPropertyGrid from './InsightExternalPropertyGrid.svelte';
 	import InsightCourseGrid from './InsightCourseGrid.svelte';
 	import InsightPartnerLogoGrid from './InsightPartnerLogoGrid.svelte';
 	import InsightGuideCards from './InsightGuideCards.svelte';
@@ -64,6 +65,7 @@
 			insightDestinationGrid: InsightDestinationGrid,
 			insightDevelopmentGrid: InsightDevelopmentGrid,
 			insightListingGrid: InsightListingGrid,
+			insightExternalPropertyGrid: InsightExternalPropertyGrid,
 			insightCourseGrid: InsightCourseGrid,
 			insightPartnerLogoGrid: InsightPartnerLogoGrid,
 			insightGuideCards: InsightGuideCards
