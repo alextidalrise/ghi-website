@@ -764,6 +764,7 @@ export const INSIGHT_DETAIL_FIELDS = /* groq */ `
   heroPartnerLabel,
   heroSublabel,
   heroPartnerPlate,
+  hideHeroPartnerName,
   "heroPartner": heroPartner->${PARTNER_LOGO_PUBLIC},
   author->${AUTHOR_PUBLIC},
   sections[]${INSIGHT_SECTION_PUBLIC},

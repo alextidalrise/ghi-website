@@ -210,6 +210,19 @@ export const insight = defineType({
 			hidden: ({ document }) => document?.heroLayout !== 'coBrand'
 		}),
 		defineField({
+			name: 'hideHeroPartnerName',
+			title: 'Hide the partner name on the plate',
+			type: 'boolean',
+			group: 'content',
+			initialValue: false,
+			description:
+				'Only used by the Co-brand hero. Turn ON when the partner logo already contains the full wordmark, so the plate does not repeat the brand name. The logo and the "GHI Partner" label are unaffected.',
+			// Matches the sibling co-brand fields, but also stays hidden until a partner is picked,
+			// since the name it governs comes from that partner record.
+			hidden: ({ document }) =>
+				document?.heroLayout !== 'coBrand' || !document?.heroPartner
+		}),
+		defineField({
 			name: 'readingTimeOverride',
 			title: 'Reading time override (minutes)',
 			type: 'number',

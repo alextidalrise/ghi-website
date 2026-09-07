@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { readingMinutes, readingLabel, splitTitleEmphasis } from './format';
+import {
+	readingMinutes,
+	readingLabel,
+	showHeroPartnerName,
+	splitTitleEmphasis
+} from './format';
 import { buildCategoryFilters, isInsightCategory, insightKickerLabel } from './categories';
 import { insightsIndexHref } from './routes';
 import { buildInsightToc } from './index';
 import { buildInsightFaqJsonLd, collectFaqItems } from './seo';
-import type { InsightCard, InsightSection } from './types';
+import type { InsightCard, InsightDetail, InsightSection } from './types';
 
 const card = (overrides: Partial<InsightCard>): InsightCard => ({
 	_id: overrides._id ?? 'id',
@@ -41,6 +46,43 @@ describe('insightKickerLabel', () => {
 	it('returns the short label for a known category', () => {
 		expect(insightKickerLabel('market')).toBe('Market');
 		expect(insightKickerLabel('lifestyle')).toBe('Lifestyle');
+	});
+});
+
+describe('showHeroPartnerName', () => {
+	type Input = Pick<InsightDetail, 'heroPartner' | 'hideHeroPartnerName'>;
+	const named = (name: string): NonNullable<Input['heroPartner']> =>
+		({ name }) as NonNullable<Input['heroPartner']>;
+
+	it('shows the name by default when a partner name is present', () => {
+		expect(showHeroPartnerName({ heroPartner: named('Albany Global Property') })).toBe(true);
+	});
+
+	it('shows the name when the flag is explicitly false', () => {
+		expect(
+			showHeroPartnerName({
+				heroPartner: named('Albany Global Property'),
+				hideHeroPartnerName: false
+			})
+		).toBe(true);
+	});
+
+	it('hides the name when the flag is true', () => {
+		expect(
+			showHeroPartnerName({
+				heroPartner: named('Albany Global Property'),
+				hideHeroPartnerName: true
+			})
+		).toBe(false);
+	});
+
+	it('stays false when hidden is true but no partner name exists', () => {
+		expect(showHeroPartnerName({ heroPartner: null, hideHeroPartnerName: true })).toBe(false);
+	});
+
+	it('is false when there is no partner, and treats a blank name as absent', () => {
+		expect(showHeroPartnerName({})).toBe(false);
+		expect(showHeroPartnerName({ heroPartner: named('   ') })).toBe(false);
 	});
 });
 

@@ -1,4 +1,4 @@
-import type { InsightCard } from './types';
+import type { InsightCard, InsightDetail } from './types';
 
 const WORDS_PER_MINUTE = 200;
 /** English average including the trailing space; turns a char count into a word count. */
@@ -78,6 +78,22 @@ export function splitTitleEmphasis(
 		{ text: phrase, emphasis: true },
 		{ text: full.slice(at + phrase.length), emphasis: false }
 	].filter((segment) => segment.text.length > 0);
+}
+
+/**
+ * Whether the co-brand hero plate should render the partner's typed name.
+ *
+ * The name is shown by default, but suppressed when `hideHeroPartnerName` is set — for a partner
+ * whose logo artwork already contains the full wordmark, so the plate does not repeat the brand
+ * name (see issue #152, Albany Global Property). Only the typed name is affected: the logo (and
+ * its alt text) and the "GHI Partner" label are governed separately. Absent/false ⇒ shown, so
+ * every existing article is unchanged.
+ */
+export function showHeroPartnerName(
+	insight: Pick<InsightDetail, 'heroPartner' | 'hideHeroPartnerName'>
+): boolean {
+	const hasName = Boolean(insight.heroPartner?.name?.trim());
+	return hasName && !insight.hideHeroPartnerName;
 }
 
 /** Up to two initials for an avatar fallback, e.g. "Golf Homes International" → "GH". */

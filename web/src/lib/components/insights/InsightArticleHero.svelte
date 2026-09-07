@@ -8,6 +8,7 @@
 		formatInsightDate,
 		insightDateISO,
 		readingLabel,
+		showHeroPartnerName,
 		splitTitleEmphasis
 	} from '$lib/insights/format';
 	import type { InsightDetail } from '$lib/insights/types';
@@ -112,6 +113,9 @@
 	const coBrandLogoAlt = $derived(coBrandPartnerName ? `${coBrandPartnerName} logo` : '');
 	const coBrandSublabel = $derived(insight.heroSublabel?.trim() || null);
 	const hasCoBrandPlate = $derived(isCoBrand && Boolean(coBrandPartnerName || coBrandLogo));
+	// The typed partner name is hidden when the logo already carries the full wordmark (issue #152).
+	// Gates ONLY the name text — `coBrandPartnerName` still feeds the logo alt text and plate presence.
+	const showCoBrandName = $derived(showHeroPartnerName(insight));
 
 	const dateLabel = $derived(formatInsightDate(insight.publishedAt, 'long'));
 	const dateISO = $derived(insightDateISO(insight.publishedAt));
@@ -179,7 +183,7 @@
 							decoding="async"
 						/>
 					{/if}
-					{#if coBrandPartnerName}
+					{#if showCoBrandName}
 						<span class="cobrand-plate__name">{coBrandPartnerName}</span>
 					{/if}
 					<span class="cobrand-plate__label">{coBrandPartnerLabel}</span>
