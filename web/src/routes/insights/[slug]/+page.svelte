@@ -8,7 +8,7 @@
 	import TalkToUsBand from '$lib/components/TalkToUsBand.svelte';
 	import InsightCard from '$lib/components/insights/InsightCard.svelte';
 	import { withoutCampaignParams } from '$lib/sanity/href';
-	import type { InsightCtaAction } from '$lib/insights';
+	import { sectionHasBackToContents, type InsightCtaAction } from '$lib/insights';
 
 	let { data } = $props();
 
@@ -75,7 +75,15 @@
 <InsightArticleHero {insight} breadcrumbs={data.breadcrumbs} />
 
 <article class="article">
-	<div class="article__body content-wrap" class:article__body--with-toc={hasToc}>
+	<!-- The back-to-contents links target the article body top, NOT the rail: the rail is sticky and
+	     stays pinned in the viewport, so an anchor jump to it resolves to its already-visible pinned
+	     position and the page does not move. The body's own (non-sticky) top is a stable destination
+	     at the article's opening, where the contents rail begins. -->
+	<div
+		class="article__body content-wrap"
+		class:article__body--with-toc={hasToc}
+		id={hasToc ? 'insight-contents' : undefined}
+	>
 		{#if hasToc}
 			<aside class="article__rail">
 				<GuideContents items={toc} title="In this article" />
@@ -107,6 +115,31 @@
 						{/if}
 					{/if}
 					<InsightBody value={section.body} />
+
+					{#if hasToc && sectionHasBackToContents(section)}
+						<!-- After a dense block (a property/content grid or the FAQ) the reader is a long way
+						     from the contents. A quiet route back — not competing with the section headings or
+						     the enquiry CTA. Keyed off the section's block types, never a hard-coded heading, so
+						     it is reusable across every Insight. -->
+						<a class="article-section__back" href="#insight-contents">
+							<svg
+								class="article-section__back-icon"
+								width="12"
+								height="12"
+								viewBox="0 0 12 12"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M6 10V2M2.5 5.5 6 2l3.5 3.5"
+									stroke="currentColor"
+									stroke-width="1.4"
+									stroke-linecap="square"
+								/>
+							</svg>
+							Back to contents
+						</a>
+					{/if}
 				</section>
 			{/each}
 		</div>
@@ -171,6 +204,56 @@
 
 	.article-section {
 		scroll-margin-top: calc(var(--nav-height) + var(--space-lg));
+	}
+
+	/* Jump target for the back-to-contents links: the article body's own (non-sticky) top, so the
+	   jump lands at the article opening where the contents rail begins. Clear the fixed nav — and,
+	   on mobile, the sticky contents bar that pins directly beneath it — so the opening is not hidden
+	   under them. */
+	#insight-contents {
+		scroll-margin-top: calc(var(--nav-height) + var(--space-md));
+	}
+
+	/* Quiet return route at the foot of a dense (grid/FAQ) section. Sans, small and --muted so it
+	   sits well below the serif section headings and the enquiry CTA in the emphasis ladder; the
+	   only colour it earns is the gold-on-hover shared with every other quiet link on the page. */
+	.article-section__back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: var(--space-lg);
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		color: var(--muted);
+		text-decoration: none;
+		transition: color var(--duration-hover) var(--ease);
+	}
+
+	.article-section__back-icon {
+		color: var(--gold);
+		transition: transform var(--duration-hover) var(--ease);
+	}
+
+	.article-section__back:hover,
+	.article-section__back:focus-visible {
+		color: var(--green);
+	}
+
+	.article-section__back:hover .article-section__back-icon,
+	.article-section__back:focus-visible .article-section__back-icon {
+		transform: translateY(-2px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.article-section__back,
+		.article-section__back-icon {
+			transition: none;
+		}
+
+		.article-section__back:hover .article-section__back-icon,
+		.article-section__back:focus-visible .article-section__back-icon {
+			transform: none;
+		}
 	}
 
 	/*
