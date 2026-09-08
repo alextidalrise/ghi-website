@@ -75,9 +75,17 @@
 <InsightArticleHero {insight} breadcrumbs={data.breadcrumbs} />
 
 <article class="article">
-	<div class="article__body content-wrap" class:article__body--with-toc={hasToc}>
+	<!-- The back-to-contents links target the article body top, NOT the rail: the rail is sticky and
+	     stays pinned in the viewport, so an anchor jump to it resolves to its already-visible pinned
+	     position and the page does not move. The body's own (non-sticky) top is a stable destination
+	     at the article's opening, where the contents rail begins. -->
+	<div
+		class="article__body content-wrap"
+		class:article__body--with-toc={hasToc}
+		id={hasToc ? 'insight-contents' : undefined}
+	>
 		{#if hasToc}
-			<aside class="article__rail" id="insight-contents">
+			<aside class="article__rail">
 				<GuideContents items={toc} title="In this article" />
 			</aside>
 		{/if}
@@ -198,8 +206,10 @@
 		scroll-margin-top: calc(var(--nav-height) + var(--space-lg));
 	}
 
-	/* The contents rail is the jump target for the back-to-contents links. It is sticky under the
-	   nav, so an anchor jump must clear the fixed nav or the rail lands hidden beneath it. */
+	/* Jump target for the back-to-contents links: the article body's own (non-sticky) top, so the
+	   jump lands at the article opening where the contents rail begins. Clear the fixed nav — and,
+	   on mobile, the sticky contents bar that pins directly beneath it — so the opening is not hidden
+	   under them. */
 	#insight-contents {
 		scroll-margin-top: calc(var(--nav-height) + var(--space-md));
 	}
