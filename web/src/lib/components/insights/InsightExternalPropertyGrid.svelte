@@ -37,13 +37,14 @@
 						/>
 					</div>
 					<div class="ext-card__body">
-						<h4 class="ext-card__name">{card.name}</h4>
+						<div class="ext-card__head">
+							<h4 class="ext-card__name">{card.name}</h4>
+							<p class="ext-card__location">{card.location}</p>
+						</div>
 
+						<!-- The facts block's hairline top rule is the thin divider below the name/location.
+						     Location is rendered above, not repeated here. -->
 						<dl class="ext-card__facts">
-							<div class="ext-card__fact">
-								<dt>Location</dt>
-								<dd>{card.location}</dd>
-							</div>
 							<div class="ext-card__fact">
 								<dt>Guests</dt>
 								<dd>{card.guests}</dd>
@@ -52,7 +53,7 @@
 								<dt>Bedrooms</dt>
 								<dd>{card.bedrooms}</dd>
 							</div>
-							<div class="ext-card__fact">
+							<div class="ext-card__fact ext-card__fact--price">
 								<dt>From price</dt>
 								<dd>{card.fromPrice}</dd>
 							</div>
@@ -157,6 +158,14 @@
 		padding: 1rem 1.1rem 1.15rem;
 	}
 
+	/* Name then location read as one unit — a tight pair, so they sit inside their own wrapper and
+	   escape the body's larger inter-block gap. */
+	.ext-card__head {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
 	.ext-card__name {
 		font-family: var(--serif);
 		font-size: 1.2rem;
@@ -165,7 +174,17 @@
 		margin: 0;
 	}
 
-	/* Facts as a fixed 2×2 group: Location, Guests, Bedrooms, From price — in that reading order. */
+	/* Location sits directly beneath the name in the quiet muted-sans metadata register. */
+	.ext-card__location {
+		margin: 0;
+		font-family: var(--sans);
+		font-size: var(--text-small);
+		line-height: 1.4;
+		color: var(--muted);
+	}
+
+	/* The structured facts below the name/location, opened by a hairline divider. Guests and
+	   Bedrooms pair across two columns; From price takes the full width beneath them. */
 	.ext-card__facts {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -177,6 +196,10 @@
 
 	.ext-card__fact {
 		min-width: 0;
+	}
+
+	.ext-card__fact--price {
+		grid-column: 1 / -1;
 	}
 
 	.ext-card__fact dt {
@@ -197,7 +220,7 @@
 	}
 
 	/* From price reads in the same serif register as the site's own card prices. */
-	.ext-card__fact:last-child dd {
+	.ext-card__fact--price dd {
 		font-family: var(--serif);
 		font-size: 1.05rem;
 		color: var(--green);
@@ -212,24 +235,35 @@
 		text-wrap: pretty;
 	}
 
+	/* Feature differentiators as a quiet, sentence-case editorial run — no fill, no pill. Items are
+	   separated by the house 3px gold dot (the same metadata idiom as the site's property cards),
+	   keeping them scannable while sitting flat on the white card. */
 	.ext-card__features {
 		list-style: none;
 		margin: 0;
 		padding: 0;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.4rem;
+		align-items: center;
+		font-family: var(--sans);
+		font-size: var(--text-small);
+		line-height: 1.4;
+		color: var(--muted);
 	}
 
 	.ext-card__features li {
-		font-family: var(--sans);
-		font-size: var(--text-overline);
-		letter-spacing: var(--tracking-overline);
-		text-transform: uppercase;
-		color: var(--green);
-		background: var(--surface-tint);
-		padding: 0.3rem 0.6rem;
-		border-radius: 999px;
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.ext-card__features li:not(:first-child)::before {
+		content: '';
+		width: 3px;
+		height: 3px;
+		border-radius: 50%;
+		background: var(--gold);
+		margin: 0 0.6rem;
+		flex: none;
 	}
 
 	/* The single interactive element. Pinned to the card foot, ≥44px tall, with a visible focus ring
