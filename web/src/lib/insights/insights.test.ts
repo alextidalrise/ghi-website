@@ -7,7 +7,7 @@ import {
 } from './format';
 import { buildCategoryFilters, isInsightCategory, insightKickerLabel } from './categories';
 import { insightsIndexHref } from './routes';
-import { buildInsightToc } from './index';
+import { buildInsightToc, sectionHasBackToContents } from './index';
 import { buildInsightFaqJsonLd, collectFaqItems } from './seo';
 import type { InsightCard, InsightDetail, InsightSection } from './types';
 
@@ -123,6 +123,63 @@ describe('buildInsightToc', () => {
 			{ anchor: 'intro', heading: 'Intro' },
 			{ anchor: 'faq', heading: 'FAQ' }
 		]);
+	});
+});
+
+describe('sectionHasBackToContents', () => {
+	const section = (body: InsightSection['body']): InsightSection => ({
+		heading: 'Section',
+		anchor: 'section',
+		body
+	});
+
+	it('is false for a prose-only section', () => {
+		expect(
+			sectionHasBackToContents(
+				section([{ _type: 'block', _key: 'a', children: [] } as never])
+			)
+		).toBe(false);
+	});
+
+	it('is true when the section carries the FAQ', () => {
+		expect(sectionHasBackToContents(section([{ _type: 'insightFaq', _key: 'f' } as never]))).toBe(
+			true
+		);
+	});
+
+	it.each([
+		'insightExternalPropertyGrid',
+		'insightListingGrid',
+		'insightDevelopmentGrid',
+		'insightDestinationGrid',
+		'insightCourseGrid',
+		'insightCardGrid'
+	])('is true when the section carries a %s', (type) => {
+		expect(
+			sectionHasBackToContents(
+				section([
+					{ _type: 'block', _key: 'p', children: [] } as never,
+					{ _type: type, _key: 'g' } as never
+				])
+			)
+		).toBe(true);
+	});
+
+	it('keys off the block type, not the heading text', () => {
+		// A section literally titled "FAQ" but carrying no FAQ/grid block must NOT get the link — the
+		// trigger is the block type, never a hard-coded heading (Albany or otherwise).
+		expect(
+			sectionHasBackToContents({
+				heading: 'FAQ',
+				anchor: 'faq',
+				body: [{ _type: 'block', _key: 'a', children: [] } as never]
+			})
+		).toBe(false);
+	});
+
+	it('tolerates an empty or missing body', () => {
+		expect(sectionHasBackToContents(section([]))).toBe(false);
+		expect(sectionHasBackToContents(section(null))).toBe(false);
 	});
 });
 

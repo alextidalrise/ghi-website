@@ -10,6 +10,10 @@
 	let open = $state(false);
 	// Set once scroll-spy starts (see onMount); the highlight only shows when enhanced.
 	let activeAnchor = $state('');
+	// 0–1 reading progress through the article, driven by scroll (see onMount). Paints the hairline
+	// fill on the mobile sticky bar. Set directly from scroll position each frame — it tracks an
+	// input rather than animating, so it needs no transition and is reduced-motion-safe by nature.
+	let progress = $state(0);
 
 	// The section the reader is currently in. On mobile the rail sticks and collapses to a
 	// single bar, so this is what turns that bar into a live "you are here" indicator rather
@@ -45,7 +49,35 @@
 		);
 
 		for (const section of sections) observer.observe(section);
-		return () => observer.disconnect();
+
+		// Reading progress: the fraction of the article (first section top → last section bottom)
+		// the reader has passed, measured against a read-line at mid-viewport so it moves in step
+		// with the current-section highlight above. rAF-throttled; recomputed on resize because the
+		// article's height changes with the viewport (reflow, font loading).
+		const firstEl = sections[0];
+		const lastEl = sections[sections.length - 1];
+		let frame = 0;
+		const measure = () => {
+			frame = 0;
+			const start = firstEl.getBoundingClientRect().top + window.scrollY;
+			const end = lastEl.getBoundingClientRect().bottom + window.scrollY;
+			const span = end - start;
+			const read = window.scrollY + window.innerHeight * 0.5;
+			progress = span > 0 ? Math.min(1, Math.max(0, (read - start) / span)) : 0;
+		};
+		const onScroll = () => {
+			if (!frame) frame = requestAnimationFrame(measure);
+		};
+		measure();
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onScroll);
+
+		return () => {
+			observer.disconnect();
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', onScroll);
+			if (frame) cancelAnimationFrame(frame);
+		};
 	});
 
 	function handleLinkClick() {
@@ -91,6 +123,12 @@
 		>
 			<path d="M3 5.5 7 9.5 11 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" />
 		</svg>
+
+		{#if enhanced}
+			<!-- Reading-progress hairline along the bar's foot. Decorative — the current-section label
+			     above already tells a screen reader where the reader is. -->
+			<span class="toc__progress" aria-hidden="true" style:transform={`scaleX(${progress})`}></span>
+		{/if}
 	</button>
 
 	<ol id={listId} class="toc__list">
@@ -135,6 +173,7 @@
 	   sticks under the nav and article text scrolls beneath this bar. */
 	.toc__toggle {
 		display: none;
+		position: relative;
 		width: 100%;
 		align-items: center;
 		justify-content: space-between;
@@ -148,6 +187,22 @@
 		cursor: pointer;
 		color: var(--muted);
 		text-align: left;
+	}
+
+	/* Reading progress: a 2px gold hairline sitting on the bar's bottom border, scaled from the
+	   left. Only meaningful where the toggle shows (mobile); on desktop the toggle is display:none,
+	   so this never paints. Tracks scroll directly (JS sets scaleX per frame) — no transition, so it
+	   is smooth by construction and needs no reduced-motion guard. */
+	.toc__progress {
+		position: absolute;
+		left: 0;
+		bottom: -1px;
+		width: 100%;
+		height: 2px;
+		transform-origin: left center;
+		transform: scaleX(0);
+		background: var(--gold);
+		pointer-events: none;
 	}
 
 	/* Eyebrow over current-section, stacked. min-width:0 lets the current line ellipsize

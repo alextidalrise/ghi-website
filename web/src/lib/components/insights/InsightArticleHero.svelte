@@ -152,15 +152,17 @@
 
 			<div class="article-hero__kicker"><InsightKicker label={kicker} /></div>
 
-			{#if insight.subhead}
-				<!-- Standfirst leads in the co-brand hero: a serif thesis line above the headline. -->
-				<p class="article-hero__standfirst">{insight.subhead}</p>
-			{/if}
-
 			<h1 class="article-hero__title article-hero__title--cobrand">
 				<!-- prettier-ignore -->
 				{#each titleParts as part (part.text)}{#if part.emphasis}<em>{part.text}</em>{:else}{part.text}{/if}{/each}
 			</h1>
+
+			{#if insight.subhead}
+				<!-- Standfirst follows the headline: the H1 establishes the page first (natural reading and
+				     screen-reader order), then the serif thesis line explains it. Still set a step larger
+				     than the standard deck, so the partner piece keeps its distinct opening voice. -->
+				<p class="article-hero__standfirst">{insight.subhead}</p>
+			{/if}
 
 			{#if coBrandSublabel}
 				<p class="article-hero__sublabel">{coBrandSublabel}</p>
@@ -642,8 +644,9 @@
 		padding-block: var(--space-xl) var(--space-2xl);
 	}
 
-	/* The standfirst sits above the headline here and reads a step larger than the standard deck —
-	   it is doing the deck's job of stating the piece, but leading rather than trailing. */
+	/* The standfirst now sits below the headline, doing the standard deck's job of stating the
+	   piece — but set a step larger than that deck so the partner piece keeps a distinct opening
+	   voice. It trails the H1, so the H1 leads the reading and screen-reader order. */
 	.article-hero__standfirst {
 		margin: var(--space-md) 0 0;
 		font-family: var(--serif);
@@ -655,8 +658,10 @@
 		text-wrap: pretty;
 	}
 
+	/* Binds tight to the kicker it follows (matches the standard hero's kicker→H1 relationship),
+	   so the headline groups with its label rather than floating toward the standfirst beneath. */
 	.article-hero__title--cobrand {
-		margin-top: var(--space-md);
+		margin-top: var(--space-sm);
 	}
 
 	/* The partner-insight marker under the headline. */
