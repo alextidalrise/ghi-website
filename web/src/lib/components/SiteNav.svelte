@@ -25,6 +25,19 @@
 		return isSiteNavItemActive(item, page.url.pathname);
 	}
 
+	// Opening the drawer answers "where am I?": the accordion holding the active page
+	// starts expanded so its gold marker is visible instead of hidden behind a collapsed
+	// group. No active section collapses everything.
+	function toggleDrawer() {
+		open = !open;
+		if (open) {
+			const activeIndex = navItems.findIndex(
+				(item) => item.children.length > 0 && itemActive(item)
+			);
+			expanded = activeIndex === -1 ? null : activeIndex;
+		}
+	}
+
 	function openDropdown(i: number) {
 		openMenu = i;
 	}
@@ -221,7 +234,7 @@
 		aria-label={open ? 'Close menu' : 'Open menu'}
 		aria-expanded={open}
 		aria-controls="site-nav-drawer"
-		onclick={() => (open = !open)}
+		onclick={toggleDrawer}
 	>
 		<span class="site-nav__toggle-bar"></span>
 		<span class="site-nav__toggle-bar"></span>
@@ -245,6 +258,10 @@
 	inert={open ? undefined : true}
 	bind:this={drawer}
 >
+	<!-- The drawer's arrival moment: the one serif voice in the panel, under a gold
+	     hairline echoing the desktop dropdown's accent. Decorative — the bar's logo
+	     already carries the accessible brand name. -->
+	<p class="site-nav__drawer-masthead" aria-hidden="true">Golf Homes International</p>
 	<ul class="site-nav__drawer-menu">
 		{#each navItems as item, i (item.label)}
 			<li class="site-nav__drawer-item">
@@ -254,7 +271,7 @@
 							<a
 								href={item.href}
 								class="site-nav__drawer-link"
-								class:is-active={isActive(item.href)}
+								class:is-active={itemActive(item)}
 								aria-current={isActive(item.href) ? 'page' : undefined}
 								target={item.external ? '_blank' : undefined}
 								rel={item.external ? 'noopener noreferrer' : undefined}
@@ -263,7 +280,10 @@
 								{item.label}
 							</a>
 						{:else}
-							<span class="site-nav__drawer-link site-nav__drawer-link--static">{item.label}</span>
+							<span
+								class="site-nav__drawer-link site-nav__drawer-link--static"
+								class:is-active={itemActive(item)}>{item.label}</span
+							>
 						{/if}
 						<button
 							type="button"
@@ -313,15 +333,17 @@
 			</li>
 		{/each}
 	</ul>
-	<a
-		href={cta.href}
-		class="site-nav__drawer-cta"
-		target={cta.external ? '_blank' : undefined}
-		rel={cta.external ? 'noopener noreferrer' : undefined}
-		tabindex={open ? 0 : -1}
-	>
-		{cta.label}
-	</a>
+	<div class="site-nav__drawer-footer">
+		<a
+			href={cta.href}
+			class="site-nav__drawer-cta"
+			target={cta.external ? '_blank' : undefined}
+			rel={cta.external ? 'noopener noreferrer' : undefined}
+			tabindex={open ? 0 : -1}
+		>
+			{cta.label}
+		</a>
+	</div>
 </aside>
 
 <style>
@@ -565,7 +587,15 @@
 		background: var(--on-green);
 		transition:
 			transform var(--duration-hover) var(--ease),
-			opacity var(--duration-hover) var(--ease);
+			opacity var(--duration-hover) var(--ease),
+			background var(--duration-hover) var(--ease);
+	}
+
+	/* The toggle joins the nav's shared interaction vocabulary: gold on hover/focus,
+	   like every other control in the bar. */
+	.site-nav__toggle:hover .site-nav__toggle-bar,
+	.site-nav__toggle:focus-visible .site-nav__toggle-bar {
+		background: var(--gold);
 	}
 
 	.site-nav__toggle.is-open .site-nav__toggle-bar:nth-child(1) {
@@ -607,16 +637,20 @@
 		top: var(--nav-height);
 		right: 0;
 		bottom: 0;
-		width: min(80vw, 360px);
+		/* Wide enough to feel like a panel, not a phone pattern stretched onto the
+		   tablet sizes this breakpoint also serves. */
+		width: min(85vw, 420px);
 		background: var(--green-deep);
-		border-left: 1px solid rgba(255, 255, 255, 0.1);
+		/* Gold hairline on the leading edge — the drawer's counterpart to the desktop
+		   dropdown's gold top accent — with the same deep shadow so the panel lifts off
+		   the scrim instead of floating on its plane. */
+		border-left: 1px solid var(--gold);
+		box-shadow: -22px 0 48px rgba(15, 22, 17, 0.4);
 		flex-direction: column;
-		padding: 1.5rem 0 2rem;
+		padding: 1.5rem 0 0;
 		transform: translateX(100%);
 		transition: transform 0.4s var(--ease);
 		z-index: 95;
-		overflow-y: auto;
-		overscroll-behavior: contain;
 		pointer-events: none;
 		/* Off-screen drawer still paints past the viewport edge; clip it closed so
 		   iOS cannot rubber-band the page sideways to reveal it. */
@@ -629,10 +663,28 @@
 		clip-path: none;
 	}
 
+	.site-nav__drawer-masthead {
+		flex-shrink: 0;
+		font-family: var(--serif);
+		font-size: 1.0625rem;
+		font-weight: 700;
+		letter-spacing: 0.01em;
+		color: var(--on-green);
+		padding: 0.125rem 2rem 1.125rem;
+		border-bottom: 1px solid var(--gold);
+	}
+
+	/* The list is the scroll region; the CTA footer below it never scrolls away. */
 	.site-nav__drawer-menu {
 		list-style: none;
 		display: flex;
 		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		scrollbar-width: thin;
+		scrollbar-color: rgba(245, 241, 232, 0.25) transparent;
 	}
 
 	/* A parent row: the link (or static label) and the accordion toggle share a line. */
@@ -643,14 +695,13 @@
 	}
 
 	/* Same vocabulary as the desktop bar — light tracked caps in warm ivory — just
-	   sized up for the vertical, touch-first drawer. The Playfair wordmark at the top
-	   keeps the serif present; the menu items stay sans, matching desktop. */
+	   sized up for the vertical, touch-first drawer. */
 	.site-nav__drawer-link {
 		position: relative;
 		display: block;
 		flex: 1;
 		font-family: var(--sans);
-		font-size: 1rem;
+		font-size: 1.0625rem;
 		font-weight: 300;
 		letter-spacing: 0.11em;
 		line-height: 1.3;
@@ -661,12 +712,15 @@
 		transition: color var(--duration-hover) var(--ease);
 	}
 
+	/* A parent with no destination of its own keeps full ink — dimming it read as
+	   "disabled" (and fell below AA); the chevron alone signals "expands, doesn't
+	   navigate". Hover gold is scoped to real links so the span never pretends. */
 	.site-nav__drawer-link--static {
-		color: rgba(245, 241, 232, 0.55);
+		cursor: default;
 	}
 
-	.site-nav__drawer-link:hover,
-	.site-nav__drawer-link:focus-visible {
+	a.site-nav__drawer-link:hover,
+	a.site-nav__drawer-link:focus-visible {
 		color: var(--gold);
 	}
 
@@ -710,7 +764,9 @@
 
 	.site-nav__drawer-submenu {
 		list-style: none;
-		background: rgba(0, 0, 0, 0.18);
+		/* Recess tinted with the site's own dark green (#0E1410) rather than black, so
+		   the well deepens the hue instead of cooling it toward neutral. */
+		background: rgba(14, 20, 16, 0.4);
 	}
 
 	/* Children read uppercase / tracked at Regular 400 — the same way the desktop
@@ -719,13 +775,15 @@
 		position: relative;
 		display: block;
 		font-family: var(--sans);
-		font-size: 0.9375rem;
+		/* A real size step below the 1.0625rem parent (was a near-invisible 1px), so
+		   the two tiers read as structure, not rendering noise. Rows stay >=44px. */
+		font-size: 0.875rem;
 		font-weight: 400;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		color: var(--on-green);
 		text-decoration: none;
-		padding: 0.9rem 2rem 0.9rem 2.75rem;
+		padding: 0.95rem 2rem 0.95rem 2.75rem;
 		transition: color var(--duration-hover) var(--ease);
 	}
 
@@ -740,8 +798,16 @@
 		color: var(--gold);
 	}
 
+	/* The drawer's closing gesture: the CTA sits in a pinned footer beneath a hairline,
+	   always on screen however long the list or short the viewport. */
+	.site-nav__drawer-footer {
+		flex-shrink: 0;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		padding: 1.25rem 2rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+	}
+
 	.site-nav__drawer-cta {
-		margin: 1.75rem 2rem 0;
+		display: block;
 		text-align: center;
 		font-family: var(--sans);
 		font-size: var(--text-ui);
@@ -781,7 +847,6 @@
 			display: flex;
 		}
 
-		.site-nav__scrim,
 		.site-nav__drawer {
 			display: flex;
 		}
@@ -801,6 +866,8 @@
 		.site-nav__cta,
 		.site-nav__drawer-cta,
 		.site-nav__drawer-link,
+		.site-nav__drawer-sublink,
+		.site-nav__caret,
 		.site-nav__submenu-link {
 			transition: none;
 		}
