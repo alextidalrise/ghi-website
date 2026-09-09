@@ -118,37 +118,3 @@ export async function fetchNavTaxonomy(): Promise<NavTaxonomy> {
 	};
 }
 
-/**
- * Communities under a single country, in the same shape the discovery bar consumes.
- * The country page's scoped search bar needs only its own country's communities, so it
- * takes this instead of the whole-catalogue {@link fetchNavTaxonomy} cascade.
- */
-export async function fetchCountryNavCommunities(
-	countrySlug: string
-): Promise<NavCommunityOption[]> {
-	const rows = await fetchPublic<
-		Array<{
-			_id: string;
-			name: string;
-			slug?: string | null;
-			locationSlug?: string | null;
-			countrySlug?: string | null;
-		}>
-	>(communitiesForNavQuery);
-
-	return dedupeCommunitiesBySlug(
-		(rows ?? []).flatMap((row) =>
-			row.slug && row.locationSlug && row.countrySlug === countrySlug
-				? [
-						{
-							_id: row._id,
-							name: row.name,
-							slug: row.slug,
-							locationSlug: row.locationSlug,
-							countrySlug: row.countrySlug
-						}
-					]
-				: []
-		)
-	);
-}

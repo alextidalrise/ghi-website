@@ -21,6 +21,7 @@
 	import PriceMenu from '$lib/components/ui/PriceMenu.svelte';
 
 	type CommunityOption = { label: string; value: string };
+	type LocationOption = { label: string; value: string };
 	type CourseOption = { label: string; value: string };
 	type FeatureOption = { label: string; value: string };
 
@@ -28,6 +29,8 @@
 		basePath: string;
 		searchParams: ListingSearchParams;
 		communityOptions?: CommunityOption[];
+		/** Location options (country scope). When non-empty, renders the Location filter. */
+		locationOptions?: LocationOption[];
 		/** Golf course/club options. When non-empty, renders the Course filter. */
 		courseOptions?: CourseOption[];
 		/** Auto-derived feature-highlight options. When non-empty, renders the Features filter. */
@@ -40,6 +43,7 @@
 		basePath,
 		searchParams,
 		communityOptions = [],
+		locationOptions = [],
 		courseOptions = [],
 		featureOptions = [],
 		showGolfRelevance = true
@@ -63,6 +67,7 @@
 	let propertyType = $state('');
 	let minBeds = $state('');
 	let community = $state('');
+	let location = $state('');
 	let sort = $state<ListingSort>('newest');
 	let minPrice = $state<number | null>(null);
 	let maxPrice = $state<number | null>(null);
@@ -90,6 +95,7 @@
 		propertyType = searchParams.propertyType ?? '';
 		minBeds = searchParams.minBeds != null ? String(searchParams.minBeds) : '';
 		community = searchParams.community ?? '';
+		location = searchParams.location ?? '';
 		sort = searchParams.sort;
 		minPrice = searchParams.minPrice;
 		maxPrice = searchParams.maxPrice;
@@ -103,6 +109,7 @@
 		searchParams.propertyType;
 		searchParams.minBeds;
 		searchParams.community;
+		searchParams.location;
 		searchParams.sort;
 		searchParams.minPrice;
 		searchParams.maxPrice;
@@ -115,6 +122,7 @@
 	const hasActiveFilters = $derived(
 		searchParams.propertyType != null ||
 			searchParams.community != null ||
+			searchParams.location != null ||
 			searchParams.minBeds != null ||
 			searchParams.minPrice != null ||
 			searchParams.maxPrice != null ||
@@ -128,6 +136,7 @@
 		(searchParams.propertyType ? 1 : 0) +
 			(searchParams.minBeds != null ? 1 : 0) +
 			(searchParams.community ? 1 : 0) +
+			(searchParams.location ? 1 : 0) +
 			(searchParams.minPrice != null || searchParams.maxPrice != null ? 1 : 0) +
 			searchParams.golfRelevance.length +
 			searchParams.golfCourse.length +
@@ -147,6 +156,7 @@
 			maxPrice: maxPrice ?? null,
 			minBeds: minBeds ? Number(minBeds) : null,
 			community: community || null,
+			location: location || null,
 			golfRelevance: [...golfRelevance] as ListingSearchParams['golfRelevance'],
 			golfCourse: [...golfCourse],
 			features: [...features]
@@ -169,7 +179,7 @@
 			trackSearchSubmitted({
 				placement: 'results_filters',
 				country: page.params.country,
-				location: page.params.location,
+				location: applied.location ?? page.params.location,
 				community: applied.community ?? page.params.community,
 				propertyType: applied.propertyType,
 				priceBand: priceBandLabel(applied.minPrice, applied.maxPrice),
@@ -237,6 +247,19 @@
 	<div class="filter-bar">
 		<!-- Core single-select narrowers share one tray, in the homepage design language. -->
 		<div class="filter-bar__tray fc-tray">
+			<!-- Location leads the country-scope tray: the first question on a country page
+			     is which area. Rendered only when location options are supplied. -->
+			{#if locationOptions.length > 0}
+				<Select
+					variant="tray"
+					label="Location"
+					placeholder="All locations"
+					name="location"
+					options={locationOptions}
+					bind:value={location}
+					onchange={applyNow}
+				/>
+			{/if}
 			<PriceMenu bind:minPrice bind:maxPrice onchange={applyNow} />
 			<Select
 				variant="tray"
@@ -357,6 +380,18 @@
 	</div>
 
 	<div class="lf-sheet__body">
+		{#if locationOptions.length > 0}
+			<label class="lf-row">
+				<span class="lf-row__label">Location</span>
+				<select class="lf-select" class:is-empty={!location} bind:value={location}>
+					<option value="">All locations</option>
+					{#each locationOptions as option (option.value)}
+						<option value={option.value}>{option.label}</option>
+					{/each}
+				</select>
+			</label>
+		{/if}
+
 		<div class="lf-row">
 			<span class="lf-row__label" id="lf-price-label">Price</span>
 			<div class="lf-price" role="group" aria-labelledby="lf-price-label">

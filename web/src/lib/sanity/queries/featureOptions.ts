@@ -38,6 +38,18 @@ const locationFeatureLabelsQuery = /* groq */ `
   ]${FEATURE_LABELS_PROJECTION}
 `;
 
+/**
+ * Highlight labels for every listing in a country (country results page). Country-wide —
+ * no per-location narrowing — so the Features menu stays stable as the visitor filters,
+ * including by the Location facet.
+ */
+const countryFeatureLabelsQuery = /* groq */ `
+  *[
+    ${FEATURE_LISTING_FILTER}
+    && location.country->slug.current == $countrySlug
+  ]${FEATURE_LABELS_PROJECTION}
+`;
+
 type FeatureLabelRow = { labels?: Array<string | null> | null };
 
 /**
@@ -54,4 +66,18 @@ export async function fetchLocationFeatureOptions(
 		params: { countrySlug, locationIds }
 	});
 	return toFeatureOptions((rows ?? []).flatMap((row) => row.labels ?? []), settings);
+}
+
+/**
+ * Raw highlight labels for every listing in a country (country results page). Returns the
+ * flattened labels rather than finished options so the caller can transform them with the
+ * feature-filter settings it already fetched in the same round trip — the country page keeps
+ * a single Promise.all (a documented TTFB optimization), so `toFeatureOptions` is applied
+ * there, alongside the settings, rather than behind a second round trip here.
+ */
+export async function fetchCountryFeatureLabels(countrySlug: string): Promise<Array<string | null>> {
+	const rows = await fetchPublic<FeatureLabelRow[]>(countryFeatureLabelsQuery, {
+		params: { countrySlug }
+	});
+	return (rows ?? []).flatMap((row) => row.labels ?? []);
 }

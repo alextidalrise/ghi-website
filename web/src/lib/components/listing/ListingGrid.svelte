@@ -8,9 +8,16 @@
 		cards: SimilarListingCard[];
 		/** Opt in to analytics by naming the list; omit and the grid behaves as before. */
 		list?: ListContext;
+		/**
+		 * Eager-load (with fetchpriority=high) the first N card images. Leave at 0 on pages
+		 * whose real LCP is an image hero above the grid; raise it (e.g. one row = 3) only
+		 * where the first cards genuinely paint above the fold, as on the imageless-hero
+		 * country page — otherwise it steals bandwidth from the true LCP element.
+		 */
+		priorityCount?: number;
 	};
 
-	let { cards, list }: Props = $props();
+	let { cards, list, priorityCount = 0 }: Props = $props();
 
 	// Built once here rather than per card: the grid owns the ordering, so this is the
 	// only place that can give impressions and clicks a consistent position.
@@ -26,12 +33,20 @@
 		class="listing-grid"
 		use:listImpression={list ? { list, items } : undefined}
 	>
-		{#each cards as item (item.card._id)}
+		{#each cards as item, index (item.card._id)}
 			<div class="listing-grid__cell" class:listing-grid__cell--wide={item.kind === 'development'}>
 				{#if item.kind === 'development'}
-					<DevelopmentCard card={item.card} item={analyticsFor(item.card)} />
+					<DevelopmentCard
+						card={item.card}
+						item={analyticsFor(item.card)}
+						priority={index < priorityCount}
+					/>
 				{:else}
-					<PropertyCard card={item.card} item={analyticsFor(item.card)} />
+					<PropertyCard
+						card={item.card}
+						item={analyticsFor(item.card)}
+						priority={index < priorityCount}
+					/>
 				{/if}
 			</div>
 		{/each}

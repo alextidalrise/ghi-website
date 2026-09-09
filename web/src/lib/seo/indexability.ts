@@ -11,6 +11,7 @@ const INDEX_AFFECTING_KEYS: (keyof ListingSearchParams)[] = [
 	'maxPrice',
 	'minBeds',
 	'community',
+	'location',
 	'golfRelevance',
 	'golfCourse',
 	'features'

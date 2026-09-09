@@ -69,26 +69,19 @@ export {
 
 export { fetchListingCards, type ListingSearchResult } from './fetchListings';
 
-export { fetchLocationFeatureOptions } from './featureOptions';
+export { fetchCountryFeatureLabels, fetchLocationFeatureOptions } from './featureOptions';
 
-export {
-	fetchListingFacetRows,
-	fetchCountryListingFacetRows,
-	type ListingFacetRow
-} from './listingFacets';
+export { fetchListingFacetRows, type ListingFacetRow } from './listingFacets';
 
 export {
 	FRONTLINE_LISTING_LIMIT,
 	HOMEPAGE_FEATURED_LIMIT,
 	COUNTRY_FEATURED_LIMIT,
 	HOMEPAGE_FEATURED_LOCATIONS_LIMIT,
-	COUNTRY_FEATURED_LOCATIONS_LIMIT,
 	fetchFrontlineListingCards,
 	fetchHomepageFrontlineListingCards,
 	fetchHomepageFeaturedListingCards,
-	fetchCountryFeaturedListingCards,
-	fetchCountryFeaturedLocations,
-	countryFeaturedLocationsQuery
+	fetchCountryFeaturedListingCards
 } from './featured';
 
 export {
@@ -111,7 +104,6 @@ export {
 
 export {
 	fetchNavTaxonomy,
-	fetchCountryNavCommunities,
 	type NavCountryOption,
 	type NavLocationOption,
 	type NavCommunityOption,

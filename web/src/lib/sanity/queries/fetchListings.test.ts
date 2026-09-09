@@ -89,6 +89,7 @@ describe('fetchListingCards', () => {
 				maxPrice: null,
 				minBeds: null,
 				community: null,
+				location: null,
 				golfRelevance: [],
 				golfCourse: [],
 				features: []
@@ -143,6 +144,7 @@ describe('fetchListingCards', () => {
 				maxPrice: null,
 				minBeds: null,
 				community: null,
+				location: null,
 				golfRelevance: [],
 				golfCourse: [],
 				features: []

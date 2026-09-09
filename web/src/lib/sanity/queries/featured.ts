@@ -1,20 +1,10 @@
 import { defineQuery } from 'groq';
-import {
-	FEATURED_LOCATION_PROJECTION,
-	FEATURED_LOCATION_REF_FILTER,
-	LISTING_CARD_UNION,
-	LISTING_REF_PUBLIC_FILTER
-} from '../allowlists';
+import { LISTING_CARD_UNION, LISTING_REF_PUBLIC_FILTER } from '../allowlists';
 import {
 	toSimilarListingCard,
 	type RawSimilarListingItem,
 	type SimilarListingCard
 } from '../transforms/similarListingCard';
-import {
-	toLocationCards,
-	type FeaturedLocationCard,
-	type TaxonomyWithHero
-} from '../transforms/taxonomyHero';
 import { fetchPublic } from './fetch';
 import {
 	buildPaginatedListingCardsQuery,
@@ -26,7 +16,6 @@ export const FRONTLINE_LISTING_LIMIT = 8;
 export const HOMEPAGE_FEATURED_LIMIT = 8;
 export const COUNTRY_FEATURED_LIMIT = 6;
 export const HOMEPAGE_FEATURED_LOCATIONS_LIMIT = 10;
-export const COUNTRY_FEATURED_LOCATIONS_LIMIT = 6;
 
 export type { ListingSearchScope };
 
@@ -40,19 +29,6 @@ export const homepageFeaturedListingsQuery = defineQuery(`
     "cards": homepageFeaturedListings[
       ${LISTING_REF_PUBLIC_FILTER}
     ]->${LISTING_CARD_UNION}
-  }
-`);
-
-/** Ordered featured locations for a country taxonomy doc — editor order preserved. */
-export const countryFeaturedLocationsQuery = defineQuery(`
-  *[
-    _type == "locationTaxonomy"
-    && type == "country"
-    && slug.current == $countrySlug
-  ][0]{
-    "locations": featuredLocations[
-      ${FEATURED_LOCATION_REF_FILTER}
-    ]->${FEATURED_LOCATION_PROJECTION}
   }
 `);
 
@@ -127,15 +103,3 @@ export async function fetchCountryFeaturedListingCards({
 	return toFeaturedCards(result?.cards, COUNTRY_FEATURED_LIMIT);
 }
 
-/** Hand-picked country featured locations from locationTaxonomy.featuredLocations. */
-export async function fetchCountryFeaturedLocations({
-	countrySlug
-}: {
-	countrySlug: string;
-}): Promise<FeaturedLocationCard[]> {
-	const result = await fetchPublic<{ locations?: Array<TaxonomyWithHero | null> | null }>(
-		countryFeaturedLocationsQuery,
-		{ params: { countrySlug } }
-	);
-	return toLocationCards(result?.locations).slice(0, COUNTRY_FEATURED_LOCATIONS_LIMIT);
-}

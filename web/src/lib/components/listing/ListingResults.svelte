@@ -11,6 +11,7 @@
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 	type CommunityOption = { label: string; value: string };
+	type LocationOption = { label: string; value: string };
 	type CourseOption = { label: string; value: string };
 	type FeatureOption = { label: string; value: string };
 
@@ -22,10 +23,14 @@
 		pagination: PaginationMeta;
 		heading?: string;
 		communityOptions?: CommunityOption[];
+		/** Location options (country scope); passed straight to the filter bar. */
+		locationOptions?: LocationOption[];
 		courseOptions?: CourseOption[];
 		/** Auto-derived feature-highlight options; when non-empty, renders the Features filter. */
 		featureOptions?: FeatureOption[];
 		showGolfRelevance?: boolean;
+		/** Eager-load the first N card images; forwarded to ListingGrid. Default 0. */
+		priorityCount?: number;
 	};
 
 	let {
@@ -36,9 +41,11 @@
 		pagination,
 		heading = 'Properties',
 		communityOptions = [],
+		locationOptions = [],
 		courseOptions = [],
 		featureOptions = [],
-		showGolfRelevance = true
+		showGolfRelevance = true,
+		priorityCount = 0
 	}: Props = $props();
 
 	const summary = $derived(formatSummary(total, pagination));
@@ -46,6 +53,7 @@
 	const hasActiveFilters = $derived(
 		searchParams.propertyType != null ||
 			searchParams.community != null ||
+			searchParams.location != null ||
 			searchParams.minPrice != null ||
 			searchParams.maxPrice != null ||
 			searchParams.minBeds != null ||
@@ -74,6 +82,7 @@
 			{basePath}
 			{searchParams}
 			{communityOptions}
+			{locationOptions}
 			{courseOptions}
 			{featureOptions}
 			{showGolfRelevance}
@@ -81,7 +90,7 @@
 
 		{#if cards.length > 0}
 			<div class="listing-results__grid">
-				<ListingGrid {cards} list={resultsList} />
+				<ListingGrid {cards} list={resultsList} {priorityCount} />
 			</div>
 			<Pagination {basePath} {searchParams} {pagination} />
 		{:else}

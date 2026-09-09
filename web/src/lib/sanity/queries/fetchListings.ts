@@ -39,6 +39,7 @@ export async function fetchListingCards({
 	const queryParams = listingSearchQueryParams(scope, {
 		propertyType: params.propertyType,
 		community: params.community,
+		location: params.location,
 		minPrice: params.minPrice,
 		maxPrice: params.maxPrice,
 		minBeds: params.minBeds,

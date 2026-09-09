@@ -17,6 +17,8 @@ export type ListingSearchParams = {
 	maxPrice: number | null;
 	minBeds: number | null;
 	community: string | null;
+	/** Location slug (country scope only): narrow a country's grid to one location. */
+	location: string | null;
 	golfRelevance: GolfRelevanceValue[];
 	/** Golf course/club slugs the listing must sit on (primary or linked). */
 	golfCourse: string[];
@@ -32,6 +34,7 @@ export const DEFAULT_LISTING_SEARCH_PARAMS: ListingSearchParams = {
 	maxPrice: null,
 	minBeds: null,
 	community: null,
+	location: null,
 	golfRelevance: [],
 	golfCourse: [],
 	features: []
@@ -75,6 +78,13 @@ function parseMinBeds(value: string | null): number | null {
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function parseCommunity(value: string | null): string | null {
+	if (!value) return null;
+	const trimmed = value.trim().toLowerCase();
+	return SLUG_PATTERN.test(trimmed) ? trimmed : null;
+}
+
+/** Validate a location slug (country scope's Location facet). Same shape as a community slug. */
+function parseLocation(value: string | null): string | null {
 	if (!value) return null;
 	const trimmed = value.trim().toLowerCase();
 	return SLUG_PATTERN.test(trimmed) ? trimmed : null;
@@ -130,6 +140,7 @@ export function parseListingSearchParams(url: URL): ListingSearchParams {
 		maxPrice: parsePositiveInt(url.searchParams.get('maxPrice')),
 		minBeds: parseMinBeds(url.searchParams.get('minBeds')),
 		community: parseCommunity(url.searchParams.get('community')),
+		location: parseLocation(url.searchParams.get('location')),
 		golfRelevance: parseGolfRelevance(url.searchParams.getAll('golfRelevance')),
 		golfCourse: parseGolfCourse(url.searchParams.getAll('golfCourse')),
 		features: parseFeatures(url.searchParams.getAll('features'))
@@ -158,6 +169,7 @@ export function serializeListingSearchParams(params: ListingSearchParams): URLSe
 	appendIfSet(searchParams, 'maxPrice', params.maxPrice);
 	appendIfSet(searchParams, 'minBeds', params.minBeds);
 	appendIfSet(searchParams, 'community', params.community);
+	appendIfSet(searchParams, 'location', params.location);
 
 	for (const value of params.golfRelevance) {
 		searchParams.append('golfRelevance', value);
