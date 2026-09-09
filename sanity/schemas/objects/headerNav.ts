@@ -111,8 +111,65 @@ export const navMenuChild = defineType({
 });
 
 /**
- * A top-level menu item. It can be a plain link, a dropdown of sub-items, or both
- * (a country that links to its own page and lists its locations underneath).
+ * A second-level item that opens its own column in the header's wide panel — a country
+ * with its curated locations beneath. The label is the column head; the optional link
+ * makes that head clickable (a country's own page); the sub-items are the third tier
+ * and are always real links. A group needs a link, sub-items, or both to earn a place.
+ */
+export const navMenuGroup = defineType({
+	name: 'navMenuGroup',
+	title: 'Group (opens a column)',
+	type: 'object',
+	fields: [
+		defineField({
+			name: 'label',
+			title: 'Label',
+			type: 'string',
+			description: 'The column heading — for example the country name.',
+			validation: (Rule) => Rule.required()
+		}),
+		defineField({
+			name: 'link',
+			title: 'Link',
+			type: 'navLink',
+			description:
+				'Optional. Where the column heading goes — link a country to its own page so its flag is shown. Leave empty for a heading that only labels its column.'
+		}),
+		defineField({
+			name: 'children',
+			title: 'Sub-items',
+			type: 'array',
+			of: [{ type: 'navMenuChild' }],
+			description: 'The third level — for example the locations under a country. Always real links.',
+			validation: (Rule) => Rule.max(12)
+		})
+	],
+	validation: (Rule) =>
+		Rule.custom((value) => {
+			const v = value as { link?: NavLinkValue; children?: unknown[] } | undefined;
+			if (!v) return true;
+			const hasLink = Boolean(v.link?.linkType);
+			const hasChildren = Array.isArray(v.children) && v.children.length > 0;
+			if (!hasLink && !hasChildren) return 'Give this group a link, sub-items, or both.';
+			return true;
+		}),
+	preview: {
+		select: { title: 'label', c0: 'children.0.label', c1: 'children.1.label', c2: 'children.2.label' },
+		prepare({ title, c0, c1, c2 }) {
+			const kids = [c0, c1, c2].filter(Boolean) as string[];
+			const subtitle = kids.length
+				? `▸ ${kids.join(', ')}${kids.length === 3 ? '…' : ''}`
+				: 'Group';
+			return { title: title || 'Group', subtitle };
+		}
+	}
+});
+
+/**
+ * A top-level menu item. It can be a plain link, a dropdown, or both. The dropdown holds
+ * either plain sub-items (a narrow list) or groups (a wide panel of columns, each group a
+ * column) — which is how a single "Countries" item carries every country and, beneath
+ * each, its locations, without a top-level slot per country.
  */
 export const navMenuItem = defineType({
 	name: 'navMenuItem',
@@ -135,8 +192,9 @@ export const navMenuItem = defineType({
 			name: 'children',
 			title: 'Dropdown items',
 			type: 'array',
-			of: [{ type: 'navMenuChild' }],
-			description: 'Optional second level — for example the locations under a country.',
+			of: [{ type: 'navMenuChild' }, { type: 'navMenuGroup' }],
+			description:
+				'Optional second level. A sub-item is a plain link in a narrow dropdown. A group opens a wide panel with one column per group — add a group per country under a “Countries” item, and its locations as the group’s sub-items.',
 			validation: (Rule) => Rule.max(12)
 		})
 	],

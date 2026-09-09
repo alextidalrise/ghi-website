@@ -22,7 +22,14 @@ export const headerNavQuery = defineQuery(`
 			"children": coalesce(children, [])[]{
 				label,
 				"href": ${NAV_HREF},
-				"external": ${NAV_EXTERNAL}
+				"external": ${NAV_EXTERNAL},
+				"countrySlug": select(link.reference->type == "country" => link.reference->slug.current),
+				"flag": select(link.reference->type == "country" => link.reference->flag.asset->url),
+				"children": coalesce(children, [])[]{
+					label,
+					"href": ${NAV_HREF},
+					"external": ${NAV_EXTERNAL}
+				}
 			}
 		},
 		"cta": headerCta{
@@ -40,12 +47,28 @@ export type HeaderNavLink = {
 	external: boolean;
 };
 
+/**
+ * A second-level entry. A plain sub-item is a group with an href and no children; a
+ * group proper (a country) may carry its own href plus a third tier of links. When the
+ * group links to a country document, `countrySlug` and `flag` let the header show the
+ * same flag stamp the homepage country index uses (flag may still be null before an
+ * editor uploads one — the stamp then falls back by slug).
+ */
+export type HeaderNavGroup = {
+	label: string;
+	href: string | null;
+	external: boolean;
+	countrySlug: string | null;
+	flag: string | null;
+	children: HeaderNavLink[];
+};
+
 /** A top-level item: may have no href of its own (dropdown-only), plus optional children. */
 export type HeaderNavItem = {
 	label: string;
 	href: string | null;
 	external: boolean;
-	children: HeaderNavLink[];
+	children: HeaderNavGroup[];
 };
 
 export type HeaderNav = {
@@ -55,7 +78,12 @@ export type HeaderNav = {
 
 // The raw, pre-cleaned shape coming back from GROQ — any field can be missing or null.
 type RawLink = { label?: string | null; href?: string | null; external?: boolean | null };
-type RawItem = RawLink & { children?: RawLink[] | null };
+type RawGroup = RawLink & {
+	countrySlug?: string | null;
+	flag?: string | null;
+	children?: RawLink[] | null;
+};
+type RawItem = RawLink & { children?: RawGroup[] | null };
 type RawHeaderNav = { items?: RawItem[] | null; cta?: RawLink | null } | null;
 
 // Campaign tags are stripped as the raw href becomes a typed link, alongside the other
@@ -70,11 +98,30 @@ function toLink(raw: RawLink | null | undefined): HeaderNavLink | null {
 	};
 }
 
-function toItem(raw: RawItem | null | undefined): HeaderNavItem | null {
+// A group earns a place the same way an item does: by leading somewhere — its own link,
+// a third tier of links, or both. Its children are always real links.
+function toGroup(raw: RawGroup | null | undefined): HeaderNavGroup | null {
 	if (!raw?.label) return null;
 	const children = (raw.children ?? []).flatMap((c) => {
 		const link = toLink(c);
 		return link ? [link] : [];
+	});
+	if (!raw.href && children.length === 0) return null;
+	return {
+		label: raw.label,
+		href: raw.href ? withoutCampaignParams(raw.href) : null,
+		external: Boolean(raw.external),
+		countrySlug: raw.countrySlug ?? null,
+		flag: raw.flag ?? null,
+		children
+	};
+}
+
+function toItem(raw: RawItem | null | undefined): HeaderNavItem | null {
+	if (!raw?.label) return null;
+	const children = (raw.children ?? []).flatMap((c) => {
+		const group = toGroup(c);
+		return group ? [group] : [];
 	});
 	// An item earns a place only if it leads somewhere — a real link, a dropdown, or both.
 	if (!raw.href && children.length === 0) return null;

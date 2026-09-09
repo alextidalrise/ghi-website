@@ -7,12 +7,28 @@ export type SiteNavLink = {
 	external: boolean;
 };
 
+/**
+ * A second-level entry. With no children it is a plain sub-item in a narrow dropdown;
+ * with children it is a column in the wide panel (a country and its locations). The
+ * flag stamp renders only for a country: `countrySlug` names the built-in fallback art,
+ * `flag` the SVG an editor uploaded.
+ */
+export type SiteNavGroup = {
+	label: string;
+	/** Null when the group is a heading with no page of its own. */
+	href: string | null;
+	external: boolean;
+	countrySlug: string | null;
+	flag: string | null;
+	children: SiteNavLink[];
+};
+
 export type SiteNavItem = {
 	label: string;
 	/** Null when the item only opens its dropdown (no destination of its own). */
 	href: string | null;
 	external: boolean;
-	children: SiteNavLink[];
+	children: SiteNavGroup[];
 };
 
 export type SiteNav = {
@@ -20,12 +36,22 @@ export type SiteNav = {
 	cta: SiteNavLink;
 };
 
+/** A fallback country entry: links to the country page, flag from the built-in stamp art. */
+function fallbackCountry(label: string, slug: string): SiteNavGroup {
+	return { label, href: `/${slug}`, external: false, countrySlug: slug, flag: null, children: [] };
+}
+
 // Fallback menu — used only when no header navigation is configured in Sanity, so the
-// header is never empty (a fresh dataset, or Sanity being unreachable). This mirrors the
-// curated editorial set the nav shipped with before it moved into the CMS.
+// header is never empty (a fresh dataset, or Sanity being unreachable). Countries sit
+// under one "Countries" item, as the authored menu does; locations are editorial and
+// only ever come from Sanity.
 const FALLBACK_ITEMS: SiteNavItem[] = [
-	{ label: 'Spain', href: '/spain', external: false, children: [] },
-	{ label: 'Portugal', href: '/portugal', external: false, children: [] },
+	{
+		label: 'Countries',
+		href: null,
+		external: false,
+		children: [fallbackCountry('Spain', 'spain'), fallbackCountry('Portugal', 'portugal')]
+	},
 	{ label: 'Front Line Collection', href: FRONTLINE_COLLECTION_PATH, external: false, children: [] },
 	{ label: 'Buying Guide', href: '/guides', external: false, children: [] },
 	{ label: 'Insights', href: '/insights', external: false, children: [] },
@@ -50,10 +76,17 @@ export function buildSiteNav(nav: HeaderNav | null | undefined): SiteNav {
 				label: item.label,
 				href: item.href,
 				external: item.external,
-				children: item.children.map((child) => ({
-					label: child.label,
-					href: child.href,
-					external: child.external
+				children: item.children.map((group) => ({
+					label: group.label,
+					href: group.href,
+					external: group.external,
+					countrySlug: group.countrySlug,
+					flag: group.flag,
+					children: group.children.map((child) => ({
+						label: child.label,
+						href: child.href,
+						external: child.external
+					}))
 				}))
 			})),
 			cta: nav.cta ?? FALLBACK_CTA
@@ -77,8 +110,24 @@ export function isNavItemActive(href: string | null, pathname: string): boolean 
 	return pathname === path || pathname.startsWith(`${path}/`);
 }
 
-/** A top-level item is active when its own href matches, or any of its children do. */
+/** A group is active when its own href matches, or any of its children do. */
+export function isSiteNavGroupActive(group: SiteNavGroup, pathname: string): boolean {
+	if (isNavItemActive(group.href, pathname)) return true;
+	return group.children.some((child) => isNavItemActive(child.href, pathname));
+}
+
+/** A top-level item is active when its own href matches, or anything beneath it does. */
 export function isSiteNavItemActive(item: SiteNavItem, pathname: string): boolean {
 	if (isNavItemActive(item.href, pathname)) return true;
-	return item.children.some((child) => isNavItemActive(child.href, pathname));
+	return item.children.some((group) => isSiteNavGroupActive(group, pathname));
+}
+
+/**
+ * An item opens the wide panel (one column per group) when any group carries a third
+ * tier; otherwise its dropdown is the narrow list. Hierarchy is decided by content, not
+ * by label, so a "Countries" item with only country links stays a plain dropdown until
+ * an editor curates locations beneath a country.
+ */
+export function hasPanel(item: SiteNavItem): boolean {
+	return item.children.some((group) => group.children.length > 0);
 }

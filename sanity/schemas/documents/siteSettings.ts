@@ -13,7 +13,7 @@ export const siteSettings = defineType({
 			type: 'array',
 			of: [{ type: 'navMenuItem' }],
 			description:
-				'The main menu in the site header. Drag to reorder. Each item can carry an optional dropdown of sub-items (for example the locations under a country). Leave this empty to fall back to the built-in default menu.',
+				'The main menu in the site header. Drag to reorder. Each item can carry an optional dropdown: plain sub-items for a narrow list, or groups for a wide panel of columns (a “Countries” item holds one group per country, each listing its locations). Leave this empty to fall back to the built-in default menu.',
 			validation: (Rule) => Rule.max(8)
 		}),
 		defineField({

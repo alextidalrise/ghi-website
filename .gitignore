@@ -27,3 +27,6 @@ sanity/.env.local
 # OS
 .DS_Store
 Thumbs.db
+
+# Impeccable screenshot rounds (local evidence only; surface briefs stay tracked)
+web/.impeccable/review/

@@ -41,7 +41,7 @@ import {
 	insightTakeawayItem
 } from './insightContent';
 import { footerColumn, socialLink } from './footerNav';
-import { navLink, navMenuChild, navMenuItem } from './headerNav';
+import { navLink, navMenuChild, navMenuGroup, navMenuItem } from './headerNav';
 import { instagramPost, instagramPostImage } from './instagramPost';
 import { marketingFields } from './marketingFields';
 import { ctaFields } from './ctaFields';
@@ -126,6 +126,7 @@ export const objectTypes: SchemaTypeDefinition[] = [
 	// Header navigation (navLink registered before the items that nest it)
 	navLink,
 	navMenuChild,
+	navMenuGroup,
 	navMenuItem,
 	// Footer (reuses navMenuChild for its links, so registered after it)
 	footerColumn,
@@ -212,6 +213,7 @@ export {
 	mediaFields,
 	navLink,
 	navMenuChild,
+	navMenuGroup,
 	navMenuItem,
 	pricingFields,
 	propertyContentFields,
