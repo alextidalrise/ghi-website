@@ -291,10 +291,8 @@
 	inert={open ? undefined : true}
 	bind:this={drawer}
 >
-	<!-- The drawer's arrival moment: the one serif voice in the panel, under a gold
-	     hairline echoing the desktop dropdown's accent. Decorative — the bar's logo
-	     already carries the accessible brand name. -->
-	<p class="site-nav__drawer-masthead" aria-hidden="true">Golf Homes International</p>
+	<!-- No brand masthead here: the bar and its logo stay visible above the drawer, so
+	     repeating the name inside the panel read as duplication on device. -->
 	<ul class="site-nav__drawer-menu">
 		{#each navItems as item, i}
 			<li class="site-nav__drawer-item">
@@ -697,17 +695,6 @@
 		transform: translateX(0);
 		pointer-events: auto;
 		clip-path: none;
-	}
-
-	.site-nav__drawer-masthead {
-		flex-shrink: 0;
-		font-family: var(--serif);
-		font-size: 1.0625rem;
-		font-weight: 700;
-		letter-spacing: 0.01em;
-		color: var(--on-green);
-		padding: 0.125rem 2rem 1.125rem;
-		border-bottom: 1px solid var(--gold);
 	}
 
 	/* The list is the scroll region; the CTA footer below it never scrolls away. */
