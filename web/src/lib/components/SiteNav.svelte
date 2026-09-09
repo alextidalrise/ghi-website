@@ -72,12 +72,30 @@
 		expanded = null;
 	});
 
+	// Growing past the drawer breakpoint (rotating an iPad, un-snapping a window) hides
+	// the open drawer via CSS but leaves `open` true — scroll stays locked and focus
+	// stays trapped with no visible way out. Close it for real when the bar takes over.
+	// Must mirror the @media (max-width: 72rem) block below.
+	$effect(() => {
+		const drawerViewport = window.matchMedia('(max-width: 72rem)');
+		function onChange(event: MediaQueryListEvent) {
+			if (!event.matches) open = false;
+		}
+		drawerViewport.addEventListener('change', onChange);
+		return () => drawerViewport.removeEventListener('change', onChange);
+	});
+
 	// While the drawer is open: lock body scroll, trap focus inside the nav, and wire
 	// Escape to close. The cleanup restores everything and returns focus to the toggle.
 	$effect(() => {
 		if (!open) return;
 
 		const previouslyFocused = document.activeElement as HTMLElement | null;
+		// Lock the page behind the drawer. iOS Safari historically ignores overflow on
+		// body alone; hiding it on <html> as well covers the versions that scroll
+		// through, without the position:fixed dance that fights SvelteKit's own scroll
+		// restoration on navigation. The scrim's touch-action:none catches the rest.
+		document.documentElement.style.overflow = 'hidden';
 		document.body.style.overflow = 'hidden';
 
 		// Move focus to the first link inside the drawer.
@@ -119,6 +137,7 @@
 		document.addEventListener('keydown', onKeydown);
 
 		return () => {
+			document.documentElement.style.overflow = '';
 			document.body.style.overflow = '';
 			document.removeEventListener('keydown', onKeydown);
 			(previouslyFocused ?? toggleButton)?.focus();
@@ -128,13 +147,23 @@
 
 <svelte:window onkeydown={onWindowKeydown} />
 
+<!-- Screen-reader warning appended inside every link that leaves the site in a new
+     tab; sighted users get the browser's own new-tab affordance. -->
+{#snippet newTabHint(external: boolean)}{#if external}<span class="visually-hidden">
+			(opens in new tab)</span
+		>{/if}{/snippet}
+
 <nav class="site-nav" aria-label="Main" bind:this={navRoot}>
 	<a href="/" class="site-nav__logo" aria-label="Golf Homes International home">
 		<img src="/design-system/assets/logo-white.svg" alt="" width="140" height="32" />
 	</a>
 
 	<ul class="site-nav__menu">
-		{#each navItems as item, i (item.label)}
+		<!-- Unkeyed (index) each blocks throughout: the menu is CMS-authored, and labels
+		     are the only candidate key but are not guaranteed unique — a duplicate would
+		     take down the header on every page. The list only ever re-renders wholesale
+		     from server data, so index identity is exactly right. -->
+		{#each navItems as item, i}
 			{#if item.children.length}
 				<li
 					class="site-nav__item site-nav__item--has-menu"
@@ -152,7 +181,7 @@
 							target={item.external ? '_blank' : undefined}
 							rel={item.external ? 'noopener noreferrer' : undefined}
 						>
-							{item.label}
+							{item.label}{@render newTabHint(item.external)}
 						</a>
 						<button
 							type="button"
@@ -183,7 +212,7 @@
 					{/if}
 
 					<ul class="site-nav__submenu" class:is-open={openMenu === i} aria-label={item.label}>
-						{#each item.children as child (child.label)}
+						{#each item.children as child}
 							<li>
 								<a
 									href={child.href}
@@ -193,7 +222,7 @@
 									target={child.external ? '_blank' : undefined}
 									rel={child.external ? 'noopener noreferrer' : undefined}
 								>
-									{child.label}
+									{child.label}{@render newTabHint(child.external)}
 								</a>
 							</li>
 						{/each}
@@ -209,7 +238,7 @@
 						target={item.external ? '_blank' : undefined}
 						rel={item.external ? 'noopener noreferrer' : undefined}
 					>
-						{item.label}
+						{item.label}{@render newTabHint(item.external)}
 					</a>
 				</li>
 			{/if}
@@ -221,7 +250,7 @@
 				target={cta.external ? '_blank' : undefined}
 				rel={cta.external ? 'noopener noreferrer' : undefined}
 			>
-				{cta.label}
+				{cta.label}{@render newTabHint(cta.external)}
 			</a>
 		</li>
 	</ul>
@@ -249,11 +278,15 @@
 	aria-hidden="true"
 ></div>
 
-<aside
+<!-- A navigation landmark, not an aside: at drawer widths this *is* the site menu
+     (the bar's own list is display:none), and screen-reader users find menus by
+     navigation landmarks. Closed, it is inert and hidden, so the two nav landmarks
+     never compete. -->
+<nav
 	id="site-nav-drawer"
 	class="site-nav__drawer"
 	class:is-open={open}
-	aria-label="Main"
+	aria-label="Main menu"
 	aria-hidden={!open}
 	inert={open ? undefined : true}
 	bind:this={drawer}
@@ -263,7 +296,7 @@
 	     already carries the accessible brand name. -->
 	<p class="site-nav__drawer-masthead" aria-hidden="true">Golf Homes International</p>
 	<ul class="site-nav__drawer-menu">
-		{#each navItems as item, i (item.label)}
+		{#each navItems as item, i}
 			<li class="site-nav__drawer-item">
 				{#if item.children.length}
 					<div class="site-nav__drawer-row">
@@ -277,7 +310,7 @@
 								rel={item.external ? 'noopener noreferrer' : undefined}
 								tabindex={open ? 0 : -1}
 							>
-								{item.label}
+								{item.label}{@render newTabHint(item.external)}
 							</a>
 						{:else}
 							<span
@@ -301,7 +334,7 @@
 						</button>
 					</div>
 					<ul id={`drawer-submenu-${i}`} class="site-nav__drawer-submenu" hidden={expanded !== i}>
-						{#each item.children as child (child.label)}
+						{#each item.children as child}
 							<li>
 								<a
 									href={child.href}
@@ -312,7 +345,7 @@
 									rel={child.external ? 'noopener noreferrer' : undefined}
 									tabindex={open && expanded === i ? 0 : -1}
 								>
-									{child.label}
+									{child.label}{@render newTabHint(child.external)}
 								</a>
 							</li>
 						{/each}
@@ -327,7 +360,7 @@
 						rel={item.external ? 'noopener noreferrer' : undefined}
 						tabindex={open ? 0 : -1}
 					>
-						{item.label}
+						{item.label}{@render newTabHint(item.external)}
 					</a>
 				{/if}
 			</li>
@@ -341,10 +374,10 @@
 			rel={cta.external ? 'noopener noreferrer' : undefined}
 			tabindex={open ? 0 : -1}
 		>
-			{cta.label}
+			{cta.label}{@render newTabHint(cta.external)}
 		</a>
 	</div>
-</aside>
+</nav>
 
 <style>
 	.site-nav {
@@ -629,6 +662,9 @@
 	.site-nav__scrim.is-open {
 		opacity: 1;
 		pointer-events: auto;
+		/* Swallow scroll gestures that land on the scrim — the second half of the iOS
+		   scroll lock (the overflow:hidden on html+body is the first). */
+		touch-action: none;
 	}
 
 	.site-nav__drawer {
@@ -829,6 +865,19 @@
 	.site-nav__drawer-cta:focus-visible {
 		background: var(--on-green);
 		border-color: var(--on-green);
+	}
+
+	/* Same rule UnitsInventory carries: readable by assistive tech, invisible on screen. */
+	.visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	/* Collapse to the drawer while the full menu still has room. The airier nav type
