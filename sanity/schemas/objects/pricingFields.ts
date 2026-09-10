@@ -3,6 +3,7 @@ import {
 	AVAILABILITY_STATUSES,
 	BUILD_STATUSES,
 	COMPLETION_STATUSES,
+	CURRENCIES,
 	PRICE_QUALIFIERS
 } from '../constants/enums';
 import { validatePricingFields } from '../validators/rules';
@@ -42,8 +43,8 @@ export const pricingFields = defineType({
 			name: 'currency',
 			title: 'Currency',
 			type: 'string',
-			initialValue: 'EUR',
-			validation: (Rule) => Rule.max(3)
+			options: { list: [...CURRENCIES], layout: 'dropdown' },
+			initialValue: 'EUR'
 		}),
 		defineField({
 			name: 'priceQualifier',

@@ -1,3 +1,4 @@
+import { rateQueryParams } from '../../currency/rates';
 import { fetchPublic } from './fetch';
 import {
 	LISTING_COMMUNITY_SLUG,
@@ -6,6 +7,7 @@ import {
 	PUBLIC_CHILD_UNIT_FILTER,
 	PUBLIC_LISTING_FILTER
 } from './filters';
+import { PRICE_NUMERIC_EUR } from './priceNumeric';
 
 function normalizeFacetRows(rows: RawFacetRow[] | null): ListingFacetRow[] {
 	return (rows ?? []).map((row) => ({
@@ -16,6 +18,7 @@ function normalizeFacetRows(rows: RawFacetRow[] | null): ListingFacetRow[] {
 			(value): value is string => typeof value === 'string' && value.length > 0
 		),
 		price: typeof row.price === 'number' ? row.price : null,
+		currency: typeof row.currency === 'string' ? row.currency : null,
 		featureLabels: (row.featureLabels ?? []).filter(
 			(value): value is string => typeof value === 'string'
 		)
@@ -38,7 +41,9 @@ const FACET_LISTING_FILTER = /* groq */ `
 /**
  * Property type is unit-aware for developments (they inherit type from their visible
  * unit types), mirroring the search facet in listingSearch.ts. Price uses the same
- * `price ?? priceFrom` coalesce the grid sorts/filters on.
+ * EUR-normalised expression the grid sorts/filters on (PRICE_NUMERIC_EUR), so the
+ * homepage budget bands classify non-EUR listings by their EUR-equivalent. `currency` is
+ * the native code, carried for display in a later step.
  */
 const FACET_ROW_PROJECTION = /* groq */ `{
   "countrySlug": ${LISTING_COUNTRY_SLUG},
@@ -48,7 +53,8 @@ const FACET_ROW_PROJECTION = /* groq */ `{
     _type == "development" => (unitTypes[]->)[${PUBLIC_CHILD_UNIT_FILTER}].propertyType,
     [propertyType]
   ),
-  "price": coalesce(pricing.price, pricing.priceFrom),
+  "price": ${PRICE_NUMERIC_EUR},
+  "currency": pricing.currency,
   "featureLabels": content.featureHighlights[defined(label)].label
 }`;
 
@@ -68,6 +74,7 @@ export type ListingFacetRow = {
 	communitySlug: string | null;
 	propertyTypes: string[];
 	price: number | null;
+	currency: string | null;
 	featureLabels: string[];
 };
 
@@ -77,17 +84,22 @@ type RawFacetRow = {
 	communitySlug?: string | null;
 	propertyTypes?: Array<string | null> | null;
 	price?: number | null;
+	currency?: string | null;
 	featureLabels?: Array<string | null> | null;
 };
 
 /** Facet rows for every public listing — feeds the homepage bar's location-aware menus. */
 export async function fetchListingFacetRows(): Promise<ListingFacetRow[]> {
-	return normalizeFacetRows(await fetchPublic<RawFacetRow[]>(facetRowsQuery));
+	return normalizeFacetRows(
+		await fetchPublic<RawFacetRow[]>(facetRowsQuery, { params: rateQueryParams() })
+	);
 }
 
 /** Facet rows for one country — feeds the country page's scoped search bar. */
 export async function fetchCountryListingFacetRows(countrySlug: string): Promise<ListingFacetRow[]> {
 	return normalizeFacetRows(
-		await fetchPublic<RawFacetRow[]>(countryFacetRowsQuery, { params: { countrySlug } })
+		await fetchPublic<RawFacetRow[]>(countryFacetRowsQuery, {
+			params: { countrySlug, ...rateQueryParams() }
+		})
 	);
 }
