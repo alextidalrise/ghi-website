@@ -27,6 +27,28 @@
 	// four: a single flat row of four reads as a thin strip, so we pull it down to two
 	// columns to form a balanced 2×2 block instead.
 	const maxCols = $derived(locations.length === 4 ? 2 : maxColumns);
+
+	// Desktop grid geometry — used only to size each tile's landscape source. Tiles fill left
+	// to right at `maxCols` per row; a trailing incomplete row flex-grows to fill, so those
+	// tiles render wider (a lone trailing tile spans the whole row). The content column caps at
+	// --content-max (1060px) minus 2× the widest --content-padding (48px) ⇒ 964px; the row gap
+	// is --space-md (24px). Sizing each tile to its widest rendered width lets a full-width tile
+	// fetch a large landscape crop while a 4-up tile fetches a small one — no over-fetch, and no
+	// under-fetch either (between 1024px and ~1112px the real column is slightly narrower than
+	// 964px, so this over-estimates by a hair and the browser rounds up to a sharper candidate).
+	const ROW_MAX = 964;
+	const ROW_GAP = 24;
+
+	function tileColumns(index: number): number {
+		const remainder = locations.length % maxCols;
+		const inTrailingRow = remainder !== 0 && index >= locations.length - remainder;
+		return inTrailingRow ? remainder : maxCols;
+	}
+
+	function desktopSizes(index: number): string {
+		const cols = tileColumns(index);
+		return `${Math.round((ROW_MAX - (cols - 1) * ROW_GAP) / cols)}px`;
+	}
 </script>
 
 {#if locations.length > 0}
@@ -38,14 +60,29 @@
 			<li class="location-tile" style="--reveal-delay: {index * 70}ms">
 				<a class="location-tile__link" href={location.href}>
 					<span class="location-tile__media">
-						<img
-							src={location.image}
-							alt={location.alt}
-							width="600"
-							height="800"
-							loading={index < priorityCount ? 'eager' : 'lazy'}
-							fetchpriority={index < priorityCount ? 'high' : undefined}
-						/>
+						<!-- Art-directed source: the desktop grid lays tiles out landscape (a lone tile
+						     spans the full row), so it takes a 3:2 crop sized to that tile; the mobile
+						     swipe rail keeps the portrait card. Both crops share the same Sanity
+						     hotspot, so the subject stays centred either way. -->
+						<picture>
+							{#if location.landscape}
+								<source
+									media="(min-width: 1024px)"
+									srcset={location.landscapeSrcset || location.landscape}
+									sizes={desktopSizes(index)}
+								/>
+							{/if}
+							<img
+								src={location.image}
+								srcset={location.portraitSrcset || undefined}
+								sizes="clamp(14rem, 72vw, 18.5rem)"
+								alt={location.alt}
+								width="600"
+								height="800"
+								loading={index < priorityCount ? 'eager' : 'lazy'}
+								fetchpriority={index < priorityCount ? 'high' : undefined}
+							/>
+						</picture>
 						<span class="location-tile__scrim" aria-hidden="true"></span>
 					</span>
 					<span class="location-tile__body">
@@ -116,6 +153,12 @@
 		position: absolute;
 		inset: 0;
 		z-index: 0;
+	}
+
+	.location-tile__media picture {
+		display: block;
+		width: 100%;
+		height: 100%;
 	}
 
 	.location-tile__media img {
