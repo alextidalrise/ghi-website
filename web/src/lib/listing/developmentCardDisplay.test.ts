@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	buildDevelopmentMetaParts,
+	developmentPriceParts,
 	formatBedroomRange,
 	formatDevelopmentCardPrice,
 	formatUnitsAvailable
@@ -62,5 +63,36 @@ describe('formatDevelopmentCardPrice', () => {
 	it('returns null for POA / no price', () => {
 		expect(formatDevelopmentCardPrice({ priceDisplay: 'POA' })).toBeNull();
 		expect(formatDevelopmentCardPrice(null)).toBeNull();
+	});
+});
+
+describe('developmentPriceParts', () => {
+	const rates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25 };
+
+	it('frames a bare single figure as a starting price without inspecting the string', () => {
+		expect(developmentPriceParts({ price: 525_000, currency: 'EUR' })).toMatchObject({
+			kind: 'single',
+			prefix: 'From',
+			figure: '€525,000'
+		});
+	});
+
+	it('keeps an existing qualifier and a range as they are', () => {
+		expect(
+			developmentPriceParts({ price: 525_000, currency: 'EUR', priceQualifier: 'guide' })?.prefix
+		).toBe('Guide');
+		expect(
+			developmentPriceParts({ priceFrom: 525_000, priceTo: 1_950_000, currency: 'EUR' })?.prefix
+		).toBeNull();
+	});
+
+	it('converts with the marker after the framing prefix', () => {
+		expect(
+			formatDevelopmentCardPrice({ price: 515_000, currency: 'EUR' }, { to: 'GBP', rates })
+		).toBe('From approx. £412,000');
+	});
+
+	it('hides POA', () => {
+		expect(developmentPriceParts({ priceDisplay: 'POA' })).toBeNull();
 	});
 });

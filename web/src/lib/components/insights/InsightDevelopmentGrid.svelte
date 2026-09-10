@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CustomBlockComponentProps } from '@portabletext/svelte';
 	import type { InsightDevelopmentGridBlock } from '$lib/insights/types';
+	import Price from '$lib/components/listing/Price.svelte';
 
 	let {
 		portableText
@@ -73,7 +74,9 @@
 								{#if card.price || card.statusLabel || card.completionLabel}
 									<div class="dev-card__facts">
 										{#if card.price}
-											<span class="dev-card__price">{card.price}</span>
+											<span class="dev-card__price tabular-nums"
+											><Price pricing={card.pricing} frame="development" /></span
+										>
 										{/if}
 										{#if card.statusLabel || card.completionLabel}
 											<div class="dev-card__timeline">

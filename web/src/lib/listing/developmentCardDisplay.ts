@@ -3,21 +3,37 @@
  * Shared by DevelopmentCard.svelte (grid) and SpotlightCard.svelte (rails) so both
  * surfaces present inventory consistently.
  */
-import { formatListingPrice } from './formatPrice';
+import {
+	composePrice,
+	formatListingPriceParts,
+	type PriceDisplayOptions,
+	type PriceParts
+} from './formatPrice';
 import type { PublicPricing } from '$lib/sanity/transforms/pricingFilter';
 
 /**
- * Card price for a development. Mirrors the detail-page Summary: a range already
- * reads "€X – €Y" and a "From/Guide" figure is kept verbatim; a bare single figure
- * is framed as a starting price ("From €X"). Returns null when no price may show.
+ * A development's price parts, framed for display: a range already reads "€X – €Y" and a
+ * "From/Guide" figure keeps its prefix; a bare single figure becomes a starting price
+ * ("From €X"). POA yields null — a development never shows the bare word. Shared by the
+ * cards, the detail Summary and the Price component so the rule lives once.
  */
+export function developmentPriceParts(
+	pricing: PublicPricing | null | undefined,
+	options?: PriceDisplayOptions
+): PriceParts | null {
+	const parts = formatListingPriceParts(pricing, options);
+	if (!parts || parts.kind === 'poa') return null;
+	if (parts.kind === 'single' && !parts.prefix) return { ...parts, prefix: 'From' };
+	return parts;
+}
+
+/** Card price for a development as one line. Returns null when no price may show. */
 export function formatDevelopmentCardPrice(
-	pricing: PublicPricing | null | undefined
+	pricing: PublicPricing | null | undefined,
+	options?: PriceDisplayOptions
 ): string | null {
-	const price = formatListingPrice(pricing);
-	if (!price || price === 'POA') return null;
-	if (/^(from|guide)/i.test(price) || price.includes('–')) return price;
-	return `From ${price}`;
+	const parts = developmentPriceParts(pricing, options);
+	return parts ? composePrice(parts) : null;
 }
 
 /** "1–3 beds" / "2 beds" / "1 bed" — or null when no bedroom data is available. */

@@ -6,6 +6,19 @@
 		<meta name="text-scale" content="scale" />
 		<link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
 		<link rel="dns-prefetch" href="https://cdn.sanity.io" />
+		<!-- The visitor's display currency, applied before first paint. Pages are cached as
+		     visitor-invariant HTML with every price pre-rendered in every currency, and the
+		     data-currency attribute picks the visible one in CSS — so this must run before
+		     the stylesheets apply or a chosen visitor sees the native figure flash first.
+		     Reads only the ghi_currency cookie; must agree with $lib/currency/currencyCookie. -->
+		<script>
+			(function () {
+				try {
+					var m = /(?:^|;\s*)ghi_currency=(EUR|GBP|USD|AED)(?:;|$)/.exec(document.cookie);
+					if (m) document.documentElement.setAttribute('data-currency', m[1]);
+				} catch (e) {}
+			})();
+		</script>
 		<!-- The head block carries the page's own LCP image preload, so it goes ahead of
 		     the ~120KB GTM bundle below: the tag bundle is then discovered afterwards and
 		     queues behind the image rather than racing it on a throttled connection.

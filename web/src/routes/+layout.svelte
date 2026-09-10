@@ -9,6 +9,7 @@
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { configureAnalytics, createConsentContext, resetAnalyticsSession, trackPageView } from '$lib/analytics';
+	import { createCurrencyContext } from '$lib/currency/currency.svelte';
 	import '$lib/styles/global.css';
 
 	let { children, data } = $props();
@@ -26,6 +27,14 @@
 	// Starts empty and reads the cookie on mount (see onMount below) — the server no longer
 	// sends the decision, so the document stays identical for every visitor.
 	const consentStore = createConsentContext();
+
+	// Same shape for the display currency: request-scoped, cookie read on mount, never on
+	// the server. The live rate table rides in from the layout load so every Price on the
+	// page converts with the same rates the server sorted by. Read untracked and once —
+	// the rates are constant for the life of a page and a rate change purges the cache.
+	const currencyStore = createCurrencyContext(
+		untrack(() => ({ rates: data.rates, asOf: data.ratesAsOf }))
+	);
 
 	// Clear per-page dedupe state before the new DOM commits. It has to happen here rather
 	// than alongside the page view: a list container's `update()` runs as the new page
@@ -58,6 +67,7 @@
 		// markup and hydration stays clean. Anything earlier would render a banner the
 		// server did not emit.
 		consentStore.hydrate();
+		currencyStore.hydrate();
 
 		if (!$isPreviewing) {
 			return;

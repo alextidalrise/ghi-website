@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PublicPropertyListing } from '$lib/sanity/transforms';
-	import { formatListingPrice, formatPropertyType } from '$lib/listing/formatPrice';
+	import { formatPropertyType } from '$lib/listing/formatPrice';
+	import Price from '$lib/components/listing/Price.svelte';
 
 	type Props = {
 		listing: PublicPropertyListing;
@@ -117,12 +118,6 @@
 		return title || raw;
 	});
 
-	const priceLabel = $derived.by(() => {
-		const price = formatListingPrice(listing.pricing);
-		if (!price || price === 'POA') return 'Price on application';
-		return price;
-	});
-
 	const goldBadge = $derived(
 		listing.golf?.golfRelevance ? (GOLF_BADGE[listing.golf.golfRelevance] ?? null) : null
 	);
@@ -149,7 +144,11 @@
 	{/if}
 
 	<div class="summary__meta">
-		<p class="summary__price tabular-nums">{priceLabel}</p>
+		<!-- The figure follows the visitor's currency; the listing's own price stays visible
+		     beneath it whenever a conversion is showing (decision D-7). -->
+		<p class="summary__price tabular-nums">
+			<Price pricing={listing.pricing} native="line" fallback="Price on application" />
+		</p>
 		<ul class="summary__badges">
 			{#if goldBadge}
 				<li class="badge badge--gold">{goldBadge}</li>

@@ -2,6 +2,8 @@
 	import type { PublicDevelopment } from '$lib/sanity/transforms';
 	import { formatListingPrice, formatPropertyType } from '$lib/listing/formatPrice';
 	import { isUnitAvailable } from '$lib/listing/developmentDisplay';
+	import Price from '$lib/components/listing/Price.svelte';
+	import type { PublicPricing } from '$lib/sanity/transforms/pricingFilter';
 
 	type Props = {
 		units: PublicDevelopment['units'];
@@ -29,7 +31,9 @@
 		numberSort: number;
 		available: boolean;
 		statusLabel: string;
+		/** Native one-line price — gates the column and the sort; <Price> renders the figure. */
 		price: string | null;
+		pricing: PublicPricing | null;
 		priceValue: number | null;
 		bedrooms: number | null;
 		size: number | null;
@@ -77,11 +81,7 @@
 	const rows = $derived.by((): Row[] =>
 		(units ?? []).map((unit) => {
 			const u = unit as Record<string, unknown>;
-			const pricing = (u.pricing ?? null) as {
-				price?: number | null;
-				availabilityStatus?: string | null;
-				completionStatus?: string | null;
-			} | null;
+			const pricing = (u.pricing ?? null) as PublicPricing | null;
 			const specs = (u.specs ?? null) as Record<string, unknown> | null;
 
 			const slug = str(u.slug);
@@ -105,6 +105,7 @@
 				available,
 				statusLabel: statusLabelFor(status),
 				price: showPricing ? formatListingPrice(pricing) : null,
+				pricing: showPricing ? pricing : null,
 				priceValue: showPricing && typeof pricing?.price === 'number' ? pricing.price : null,
 				bedrooms: num(specs?.bedrooms),
 				size: builtArea,
@@ -139,22 +140,23 @@
 		label: string;
 		count: number;
 		availableCount: number;
-		fromPrice: string | null;
+		/** The cheapest member as a "From" price, for <Price>; null when none is priced. */
+		fromPricing: PublicPricing | null;
 		memberIds: Set<string>;
 	};
 
 	function buildGroup(key: string, label: string, members: Row[]): Group {
 		const prices = members.map((m) => m.priceValue).filter((v): v is number => v != null);
-		const fromPrice =
+		const fromPricing =
 			hasPrice && prices.length > 0
-				? formatListingPrice({ price: Math.min(...prices), currency, priceQualifier: 'from' })
+				? { price: Math.min(...prices), currency, priceQualifier: 'from' }
 				: null;
 		return {
 			key,
 			label,
 			count: members.length,
 			availableCount: members.filter((m) => m.available).length,
-			fromPrice,
+			fromPricing,
 			memberIds: new Set(members.map((m) => m.id))
 		};
 	}
@@ -375,7 +377,7 @@
 						<span class="tfilter__body">
 							<span class="tfilter__label">{group.label}</span>
 							<span class="tfilter__meta">
-								{group.count} {group.count === 1 ? 'home' : 'homes'}{#if group.fromPrice}<span class="tfilter__from"> · {group.fromPrice}</span>{/if}
+								{group.count} {group.count === 1 ? 'home' : 'homes'}{#if group.fromPricing}<span class="tfilter__from"> · <Price pricing={group.fromPricing} native="none" /></span>{/if}
 							</span>
 						</span>
 					</button>
@@ -423,7 +425,9 @@
 								{/if}
 							</th>
 							{#if hasPrice}
-								<td class="utable__num tabular-nums">{row.price ?? '—'}</td>
+								<td class="utable__num tabular-nums"
+									>{#if row.price}<Price pricing={row.pricing} native="line" />{:else}—{/if}</td
+								>
 							{/if}
 							<td class="utable__num tabular-nums">{row.bedrooms ?? '—'}</td>
 							<td class="utable__num tabular-nums">{row.sizeLabel ?? '—'}</td>
@@ -468,7 +472,7 @@
 								>
 							{/if}
 							{#if row.available && row.price}
-								<span class="ucard__price">{row.price}</span>
+								<span class="ucard__price tabular-nums"><Price pricing={row.pricing} native="line" /></span>
 							{:else if !row.available}
 								<span class="ucard__status">{row.statusLabel}</span>
 							{/if}

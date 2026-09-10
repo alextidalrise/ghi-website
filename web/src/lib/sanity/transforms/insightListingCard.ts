@@ -4,6 +4,7 @@ import type { MediaAssetInput } from './mediaFilter';
 import { buildListingHref } from '$lib/listing/canonicalPath';
 import { resolveCardLocationLine } from '$lib/listing/cardLocationLine';
 import { formatListingPrice } from '$lib/listing/formatPrice';
+import type { PublicPricing } from './pricingFilter';
 
 /** One projected listing item: article overrides plus the publish-gated canonical property card row. */
 export type InsightListingGridItemRaw = {
@@ -27,7 +28,10 @@ export type InsightListingCard = {
 	href: string;
 	locationLabel: string | null;
 	countryLabel: string | null;
+	/** The native one-line price — a presence gate. The grid renders `pricing` via <Price>. */
 	price: string | null;
+	/** Public-safe pricing, passed through raw so the client can convert it. */
+	pricing: PublicPricing | null;
 	specsLabel: string | null;
 	image: string | null;
 	srcset: string;
@@ -107,6 +111,7 @@ export function toInsightListingCard(
 		locationLabel,
 		countryLabel,
 		price,
+		pricing: base.pricing ?? null,
 		specsLabel,
 		image,
 		srcset,

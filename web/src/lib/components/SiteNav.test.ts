@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'svelte/server';
 import type { HeaderNav, HeaderNavGroup } from '$lib/sanity/queries/headerNav';
+import { CURRENCY_CONTEXT_KEY, CurrencyStore } from '$lib/currency/currency.svelte';
 
 // SvelteKit's page state and navigation hooks need a running app; stub them so the
 // component renders in a plain node (SSR) test. The pathname drives active-state checks.
@@ -52,7 +53,9 @@ const threeTier: HeaderNav = {
 
 function renderNav(nav: HeaderNav | null = threeTier, at = '/'): string {
 	pathname = at;
-	return render(SiteNav, { props: { nav } }).body;
+	// The root layout provides the currency store; stand in for it here.
+	const context = new Map<symbol, unknown>([[CURRENCY_CONTEXT_KEY, new CurrencyStore()]]);
+	return render(SiteNav, { props: { nav }, context }).body;
 }
 
 describe('SiteNav — three-tier countries menu', () => {
@@ -94,6 +97,36 @@ describe('SiteNav — three-tier countries menu', () => {
 		// The countries section is its own group; Insights follows as a plain row.
 		const drawer = html.slice(html.indexOf('id="site-nav-drawer"'));
 		expect(drawer.indexOf('site-nav__drawer-section')).toBeLessThan(drawer.indexOf('Insights'));
+	});
+
+	it('renders the currency switcher in the bar, before Contact, with every label variant', () => {
+		const html = renderNav();
+		const bar = html.slice(0, html.indexOf('id="site-nav-drawer"'));
+		expect(bar).toContain('aria-haspopup="menu"');
+		// Label spans for the unchosen state and each code; CSS shows exactly one.
+		expect(bar).toMatch(/data-ccy=""[^>]*>Prices</);
+		for (const code of ['EUR', 'GBP', 'USD', 'AED']) {
+			expect(bar).toMatch(new RegExp(`site-nav__currency-label[^>]*data-ccy="${code}"[^>]*>${code}<`));
+		}
+		// The switcher precedes the Contact action.
+		expect(bar.indexOf('site-nav__item--currency')).toBeLessThan(bar.indexOf('site-nav__cta-item'));
+		// Five radio rows, "As listed" checked by default, plus the dated rates line.
+		expect(bar.match(/role="menuitemradio"/g)).toHaveLength(5);
+		expect(bar).toMatch(/aria-checked="true"[^>]*>\s*<span[^>]*>As listed</);
+		expect(bar).toContain('ECB rates 9 Sept 2026');
+	});
+
+	it('renders the switcher as a flat five-segment row in the drawer', () => {
+		const html = renderNav();
+		const drawer = html.slice(html.indexOf('id="site-nav-drawer"'));
+		expect(drawer).toContain('Show prices in');
+		expect(drawer.match(/site-nav__drawer-segment /g)).toHaveLength(5);
+		expect(drawer).toMatch(/aria-pressed="true"[^>]*aria-label="As listed"/);
+		// It sits after the editorial items and before the pinned Contact footer.
+		expect(drawer.indexOf('Insights')).toBeLessThan(drawer.indexOf('site-nav__drawer-currency'));
+		expect(drawer.indexOf('site-nav__drawer-currency')).toBeLessThan(
+			drawer.indexOf('site-nav__drawer-footer')
+		);
 	});
 
 	it('keeps a narrow dropdown for the fallback menu, whose countries carry no locations', () => {

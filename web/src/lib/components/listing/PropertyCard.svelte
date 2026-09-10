@@ -3,6 +3,7 @@
 	import { buildListingHref } from '$lib/listing/canonicalPath';
 	import { resolveCardLocationLine } from '$lib/listing/cardLocationLine';
 	import { formatListingPrice } from '$lib/listing/formatPrice';
+	import Price from '$lib/components/listing/Price.svelte';
 	import {
 		CARD_HERO_IMAGE,
 		type PublicPropertyCard,
@@ -29,6 +30,7 @@
 			location: card.location
 		})
 	);
+	// Gate only: the visible figure comes from <Price>, which follows the visitor's currency.
 	const price = $derived(formatListingPrice(card.pricing));
 	// Prefer the community name — the area/country are usually established by the
 	// page context (e.g. the Nueva Andalucia page). When the community just echoes
@@ -79,7 +81,7 @@
 					<span class="property-card__specs">{specsLine}</span>
 				{/if}
 				{#if price}
-					<span class="property-card__price tabular-nums">{price}</span>
+					<span class="property-card__price tabular-nums"><Price pricing={card.pricing} /></span>
 				{/if}
 			</div>
 		{/if}

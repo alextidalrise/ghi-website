@@ -2,7 +2,7 @@
 	import LegalPage from '$lib/components/LegalPage.svelte';
 </script>
 
-<LegalPage title="Cookie policy" updated="20 July 2026">
+<LegalPage title="Cookie policy" updated="10 September 2026">
 	<h2>What cookies we use</h2>
 	<p>
 		We use a small number of cookies. Some are essential for the site to work; the rest
@@ -27,6 +27,15 @@
 						you. Essential.
 					</td>
 					<td>180 days</td>
+				</tr>
+				<tr>
+					<td>ghi_currency</td>
+					<td>
+						Remembers the currency you chose to see prices in, so every page shows the
+						same one. Set only when you pick a currency; stores nothing but the
+						three-letter code. Preference.
+					</td>
+					<td>1 year</td>
 				</tr>
 				<tr>
 					<td>launch_bypass</td>
