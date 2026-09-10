@@ -40,6 +40,13 @@ export const AREA_UNITS = [
 	{ title: 'Square feet', value: 'sqft' }
 ] as const;
 
+export const CURRENCIES = [
+	{ title: 'Euro (EUR)', value: 'EUR' },
+	{ title: 'Pound sterling (GBP)', value: 'GBP' },
+	{ title: 'US dollar (USD)', value: 'USD' },
+	{ title: 'UAE dirham (AED)', value: 'AED' }
+] as const;
+
 export const PROPERTY_BUILD_STATUSES = [
 	{ title: 'Built', value: 'built' },
 	{ title: 'Off-Plan', value: 'off_plan' }

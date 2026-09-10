@@ -408,7 +408,7 @@ export type PricingFields = {
   priceFrom?: number;
   priceTo?: number;
   priceDisplay?: string;
-  currency?: string;
+  currency?: "EUR" | "GBP" | "USD" | "AED";
   priceQualifier?:
     | "exact"
     | "from"
@@ -815,7 +815,7 @@ export type PropertyPricingFields = {
   _type: "propertyPricingFields";
   price?: number;
   priceDisplay?: string;
-  currency?: string;
+  currency?: "EUR" | "GBP" | "USD" | "AED";
 };
 
 export type LocationFields = {
@@ -2039,7 +2039,7 @@ export type DevelopmentByPathPreviewQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -2370,7 +2370,7 @@ export type DevelopmentByPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -2467,7 +2467,7 @@ export type DevelopmentByPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -2683,7 +2683,7 @@ export type DevelopmentByPathQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -3014,7 +3014,7 @@ export type DevelopmentByPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -3111,7 +3111,7 @@ export type DevelopmentByPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -3327,7 +3327,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -3658,7 +3658,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -3755,7 +3755,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -3971,7 +3971,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -4302,7 +4302,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -4399,7 +4399,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -4627,7 +4627,7 @@ export type DevelopmentByGhiIdQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -4958,7 +4958,7 @@ export type DevelopmentByGhiIdQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -5055,7 +5055,7 @@ export type DevelopmentByGhiIdQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -5206,7 +5206,7 @@ export type HomepageFeaturedListingsQueryResult = {
     pricing: {
       price: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
     } | null;
     specs: {
       bedrooms: number | null;
@@ -5324,7 +5324,7 @@ export type CountryFeaturedListingsQueryResult = {
           priceFrom: number | null;
           priceTo: number | null;
           priceDisplay: string | null;
-          currency: string | null;
+          currency: "AED" | "EUR" | "GBP" | "USD" | null;
           priceQualifier:
             | "enquiry_led"
             | "exact"
@@ -5439,7 +5439,7 @@ export type CountryFeaturedListingsQueryResult = {
         pricing: {
           price: number | null;
           priceDisplay: string | null;
-          currency: string | null;
+          currency: "AED" | "EUR" | "GBP" | "USD" | null;
         } | null;
         specs: {
           bedrooms: number | null;
@@ -6263,7 +6263,7 @@ export type InsightBySlugQueryResult = {
                 priceFrom: number | null;
                 priceTo: number | null;
                 priceDisplay: string | null;
-                currency: string | null;
+                currency: "AED" | "EUR" | "GBP" | "USD" | null;
                 priceQualifier:
                   | "enquiry_led"
                   | "exact"
@@ -6496,7 +6496,7 @@ export type InsightBySlugQueryResult = {
                   priceFrom: number | null;
                   priceTo: number | null;
                   priceDisplay: string | null;
-                  currency: string | null;
+                  currency: "AED" | "EUR" | "GBP" | "USD" | null;
                   priceQualifier:
                     | "enquiry_led"
                     | "exact"
@@ -6611,7 +6611,7 @@ export type InsightBySlugQueryResult = {
                 pricing: {
                   price: number | null;
                   priceDisplay: string | null;
-                  currency: string | null;
+                  currency: "AED" | "EUR" | "GBP" | "USD" | null;
                 } | null;
                 specs: {
                   bedrooms: number | null;
@@ -6745,7 +6745,7 @@ export type InsightBySlugQueryResult = {
               pricing: {
                 price: number | null;
                 priceDisplay: string | null;
-                currency: string | null;
+                currency: "AED" | "EUR" | "GBP" | "USD" | null;
               } | null;
               specs: {
                 bedrooms: number | null;
@@ -8093,7 +8093,7 @@ export type PropertyByPathPreviewQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -8401,7 +8401,7 @@ export type PropertyByPathQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -8709,7 +8709,7 @@ export type PropertyByCatchAllPathQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -9017,7 +9017,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -9337,7 +9337,7 @@ export type PropertyByGhiIdQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -9582,7 +9582,7 @@ export type PropertyCardsByCommunityQueryResult = Array<{
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: {
     bedrooms: number | null;
@@ -9654,7 +9654,7 @@ export type PropertyCardsByLocationQueryResult = Array<{
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: {
     bedrooms: number | null;
@@ -9832,7 +9832,7 @@ export type AutomaticSimilarPropertiesQueryResult = Array<{
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: {
     bedrooms: number | null;
@@ -9913,7 +9913,7 @@ export type AutomaticSimilarDevelopmentsQueryResult = Array<{
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -10037,7 +10037,7 @@ export type TagsSimilarPropertiesQueryResult = Array<
         priceFrom: number | null;
         priceTo: number | null;
         priceDisplay: string | null;
-        currency: string | null;
+        currency: "AED" | "EUR" | "GBP" | "USD" | null;
         priceQualifier:
           | "enquiry_led"
           | "exact"
@@ -10152,7 +10152,7 @@ export type TagsSimilarPropertiesQueryResult = Array<
       pricing: {
         price: number | null;
         priceDisplay: string | null;
-        currency: string | null;
+        currency: "AED" | "EUR" | "GBP" | "USD" | null;
       } | null;
       specs: {
         bedrooms: number | null;
@@ -10240,7 +10240,7 @@ export type ManualSimilarPropertiesQueryResult =
               priceFrom: number | null;
               priceTo: number | null;
               priceDisplay: string | null;
-              currency: string | null;
+              currency: "AED" | "EUR" | "GBP" | "USD" | null;
               priceQualifier:
                 | "enquiry_led"
                 | "exact"
@@ -10355,7 +10355,7 @@ export type ManualSimilarPropertiesQueryResult =
             pricing: {
               price: number | null;
               priceDisplay: string | null;
-              currency: string | null;
+              currency: "AED" | "EUR" | "GBP" | "USD" | null;
             } | null;
             specs: {
               bedrooms: number | null;
@@ -10468,7 +10468,7 @@ export type UnitByDevPathQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -10884,7 +10884,7 @@ export type UnitByDevPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -11270,7 +11270,7 @@ export type UnitByDevPathPreviewQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -11686,7 +11686,7 @@ export type UnitByDevPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -12072,7 +12072,7 @@ export type UnitByCatchAllDevPathQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -12488,7 +12488,7 @@ export type UnitByCatchAllDevPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -12874,7 +12874,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -13290,7 +13290,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
