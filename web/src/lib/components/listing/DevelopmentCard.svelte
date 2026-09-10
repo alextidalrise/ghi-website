@@ -7,6 +7,7 @@
 		formatDevelopmentCardPrice
 	} from '$lib/listing/developmentCardDisplay';
 	import { shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
+	import Price from '$lib/components/listing/Price.svelte';
 	import { CARD_HERO_IMAGE } from '$lib/sanity/transforms/propertyCard';
 	import type { PublicDevelopmentCard } from '$lib/sanity/transforms/similarListingCard';
 
@@ -75,7 +76,9 @@
 					<span class="property-card__specs">{specsLine}</span>
 				{/if}
 				{#if price}
-					<span class="property-card__price tabular-nums">{price}</span>
+					<span class="property-card__price tabular-nums"
+						><Price pricing={card.pricing} frame="development" /></span
+					>
 				{/if}
 			</div>
 		{/if}

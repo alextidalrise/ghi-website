@@ -5,6 +5,7 @@ import type { MediaAssetInput } from './mediaFilter';
 import { buildListingHref } from '$lib/listing/canonicalPath';
 import { formatDevelopmentCardPrice } from '$lib/listing/developmentCardDisplay';
 import { shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
+import type { PublicPricing } from './pricingFilter';
 
 /** One projected development item: article overrides plus the publish-gated canonical card row. */
 export type InsightDevelopmentGridItemRaw = {
@@ -35,7 +36,10 @@ export type InsightDevelopmentCard = {
 	href: string;
 	locationLabel: string | null;
 	countryLabel: string | null;
+	/** The native one-line price — a presence gate. The grid renders `pricing` via <Price>. */
 	price: string | null;
+	/** Public-safe pricing, passed through raw so the client can convert it; null when hidden. */
+	pricing: PublicPricing | null;
 	statusLabel: string | null;
 	completionLabel: string | null;
 	image: string | null;
@@ -138,9 +142,9 @@ export function toInsightDevelopmentCard(
 		(override ? override.altText?.trim() : base.heroImageAlt) ||
 		title;
 
-	const price = shouldShowDevelopmentPricing(base.developmentDisplayMode)
-		? formatDevelopmentCardPrice(base.pricing)
-		: null;
+	const showPricing = shouldShowDevelopmentPricing(base.developmentDisplayMode);
+	const price = showPricing ? formatDevelopmentCardPrice(base.pricing) : null;
+	const pricing = price ? (base.pricing ?? null) : null;
 
 	// v15 shows the destination (location), not the community, plus the country.
 	const locationLabel = base.location?.location?.name ?? base.location?.community?.name ?? null;
@@ -164,6 +168,7 @@ export function toInsightDevelopmentCard(
 		locationLabel,
 		countryLabel,
 		price,
+		pricing,
 		statusLabel,
 		completionLabel,
 		image,

@@ -7,6 +7,7 @@
 	} from '$lib/listing/developmentCardDisplay';
 	import { formatEnumLabel, shouldShowDevelopmentPricing } from '$lib/listing/developmentDisplay';
 	import { formatListingPrice, formatPropertyType } from '$lib/listing/formatPrice';
+	import Price from '$lib/components/listing/Price.svelte';
 	import {
 		CARD_HERO_IMAGE,
 		type PublicPropertyCard,
@@ -98,6 +99,7 @@
 			: buildSpecs((card as PublicPropertyCard).propertyType, (card as PublicPropertyCard).specs)
 	);
 
+	// Gate only: the visible figure comes from <Price>, which follows the visitor's currency.
 	const price = $derived.by(() => {
 		if (kind === 'development') {
 			const dev = card as PublicDevelopmentCard;
@@ -169,7 +171,12 @@
 		{/if}
 
 		{#if price}
-			<span class="spotlight-card__price tabular-nums">{price}</span>
+			<span class="spotlight-card__price tabular-nums"
+				><Price
+					pricing={card.pricing}
+					frame={kind === 'development' ? 'development' : 'listing'}
+				/></span
+			>
 		{/if}
 	</span>
 {/snippet}

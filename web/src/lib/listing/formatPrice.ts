@@ -1,3 +1,5 @@
+import { displayAmount } from '$lib/currency/convert';
+import { FALLBACK_RATES, type RateTable } from '$lib/currency/rates';
 import type { PublicPricing } from '$lib/sanity/transforms/pricingFilter';
 
 type AmountFormatter = { format(amount: number): string };
@@ -43,33 +45,95 @@ const QUALIFIER_PREFIX: Record<string, string> = {
 	guide: 'Guide'
 };
 
-/** Format public-safe pricing for display. Returns null when no price may be shown. */
-export function formatListingPrice(pricing: PublicPricing | null | undefined): string | null {
+/** The marker set before a converted figure. Exported so the one word lives in one place. */
+export const APPROX_MARKER = 'approx.';
+
+/**
+ * A price broken into the pieces a renderer composes: the qualifier prefix ("From"), the
+ * approximation marker (present when `approx`), and the figure itself. `kind` says what
+ * the figure is so callers can frame it without inspecting the string (a development
+ * frames a bare `single` as a starting price; a `poa` never converts).
+ */
+export type PriceParts = {
+	kind: 'poa' | 'single' | 'range' | 'text';
+	prefix: string | null;
+	figure: string;
+	/** The currency the figure is expressed in. */
+	currency: string;
+	/** The figure is a rounded conversion, not the listing's own price. */
+	approx: boolean;
+};
+
+export type PriceDisplayOptions = {
+	/** Currency to display in. Absent/unknown/equal to the native currency → native, exact. */
+	to?: string | null;
+	rates?: RateTable;
+};
+
+/**
+ * Public-safe pricing as structured parts, optionally converted for display. Returns null
+ * when no price may be shown. POA and free-text prices never convert.
+ */
+export function formatListingPriceParts(
+	pricing: PublicPricing | null | undefined,
+	{ to = null, rates = FALLBACK_RATES }: PriceDisplayOptions = {}
+): PriceParts | null {
 	if (!pricing) {
 		return null;
 	}
 
+	const native = pricing.currency ?? 'EUR';
+
 	if (pricing.priceDisplay === 'POA') {
-		return 'POA';
+		return { kind: 'poa', prefix: null, figure: 'POA', currency: native, approx: false };
 	}
 
-	const currency = pricing.currency ?? 'EUR';
+	const shown = (amount: number) => displayAmount(amount, native, to, rates);
 
 	if (pricing.price != null) {
-		const prefix = pricing.priceQualifier ? (QUALIFIER_PREFIX[pricing.priceQualifier] ?? '') : '';
-		const amount = formatAmount(pricing.price, currency);
-		return prefix ? `${prefix} ${amount}` : amount;
+		const { amount, currency, approx } = shown(pricing.price);
+		const prefix = pricing.priceQualifier ? (QUALIFIER_PREFIX[pricing.priceQualifier] ?? null) : null;
+		return { kind: 'single', prefix: prefix || null, figure: formatAmount(amount, currency), currency, approx };
 	}
 
 	if (pricing.priceFrom != null && pricing.priceTo != null) {
-		return `${formatAmount(pricing.priceFrom, currency)} – ${formatAmount(pricing.priceTo, currency)}`;
+		const lo = shown(pricing.priceFrom);
+		const hi = shown(pricing.priceTo);
+		return {
+			kind: 'range',
+			prefix: null,
+			figure: `${formatAmount(lo.amount, lo.currency)} – ${formatAmount(hi.amount, hi.currency)}`,
+			currency: lo.currency,
+			approx: lo.approx
+		};
 	}
 
 	if (pricing.priceFrom != null) {
-		return `From ${formatAmount(pricing.priceFrom, currency)}`;
+		const { amount, currency, approx } = shown(pricing.priceFrom);
+		return { kind: 'single', prefix: 'From', figure: formatAmount(amount, currency), currency, approx };
 	}
 
-	return pricing.priceDisplay ?? null;
+	if (pricing.priceDisplay) {
+		return { kind: 'text', prefix: null, figure: pricing.priceDisplay, currency: native, approx: false };
+	}
+
+	return null;
+}
+
+/** Compose parts back into one line: "From approx. £412,000". */
+export function composePrice(parts: PriceParts): string {
+	return [parts.prefix, parts.approx ? APPROX_MARKER : null, parts.figure]
+		.filter((part): part is string => Boolean(part))
+		.join(' ');
+}
+
+/** Format public-safe pricing for display. Returns null when no price may be shown. */
+export function formatListingPrice(
+	pricing: PublicPricing | null | undefined,
+	options?: PriceDisplayOptions
+): string | null {
+	const parts = formatListingPriceParts(pricing, options);
+	return parts ? composePrice(parts) : null;
 }
 
 export function formatPropertyType(type: string | null | undefined): string {

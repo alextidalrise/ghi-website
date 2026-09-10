@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PublicDevelopment } from '$lib/sanity/transforms';
-	import { formatListingPrice } from '$lib/listing/formatPrice';
+	import Price from '$lib/components/listing/Price.svelte';
 
 	type Props = {
 		development: PublicDevelopment;
@@ -60,14 +60,6 @@
 		return title || raw;
 	});
 
-	const priceLabel = $derived.by(() => {
-		if (!showPricing) return 'Price on application';
-		const price = formatListingPrice(development.pricing);
-		if (!price || price === 'POA') return 'Price on application';
-		// A development range already reads "From €…"; a single figure is framed as a starting price.
-		return /^(from|guide)/i.test(price) || price.includes('–') ? price : `From ${price}`;
-	});
-
 	const goldBadge = $derived(
 		development.golf?.golfRelevance ? (GOLF_BADGE[development.golf.golfRelevance] ?? null) : null
 	);
@@ -89,7 +81,20 @@
 	{/if}
 
 	<div class="summary__meta">
-		<p class="summary__price tabular-nums">{priceLabel}</p>
+		<!-- A bare single figure is framed as a starting price ("From …") by the development
+		     frame; the figure follows the visitor's currency with the listed price beneath. -->
+		<p class="summary__price tabular-nums">
+			{#if showPricing}
+				<Price
+					pricing={development.pricing}
+					frame="development"
+					native="line"
+					fallback="Price on application"
+				/>
+			{:else}
+				Price on application
+			{/if}
+		</p>
 		{#if goldBadge || outlineBadges.length > 0}
 			<ul class="summary__badges">
 				{#if goldBadge}

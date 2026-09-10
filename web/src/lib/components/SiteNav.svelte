@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { afterNavigate } from '$app/navigation';
+	import { tick } from 'svelte';
 	import CountryFlagArt from '$lib/components/CountryFlagArt.svelte';
 	import {
 		buildSiteNav,
@@ -12,12 +13,89 @@
 		type SiteNavItem
 	} from '$lib/nav/siteNav';
 	import type { HeaderNav } from '$lib/sanity/queries/headerNav';
+	import { CURRENCY_NAMES } from '$lib/currency/convert';
+	import { getCurrency } from '$lib/currency/currency.svelte';
+	import { CURRENCIES, type Currency } from '$lib/currency/rates';
 
 	let { nav = null }: { nav?: HeaderNav | null } = $props();
 
 	const site = $derived(buildSiteNav(nav));
 	const navItems = $derived(site.items);
 	const cta = $derived(site.cta);
+
+	// The display-currency switcher is the bar's last text item, before Contact. It shares
+	// the dropdown state machine with the CMS items (one open menu at a time, same hover
+	// intent, Escape, focus-out), addressed by the index just past the authored list.
+	const currency = getCurrency();
+	const currencyIndex = $derived(navItems.length);
+	const currencyOptions: { code: Currency | null; label: string; name: string }[] = [
+		{ code: null, label: 'As listed', name: "Each listing's own currency" },
+		...CURRENCIES.map((code) => ({ code, label: code, name: CURRENCY_NAMES[code] }))
+	];
+	const ratesDate = $derived(
+		new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(
+			new Date(`${currency.asOf}T00:00:00Z`)
+		)
+	);
+
+	let currencyButton = $state<HTMLButtonElement>();
+	let currencyMenu = $state<HTMLElement>();
+
+	function chooseCurrency(code: Currency | null) {
+		currency.select(code);
+		openMenu = null;
+		currencyButton?.focus();
+	}
+
+	// Menu-button pattern: opening from the keyboard moves focus onto the checked row so the
+	// arrow keys work at once; Escape hands focus back to the button. A pointer click leaves
+	// focus where it is (the click already put it on the button).
+	async function openCurrencyMenuFromKeyboard() {
+		openMenu = currencyIndex;
+		await tick();
+		// After the DOM update, and one frame later so the panel has computed as visible
+		// (an element that still computes hidden refuses focus).
+		requestAnimationFrame(() => {
+			currencyMenu
+				?.querySelector<HTMLButtonElement>('[role="menuitemradio"][aria-checked="true"]')
+				?.focus();
+		});
+	}
+
+	function onCurrencyButtonKeydown(event: KeyboardEvent) {
+		const isOpen = openMenu === currencyIndex;
+		if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+			event.preventDefault();
+			void openCurrencyMenuFromKeyboard();
+		} else if (event.key === 'Enter' || event.key === ' ') {
+			// Handled here rather than by the synthesised click so the open moves focus.
+			event.preventDefault();
+			if (isOpen) openMenu = null;
+			else void openCurrencyMenuFromKeyboard();
+		}
+	}
+
+	// Arrow keys walk the currency menu's rows like a native menu; Home/End jump.
+	function onCurrencyMenuKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			openMenu = null;
+			currencyButton?.focus();
+			return;
+		}
+		if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+		const rows = Array.from(
+			(event.currentTarget as HTMLElement).querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]')
+		);
+		if (rows.length === 0) return;
+		const current = rows.indexOf(document.activeElement as HTMLButtonElement);
+		let next = current;
+		if (event.key === 'ArrowDown') next = (current + 1) % rows.length;
+		else if (event.key === 'ArrowUp') next = (current - 1 + rows.length) % rows.length;
+		else if (event.key === 'Home') next = 0;
+		else next = rows.length - 1;
+		event.preventDefault();
+		rows[next]?.focus();
+	}
 
 	let open = $state(false); // mobile drawer
 	let openMenu = $state<number | null>(null); // desktop dropdown / panel index, if any
@@ -139,9 +217,9 @@
 	// Growing past the drawer breakpoint (rotating an iPad, un-snapping a window) hides
 	// the open drawer via CSS but leaves `open` true — scroll stays locked and focus
 	// stays trapped with no visible way out. Close it for real when the bar takes over.
-	// Must mirror the @media (max-width: 78rem) block below.
+	// Must mirror the @media (max-width: 79.9375rem) block below.
 	$effect(() => {
-		const drawerViewport = window.matchMedia('(max-width: 78rem)');
+		const drawerViewport = window.matchMedia('(max-width: 79.9375rem)');
 		function onChange(event: MediaQueryListEvent) {
 			if (!event.matches) open = false;
 		}
@@ -210,6 +288,9 @@
 </script>
 
 <svelte:window onkeydown={onWindowKeydown} />
+
+<!-- One polite sentence when the display currency changes; silent otherwise. -->
+<span class="visually-hidden" role="status" aria-live="polite">{currency.announcement}</span>
 
 <!-- Screen-reader warning appended inside every link that leaves the site in a new
      tab; sighted users get the browser's own new-tab affordance. -->
@@ -389,6 +470,63 @@
 				</li>
 			{/if}
 		{/each}
+		<!-- The currency switcher: a fourth nav voice, not a widget. Its label is the chosen
+		     code (or "Currency" until a choice is made), selected in CSS from the same root
+		     attribute that selects every price, so the bar never flashes on load either. -->
+		<!-- Unlike the link items, focus alone does not open this menu: a menu button opens on
+		     activation (Enter, Space, arrows, click), otherwise focus returning to the button
+		     after a choice would pop the menu straight back open. -->
+		<li
+			class="site-nav__item site-nav__item--currency"
+			onpointerenter={() => pointerEnterItem(currencyIndex)}
+			onpointerleave={() => pointerLeaveItem(currencyIndex)}
+			onfocusout={(event) => handleItemFocusOut(event, currencyIndex)}
+		>
+			<button
+				bind:this={currencyButton}
+				type="button"
+				class="site-nav__link site-nav__link--button site-nav__currency"
+				aria-label="Show prices in"
+				aria-haspopup="menu"
+				aria-expanded={openMenu === currencyIndex}
+				onclick={() => toggleDropdown(currencyIndex)}
+				onkeydown={onCurrencyButtonKeydown}
+			>
+				<span class="site-nav__currency-label" data-ccy="">Prices</span>
+				{#each CURRENCIES as code (code)}
+					<span class="site-nav__currency-label" data-ccy={code}>{code}</span>
+				{/each}
+				{@render chevron('sm', openMenu === currencyIndex)}
+			</button>
+			<ul
+				bind:this={currencyMenu}
+				class="site-nav__submenu site-nav__currency-menu"
+				class:is-open={openMenu === currencyIndex}
+				role="menu"
+				aria-label="Show prices in"
+				onkeydown={onCurrencyMenuKeydown}
+			>
+				{#each currencyOptions as option (option.label)}
+					<li role="none">
+						<button
+							type="button"
+							role="menuitemradio"
+							class="site-nav__submenu-link site-nav__currency-option"
+							class:is-active={currency.chosen === option.code}
+							aria-checked={currency.chosen === option.code}
+							tabindex={openMenu === currencyIndex ? 0 : -1}
+							onclick={() => chooseCurrency(option.code)}
+						>
+							<span class="site-nav__currency-code">{option.label}</span>
+							<span class="site-nav__currency-name">{option.name}</span>
+						</button>
+					</li>
+				{/each}
+				<li role="none" class="site-nav__currency-note">
+					Converted prices are approximate · ECB rates {ratesDate}
+				</li>
+			</ul>
+		</li>
 		<li class="site-nav__cta-item">
 			<a
 				href={cta.href}
@@ -591,6 +729,26 @@
 				</li>
 			{/if}
 		{/each}
+		<!-- Display currency: a flat section, not a third accordion. Five segments in the
+		     drawer's Regular caps; the chosen one takes gold, the drawer's "you are here". -->
+		<li class="site-nav__drawer-section site-nav__drawer-currency">
+			<span class="site-nav__drawer-overline" id="drawer-currency-label">Show prices in</span>
+			<div class="site-nav__drawer-segments" role="group" aria-labelledby="drawer-currency-label">
+				{#each currencyOptions as option (option.label)}
+					<button
+						type="button"
+						class="site-nav__drawer-segment"
+						class:is-active={currency.chosen === option.code}
+						aria-pressed={currency.chosen === option.code}
+						aria-label={option.code ? option.name : option.label}
+						tabindex={open ? 0 : -1}
+						onclick={() => currency.select(option.code)}
+					>
+						{option.label}
+					</button>
+				{/each}
+			</div>
+		</li>
 	</ul>
 	<div class="site-nav__drawer-footer">
 		<a
@@ -661,7 +819,9 @@
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
 		color: var(--on-green);
-		padding: 0 1.15rem;
+		/* 1rem, down from 1.15rem: the currency item (Step 3) had to fit without pushing a
+		   1280px laptop into the drawer. Seven items × 2 sides × 0.15rem bought ~34px. */
+		padding: 0 1rem;
 		height: var(--nav-height);
 		display: flex;
 		align-items: center;
@@ -682,8 +842,8 @@
 	.site-nav__link::after {
 		content: '';
 		position: absolute;
-		left: 1.15rem;
-		right: 1.15rem;
+		left: 1rem;
+		right: 1rem;
 		bottom: 0;
 		height: 2px;
 		background: var(--gold);
@@ -751,10 +911,14 @@
 		visibility: hidden;
 		transform: translateY(-0.5rem);
 		pointer-events: none;
+		/* Visibility does not fade: it flips to hidden once the fade-out has finished
+		   (the delay), and to visible at once on open — an element mid-way through a
+		   visibility transition still computes as hidden in its first frame and refuses
+		   focus, which broke moving focus into the currency menu from the keyboard. */
 		transition:
 			opacity var(--duration-hover) var(--ease),
 			transform var(--duration-hover) var(--ease),
-			visibility var(--duration-hover) var(--ease);
+			visibility 0s linear var(--duration-hover);
 		z-index: 1;
 	}
 
@@ -763,6 +927,7 @@
 		visibility: visible;
 		transform: translateY(0);
 		pointer-events: auto;
+		transition-delay: 0s;
 	}
 
 	.site-nav__submenu-link {
@@ -793,6 +958,96 @@
 	.site-nav__submenu-link.is-active {
 		color: var(--gold);
 		background: rgba(255, 255, 255, 0.04);
+	}
+
+	/* ---- Currency switcher (bar) -------------------------------------------------
+	   The label is one of five spans, selected by the same root attribute that selects
+	   every price on the page — set before first paint, so the bar and the prices agree
+	   from the first frame. "Currency" shows until a choice exists. */
+	.site-nav__currency-label {
+		display: none;
+	}
+
+	:global(html:not([data-currency='EUR']):not([data-currency='GBP']):not([data-currency='USD']):not(
+			[data-currency='AED']
+		))
+		.site-nav__currency-label[data-ccy=''] {
+		display: inline;
+	}
+
+	:global(html[data-currency='EUR']) .site-nav__currency-label[data-ccy='EUR'],
+	:global(html[data-currency='GBP']) .site-nav__currency-label[data-ccy='GBP'],
+	:global(html[data-currency='USD']) .site-nav__currency-label[data-ccy='USD'],
+	:global(html[data-currency='AED']) .site-nav__currency-label[data-ccy='AED'] {
+		display: inline;
+	}
+
+	/* The menu hangs from the bar's right side, so it opens toward the page, not off it. */
+	.site-nav__currency-menu {
+		left: auto;
+		right: 0;
+		min-width: 16.5rem;
+	}
+
+	/* Rows are buttons wearing the submenu-link vocabulary: code in Regular caps, the
+	   currency's name in Light beside it, same hairline between rows. */
+	.site-nav__currency-option {
+		display: flex;
+		align-items: baseline;
+		gap: 0.9rem;
+		width: 100%;
+		background: none;
+		border: 0;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	.site-nav__currency-option {
+		position: relative;
+	}
+
+	/* Keyboard focus takes the same gold ring the drawer segments use, inset so it sits
+	   within the row rather than clipping against the panel's edge. */
+	.site-nav__currency-option:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: -2px;
+	}
+
+	/* The checked row: gold ink (the dropdown's active vocabulary) plus the drawer's 2px
+	   leading marker, so the current choice reads at a glance and not by hue alone. */
+	.site-nav__currency-option[aria-checked='true']::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0.7rem;
+		bottom: 0.7rem;
+		width: 2px;
+		background: var(--gold);
+	}
+
+	.site-nav__currency-code {
+		flex: 0 0 5.75rem;
+	}
+
+	.site-nav__currency-name {
+		font-weight: 300;
+		font-size: 0.75rem;
+		letter-spacing: 0.04em;
+		text-transform: none;
+	}
+
+	/* The rates line: the one piece of fine print, set in Light below a hairline. */
+	.site-nav__currency-note {
+		margin-top: 0.4rem;
+		padding: 0.7rem 1.75rem 0.45rem 1.25rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.12);
+		font-family: var(--sans);
+		font-size: var(--text-small);
+		font-weight: 300;
+		letter-spacing: 0.02em;
+		line-height: 1.4;
+		color: var(--on-green);
+		white-space: nowrap;
 	}
 
 	/* ---- The wide panel ----------------------------------------------------------
@@ -941,7 +1196,7 @@
 	.site-nav__cta-item {
 		display: flex;
 		align-items: center;
-		margin-left: 1.25rem;
+		margin-left: 1rem;
 	}
 
 	.site-nav__cta {
@@ -1231,6 +1486,74 @@
 		color: var(--gold);
 	}
 
+	/* ---- Currency switcher (drawer) ----------------------------------------------
+	   The last section of the scrolling list: an overline and one row of five hairline
+	   segments in the drawer's Regular caps. The chosen segment takes gold ink and a gold
+	   frame — the drawer's "you are here" — never a fill, which would read as a second CTA. */
+	.site-nav__drawer-currency {
+		margin-top: 0.5rem;
+		padding-top: 1rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		border-bottom: 0;
+		padding-bottom: 1.25rem;
+	}
+
+	.site-nav__drawer-segments {
+		display: flex;
+		padding: 0.25rem 2rem 0;
+	}
+
+	.site-nav__drawer-segment {
+		flex: 1 1 0;
+		min-height: 2.75rem;
+		padding: 0 0.5rem;
+		background: none;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-left-width: 0;
+		font-family: var(--sans);
+		font-size: 0.8125rem;
+		font-weight: 400;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		white-space: nowrap;
+		color: var(--on-green);
+		cursor: pointer;
+		transition:
+			color var(--duration-hover) var(--ease),
+			border-color var(--duration-hover) var(--ease);
+	}
+
+	.site-nav__drawer-segment:first-child {
+		flex: 0 0 auto;
+		padding: 0 0.9rem;
+		border-left-width: 1px;
+	}
+
+	.site-nav__drawer-segment:hover,
+	.site-nav__drawer-segment:focus-visible {
+		color: var(--gold);
+	}
+
+	.site-nav__drawer-segment:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 2px;
+		position: relative;
+		z-index: 1;
+	}
+
+	.site-nav__drawer-segment.is-active {
+		position: relative;
+		z-index: 1;
+		color: var(--gold);
+		border-color: var(--gold);
+		/* Take over the shared edge from the neighbour on the left as well. */
+		box-shadow: -1px 0 0 var(--gold);
+	}
+
+	.site-nav__drawer-segment:first-child.is-active {
+		box-shadow: none;
+	}
+
 	/* The drawer's closing gesture: the CTA sits in a pinned footer beneath a hairline,
 	   always on screen however long the list or short the viewport. */
 	.site-nav__drawer-footer {
@@ -1277,12 +1600,22 @@
 		border: 0;
 	}
 
-	/* Collapse to the drawer while the full menu still has room. Measured with the
-	   authored menu (Countries + five editorial items + Contact): the list is ~1013px
-	   wide, so with the logo and the bar's padding it needs ~1235px before the links
-	   crowd the Contact action off the bar. The hamburger takes over below 78rem
-	   (1248px); the old 72rem let the bar clip between 1152px and ~1240px. */
-	@media (max-width: 78rem) {
+	/* Below 88rem the bar's side padding steps down from 2.5rem to 1.5rem: the 1280px
+	   laptop class needs those 32px for the full menu (see the breakpoint note below). */
+	@media (max-width: 88rem) {
+		.site-nav {
+			padding: 0 1.5rem;
+		}
+	}
+
+	/* Collapse to the drawer while the full menu still has room. Re-measured 2026-09-10
+	   with the currency switcher in the bar and the six-item authored menu (Countries +
+	   Front Line Collection, Buying Guide, Partners, Insights, About + Contact), fonts
+	   loaded: the list is ~1085px wide, so with the logo and 1.5rem side padding it needs
+	   ~1273px. The hamburger takes over up to 1279px (79.9375rem); 1280px itself keeps the
+	   full bar, which is the ceiling the Step 3 brief set so a 13-inch laptop never gets
+	   the drawer. The earlier 78rem (1248px) figure predates the switcher. */
+	@media (max-width: 79.9375rem) {
 		.site-nav {
 			padding: 0 1.25rem;
 		}
@@ -1319,7 +1652,8 @@
 		.site-nav__caret,
 		.site-nav__submenu-link,
 		.site-nav__column-head,
-		.site-nav__column-link {
+		.site-nav__column-link,
+		.site-nav__drawer-segment {
 			transition: none;
 		}
 	}
