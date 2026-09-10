@@ -102,6 +102,7 @@ const FACET_FILTERS = /* groq */ `
     )
   )
   && (!defined($community) || location.community->slug.current == $community)
+  && (!defined($location) || location.location->slug.current == $location)
   && (
     !defined($minBeds)
     || (_type == "propertyListing" && coalesce(specs.bedrooms, 0) >= $minBeds)
@@ -182,6 +183,7 @@ export function listingSearchQueryParams(
 	params: {
 		propertyType?: string | null;
 		community?: string | null;
+		location?: string | null;
 		minPrice?: number | null;
 		maxPrice?: number | null;
 		minBeds?: number | null;
@@ -210,6 +212,7 @@ export function listingSearchQueryParams(
 		...(scope.type === 'golfCourse' ? { golfCourseId: scope.golfCourseId } : {}),
 		propertyType: params.propertyType ?? null,
 		community: params.community ?? null,
+		location: params.location ?? null,
 		minPrice: params.minPrice ?? null,
 		maxPrice: params.maxPrice ?? null,
 		minBeds: params.minBeds ?? null,

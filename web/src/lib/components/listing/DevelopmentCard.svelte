@@ -14,9 +14,11 @@
 		card: PublicDevelopmentCard;
 		/** Supplied by the list container, which knows the card's list and position. */
 		item?: AnalyticsItem | null;
+		/** Eager-load this card's image (above-the-fold LCP candidate). */
+		priority?: boolean;
 	};
 
-	let { card, item = null }: Props = $props();
+	let { card, item = null, priority = false }: Props = $props();
 
 	const href = $derived(
 		buildListingHref({
@@ -49,7 +51,8 @@
 			alt={imageAlt}
 			width={CARD_HERO_IMAGE.width}
 			height={CARD_HERO_IMAGE.height}
-			loading="lazy"
+			loading={priority ? 'eager' : 'lazy'}
+			fetchpriority={priority ? 'high' : undefined}
 			decoding="async"
 			style:background-image={card.heroImageLqip ? `url(${card.heroImageLqip})` : undefined}
 		/>

@@ -17,7 +17,7 @@ describe('parseListingSearchParams', () => {
 	it('parses valid filters and normalizes page to at least 1', () => {
 		const params = parseListingSearchParams(
 			new URL(
-				'https://example.com/spain/marbella?page=2&sort=price_asc&propertyType=villa&minPrice=500000&maxPrice=2000000&minBeds=3&community=nueva-andalucia&golfRelevance=frontline_golf&golfRelevance=golf_view&golfCourse=valderrama&golfCourse=la-reserva&features=Sea%20view&features=private%20pool'
+				'https://example.com/spain/marbella?page=2&sort=price_asc&propertyType=villa&minPrice=500000&maxPrice=2000000&minBeds=3&community=nueva-andalucia&location=marbella&golfRelevance=frontline_golf&golfRelevance=golf_view&golfCourse=valderrama&golfCourse=la-reserva&features=Sea%20view&features=private%20pool'
 			)
 		);
 
@@ -29,6 +29,7 @@ describe('parseListingSearchParams', () => {
 			maxPrice: 2_000_000,
 			minBeds: 3,
 			community: 'nueva-andalucia',
+			location: 'marbella',
 			golfRelevance: ['frontline_golf', 'golf_view'],
 			golfCourse: ['la-reserva', 'valderrama'],
 			features: ['private pool', 'sea view']

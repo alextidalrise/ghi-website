@@ -5,15 +5,17 @@ import type { LocationTaxonomyRef } from '$lib/listing/breadcrumbs';
 import { withPreviewLocationSeo } from '$lib/listing/detailPage';
 import { FRONTLINE_COLLECTION_PATH } from '$lib/listing/routes';
 import { buildLocationSeo } from '$lib/listing/seo';
+import { parseListingSearchParams } from '$lib/listing/searchParams';
+import { hasIndexAffectingQuery } from '$lib/seo/indexability';
+import { toFeatureOptions } from '$lib/listing/featureHighlights';
 import { loadReviews } from '$lib/reviews';
 import {
 	countryBySlugQuery,
 	fetchCountryFeaturedListingCards,
-	fetchCountryFeaturedLocations,
-	fetchCountryListingFacetRows,
-	fetchCountryNavCommunities,
+	fetchCountryFeatureLabels,
 	fetchFeatureFilterSettings,
 	fetchFrontlineListingCards,
+	fetchListingCards,
 	fetchMaybePreview,
 	fetchPublic,
 	locationsByCountryQuery
@@ -34,23 +36,30 @@ export const load: PageServerLoad = async ({
 	fetch,
 	locals: { preview, loadQuery }
 }) => {
-	/* One await, not three. Every query below is keyed on `params.country` — the slug from
-	   the URL — and none of them read the fetched `country` document, so nothing here needs
-	   to wait for it. Reviews are an outbound call to a third party and depend on nothing at
-	   all. Awaiting those separately turned one round trip into three sequential ones, and
-	   TTFB is the binding constraint on this page: measured at 1.25–3.0s on production,
-	   against a 6–21ms connect, which gates FCP, LCP and Speed Index alike.
+	const searchParams = parseListingSearchParams(url);
+	const listingScope = { type: 'country' as const, countrySlug: params.country };
+
+	/* One round trip. Every query below is keyed on `params.country` (and, for the grid, the
+	   URL search params) — none read the fetched `country` document, so nothing waits for it.
+	   Reviews are an outbound call to a third party and depend on nothing at all. Awaiting
+	   these separately would turn one round trip into several sequential ones, and TTFB is the
+	   binding constraint on this page: measured at 1.25–3.0s on production, against a 6–21ms
+	   connect, which gates FCP, LCP and Speed Index alike.
+
+	   The Features menu depends on the feature-filter settings, but only in a synchronous
+	   transform: the raw labels and the settings both fetch here, in parallel, and
+	   `toFeatureOptions` joins them below — so the menu stays in this single round trip rather
+	   than sitting behind a second one.
 
 	   The cost of collapsing them is that an unknown slug now runs the other queries before
-	   404ing. That is a rare, cheap path, and it buys the common one two fewer round trips. */
+	   404ing. That is a rare, cheap path, and it buys the common one fewer round trips. */
 	const [
 		country,
 		locations,
 		featuredCards,
 		frontlineCards,
-		featuredLocations,
-		communities,
-		facetRows,
+		listingResults,
+		featureLabels,
 		featureFilter,
 		reviews
 	] = await Promise.all([
@@ -64,12 +73,9 @@ export const load: PageServerLoad = async ({
 			params: { countrySlug: params.country }
 		}),
 		fetchCountryFeaturedListingCards({ countrySlug: params.country }),
-		fetchFrontlineListingCards({
-			scope: { type: 'country', countrySlug: params.country }
-		}),
-		fetchCountryFeaturedLocations({ countrySlug: params.country }),
-		fetchCountryNavCommunities(params.country),
-		fetchCountryListingFacetRows(params.country),
+		fetchFrontlineListingCards({ scope: listingScope }),
+		fetchListingCards({ scope: listingScope, params: searchParams }),
+		fetchCountryFeatureLabels(params.country),
 		fetchFeatureFilterSettings(),
 		loadReviews(fetch)
 	]);
@@ -78,6 +84,22 @@ export const load: PageServerLoad = async ({
 		error(404, 'Location not found.');
 	}
 
+	const featureOptions = toFeatureOptions(featureLabels, featureFilter);
+
+	/* Location facet options for the filter bar: the country's locations as {label, value}.
+	   De-duped by slug — a country can surface two location docs sharing one slug (a stray CMS
+	   duplicate, or a draft alongside its published twin in preview), and both filter to the
+	   identical ?location= value. Left un-deduped, the keyed {#each} in ListingFilters hits a
+	   duplicate key and throws during client-side navigation. */
+	const locationOptions = (() => {
+		const bySlug = new Map<string, { label: string; value: string }>();
+		for (const loc of locations ?? []) {
+			if (!loc.slug || !loc.name || bySlug.has(loc.slug)) continue;
+			bySlug.set(loc.slug, { label: loc.name, value: loc.slug });
+		}
+		return [...bySlug.values()];
+	})();
+
 	/* Structural tags for new documents this page's live queries would surface: a new
 	   country-wide listing and a new frontline listing in this country. Curated featured
 	   listings/locations are already covered by their `doc:` tags (and the country doc's). */
@@ -85,45 +107,31 @@ export const load: PageServerLoad = async ({
 
 	const canonicalPath = `/${country.slug}`;
 
-	/* Taxonomy the country-scoped search bar consumes. Locations arrive without a country
-	   slug (they were queried under one already), so stamp it on for the bar's shape. */
-	const searchLocations = (locations ?? []).flatMap((location) =>
-		location._id && location.name && location.slug
-			? [
-					{
-						_id: location._id,
-						name: location.name,
-						slug: location.slug,
-						countrySlug: country.slug
-					}
-				]
-			: []
-	);
-
 	const frontlineViewAllHref = FRONTLINE_COLLECTION_PATH;
 
 	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const breadcrumbs = buildCountryBreadcrumbs(country, canonicalPath);
-	const seo = preview
-		? withPreviewLocationSeo(buildLocationSeo(country, canonicalUrl))
-		: buildLocationSeo(country, canonicalUrl);
+	/* Canonical stays the unfiltered country URL; an active listing filter makes the page
+	   noindex (follow), mirroring the location page's filtered-results behavior. */
+	const seoBase = buildLocationSeo(country, canonicalUrl);
+	if (hasIndexAffectingQuery(searchParams)) {
+		seoBase.noindex = true;
+	}
+	const seo = preview ? withPreviewLocationSeo(seoBase) : seoBase;
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, url.origin);
 
 	return {
 		pageType: 'country' as const,
 		location: country,
 		locations: locations ?? [],
-		featuredLocations,
 		featuredCards,
 		frontlineCards,
 		frontlineViewAllHref,
 		reviews,
-		// Country-scoped taxonomy for the search bar (country selector omitted; the country
-		// is fixed to this page's subject).
-		searchLocations,
-		searchCommunities: communities,
-		searchFacetRows: facetRows,
-		featureFilter,
+		searchParams,
+		listingResults,
+		featureOptions,
+		locationOptions,
 		canonicalUrl,
 		breadcrumbs,
 		seo,

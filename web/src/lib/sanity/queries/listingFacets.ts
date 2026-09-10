@@ -62,12 +62,6 @@ const facetRowsQuery = /* groq */ `
   *[${FACET_LISTING_FILTER}]${FACET_ROW_PROJECTION}
 `;
 
-/** Same rows narrowed to a single country — feeds the country page's scoped search bar,
-    so a country page never pulls the whole catalogue's facets. */
-const countryFacetRowsQuery = /* groq */ `
-  *[${FACET_LISTING_FILTER} && ${LISTING_COUNTRY_SLUG} == $countrySlug]${FACET_ROW_PROJECTION}
-`;
-
 export type ListingFacetRow = {
 	countrySlug: string | null;
 	locationSlug: string | null;
@@ -92,14 +86,5 @@ type RawFacetRow = {
 export async function fetchListingFacetRows(): Promise<ListingFacetRow[]> {
 	return normalizeFacetRows(
 		await fetchPublic<RawFacetRow[]>(facetRowsQuery, { params: rateQueryParams() })
-	);
-}
-
-/** Facet rows for one country — feeds the country page's scoped search bar. */
-export async function fetchCountryListingFacetRows(countrySlug: string): Promise<ListingFacetRow[]> {
-	return normalizeFacetRows(
-		await fetchPublic<RawFacetRow[]>(countryFacetRowsQuery, {
-			params: { countrySlug, ...rateQueryParams() }
-		})
 	);
 }
