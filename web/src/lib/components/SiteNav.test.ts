@@ -122,6 +122,9 @@ describe('SiteNav — three-tier countries menu', () => {
 		expect(drawer).toContain('Show prices in');
 		expect(drawer.match(/site-nav__drawer-segment /g)).toHaveLength(5);
 		expect(drawer).toMatch(/aria-pressed="true"[^>]*aria-label="As listed"/);
+		// Countries speak in the serif country voice; editorial rows do not.
+		expect(drawer.match(/site-nav__drawer-link--country/g)).toHaveLength(2);
+		expect(drawer).toMatch(/href="\/insights" class="site-nav__drawer-link(?! site-nav__drawer-link--country)/);
 		// It sits after the editorial items and before the pinned Contact footer.
 		expect(drawer.indexOf('Insights')).toBeLessThan(drawer.indexOf('site-nav__drawer-currency'));
 		expect(drawer.indexOf('site-nav__drawer-currency')).toBeLessThan(
