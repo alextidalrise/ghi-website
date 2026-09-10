@@ -7,12 +7,12 @@ describe('formatListingPrice', () => {
 	});
 
 	it('formats AED, GBP and USD prices with their symbols', () => {
-		// en-GB renders AED with a non-breaking space and USD as "US$" — assert the grouped
-		// amount and code rather than an exact symbol/whitespace shape.
+		// en-GB renders AED with a non-breaking space — assert the grouped amount and code
+		// rather than an exact whitespace shape. USD takes the narrow "$".
 		expect(formatListingPrice({ price: 22_500_000, currency: 'AED' })).toContain('22,500,000');
 		expect(formatListingPrice({ price: 22_500_000, currency: 'AED' })).toContain('AED');
 		expect(formatListingPrice({ price: 1_000_000, currency: 'GBP' })).toBe('£1,000,000');
-		expect(formatListingPrice({ price: 1_000_000, currency: 'USD' })).toBe('US$1,000,000');
+		expect(formatListingPrice({ price: 1_000_000, currency: 'USD' })).toBe('$1,000,000');
 	});
 
 	it('defaults a missing currency to EUR', () => {
@@ -125,6 +125,6 @@ describe('formatListingPriceParts', () => {
 			{ price: 1_000_000, currency: 'EUR', priceQualifier: 'guide' },
 			{ to: 'USD', rates: { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25 } }
 		)!;
-		expect(composePrice(parts)).toBe('Guide approx. US$1,250,000');
+		expect(composePrice(parts)).toBe('Guide approx. $1,250,000');
 	});
 });

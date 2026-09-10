@@ -23,7 +23,12 @@ function formatter(currency: string): AmountFormatter {
 			created = new Intl.NumberFormat('en-GB', {
 				style: 'currency',
 				currency,
-				maximumFractionDigits: 0
+				maximumFractionDigits: 0,
+				// The narrow symbol: "$" rather than en-GB's "US$". The only dollar on the site
+				// is the US dollar and the switcher names it, so the plain sign is unambiguous.
+				// The dirham has no Latin symbol in any locale, so AED stays "AED 1,050,000",
+				// as UAE portals write it in English.
+				currencyDisplay: 'narrowSymbol'
 			});
 		} catch {
 			created = fallbackFormatter(currency);

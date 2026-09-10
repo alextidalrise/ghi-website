@@ -35,7 +35,7 @@ describe('Price — pre-rendered variants', () => {
 		const v = variants(html);
 		expect(v.EUR).toBe('€1,245,000');
 		expect(v.GBP).toContain('approx. £996,000');
-		expect(v.USD).toContain('approx. US$1,560,000');
+		expect(v.USD).toContain('approx. $1,560,000');
 		expect(v.AED).toContain('approx.');
 		// The native variant is the one marked data-native; the others carry the hover hint.
 		expect(html).toMatch(/data-ccy="EUR" data-native/);
