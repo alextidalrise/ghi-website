@@ -10,6 +10,7 @@ import {
 	EnvelopeIcon,
 	EyeClosedIcon,
 	InfoOutlineIcon,
+	TrendUpwardIcon,
 	UsersIcon,
 	WarningOutlineIcon
 } from '@sanity/icons';
@@ -45,6 +46,15 @@ export const deskStructure: StructureResolver = (S) =>
 				.icon(DesktopIcon)
 				.child(
 					S.document().schemaType('siteSettings').documentId('siteSettings').title('Site settings')
+				),
+			S.listItem()
+				.title('Exchange rates')
+				.icon(TrendUpwardIcon)
+				.child(
+					S.document()
+						.schemaType('exchangeRates')
+						.documentId('exchangeRates')
+						.title('Exchange rates')
 				),
 			S.listItem()
 				.title('Pages')

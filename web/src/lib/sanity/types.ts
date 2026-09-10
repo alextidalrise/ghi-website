@@ -583,6 +583,21 @@ export type GuidesHubPage = {
   seo?: SeoFields;
 };
 
+export type ExchangeRates = {
+  _id: string;
+  _type: "exchangeRates";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  gbpPerEur?: number;
+  usdPerEur?: number;
+  asOf?: string;
+  updatedByCron?: string;
+  gbpOverride?: number;
+  usdOverride?: number;
+  aedOverride?: number;
+};
+
 export type PropertyListingReference = {
   _ref: string;
   _type: "reference";
@@ -1813,6 +1828,7 @@ export type AllSanitySchemaTypes =
   | ContactPage
   | AboutPage
   | GuidesHubPage
+  | ExchangeRates
   | PropertyListingReference
   | SiteSettings
   | FrontlineContent

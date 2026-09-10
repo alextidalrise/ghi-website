@@ -1,5 +1,11 @@
 {
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"installCommand": "corepack enable && corepack prepare pnpm@10.12.1 --activate && pnpm install --frozen-lockfile",
-	"buildCommand": "pnpm --filter web build && mkdir -p .vercel && cp -R web/.vercel/output .vercel/output"
+	"buildCommand": "pnpm --filter web build && mkdir -p .vercel && cp -R web/.vercel/output .vercel/output",
+	"crons": [
+		{
+			"path": "/api/rates-refresh",
+			"schedule": "0 16 * * *"
+		}
+	]
 }

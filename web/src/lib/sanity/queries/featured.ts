@@ -1,4 +1,5 @@
 import { defineQuery } from 'groq';
+import type { RateTable } from '../../currency/rates';
 import { LISTING_CARD_UNION, LISTING_REF_PUBLIC_FILTER } from '../allowlists';
 import {
 	toSimilarListingCard,
@@ -61,15 +62,21 @@ function toFeaturedCards(
  * Reuses listing-search GROQ with a fixed frontline_golf filter and newest sort.
  */
 export async function fetchFrontlineListingCards({
-	scope
+	scope,
+	rates
 }: {
 	scope: ListingSearchScope;
+	rates?: RateTable;
 }): Promise<SimilarListingCard[]> {
-	const queryParams = listingSearchQueryParams(scope, {
-		golfRelevance: ['frontline_golf'],
-		start: 0,
-		end: FRONTLINE_LISTING_LIMIT
-	});
+	const queryParams = listingSearchQueryParams(
+		scope,
+		{
+			golfRelevance: ['frontline_golf'],
+			start: 0,
+			end: FRONTLINE_LISTING_LIMIT
+		},
+		rates
+	);
 	const query = buildPaginatedListingCardsQuery(scope, 'newest');
 	const raw = await fetchPublic<RawSimilarListingItem[]>(query, { params: queryParams });
 	return (raw ?? [])
@@ -78,8 +85,10 @@ export async function fetchFrontlineListingCards({
 }
 
 /** Site-wide frontline golf spotlight for the homepage. */
-export async function fetchHomepageFrontlineListingCards(): Promise<SimilarListingCard[]> {
-	return fetchFrontlineListingCards({ scope: { type: 'global' } });
+export async function fetchHomepageFrontlineListingCards(
+	rates?: RateTable
+): Promise<SimilarListingCard[]> {
+	return fetchFrontlineListingCards({ scope: { type: 'global' }, rates });
 }
 
 /** Hand-picked homepage featured cards from siteSettings.homepageFeaturedListings. */

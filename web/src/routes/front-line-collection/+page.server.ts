@@ -15,18 +15,20 @@ import { cacheTag } from '$lib/cache/tags';
 
 const BASE_PATH = FRONTLINE_COLLECTION_PATH;
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
 	// The grid is the global "newest frontline_golf" query, so a new frontline listing
 	// anywhere must purge this page.
 	addCacheTags(cacheTag.frontline);
 
 	const searchParams = parseListingSearchParams(url);
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
+	const { rates } = await locals.exchangeRates;
 
 	const [listingResults, courseOptions, hero, rawContent] = await Promise.all([
 		fetchListingCards({
 			scope: { type: 'global' },
-			params: { ...searchParams, golfRelevance: ['frontline_golf'] }
+			params: { ...searchParams, golfRelevance: ['frontline_golf'] },
+			rates
 		}),
 		fetchFrontlineCourseOptions(),
 		fetchFrontlineHero(),

@@ -1,4 +1,4 @@
-import { rateQueryParams } from '../../currency/rates';
+import { rateQueryParams, type RateTable } from '../../currency/rates';
 import { fetchPublic } from './fetch';
 import {
 	LISTING_COMMUNITY_SLUG,
@@ -83,8 +83,8 @@ type RawFacetRow = {
 };
 
 /** Facet rows for every public listing — feeds the homepage bar's location-aware menus. */
-export async function fetchListingFacetRows(): Promise<ListingFacetRow[]> {
+export async function fetchListingFacetRows(rates?: RateTable): Promise<ListingFacetRow[]> {
 	return normalizeFacetRows(
-		await fetchPublic<RawFacetRow[]>(facetRowsQuery, { params: rateQueryParams() })
+		await fetchPublic<RawFacetRow[]>(facetRowsQuery, { params: rateQueryParams(rates) })
 	);
 }

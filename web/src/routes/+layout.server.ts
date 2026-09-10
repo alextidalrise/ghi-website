@@ -41,7 +41,7 @@ function hasLaunchBypass(url: URL, cookies: Cookies): boolean {
 }
 
 export const load: LayoutServerLoad = async ({
-	locals: { preview, analytics },
+	locals: { preview, analytics, exchangeRates },
 	url,
 	route,
 	cookies
@@ -79,7 +79,22 @@ export const load: LayoutServerLoad = async ({
 	// lets an edit to either purge the whole site; their `doc:` tags are collected too.
 	addCacheTags(cacheTag.nav);
 
-	const [footer, headerNav] = await Promise.all([fetchFooter(), fetchHeaderNav()]);
+	// Rates ride in layout data so the (later) client currency switcher can convert without
+	// its own fetch. The promise is already in flight from ratesHandle, so awaiting it here
+	// overlaps the nav/footer fetch rather than adding a round trip. Sort/filter uses the
+	// same rates server-side; see the listing loads.
+	const [footer, headerNav, rates] = await Promise.all([
+		fetchFooter(),
+		fetchHeaderNav(),
+		exchangeRates
+	]);
 
-	return { preview, footer, headerNav, analytics: analyticsState };
+	return {
+		preview,
+		footer,
+		headerNav,
+		analytics: analyticsState,
+		rates: rates.rates,
+		ratesAsOf: rates.asOf
+	};
 };

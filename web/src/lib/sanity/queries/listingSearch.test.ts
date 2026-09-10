@@ -68,6 +68,15 @@ describe('EUR-normalised price', () => {
 			rateAED: expect.any(Number)
 		});
 	});
+
+	it('threads a live rate table through to the params', () => {
+		const params = listingSearchQueryParams(
+			{ type: 'global' },
+			{ start: 0, end: 12 },
+			{ EUR: 1, GBP: 1.2, USD: 0.9, AED: 0.25 }
+		);
+		expect(params).toMatchObject({ rateGBP: 1.2, rateUSD: 0.9, rateAED: 0.25 });
+	});
 });
 
 describe('golfCourse facet filter', () => {

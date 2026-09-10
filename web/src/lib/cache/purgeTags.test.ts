@@ -125,6 +125,10 @@ describe('tagsForDoc', () => {
 		);
 	});
 
+	it('maps an exchangeRates edit to a whole-site nav purge', () => {
+		expect(tagsForDoc(base({ _type: 'exchangeRates' }))).toContain('nav');
+	});
+
 	it('gives a golf course its doc tag plus the sitemap tag', () => {
 		expect(tagsForDoc(base({ _id: 'gc-1', _type: 'golfCourse' }))).toEqual(
 			expect.arrayContaining(['doc:gc-1', 'sitemap'])
@@ -153,6 +157,7 @@ describe('tagsForDoc', () => {
 			['partner'],
 			['partnerCategory'],
 			['siteSettings'],
+			['exchangeRates'],
 			['aboutPage']
 		])('does not purge the sitemap for %s', (_type) => {
 			expect(tagsForDoc(base({ _type }))).not.toContain('sitemap');

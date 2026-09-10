@@ -59,7 +59,11 @@ type CommunityTaxonomyRow = {
 	isAssociated?: boolean | null;
 };
 
-export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
+export const load: PageServerLoad = async ({
+	params,
+	url,
+	locals: { preview, loadQuery, exchangeRates }
+}) => {
 	// Legacy pre-hierarchy URLs (e.g. /estepona/estepona) land here with an unknown country
 	// slug and would otherwise 404 after running every query below. Redirect them permanently
 	// before any fetch, so crawlers reach the live page in one hop.
@@ -139,12 +143,14 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 	// featureOptions applies the same block/allow lists and thresholds as the DiscoveryBar
 	// (via featureFilter, already resolved above), and depends only on locationIds — so it
 	// runs in this group alongside the listing fetch rather than in a round trip after it.
+	const { rates } = await exchangeRates;
 	const [listingResults, frontlineCards, featureOptions] = await Promise.all([
 		fetchListingCards({
 			scope: listingScope,
-			params: searchParams
+			params: searchParams,
+			rates
 		}),
-		fetchFrontlineListingCards({ scope: listingScope }),
+		fetchFrontlineListingCards({ scope: listingScope, rates }),
 		fetchLocationFeatureOptions(params.country, locationIds, featureFilter)
 	]);
 
