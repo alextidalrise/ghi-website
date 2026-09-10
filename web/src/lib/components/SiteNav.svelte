@@ -579,6 +579,7 @@
 			<a
 				{href}
 				class="site-nav__drawer-link"
+				class:site-nav__drawer-link--country={group !== null}
 				class:is-active={active}
 				aria-current={isActive(href) ? 'page' : undefined}
 				target={external ? '_blank' : undefined}
@@ -589,7 +590,11 @@
 				<span>{label}{@render newTabHint(external)}</span>
 			</a>
 		{:else}
-			<span class="site-nav__drawer-link site-nav__drawer-link--static" class:is-active={active}>
+			<span
+				class="site-nav__drawer-link site-nav__drawer-link--static"
+				class:site-nav__drawer-link--country={group !== null}
+				class:is-active={active}
+			>
 				{#if group}{@render stamp(group, 'site-nav__drawer-stamp')}{/if}
 				<span>{label}</span>
 			</span>
@@ -682,7 +687,7 @@
 								{:else if group.href}
 									<a
 										href={group.href}
-										class="site-nav__drawer-link"
+										class="site-nav__drawer-link site-nav__drawer-link--country"
 										class:is-active={isActive(group.href)}
 										aria-current={isActive(group.href) ? 'page' : undefined}
 										target={group.external ? '_blank' : undefined}
@@ -729,8 +734,9 @@
 				</li>
 			{/if}
 		{/each}
-		<!-- Display currency: a flat section, not a third accordion. Five segments in the
-		     drawer's Regular caps; the chosen one takes gold, the drawer's "you are here". -->
+		<!-- Display currency: a utility, not a destination, so it sits in the drawer's
+		     recessed well rather than among the rows. "As listed" takes a row of its own
+		     above the four codes: five segments never fit the phone drawer side by side. -->
 		<li class="site-nav__drawer-section site-nav__drawer-currency">
 			<span class="site-nav__drawer-overline" id="drawer-currency-label">Show prices in</span>
 			<div class="site-nav__drawer-segments" role="group" aria-labelledby="drawer-currency-label">
@@ -1335,6 +1341,9 @@
 		flex: 1;
 		min-height: 0;
 		overflow-y: auto;
+		/* The list only ever scrolls vertically; a row that fails to fit must wrap or shrink,
+		   never open a sideways scroll on a phone. */
+		overflow-x: hidden;
 		overscroll-behavior: contain;
 		scrollbar-width: thin;
 		scrollbar-color: rgba(245, 241, 232, 0.25) transparent;
@@ -1380,8 +1389,9 @@
 		justify-content: space-between;
 	}
 
-	/* Same vocabulary as the desktop bar — light tracked caps in warm ivory — just
-	   sized up for the vertical, touch-first drawer. */
+	/* Three voices, as on the desktop shelf. Editorial items (the buying guide, insights,
+	   partners, about) speak in the bar's own voice — light tracked caps in warm ivory —
+	   at a size that sits clearly below the countries. Rows stay comfortably over 44px. */
 	.site-nav__drawer-link {
 		position: relative;
 		display: flex;
@@ -1389,15 +1399,29 @@
 		gap: 0.85rem;
 		flex: 1;
 		font-family: var(--sans);
-		font-size: 1.0625rem;
+		font-size: 0.9375rem;
 		font-weight: 300;
-		letter-spacing: 0.11em;
+		letter-spacing: 0.12em;
 		line-height: 1.3;
 		text-transform: uppercase;
 		color: var(--on-green);
 		text-decoration: none;
-		padding: 1.05rem 2rem;
+		padding: 0.95rem 2rem;
 		transition: color var(--duration-hover) var(--ease);
+	}
+
+	/* Countries are the destinations, so they take the shelf's country voice: Playfair,
+	   mixed case, beside the 1px-framed flag stamp. The serif against the caps is what
+	   separates "where we are" from "what we publish" at a glance. */
+	.site-nav__drawer-link--country {
+		gap: 1rem;
+		font-family: var(--serif);
+		font-size: 1.375rem;
+		font-weight: 400;
+		letter-spacing: normal;
+		line-height: 1.15;
+		text-transform: none;
+		padding: 0.9rem 2rem;
 	}
 
 	/* A parent with no destination of its own keeps full ink — dimming it read as
@@ -1421,8 +1445,8 @@
 		content: '';
 		position: absolute;
 		left: 0;
-		top: 1.05rem;
-		bottom: 1.05rem;
+		top: 0.9rem;
+		bottom: 0.9rem;
 		width: 2px;
 		background: var(--gold);
 	}
@@ -1487,29 +1511,35 @@
 	}
 
 	/* ---- Currency switcher (drawer) ----------------------------------------------
-	   The last section of the scrolling list: an overline and one row of five hairline
-	   segments in the drawer's Regular caps. The chosen segment takes gold ink and a gold
-	   frame — the drawer's "you are here" — never a fill, which would read as a second CTA. */
+	   A utility, not a destination: the block sits in the drawer's recessed well (the same
+	   dark-green tint the location lists use), which is what separates it from the rows
+	   above without a heavier device. Inside: the overline, then "As listed" on a row of
+	   its own and the four codes beneath it, all hairline segments in the drawer's Regular
+	   caps. The chosen segment takes gold ink and a gold frame — the drawer's "you are
+	   here" — never a fill, which would read as a second Contact. */
 	.site-nav__drawer-currency {
-		margin-top: 0.5rem;
-		padding-top: 1rem;
+		margin-top: 1rem;
+		margin-bottom: 0;
+		padding: 1.1rem 0 1.4rem;
+		background: rgba(14, 20, 16, 0.4);
 		border-top: 1px solid rgba(255, 255, 255, 0.08);
 		border-bottom: 0;
-		padding-bottom: 1.25rem;
 	}
 
 	.site-nav__drawer-segments {
-		display: flex;
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 		padding: 0.25rem 2rem 0;
 	}
 
 	.site-nav__drawer-segment {
-		flex: 1 1 0;
 		min-height: 2.75rem;
 		padding: 0 0.5rem;
+		/* Neighbours share one hairline: each segment pulls over its left and top
+		   neighbour's edge, and the chosen one rises above them to show its gold frame. */
+		margin: -1px 0 0 -1px;
 		background: none;
-		border: 1px solid rgba(255, 255, 255, 0.16);
-		border-left-width: 0;
+		border: 1px solid rgba(255, 255, 255, 0.18);
 		font-family: var(--sans);
 		font-size: 0.8125rem;
 		font-weight: 400;
@@ -1524,9 +1554,12 @@
 	}
 
 	.site-nav__drawer-segment:first-child {
-		flex: 0 0 auto;
-		padding: 0 0.9rem;
-		border-left-width: 1px;
+		grid-column: 1 / -1;
+		margin: 0;
+	}
+
+	.site-nav__drawer-segment:nth-child(2) {
+		margin-left: 0;
 	}
 
 	.site-nav__drawer-segment:hover,
@@ -1536,9 +1569,9 @@
 
 	.site-nav__drawer-segment:focus-visible {
 		outline: 2px solid var(--gold);
-		outline-offset: 2px;
+		outline-offset: -2px;
 		position: relative;
-		z-index: 1;
+		z-index: 2;
 	}
 
 	.site-nav__drawer-segment.is-active {
@@ -1546,12 +1579,6 @@
 		z-index: 1;
 		color: var(--gold);
 		border-color: var(--gold);
-		/* Take over the shared edge from the neighbour on the left as well. */
-		box-shadow: -1px 0 0 var(--gold);
-	}
-
-	.site-nav__drawer-segment:first-child.is-active {
-		box-shadow: none;
 	}
 
 	/* The drawer's closing gesture: the CTA sits in a pinned footer beneath a hairline,
