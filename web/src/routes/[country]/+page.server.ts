@@ -34,10 +34,11 @@ export const load: PageServerLoad = async ({
 	params,
 	url,
 	fetch,
-	locals: { preview, loadQuery }
+	locals: { preview, loadQuery, exchangeRates }
 }) => {
 	const searchParams = parseListingSearchParams(url);
 	const listingScope = { type: 'country' as const, countrySlug: params.country };
+	const { rates } = await exchangeRates;
 
 	/* One round trip. Every query below is keyed on `params.country` (and, for the grid, the
 	   URL search params) — none read the fetched `country` document, so nothing waits for it.
@@ -73,8 +74,8 @@ export const load: PageServerLoad = async ({
 			params: { countrySlug: params.country }
 		}),
 		fetchCountryFeaturedListingCards({ countrySlug: params.country }),
-		fetchFrontlineListingCards({ scope: listingScope }),
-		fetchListingCards({ scope: listingScope, params: searchParams }),
+		fetchFrontlineListingCards({ scope: listingScope, rates }),
+		fetchListingCards({ scope: listingScope, params: searchParams, rates }),
 		fetchCountryFeatureLabels(params.country),
 		fetchFeatureFilterSettings(),
 		loadReviews(fetch)

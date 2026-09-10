@@ -18,7 +18,11 @@ import {
 import { addCacheTags } from '$lib/cache/tagContext';
 import { cacheTag } from '$lib/cache/tags';
 
-export const load: PageServerLoad = async ({ params, url, locals: { preview, loadQuery } }) => {
+export const load: PageServerLoad = async ({
+	params,
+	url,
+	locals: { preview, loadQuery, exchangeRates }
+}) => {
 	const raw = await fetchMaybePreview<RawGolfCourse | null>(
 		golfCourseByPathQuery,
 		{
@@ -44,9 +48,11 @@ export const load: PageServerLoad = async ({ params, url, locals: { preview, loa
 	const canonicalUrl = `${url.origin}${canonicalPath}`;
 	const searchParams = parseListingSearchParams(url);
 
+	const { rates } = await exchangeRates;
 	const listingResults = await fetchListingCards({
 		scope: { type: 'golfCourse', golfCourseId: course._id },
-		params: searchParams
+		params: searchParams,
+		rates
 	});
 
 	const breadcrumbs = buildGolfCourseBreadcrumbs(course, canonicalPath);

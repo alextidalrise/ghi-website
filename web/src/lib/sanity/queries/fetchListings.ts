@@ -1,3 +1,4 @@
+import type { RateTable } from '../../currency/rates';
 import {
 	buildPaginationMeta,
 	PAGE_SIZE,
@@ -29,26 +30,32 @@ export type ListingSearchResult = {
  */
 export async function fetchListingCards({
 	scope,
-	params
+	params,
+	rates
 }: {
 	scope: ListingSearchScope;
 	params: ListingSearchParams;
+	rates?: RateTable;
 }): Promise<ListingSearchResult> {
 	const start = (params.page - 1) * PAGE_SIZE;
 	const end = start + PAGE_SIZE;
-	const queryParams = listingSearchQueryParams(scope, {
-		propertyType: params.propertyType,
-		community: params.community,
-		location: params.location,
-		minPrice: params.minPrice,
-		maxPrice: params.maxPrice,
-		minBeds: params.minBeds,
-		golfRelevance: params.golfRelevance,
-		golfCourse: params.golfCourse,
-		features: params.features,
-		start,
-		end
-	});
+	const queryParams = listingSearchQueryParams(
+		scope,
+		{
+			propertyType: params.propertyType,
+			community: params.community,
+			location: params.location,
+			minPrice: params.minPrice,
+			maxPrice: params.maxPrice,
+			minBeds: params.minBeds,
+			golfRelevance: params.golfRelevance,
+			golfCourse: params.golfCourse,
+			features: params.features,
+			start,
+			end
+		},
+		rates
+	);
 
 	const cardsQuery = buildPaginatedListingCardsQuery(scope, params.sort);
 	const countQuery = buildListingCardsCountQuery(scope);

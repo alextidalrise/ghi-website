@@ -141,6 +141,13 @@ export function tagsForDoc(payload: PurgePayload): string[] {
 			add(cacheTag.nav);
 			break;
 		}
+		case 'exchangeRates': {
+			// A manual rate override changes the EUR-equivalent every listing surface sorts and
+			// filters on. `nav` rides on every page (root layout), so it is the whole-site lever —
+			// the same one the rates cron purges after its own write.
+			add(cacheTag.nav);
+			break;
+		}
 		// aboutPage / contactPage / guidesHubPage: single pages covered by their `doc:` tag.
 	}
 

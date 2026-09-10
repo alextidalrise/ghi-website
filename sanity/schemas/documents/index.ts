@@ -4,6 +4,7 @@ import { aboutPage } from './aboutPage';
 import { author } from './author';
 import { contactPage } from './contactPage';
 import { development } from './development';
+import { exchangeRates } from './exchangeRates';
 import { golfCourse } from './golfCourse';
 import { guide } from './guide';
 import { guidesHubPage } from './guidesHubPage';
@@ -19,6 +20,7 @@ import { unitType } from './unitType';
 /** Document schemas for GHI Sanity Studio. */
 export const documentTypes: SchemaTypeDefinition[] = [
 	siteSettings,
+	exchangeRates,
 	guidesHubPage,
 	aboutPage,
 	contactPage,
@@ -40,6 +42,7 @@ export {
 	author,
 	contactPage,
 	development,
+	exchangeRates,
 	golfCourse,
 	guide,
 	guidesHubPage,

@@ -17,10 +17,14 @@ import { resolveHomepageContent } from '$lib/sanity/transforms/pageContent';
 import { addCacheTags } from '$lib/cache/tagContext';
 import { cacheTag } from '$lib/cache/tags';
 
-export const load: PageServerLoad = async ({ fetch, url }) => {
+export const load: PageServerLoad = async ({ fetch, url, locals }) => {
 	// `home` covers the query-driven homepage rails (featured, frontline, partners,
 	// countries); `frontline` also fires on any new frontline listing site-wide.
 	addCacheTags(cacheTag.home, cacheTag.frontline);
+
+	// Live rates for the EUR-normalised sort/filter behind the frontline rail and facet bar.
+	// Already in flight from ratesHandle, so this await overlaps the fetches below.
+	const { rates } = await locals.exchangeRates;
 
 	const [
 		nav,
@@ -37,12 +41,12 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 	] = await Promise.all([
 		fetchNavTaxonomy(),
 		fetchHomepageFeaturedListingCards(),
-		fetchHomepageFrontlineListingCards(),
+		fetchHomepageFrontlineListingCards(rates),
 		fetchSiteSettingsHero(),
 		fetchCountriesWithHero(),
 		fetchHomepageFeaturedLocations(),
 		fetchHomepagePartnerLogos(),
-		fetchListingFacetRows(),
+		fetchListingFacetRows(rates),
 		loadReviews(fetch),
 		fetchFeatureFilterSettings(),
 		fetchHomepageContent()

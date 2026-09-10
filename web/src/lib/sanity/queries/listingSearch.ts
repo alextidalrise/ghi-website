@@ -1,6 +1,6 @@
 import { LISTING_CARD_UNION } from '../allowlists';
 import type { ListingSort } from '../../listing/filterOptions';
-import { rateQueryParams } from '../../currency/rates';
+import { rateQueryParams, type RateTable } from '../../currency/rates';
 import { PUBLIC_CHILD_UNIT_FILTER, PUBLIC_LISTING_FILTER } from './filters';
 import { PRICE_NUMERIC_EUR } from './priceNumeric';
 
@@ -192,12 +192,14 @@ export function listingSearchQueryParams(
 		features?: string[];
 		start?: number;
 		end?: number;
-	}
+	},
+	rates?: RateTable
 ) {
 	// Sanity requires every $param referenced in GROQ to be supplied — use null for inactive facets.
 	return {
 		// $rateGBP/$rateUSD/$rateAED for the EUR-normalised price expression (PRICE_NUMERIC).
-		...rateQueryParams(),
+		// `rates` comes from the request's live exchange-rates doc; omitted → static fallback.
+		...rateQueryParams(rates),
 		...(scope.type === 'country' ||
 		scope.type === 'location' ||
 		scope.type === 'community'
