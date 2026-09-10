@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { afterNavigate } from '$app/navigation';
-	import { buildSiteNav, isNavItemActive, isSiteNavItemActive, type SiteNavItem } from '$lib/nav/siteNav';
+	import CountryFlagArt from '$lib/components/CountryFlagArt.svelte';
+	import {
+		buildSiteNav,
+		hasPanel,
+		isNavItemActive,
+		isSiteNavGroupActive,
+		isSiteNavItemActive,
+		type SiteNavGroup,
+		type SiteNavItem
+	} from '$lib/nav/siteNav';
 	import type { HeaderNav } from '$lib/sanity/queries/headerNav';
 
 	let { nav = null }: { nav?: HeaderNav | null } = $props();
@@ -11,8 +20,11 @@
 	const cta = $derived(site.cta);
 
 	let open = $state(false); // mobile drawer
-	let openMenu = $state<number | null>(null); // desktop dropdown index, if any
-	let expanded = $state<number | null>(null); // mobile accordion index, if any
+	let openMenu = $state<number | null>(null); // desktop dropdown / panel index, if any
+	// Mobile accordion key, if any: `${i}` for a top-level dropdown, `${i}.${g}` for a
+	// country inside a panel item (the drawer flattens the panel's first tier to a label,
+	// so its countries are the drawer's own accordions).
+	let expanded = $state<string | null>(null);
 	let navRoot = $state<HTMLElement>();
 	let drawer = $state<HTMLElement>();
 	let toggleButton = $state<HTMLButtonElement>();
@@ -25,17 +37,33 @@
 		return isSiteNavItemActive(item, page.url.pathname);
 	}
 
+	function groupActive(group: SiteNavGroup): boolean {
+		return isSiteNavGroupActive(group, page.url.pathname);
+	}
+
+	/** The accordion that should open to reveal the current page, if any. */
+	function activeAccordionKey(): string | null {
+		for (const [i, item] of navItems.entries()) {
+			if (hasPanel(item)) {
+				const g = item.children.findIndex((group) => group.children.length > 0 && groupActive(group));
+				if (g !== -1) return `${i}.${g}`;
+			} else if (item.children.length > 0 && itemActive(item)) {
+				return `${i}`;
+			}
+		}
+		return null;
+	}
+
 	// Opening the drawer answers "where am I?": the accordion holding the active page
 	// starts expanded so its gold marker is visible instead of hidden behind a collapsed
 	// group. No active section collapses everything.
 	function toggleDrawer() {
 		open = !open;
-		if (open) {
-			const activeIndex = navItems.findIndex(
-				(item) => item.children.length > 0 && itemActive(item)
-			);
-			expanded = activeIndex === -1 ? null : activeIndex;
-		}
+		if (open) expanded = activeAccordionKey();
+	}
+
+	function toggleAccordion(key: string) {
+		expanded = expanded === key ? null : key;
 	}
 
 	function openDropdown(i: number) {
@@ -46,12 +74,45 @@
 		if (openMenu === i) openMenu = null;
 	}
 
+	// Hover intent: a pointer crossing the bar on its way to Contact must not flash the
+	// full-width panel over the page, so a pointer opens after a short settle and a
+	// leave inside that window cancels it. Once a menu is open, moving to a sibling
+	// switches at once. Click and focus stay immediate (see the handlers below).
+	const HOVER_INTENT_MS = 120;
+	let hoverTimer: ReturnType<typeof setTimeout> | null = null;
+
+	function cancelHoverIntent() {
+		if (hoverTimer !== null) {
+			clearTimeout(hoverTimer);
+			hoverTimer = null;
+		}
+	}
+
+	function pointerEnterItem(i: number) {
+		cancelHoverIntent();
+		if (openMenu !== null) {
+			openDropdown(i);
+			return;
+		}
+		hoverTimer = setTimeout(() => {
+			hoverTimer = null;
+			openDropdown(i);
+		}, HOVER_INTENT_MS);
+	}
+
+	function pointerLeaveItem(i: number) {
+		cancelHoverIntent();
+		closeDropdown(i);
+	}
+
 	function toggleDropdown(i: number) {
 		openMenu = openMenu === i ? null : i;
 	}
 
 	// Close a desktop dropdown once focus leaves its item entirely (keyboard users tabbing
-	// past the last sub-link). relatedTarget is the element focus is moving to.
+	// past the last sub-link). relatedTarget is the element focus is moving to. The wide
+	// panel is a DOM descendant of its item even though it spans the bar, so the same
+	// containment test covers both shapes.
 	function handleItemFocusOut(event: FocusEvent, i: number) {
 		const next = event.relatedTarget as Node | null;
 		const item = event.currentTarget as HTMLElement;
@@ -67,17 +128,20 @@
 	// Close everything after any navigation (e.g. a link tap inside the drawer or a
 	// dropdown). afterNavigate only fires on real route changes.
 	afterNavigate(() => {
+		cancelHoverIntent();
 		open = false;
 		openMenu = null;
 		expanded = null;
 	});
 
+	$effect(() => () => cancelHoverIntent());
+
 	// Growing past the drawer breakpoint (rotating an iPad, un-snapping a window) hides
 	// the open drawer via CSS but leaves `open` true — scroll stays locked and focus
 	// stays trapped with no visible way out. Close it for real when the bar takes over.
-	// Must mirror the @media (max-width: 72rem) block below.
+	// Must mirror the @media (max-width: 78rem) block below.
 	$effect(() => {
-		const drawerViewport = window.matchMedia('(max-width: 72rem)');
+		const drawerViewport = window.matchMedia('(max-width: 78rem)');
 		function onChange(event: MediaQueryListEvent) {
 			if (!event.matches) open = false;
 		}
@@ -153,6 +217,31 @@
 			(opens in new tab)</span
 		>{/if}{/snippet}
 
+<!-- The country's flag as a 1px-framed 3:2 stamp — the same emblem the homepage country
+     index and the country hero carry, so the menu reads as the same portfolio. Only a
+     country earns one (the query sets countrySlug for country references alone); the
+     name carries the meaning, so the stamp is decorative. -->
+{#snippet stamp(group: SiteNavGroup, cls: string)}
+	{#if group.countrySlug}
+		<span class={cls} aria-hidden="true">
+			<CountryFlagArt slug={group.countrySlug} flagUrl={group.flag} />
+		</span>
+	{/if}
+{/snippet}
+
+{#snippet chevron(size: 'sm' | 'md', isOpen = false)}
+	<svg
+		class="site-nav__chevron"
+		class:is-open={isOpen}
+		width={size === 'md' ? 14 : 10}
+		height={size === 'md' ? 8 : 6}
+		viewBox="0 0 10 6"
+		aria-hidden="true"
+	>
+		<path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>
+{/snippet}
+
 <nav class="site-nav" aria-label="Main" bind:this={navRoot}>
 	<a href="/" class="site-nav__logo" aria-label="Golf Homes International home">
 		<img src="/design-system/assets/logo-white.svg" alt="" width="140" height="32" />
@@ -164,11 +253,13 @@
 		     take down the header on every page. The list only ever re-renders wholesale
 		     from server data, so index identity is exactly right. -->
 		{#each navItems as item, i}
+			{@const panel = hasPanel(item)}
 			{#if item.children.length}
 				<li
 					class="site-nav__item site-nav__item--has-menu"
-					onpointerenter={() => openDropdown(i)}
-					onpointerleave={() => closeDropdown(i)}
+					class:site-nav__item--panel={panel}
+					onpointerenter={() => pointerEnterItem(i)}
+					onpointerleave={() => pointerLeaveItem(i)}
 					onfocusin={() => openDropdown(i)}
 					onfocusout={(event) => handleItemFocusOut(event, i)}
 				>
@@ -191,9 +282,7 @@
 							aria-expanded={openMenu === i}
 							onclick={() => toggleDropdown(i)}
 						>
-							<svg class="site-nav__chevron" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
-								<path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
+							{@render chevron('sm')}
 						</button>
 					{:else}
 						<button
@@ -205,28 +294,85 @@
 							onclick={() => toggleDropdown(i)}
 						>
 							{item.label}
-							<svg class="site-nav__chevron" class:is-open={openMenu === i} width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
-								<path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
+							{@render chevron('sm', openMenu === i)}
 						</button>
 					{/if}
 
-					<ul class="site-nav__submenu" class:is-open={openMenu === i} aria-label={item.label}>
-						{#each item.children as child}
-							<li>
-								<a
-									href={child.href}
-									class="site-nav__submenu-link"
-									class:is-active={isActive(child.href)}
-									aria-current={isActive(child.href) ? 'page' : undefined}
-									target={child.external ? '_blank' : undefined}
-									rel={child.external ? 'noopener noreferrer' : undefined}
-								>
-									{child.label}{@render newTabHint(child.external)}
-								</a>
-							</li>
-						{/each}
-					</ul>
+					{#if panel}
+						<!-- The wide panel: a shelf beneath the bar, one column per group. Every
+						     country and its places are visible at once — no second hover step.
+						     Columns top-align and never stretch to a common height. -->
+						<div class="site-nav__panel" class:is-open={openMenu === i}>
+							<div class="site-nav__panel-inner">
+								{#each item.children as group, g}
+									{@const headId = `site-nav-col-${i}-${g}`}
+									<div class="site-nav__column">
+										{#if group.href}
+											<a
+												id={headId}
+												href={group.href}
+												class="site-nav__column-head"
+												class:is-active={groupActive(group)}
+												aria-current={isActive(group.href) ? 'page' : undefined}
+												target={group.external ? '_blank' : undefined}
+												rel={group.external ? 'noopener noreferrer' : undefined}
+											>
+												{@render stamp(group, 'site-nav__stamp')}
+												<span class="site-nav__column-name">{group.label}</span
+												>{@render newTabHint(group.external)}
+											</a>
+										{:else}
+											<span
+												id={headId}
+												class="site-nav__column-head site-nav__column-head--static"
+												class:is-active={groupActive(group)}
+											>
+												{@render stamp(group, 'site-nav__stamp')}
+												<span class="site-nav__column-name">{group.label}</span>
+											</span>
+										{/if}
+										{#if group.children.length}
+											<ul class="site-nav__column-list" aria-labelledby={headId}>
+												{#each group.children as child}
+													<li>
+														<a
+															href={child.href}
+															class="site-nav__column-link"
+															class:is-active={isActive(child.href)}
+															aria-current={isActive(child.href) ? 'page' : undefined}
+															target={child.external ? '_blank' : undefined}
+															rel={child.external ? 'noopener noreferrer' : undefined}
+														>
+															{child.label}{@render newTabHint(child.external)}
+														</a>
+													</li>
+												{/each}
+											</ul>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{:else}
+						<ul class="site-nav__submenu" class:is-open={openMenu === i} aria-label={item.label}>
+							{#each item.children as child}
+								{#if child.href}
+									<li>
+										<a
+											href={child.href}
+											class="site-nav__submenu-link"
+											class:is-active={isActive(child.href)}
+											aria-current={isActive(child.href) ? 'page' : undefined}
+											target={child.external ? '_blank' : undefined}
+											rel={child.external ? 'noopener noreferrer' : undefined}
+										>
+											{child.label}{@render newTabHint(child.external)}
+										</a>
+									</li>
+								{/if}
+							{/each}
+						</ul>
+					{/if}
 				</li>
 			{:else if item.href}
 				<li class="site-nav__item">
@@ -278,6 +424,74 @@
 	aria-hidden="true"
 ></div>
 
+<!-- A drawer accordion row: a country (inside a panel item) or a top-level dropdown. The
+     link, or a static label when the entry has no page of its own, shares the line with
+     the chevron that reveals the sub-list. -->
+{#snippet drawerAccordion(
+	key: string,
+	label: string,
+	href: string | null,
+	external: boolean,
+	active: boolean,
+	children: { label: string; href: string; external: boolean }[],
+	group: SiteNavGroup | null
+)}
+	<div class="site-nav__drawer-row">
+		{#if href}
+			<a
+				{href}
+				class="site-nav__drawer-link"
+				class:is-active={active}
+				aria-current={isActive(href) ? 'page' : undefined}
+				target={external ? '_blank' : undefined}
+				rel={external ? 'noopener noreferrer' : undefined}
+				tabindex={open ? 0 : -1}
+			>
+				{#if group}{@render stamp(group, 'site-nav__drawer-stamp')}{/if}
+				<span>{label}{@render newTabHint(external)}</span>
+			</a>
+		{:else}
+			<span class="site-nav__drawer-link site-nav__drawer-link--static" class:is-active={active}>
+				{#if group}{@render stamp(group, 'site-nav__drawer-stamp')}{/if}
+				<span>{label}</span>
+			</span>
+		{/if}
+		<button
+			type="button"
+			class="site-nav__drawer-accordion"
+			class:is-open={expanded === key}
+			aria-label={`${expanded === key ? 'Hide' : 'Show'} ${label} submenu`}
+			aria-expanded={expanded === key}
+			aria-controls={`drawer-submenu-${key.replace('.', '-')}`}
+			tabindex={open ? 0 : -1}
+			onclick={() => toggleAccordion(key)}
+		>
+			{@render chevron('md')}
+		</button>
+	</div>
+	<ul
+		id={`drawer-submenu-${key.replace('.', '-')}`}
+		class="site-nav__drawer-submenu"
+		hidden={expanded !== key}
+	>
+		{#each children as child}
+			<li>
+				<a
+					href={child.href}
+					class="site-nav__drawer-sublink"
+					class:is-active={isActive(child.href)}
+					aria-current={isActive(child.href) ? 'page' : undefined}
+					target={child.external ? '_blank' : undefined}
+					rel={child.external ? 'noopener noreferrer' : undefined}
+					tabindex={open && expanded === key ? 0 : -1}
+				>
+					{child.label}{@render newTabHint(child.external)}
+				</a>
+			</li>
+		{/each}
+	</ul>
+{/snippet}
+
 <!-- A navigation landmark, not an aside: at drawer widths this *is* the site menu
      (the bar's own list is display:none), and screen-reader users find menus by
      navigation landmarks. Closed, it is inert and hidden, so the two nav landmarks
@@ -295,60 +509,74 @@
 	     repeating the name inside the panel read as duplication on device. -->
 	<ul class="site-nav__drawer-menu">
 		{#each navItems as item, i}
-			<li class="site-nav__drawer-item">
-				{#if item.children.length}
-					<div class="site-nav__drawer-row">
-						{#if item.href}
-							<a
-								href={item.href}
-								class="site-nav__drawer-link"
-								class:is-active={itemActive(item)}
-								aria-current={isActive(item.href) ? 'page' : undefined}
-								target={item.external ? '_blank' : undefined}
-								rel={item.external ? 'noopener noreferrer' : undefined}
-								tabindex={open ? 0 : -1}
-							>
-								{item.label}{@render newTabHint(item.external)}
-							</a>
-						{:else}
-							<span
-								class="site-nav__drawer-link site-nav__drawer-link--static"
-								class:is-active={itemActive(item)}>{item.label}</span
-							>
-						{/if}
-						<button
-							type="button"
-							class="site-nav__drawer-accordion"
-							class:is-open={expanded === i}
-							aria-label={`${expanded === i ? 'Hide' : 'Show'} ${item.label} submenu`}
-							aria-expanded={expanded === i}
-							aria-controls={`drawer-submenu-${i}`}
+			{#if hasPanel(item)}
+				<!-- A panel item does not nest two accordions in the drawer. Its label becomes
+				     a section overline and each of its groups (countries) is a row of the
+				     drawer itself, so the drawer keeps exactly two interactive tiers. -->
+				<li class="site-nav__drawer-section">
+					{#if item.href}
+						<a
+							href={item.href}
+							class="site-nav__drawer-overline"
+							aria-current={isActive(item.href) ? 'page' : undefined}
+							target={item.external ? '_blank' : undefined}
+							rel={item.external ? 'noopener noreferrer' : undefined}
 							tabindex={open ? 0 : -1}
-							onclick={() => (expanded = expanded === i ? null : i)}
 						>
-							<svg class="site-nav__chevron" width="14" height="8" viewBox="0 0 10 6" aria-hidden="true">
-								<path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
-						</button>
-					</div>
-					<ul id={`drawer-submenu-${i}`} class="site-nav__drawer-submenu" hidden={expanded !== i}>
-						{#each item.children as child}
-							<li>
-								<a
-									href={child.href}
-									class="site-nav__drawer-sublink"
-									class:is-active={isActive(child.href)}
-									aria-current={isActive(child.href) ? 'page' : undefined}
-									target={child.external ? '_blank' : undefined}
-									rel={child.external ? 'noopener noreferrer' : undefined}
-									tabindex={open && expanded === i ? 0 : -1}
-								>
-									{child.label}{@render newTabHint(child.external)}
-								</a>
+							{item.label}{@render newTabHint(item.external)}
+						</a>
+					{:else}
+						<span class="site-nav__drawer-overline">{item.label}</span>
+					{/if}
+					<ul class="site-nav__drawer-groups">
+						{#each item.children as group, g}
+							<li class="site-nav__drawer-item">
+								{#if group.children.length}
+									{@render drawerAccordion(
+										`${i}.${g}`,
+										group.label,
+										group.href,
+										group.external,
+										groupActive(group),
+										group.children,
+										group
+									)}
+								{:else if group.href}
+									<a
+										href={group.href}
+										class="site-nav__drawer-link"
+										class:is-active={isActive(group.href)}
+										aria-current={isActive(group.href) ? 'page' : undefined}
+										target={group.external ? '_blank' : undefined}
+										rel={group.external ? 'noopener noreferrer' : undefined}
+										tabindex={open ? 0 : -1}
+									>
+										{@render stamp(group, 'site-nav__drawer-stamp')}
+										<span>{group.label}{@render newTabHint(group.external)}</span>
+									</a>
+								{/if}
 							</li>
 						{/each}
 					</ul>
-				{:else if item.href}
+				</li>
+			{:else if item.children.length}
+				<li class="site-nav__drawer-item">
+					{@render drawerAccordion(
+						`${i}`,
+						item.label,
+						item.href,
+						item.external,
+						itemActive(item),
+						item.children.filter((group) => group.href !== null) as {
+							label: string;
+							href: string;
+							external: boolean;
+						}[],
+						null
+					)}
+				</li>
+			{:else if item.href}
+				<li class="site-nav__drawer-item">
 					<a
 						href={item.href}
 						class="site-nav__drawer-link"
@@ -358,10 +586,10 @@
 						rel={item.external ? 'noopener noreferrer' : undefined}
 						tabindex={open ? 0 : -1}
 					>
-						{item.label}{@render newTabHint(item.external)}
+						<span>{item.label}{@render newTabHint(item.external)}</span>
 					</a>
-				{/if}
-			</li>
+				</li>
+			{/if}
 		{/each}
 	</ul>
 	<div class="site-nav__drawer-footer">
@@ -417,6 +645,12 @@
 		display: flex;
 		align-items: center;
 		height: var(--nav-height);
+	}
+
+	/* A panel item gives up its own context: the wide panel anchors to the bar itself
+	   (the fixed <nav> is the nearest positioned ancestor) and spans it edge to edge. */
+	.site-nav__item--panel {
+		position: static;
 	}
 
 	.site-nav__link {
@@ -559,6 +793,147 @@
 	.site-nav__submenu-link.is-active {
 		color: var(--gold);
 		background: rgba(255, 255, 255, 0.04);
+	}
+
+	/* ---- The wide panel ----------------------------------------------------------
+	   The bar drops a shelf: same deep green, the dropdown's gold top rule stretched
+	   across the viewport, and its deep shadow beneath. Columns sit on the page's own
+	   1060px content measure so the panel reads as part of the page, not a floating box. */
+	.site-nav__panel {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background: var(--green-deep);
+		border-top: 2px solid var(--gold);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		box-shadow: 0 22px 48px rgba(15, 22, 17, 0.4);
+		padding: 0 2.5rem;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-0.5rem);
+		pointer-events: none;
+		transition:
+			opacity var(--duration-hover) var(--ease),
+			transform var(--duration-hover) var(--ease),
+			visibility var(--duration-hover) var(--ease);
+		z-index: 1;
+	}
+
+	.site-nav__panel.is-open {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		pointer-events: auto;
+	}
+
+	/* One column per country. auto-fit lets four columns breathe across the measure and
+	   still seats six on one row; past that the grid wraps to a second row of columns
+	   rather than shrinking the type. Rows top-align: a column is as tall as its list. */
+	.site-nav__panel-inner {
+		max-width: var(--content-max);
+		margin: 0 auto;
+		padding: 2rem 0 2.25rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+		row-gap: 2.25rem;
+		align-items: start;
+	}
+
+	/* Vertical hairlines divide the columns; the first sits flush with the content edge. */
+	.site-nav__column {
+		min-width: 0;
+		padding: 0 1.75rem 0 1.5rem;
+		border-left: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.site-nav__column:first-child {
+		padding-left: 0;
+		border-left-color: transparent;
+	}
+
+	/* Country head: the serif is the desktop dropdown's editorial voice, kept mixed-case
+	   so the three tiers read as three voices — Light caps → serif name → Regular caps. */
+	.site-nav__column-head {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+		font-family: var(--serif);
+		font-size: 1.25rem;
+		font-weight: 400;
+		line-height: 1.15;
+		color: var(--on-green);
+		text-decoration: none;
+		padding-bottom: 0.9rem;
+		margin-bottom: 0.25rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+		transition: color var(--duration-hover) var(--ease);
+	}
+
+	.site-nav__column-head--static {
+		cursor: default;
+	}
+
+	a.site-nav__column-head:hover,
+	a.site-nav__column-head:focus-visible,
+	.site-nav__column-head.is-active {
+		color: var(--gold);
+	}
+
+	.site-nav__column-name {
+		text-wrap: balance;
+	}
+
+	/* The flag stamp: a 3:2 emblem in a 1px frame, framed in the ivory ink at low
+	   alpha so it holds its edge on green without a bright box. */
+	.site-nav__stamp,
+	.site-nav__drawer-stamp {
+		flex: 0 0 auto;
+		display: inline-flex;
+		width: 2.25rem;
+		height: 1.5rem;
+		overflow: hidden;
+		border: 1px solid rgba(245, 241, 232, 0.35);
+	}
+
+	.site-nav__stamp :global(svg),
+	.site-nav__stamp :global(img),
+	.site-nav__drawer-stamp :global(svg),
+	.site-nav__drawer-stamp :global(img) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.site-nav__column-list {
+		list-style: none;
+	}
+
+	/* Locations: the existing second-tier vocabulary (Regular caps, hairline rows),
+	   left to wrap rather than truncate — "San Pedro de Alcantara" keeps its name. */
+	.site-nav__column-link {
+		display: block;
+		font-family: var(--sans);
+		font-size: 0.8125rem;
+		font-weight: 400;
+		letter-spacing: 0.1em;
+		line-height: 1.4;
+		text-transform: uppercase;
+		color: var(--on-green);
+		padding: 0.6rem 0;
+		text-decoration: none;
+		transition: color var(--duration-hover) var(--ease);
+	}
+
+	.site-nav__column-list li + li .site-nav__column-link {
+		border-top: 1px solid rgba(255, 255, 255, 0.07);
+	}
+
+	.site-nav__column-link:hover,
+	.site-nav__column-link:focus-visible,
+	.site-nav__column-link.is-active {
+		color: var(--gold);
 	}
 
 	/* Contact: the bar's one accent. Gold reads against deep green where a green
@@ -710,6 +1085,39 @@
 		scrollbar-color: rgba(245, 241, 232, 0.25) transparent;
 	}
 
+	/* The countries section: an overline names it, its country rows follow, and a
+	   hairline closes it before the editorial items. The overline is set in the same
+	   ivory as the rows, well below their size: gold in the drawer means "you are here",
+	   so a static label never takes it. */
+	.site-nav__drawer-section {
+		padding-bottom: 0.75rem;
+		margin-bottom: 0.5rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.site-nav__drawer-overline {
+		display: block;
+		font-family: var(--sans);
+		font-size: var(--text-overline);
+		font-weight: 500;
+		letter-spacing: var(--tracking-overline);
+		line-height: 1;
+		text-transform: uppercase;
+		color: var(--on-green);
+		text-decoration: none;
+		padding: 0.25rem 2rem 0.75rem;
+		transition: color var(--duration-hover) var(--ease);
+	}
+
+	a.site-nav__drawer-overline:hover,
+	a.site-nav__drawer-overline:focus-visible {
+		color: var(--gold);
+	}
+
+	.site-nav__drawer-groups {
+		list-style: none;
+	}
+
 	/* A parent row: the link (or static label) and the accordion toggle share a line. */
 	.site-nav__drawer-row {
 		display: flex;
@@ -721,7 +1129,9 @@
 	   sized up for the vertical, touch-first drawer. */
 	.site-nav__drawer-link {
 		position: relative;
-		display: block;
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
 		flex: 1;
 		font-family: var(--sans);
 		font-size: 1.0625rem;
@@ -867,10 +1277,12 @@
 		border: 0;
 	}
 
-	/* Collapse to the drawer while the full menu still has room. The airier nav type
-	   needs ~1140px to lay out without clipping, so the hamburger takes over below 72rem
-	   rather than letting the links crowd the Contact action off the bar. */
-	@media (max-width: 72rem) {
+	/* Collapse to the drawer while the full menu still has room. Measured with the
+	   authored menu (Countries + five editorial items + Contact): the list is ~1013px
+	   wide, so with the logo and the bar's padding it needs ~1235px before the links
+	   crowd the Contact action off the bar. The hamburger takes over below 78rem
+	   (1248px); the old 72rem let the bar clip between 1152px and ~1240px. */
+	@media (max-width: 78rem) {
 		.site-nav {
 			padding: 0 1.25rem;
 		}
@@ -899,12 +1311,15 @@
 		.site-nav__toggle-bar,
 		.site-nav__chevron,
 		.site-nav__submenu,
+		.site-nav__panel,
 		.site-nav__cta,
 		.site-nav__drawer-cta,
 		.site-nav__drawer-link,
 		.site-nav__drawer-sublink,
 		.site-nav__caret,
-		.site-nav__submenu-link {
+		.site-nav__submenu-link,
+		.site-nav__column-head,
+		.site-nav__column-link {
 			transition: none;
 		}
 	}

@@ -1,17 +1,32 @@
 import type { PublicPricing } from '$lib/sanity/transforms/pricingFilter';
 
-const currencyFormatters = new Map<string, Intl.NumberFormat>();
+type AmountFormatter = { format(amount: number): string };
 
-function formatter(currency: string): Intl.NumberFormat {
+const currencyFormatters = new Map<string, AmountFormatter>();
+
+/** Fallback used when a currency code is malformed or empty. `Intl.NumberFormat`
+    throws `RangeError` on a code that is not three ASCII letters, so a single bad
+    value (a hand-typed or imported code that slipped past the Studio dropdown) would
+    otherwise crash every card grid and detail page rendering that listing. Degrade to
+    a plain, grouped number prefixed with the raw code instead. */
+function fallbackFormatter(currency: string): AmountFormatter {
+	const prefix = currency ? `${currency} ` : '';
+	return { format: (amount: number) => `${prefix}${amount.toLocaleString('en-GB')}` };
+}
+
+function formatter(currency: string): AmountFormatter {
 	if (!currencyFormatters.has(currency)) {
-		currencyFormatters.set(
-			currency,
-			new Intl.NumberFormat('en-GB', {
+		let created: AmountFormatter;
+		try {
+			created = new Intl.NumberFormat('en-GB', {
 				style: 'currency',
 				currency,
 				maximumFractionDigits: 0
-			})
-		);
+			});
+		} catch {
+			created = fallbackFormatter(currency);
+		}
+		currencyFormatters.set(currency, created);
 	}
 	return currencyFormatters.get(currency)!;
 }

@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity';
+import { CURRENCIES } from '../constants/enums';
 
 /**
  * Pricing for a single property listing. Unlike the shared `pricingFields`
@@ -28,8 +29,8 @@ export const propertyPricingFields = defineType({
 			name: 'currency',
 			title: 'Currency',
 			type: 'string',
-			initialValue: 'EUR',
-			validation: (Rule) => Rule.max(3)
+			options: { list: [...CURRENCIES], layout: 'dropdown' },
+			initialValue: 'EUR'
 		})
 	],
 	preview: {

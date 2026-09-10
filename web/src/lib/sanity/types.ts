@@ -408,7 +408,7 @@ export type PricingFields = {
   priceFrom?: number;
   priceTo?: number;
   priceDisplay?: string;
-  currency?: string;
+  currency?: "EUR" | "GBP" | "USD" | "AED";
   priceQualifier?:
     | "exact"
     | "from"
@@ -815,7 +815,7 @@ export type PropertyPricingFields = {
   _type: "propertyPricingFields";
   price?: number;
   priceDisplay?: string;
-  currency?: string;
+  currency?: "EUR" | "GBP" | "USD" | "AED";
 };
 
 export type LocationFields = {
@@ -845,6 +845,20 @@ export type FooterColumn = {
 
 export type NavMenuItem = {
   _type: "navMenuItem";
+  label: string;
+  link?: NavLink;
+  children?: Array<
+    | ({
+        _key: string;
+      } & NavMenuChild)
+    | ({
+        _key: string;
+      } & NavMenuGroup)
+  >;
+};
+
+export type NavMenuGroup = {
+  _type: "navMenuGroup";
   label: string;
   link?: NavLink;
   children?: Array<
@@ -1816,6 +1830,7 @@ export type AllSanitySchemaTypes =
   | SocialLink
   | FooterColumn
   | NavMenuItem
+  | NavMenuGroup
   | InsightSection
   | InsightExternalPropertyGrid
   | InsightExternalPropertyCard
@@ -2024,7 +2039,7 @@ export type DevelopmentByPathPreviewQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -2355,7 +2370,7 @@ export type DevelopmentByPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -2452,7 +2467,7 @@ export type DevelopmentByPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -2668,7 +2683,7 @@ export type DevelopmentByPathQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -2999,7 +3014,7 @@ export type DevelopmentByPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -3096,7 +3111,7 @@ export type DevelopmentByPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -3312,7 +3327,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -3643,7 +3658,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -3740,7 +3755,7 @@ export type DevelopmentByCatchAllPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -3956,7 +3971,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -4287,7 +4302,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -4384,7 +4399,7 @@ export type DevelopmentByCatchAllPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -4612,7 +4627,7 @@ export type DevelopmentByGhiIdQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -4943,7 +4958,7 @@ export type DevelopmentByGhiIdQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -5040,7 +5055,7 @@ export type DevelopmentByGhiIdQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -5191,7 +5206,7 @@ export type HomepageFeaturedListingsQueryResult = {
     pricing: {
       price: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
     } | null;
     specs: {
       bedrooms: number | null;
@@ -5275,7 +5290,7 @@ export type CountryFeaturedListingsQueryResult = {
           priceFrom: number | null;
           priceTo: number | null;
           priceDisplay: string | null;
-          currency: string | null;
+          currency: "AED" | "EUR" | "GBP" | "USD" | null;
           priceQualifier:
             | "enquiry_led"
             | "exact"
@@ -5390,7 +5405,7 @@ export type CountryFeaturedListingsQueryResult = {
         pricing: {
           price: number | null;
           priceDisplay: string | null;
-          currency: string | null;
+          currency: "AED" | "EUR" | "GBP" | "USD" | null;
         } | null;
         specs: {
           bedrooms: number | null;
@@ -5811,7 +5826,7 @@ export type SitemapGuidesQueryResult = Array<{
 
 // Source: ../web/src/lib/sanity/queries/headerNav.ts
 // Variable: headerNavQuery
-// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{		"items": coalesce(headerNav, [])[]{			label,			"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),			"external": link.linkType == "external",			"children": coalesce(children, [])[]{				label,				"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),				"external": link.linkType == "external"			}		},		"cta": headerCta{			label,			"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),			"external": link.linkType == "external"		}	}
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{		"items": coalesce(headerNav, [])[]{			label,			"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),			"external": link.linkType == "external",			"children": coalesce(children, [])[]{				label,				"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),				"external": link.linkType == "external",				"countrySlug": select(link.reference->type == "country" => link.reference->slug.current),				"flag": select(link.reference->type == "country" => link.reference->flag.asset->url),				"children": coalesce(children, [])[]{					label,					"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),					"external": link.linkType == "external"				}			}		},		"cta": headerCta{			label,			"href": select(		link.linkType == "external" => link.externalUrl,		link.linkType == "internal" => link.internalPath,		link.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,		link.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current	),			"external": link.linkType == "external"		}	}
 export type HeaderNavQueryResult = {
   items:
     | Array<{
@@ -5819,12 +5834,31 @@ export type HeaderNavQueryResult = {
         href: string | null;
         external: false | true;
         children:
-          | Array<{
-              label: string;
-              href: string | null;
-              external: false | true;
-            }>
-          | Array<never>;
+          | Array<never>
+          | Array<
+              | {
+                  label: string;
+                  href: string | null;
+                  external: false | true;
+                  countrySlug: string | null;
+                  flag: string | null;
+                  children: Array<never>;
+                }
+              | {
+                  label: string;
+                  href: string | null;
+                  external: false | true;
+                  countrySlug: string | null;
+                  flag: string | null;
+                  children:
+                    | Array<{
+                        label: string;
+                        href: string | null;
+                        external: false | true;
+                      }>
+                    | Array<never>;
+                }
+            >;
       }>
     | Array<never>;
   cta: {
@@ -6195,7 +6229,7 @@ export type InsightBySlugQueryResult = {
                 priceFrom: number | null;
                 priceTo: number | null;
                 priceDisplay: string | null;
-                currency: string | null;
+                currency: "AED" | "EUR" | "GBP" | "USD" | null;
                 priceQualifier:
                   | "enquiry_led"
                   | "exact"
@@ -6428,7 +6462,7 @@ export type InsightBySlugQueryResult = {
                   priceFrom: number | null;
                   priceTo: number | null;
                   priceDisplay: string | null;
-                  currency: string | null;
+                  currency: "AED" | "EUR" | "GBP" | "USD" | null;
                   priceQualifier:
                     | "enquiry_led"
                     | "exact"
@@ -6543,7 +6577,7 @@ export type InsightBySlugQueryResult = {
                 pricing: {
                   price: number | null;
                   priceDisplay: string | null;
-                  currency: string | null;
+                  currency: "AED" | "EUR" | "GBP" | "USD" | null;
                 } | null;
                 specs: {
                   bedrooms: number | null;
@@ -6677,7 +6711,7 @@ export type InsightBySlugQueryResult = {
               pricing: {
                 price: number | null;
                 priceDisplay: string | null;
-                currency: string | null;
+                currency: "AED" | "EUR" | "GBP" | "USD" | null;
               } | null;
               specs: {
                 bedrooms: number | null;
@@ -8025,7 +8059,7 @@ export type PropertyByPathPreviewQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -8333,7 +8367,7 @@ export type PropertyByPathQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -8641,7 +8675,7 @@ export type PropertyByCatchAllPathQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -8949,7 +8983,7 @@ export type PropertyByCatchAllPathPreviewQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -9269,7 +9303,7 @@ export type PropertyByGhiIdQueryResult = {
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: SpecsFields | null;
   golf: {
@@ -9514,7 +9548,7 @@ export type PropertyCardsByCommunityQueryResult = Array<{
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: {
     bedrooms: number | null;
@@ -9586,7 +9620,7 @@ export type PropertyCardsByLocationQueryResult = Array<{
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: {
     bedrooms: number | null;
@@ -9764,7 +9798,7 @@ export type AutomaticSimilarPropertiesQueryResult = Array<{
   pricing: {
     price: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
   } | null;
   specs: {
     bedrooms: number | null;
@@ -9845,7 +9879,7 @@ export type AutomaticSimilarDevelopmentsQueryResult = Array<{
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -9969,7 +10003,7 @@ export type TagsSimilarPropertiesQueryResult = Array<
         priceFrom: number | null;
         priceTo: number | null;
         priceDisplay: string | null;
-        currency: string | null;
+        currency: "AED" | "EUR" | "GBP" | "USD" | null;
         priceQualifier:
           | "enquiry_led"
           | "exact"
@@ -10084,7 +10118,7 @@ export type TagsSimilarPropertiesQueryResult = Array<
       pricing: {
         price: number | null;
         priceDisplay: string | null;
-        currency: string | null;
+        currency: "AED" | "EUR" | "GBP" | "USD" | null;
       } | null;
       specs: {
         bedrooms: number | null;
@@ -10172,7 +10206,7 @@ export type ManualSimilarPropertiesQueryResult =
               priceFrom: number | null;
               priceTo: number | null;
               priceDisplay: string | null;
-              currency: string | null;
+              currency: "AED" | "EUR" | "GBP" | "USD" | null;
               priceQualifier:
                 | "enquiry_led"
                 | "exact"
@@ -10287,7 +10321,7 @@ export type ManualSimilarPropertiesQueryResult =
             pricing: {
               price: number | null;
               priceDisplay: string | null;
-              currency: string | null;
+              currency: "AED" | "EUR" | "GBP" | "USD" | null;
             } | null;
             specs: {
               bedrooms: number | null;
@@ -10400,7 +10434,7 @@ export type UnitByDevPathQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -10816,7 +10850,7 @@ export type UnitByDevPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -11202,7 +11236,7 @@ export type UnitByDevPathPreviewQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -11618,7 +11652,7 @@ export type UnitByDevPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -12004,7 +12038,7 @@ export type UnitByCatchAllDevPathQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -12420,7 +12454,7 @@ export type UnitByCatchAllDevPathQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -12806,7 +12840,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
     priceFrom: number | null;
     priceTo: number | null;
     priceDisplay: string | null;
-    currency: string | null;
+    currency: "AED" | "EUR" | "GBP" | "USD" | null;
     priceQualifier:
       | "enquiry_led"
       | "exact"
@@ -13222,7 +13256,7 @@ export type UnitByCatchAllDevPathPreviewQueryResult = {
       priceFrom: number | null;
       priceTo: number | null;
       priceDisplay: string | null;
-      currency: string | null;
+      currency: "AED" | "EUR" | "GBP" | "USD" | null;
       priceQualifier:
         | "enquiry_led"
         | "exact"
@@ -13636,7 +13670,7 @@ declare module "@sanity/client" {
     '\n  *[_type == "guide" && slug.current == $slug][0]{\n    \n  _id,\n  _type,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  intro,\n  lastReviewed,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  sections[]{\n  heading,\n  "anchor": anchor.current,\n  body[]{\n    _type == "mediaAssetMetadata" => {\n      _type,\n      _key,\n      asset,\n      altText,\n      "lqip": asset.asset->metadata.lqip,\n      "dimensions": asset.asset->metadata.dimensions\n    },\n    _type != "mediaAssetMetadata" => { ... }\n  }\n},\n  advisorHeading,\n  advisorBody,\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n,\n    "relatedGuides": *[\n      _type == "guide"\n      && guideCategory == ^.guideCategory\n      && defined(slug.current)\n      && slug.current != ^.slug.current\n    ] | order(coalesce(order, 999) asc, title asc) {\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n  }\n': GuideBySlugQueryResult;
     '\n  *[_type == "guide" && defined(slug.current)]\n    | order(coalesce(order, 999) asc, title asc) {\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n': GuidesHubQueryResult;
     '\n  *[\n    _type == "guide"\n    && defined(slug.current)\n    && coalesce(seo.noindex, false) != true\n  ]{\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapGuidesQueryResult;
-    '\n\t*[_type == "siteSettings" && _id == "siteSettings"][0]{\n\t\t"items": coalesce(headerNav, [])[]{\n\t\t\tlabel,\n\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t"external": link.linkType == "external",\n\t\t\t"children": coalesce(children, [])[]{\n\t\t\t\tlabel,\n\t\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t\t"external": link.linkType == "external"\n\t\t\t}\n\t\t},\n\t\t"cta": headerCta{\n\t\t\tlabel,\n\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t"external": link.linkType == "external"\n\t\t}\n\t}\n': HeaderNavQueryResult;
+    '\n\t*[_type == "siteSettings" && _id == "siteSettings"][0]{\n\t\t"items": coalesce(headerNav, [])[]{\n\t\t\tlabel,\n\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t"external": link.linkType == "external",\n\t\t\t"children": coalesce(children, [])[]{\n\t\t\t\tlabel,\n\t\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t\t"external": link.linkType == "external",\n\t\t\t\t"countrySlug": select(link.reference->type == "country" => link.reference->slug.current),\n\t\t\t\t"flag": select(link.reference->type == "country" => link.reference->flag.asset->url),\n\t\t\t\t"children": coalesce(children, [])[]{\n\t\t\t\t\tlabel,\n\t\t\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t\t\t"external": link.linkType == "external"\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\t"cta": headerCta{\n\t\t\tlabel,\n\t\t\t"href": select(\n\t\tlink.linkType == "external" => link.externalUrl,\n\t\tlink.linkType == "internal" => link.internalPath,\n\t\tlink.linkType == "reference" && link.reference->_type == "guide" => "/guides/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "country" => "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "location" => "/" + link.reference->parent->slug.current + "/" + link.reference->slug.current,\n\t\tlink.linkType == "reference" && link.reference->type == "community" => "/" + link.reference->parent->parent->slug.current + "/" + link.reference->parent->slug.current + "?community=" + link.reference->slug.current\n\t),\n\t\t\t"external": link.linkType == "external"\n\t\t}\n\t}\n': HeaderNavQueryResult;
     '\n  *[_type == "insight" && slug.current == $slug][0]{\n    \n  _id,\n  _type,\n  title,\n  titleEmphasis,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  heroCaption,\n  heroNote{ heading, body },\n  "heroLinkHref": select(\n\t\theroLink.linkType == "external" => heroLink.externalUrl,\n\t\theroLink.linkType == "internal" => heroLink.internalPath,\n\t\theroLink.linkType == "reference" && heroLink.reference->_type == "guide" => "/guides/" + heroLink.reference->slug.current,\n\t\theroLink.linkType == "reference" && heroLink.reference->type == "country" => "/" + heroLink.reference->slug.current,\n\t\theroLink.linkType == "reference" && heroLink.reference->type == "location" => "/" + heroLink.reference->parent->slug.current + "/" + heroLink.reference->slug.current,\n\t\theroLink.linkType == "reference" && heroLink.reference->type == "community" => "/" + heroLink.reference->parent->parent->slug.current + "/" + heroLink.reference->parent->slug.current + "?community=" + heroLink.reference->slug.current\n\t),\n  heroLayout,\n  heroPartnerLabel,\n  heroSublabel,\n  heroPartnerPlate,\n  hideHeroPartnerName,\n  "heroPartner": heroPartner->{\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  logoAlt{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n},\n  sections[]{\n  heading,\n  "anchor": anchor.current,\n  headingStyle,\n  body[]{\n    _type == "mediaAssetMetadata" => {\n      _type,\n      _key,\n      asset,\n      altText,\n      "lqip": asset.asset->metadata.lqip,\n      "dimensions": asset.asset->metadata.dimensions\n    },\n    _type == "insightFigure" => {\n      _type,\n      _key,\n      caption,\n      "image": image{\n        asset,\n        altText,\n        "lqip": asset.asset->metadata.lqip,\n        "dimensions": asset.asset->metadata.dimensions\n      }\n    },\n    _type == "insightFigurePair" => {\n      _type,\n      _key,\n      items[]{\n        _key,\n        caption,\n        linkLabel,\n        linkHref,\n        "image": image{\n          asset,\n          altText,\n          "lqip": asset.asset->metadata.lqip,\n          "dimensions": asset.asset->metadata.dimensions\n        }\n      }\n    },\n    _type == "insightPortrait" => {\n      _type,\n      _key,\n      name,\n      role,\n      "image": image{\n        asset,\n        altText,\n        "lqip": asset.asset->metadata.lqip,\n        "dimensions": asset.asset->metadata.dimensions\n      }\n    },\n    _type == "insightFrontlineRail" => {\n      _type,\n      _key,\n      heading,\n      summary,\n      summaryCountSingular,\n      summaryCountPlural,\n      showViewAll,\n      viewAllLabel,\n      viewAllHref,\n      "listings": listings[\n        \n  (\n    (@->_type == "propertyListing" && @->listingKind in ["property", "unit"])\n    || @->_type == "development"\n  )\n  && (coalesce(@->status, "") == $publishedStatus || $previewAll)\n\n      ]->{\n  _type == "development" => {\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n},\n  _type == "propertyListing" => {\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}\n}\n    },\n    _type == "insightDestinationGrid" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        body,\n        caption,\n        actionLabel,\n        actionHrefOverride,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        location->{\n          _id,\n          name,\n          "slug": slug.current,\n          type,\n          "countrySlug": parent->slug.current,\n          "heroImage": heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n        }\n      }\n    },\n    _type == "insightDevelopmentGrid" => {\n      _type,\n      _key,\n      heading,\n      mobileInitialMode,\n      expandLabel,\n      collapseLabel,\n      items[]{\n        _key,\n        altOverride,\n        groupLabelOverride,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        "development": select(\n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n => development->{\n  _id,\n  _type,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  developmentDisplayMode,\n  developmentStatus,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceFrom,\n  priceTo,\n  priceDisplay,\n  currency,\n  priceQualifier,\n  priceConfirmed,\n  availabilityStatus,\n  completionStatus,\n  completionDate,\n  buildStatus\n},\n  "unitsAvailable": count((units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ]),\n  "bedroomsFrom": math::min(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  "bedroomsTo": math::max(\n    (unitTypes[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n    + (units[]->)[ \n  (coalesce(status, "") == $publishedStatus || $previewAll)\n ].specs.bedrooms\n  ),\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n    thumbnailOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n}),\n        "completionDate": select(\n          \n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n =>\n            coalesce(development->pricing.completionDate, development->completionDate)\n        ),\n        "completionPrecision": select(\n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n => development->completionPrecision),\n        "completionNote": select(\n  (coalesce(development->status, "") == $publishedStatus || $previewAll)\n => development->completionNote)\n      }\n    },\n    _type == "insightListingGrid" => {\n      _type,\n      _key,\n      heading,\n      mobileInitialMode,\n      expandLabel,\n      collapseLabel,\n      items[]{\n        _key,\n        altOverride,\n        groupLabelOverride,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        "listing": select(\n  (\n    listing->listingKind in ["property", "unit"]\n    && (coalesce(listing->status, "") == $publishedStatus || $previewAll)\n  )\n => listing->{\n  _id,\n  ghiListingId,\n  title,\n  "slug": slug.current,\n  listingKind,\n  propertyType,\n  transactionType,\n  "countrySlug": coalesce(\n  location.country->slug.current,\n  location.community->parent->parent->slug.current\n),\n  "locationSlug": coalesce(\n  location.location->slug.current,\n  location.community->parent->slug.current\n),\n  "communitySlug": coalesce(\n  location.community->slug.current,\n  select(\n    location.community->_id match "places-community-*" =>\n      string::split(location.community->_id, "places-community-")[1],\n    location.community->_id match "location.community.*" =>\n      string::split(location.community->_id, "location.community.")[1]\n  )\n),\n  "isCatchAll": coalesce(location.community->isCatchAll, false),\n  location{\n    country->{ name, "slug": slug.current },\n    location->{ name, "slug": slug.current },\n    community->{ _id, name, "slug": slug.current, isCatchAll },\n    addressDisplay\n  },\n  pricing{\n  price,\n  priceDisplay,\n  currency\n},\n  specs{\n    bedrooms,\n    bathrooms,\n    builtArea,\n    builtAreaUnit\n  },\n  media{\n    gallery[0...1]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n  }\n})\n      }\n    },\n    _type == "insightExternalPropertyGrid" => {\n      _type,\n      _key,\n      heading,\n      priceNote,\n      items[]{\n        _key,\n        name,\n        location,\n        guests,\n        bedrooms,\n        fromPrice,\n        description,\n        features,\n        linkLabel,\n        linkHref,\n        "image": image{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n      }\n    },\n    _type == "insightCourseGrid" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        altOverride,\n        actionLabel,\n        "imageOverride": imageOverride{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n        "golfCourse": golfCourse->{\n          _id,\n          name,\n          "slug": slug.current,\n          tagline,\n          "communityName": community->name,\n          "communitySlug": community->slug.current,\n          "locationSlug": community->parent->slug.current,\n          "countryName": community->parent->parent->name,\n          "countrySlug": community->parent->parent->slug.current,\n          "media": media[0]{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n        }\n      }\n    },\n    _type == "insightPartnerLogoGrid" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        serviceLabel,\n        "partner": partner->{\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  logoAlt{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n      }\n    },\n    _type == "insightGuideCards" => {\n      _type,\n      _key,\n      heading,\n      items[]{\n        _key,\n        summaryOverride,\n        "guide": guide->{\n  _id,\n  title,\n  "slug": slug.current,\n  guideCategory,\n  audienceLabel,\n  tagline,\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n      }\n    },\n    _type == "insightPartnerProfile" => {\n      _type,\n      _key,\n      layout,\n      heading,\n      body,\n      personName,\n      personRole,\n      "teamImage": teamImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n      "portrait": portrait{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n      "partner": partner->{\n  _id,\n  name,\n  "slug": slug.current,\n  "category": category->name,\n  logo{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  logoAlt{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n    },\n    _type == "insightReferenceCard" => {\n      _type,\n      _key,\n      eyebrow,\n      heading,\n      description,\n      linkLabel,\n      linkHref,\n      "image": image{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n    },\n    _type != "mediaAssetMetadata"\n      && _type != "insightFigure"\n      && _type != "insightFigurePair"\n      && _type != "insightPortrait"\n      && _type != "insightFrontlineRail"\n      && _type != "insightDestinationGrid"\n      && _type != "insightDevelopmentGrid"\n      && _type != "insightListingGrid"\n      && _type != "insightExternalPropertyGrid"\n      && _type != "insightCourseGrid"\n      && _type != "insightPartnerLogoGrid"\n      && _type != "insightGuideCards"\n      && _type != "insightPartnerProfile"\n      && _type != "insightReferenceCard" => { ... }\n  }\n},\n  ctaHeading,\n  ctaBody,\n  ctaPrimary{ label, href },\n  ctaSecondary{ label, href },\n  ctaShowSecondary,\n  ctaWhatsAppLabel,\n  ctaWhatsAppMessage,\n  seo{\n  seoTitle,\n  metaDescription,\n  openGraphTitle,\n  openGraphDescription,\n  openGraphImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  noindex,\n  schemaType,\n  backLinks[]{\n    label,\n    url\n  },\n  supportingArticles\n}\n,\n    "related": select(\n      count(relatedInsights) > 0 =>\n        relatedInsights[defined(@->slug.current)]->{\n  _id,\n  title,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n},\n      *[\n        _type == "insight"\n        && insightCategory == ^.insightCategory\n        && defined(slug.current)\n        && defined(publishedAt)\n        && slug.current != ^.slug.current\n      ] | order(publishedAt desc)[0...3] {\n  _id,\n  title,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n}\n    )\n  }\n': InsightBySlugQueryResult;
     '\n  *[_type == "insight" && defined(slug.current) && defined(publishedAt)]\n    | order(publishedAt desc) {\n  _id,\n  title,\n  "slug": slug.current,\n  insightCategory,\n  subhead,\n  publishedAt,\n  featured,\n  readingTimeOverride,\n  "bodyChars": length(pt::text(sections[].body[])),\n  heroImage{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n},\n  author->{\n  _id,\n  name,\n  "slug": slug.current,\n  role,\n  bio,\n  avatar{\n  asset,\n  fileAsset,\n  altText,\n  "lqip": asset.asset->metadata.lqip,\n  "dimensions": asset.asset->metadata.dimensions\n}\n}\n}\n': InsightsHubQueryResult;
     '\n  *[\n    _type == "insight"\n    && defined(slug.current)\n    && defined(publishedAt)\n    && coalesce(seo.noindex, false) != true\n  ]{\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapInsightsQueryResult;

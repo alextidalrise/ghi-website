@@ -2,8 +2,13 @@
 /**
  * Bootstrap `siteSettings.headerNav` (and `headerCta`) on a dataset that has no menu yet:
  *
- *   Spain ▸ 6 locations · Portugal ▸ 4 locations · Front Line Collection ·
+ *   Countries ▸ [ Spain ▸ 6 locations · Portugal ▸ 4 locations ] · Front Line Collection ·
  *   Buying Guide · Partners · Insights · About Us          [ Contact ]
+ *
+ * Countries never take a top-level slot: they are groups (columns) under one "Countries"
+ * item, and their locations are the third tier. Adding a country is a Studio job — a new
+ * group under Countries — and needs no code. (header-nav-countries-migrate.ts folds an
+ * older flat menu into this shape.)
  *
  * This is a BOOTSTRAP, not a source of truth. The menu is editorial content: editors own
  * it in the Studio, and what they author there outranks anything in this file. So by
@@ -16,8 +21,8 @@
  * `--force` overwrites an existing menu. It is the only way to clobber authored content,
  * and it exists for exactly one purpose: restoring the menu wholesale from this file.
  *
- * The country dropdowns link to location documents by reference, so their URLs track the
- * location slugs. Any child whose location is missing from the target dataset is skipped
+ * Countries and their locations link to taxonomy documents by reference, so their URLs
+ * track the slugs and the header can show each country's flag. Any child whose location is missing from the target dataset is skipped
  * with a warning rather than seeded as a dangling reference — that keeps this runnable
  * against an empty dataset, where it just seeds the top level.
  *
@@ -72,15 +77,22 @@ function referenceLink(id: string) {
 }
 
 type Child = { _key: string; _type: 'navMenuChild'; label: string; link: ReturnType<typeof referenceLink> };
+type Group = {
+	_key: string;
+	_type: 'navMenuGroup';
+	label: string;
+	link: ReturnType<typeof referenceLink>;
+	children?: Child[];
+};
 type Item = {
 	_key: string;
 	_type: 'navMenuItem';
 	label: string;
-	link: ReturnType<typeof internalLink>;
-	children?: Child[];
+	link?: ReturnType<typeof internalLink>;
+	children?: Group[];
 };
 
-/** A dropdown entry pointing at a location document. Keyed off the slug so re-runs are stable. */
+/** A third-tier entry pointing at a location document. Keyed off the slug so re-runs are stable. */
 function location(slug: string, label: string): Child {
 	return {
 		_key: `loc-${slug}`,
@@ -90,27 +102,44 @@ function location(slug: string, label: string): Child {
 	};
 }
 
+/** A country column under "Countries": links to the country document, lists its locations. */
+function country(slug: string, label: string, children: Child[]): Group {
+	return {
+		_key: slug,
+		_type: 'navMenuGroup',
+		label,
+		link: referenceLink(`places-country-${slug}`),
+		children
+	};
+}
+
 /** A top-level item, keyed stably so re-runs don't churn array keys. */
-function item(key: string, label: string, path: string, children?: Child[]): Item {
-	const base: Item = { _key: key, _type: 'navMenuItem', label, link: internalLink(path) };
-	return children?.length ? { ...base, children } : base;
+function item(key: string, label: string, path: string): Item {
+	return { _key: key, _type: 'navMenuItem', label, link: internalLink(path) };
 }
 
 const HEADER_NAV: Item[] = [
-	item('spain', 'Spain', '/spain', [
-		location('marbella', 'Marbella'),
-		location('nueva-andalucia', 'Nueva Andalucia'),
-		location('benahavis', 'Benahavis'),
-		location('estepona', 'Estepona'),
-		location('sotogrande', 'Sotogrande'),
-		location('san-pedro-de-alcantara', 'San Pedro de Alcantara')
-	]),
-	item('portugal', 'Portugal', '/portugal', [
-		location('monte-rei', 'Monte Rei'),
-		location('palmares', 'Palmares'),
-		location('quinta-do-lago', 'Quinta do Lago'),
-		location('vilamoura', 'Vilamoura')
-	]),
+	{
+		_key: 'countries',
+		_type: 'navMenuItem',
+		label: 'Countries',
+		children: [
+			country('spain', 'Spain', [
+				location('marbella', 'Marbella'),
+				location('nueva-andalucia', 'Nueva Andalucia'),
+				location('benahavis', 'Benahavis'),
+				location('estepona', 'Estepona'),
+				location('sotogrande', 'Sotogrande'),
+				location('san-pedro-de-alcantara', 'San Pedro de Alcantara')
+			]),
+			country('portugal', 'Portugal', [
+				location('monte-rei', 'Monte Rei'),
+				location('palmares', 'Palmares'),
+				location('quinta-do-lago', 'Quinta do Lago'),
+				location('vilamoura', 'Vilamoura')
+			])
+		]
+	},
 	item('front-line-collection', 'Front Line Collection', '/front-line-collection'),
 	item('buying-guide', 'Buying Guide', '/guides'),
 	item('partners', 'Partners', '/partners'),
@@ -150,22 +179,40 @@ async function navExists(client: SanityClient): Promise<boolean> {
  * it from the menu anyway — better to say so out loud than to write broken content.
  */
 async function withExistingLocationsOnly(client: SanityClient, nav: Item[]): Promise<Item[]> {
-	const ids = nav.flatMap((i) => i.children ?? []).map((c) => c.link.reference._ref);
+	const groups = nav.flatMap((i) => i.children ?? []);
+	const ids = [
+		...groups.map((g) => g.link.reference._ref),
+		...groups.flatMap((g) => g.children ?? []).map((c) => c.link.reference._ref)
+	];
 	if (ids.length === 0) return nav;
 
 	const present = new Set(await client.fetch<string[]>(`*[_id in $ids]._id`, { ids }));
 
-	return nav.map((entry) => {
-		if (!entry.children?.length) return entry;
-		const kept = entry.children.filter((c) => present.has(c.link.reference._ref));
-		for (const child of entry.children) {
-			if (!present.has(child.link.reference._ref)) {
+	return nav.flatMap((entry) => {
+		if (!entry.children?.length) return [entry];
+		const kept: Group[] = [];
+		for (const group of entry.children) {
+			if (!present.has(group.link.reference._ref)) {
 				console.warn(
-					`  ! skipping “${entry.label} › ${child.label}” — ${child.link.reference._ref} not in ${dataset}`
+					`  ! skipping “${entry.label} › ${group.label}” — ${group.link.reference._ref} not in ${dataset}`
 				);
+				continue;
 			}
+			const locations = (group.children ?? []).filter((c) => {
+				const ok = present.has(c.link.reference._ref);
+				if (!ok) {
+					console.warn(
+						`  ! skipping “${group.label} › ${c.label}” — ${c.link.reference._ref} not in ${dataset}`
+					);
+				}
+				return ok;
+			});
+			kept.push(locations.length ? { ...group, children: locations } : { ...group, children: undefined });
 		}
-		return kept.length ? { ...entry, children: kept } : { ...entry, children: undefined };
+		// A "Countries" item with no countries left has nothing to open; drop it rather
+		// than seed an empty dropdown.
+		if (kept.length === 0 && !entry.link) return [];
+		return [kept.length ? { ...entry, children: kept } : { ...entry, children: undefined }];
 	});
 }
 
@@ -192,9 +239,12 @@ async function unset(client: SanityClient) {
 /** Print the menu about to be written, dropdowns and all. */
 function describe(nav: Item[]) {
 	for (const entry of nav) {
-		console.log(`  ${entry.label} → ${entry.link.internalPath}`);
-		for (const child of entry.children ?? []) {
-			console.log(`      ▸ ${child.label} → ${child.link.reference._ref}`);
+		console.log(`  ${entry.label}${entry.link ? ` → ${entry.link.internalPath}` : ''}`);
+		for (const group of entry.children ?? []) {
+			console.log(`      ▸ ${group.label} → ${group.link.reference._ref}`);
+			for (const child of group.children ?? []) {
+				console.log(`            · ${child.label} → ${child.link.reference._ref}`);
+			}
 		}
 	}
 	console.log(`  [CTA] ${HEADER_CTA.label} → ${HEADER_CTA.link.internalPath}`);

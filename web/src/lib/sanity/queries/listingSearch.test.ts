@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	buildListingCardsCountQuery,
 	buildLocationGridIds,
+	buildPaginatedListingCardsQuery,
 	listingSearchQueryParams
 } from './listingSearch';
 
@@ -42,6 +43,30 @@ describe('price facet filter', () => {
 		const query = buildListingCardsCountQuery({ type: 'global' });
 		expect(query).toContain('_type == "development" && pricing.priceConfirmed == true');
 		expect(query).toContain('_type == "propertyListing" && defined(pricing.price)');
+	});
+});
+
+describe('EUR-normalised price', () => {
+	it('applies the per-currency rate select in the min/max facet branches', () => {
+		const query = buildListingCardsCountQuery({ type: 'global' });
+		// Both price facet comparisons convert native currency before comparing.
+		expect(query).toContain('pricing.currency == "AED" => $rateAED');
+		expect(query.match(/\$rateAED/g)?.length).toBeGreaterThanOrEqual(2);
+	});
+
+	it('sorts on the same normalised expression', () => {
+		const query = buildPaginatedListingCardsQuery({ type: 'global' }, 'price_desc');
+		expect(query).toContain('pricing.currency == "GBP" => $rateGBP');
+		expect(query).toContain('desc, _id asc');
+	});
+
+	it('always supplies the three rate params', () => {
+		const params = listingSearchQueryParams({ type: 'global' }, { start: 0, end: 12 });
+		expect(params).toMatchObject({
+			rateGBP: expect.any(Number),
+			rateUSD: expect.any(Number),
+			rateAED: expect.any(Number)
+		});
 	});
 });
 

@@ -1,6 +1,8 @@
 import { LISTING_CARD_UNION } from '../allowlists';
 import type { ListingSort } from '../../listing/filterOptions';
+import { rateQueryParams } from '../../currency/rates';
 import { PUBLIC_CHILD_UNIT_FILTER, PUBLIC_LISTING_FILTER } from './filters';
+import { PRICE_NUMERIC_EUR } from './priceNumeric';
 
 /**
  * Base document filter shared by cards and count queries. Surfaces individual
@@ -15,8 +17,10 @@ const LISTING_BASE_FILTER = /* groq */ `
   && ${PUBLIC_LISTING_FILTER}
 `;
 
-/** Numeric value used for price filters and sorts. */
-const PRICE_NUMERIC = /* groq */ `coalesce(pricing.price, pricing.priceFrom)`;
+/** EUR-normalised numeric value used for price filters and sorts. Native amounts are
+    converted so a mixed-currency catalogue sorts and filters coherently. Shared with the
+    homepage facet projection via ./priceNumeric. Requires $rateGBP/$rateUSD/$rateAED. */
+const PRICE_NUMERIC = PRICE_NUMERIC_EUR;
 
 /**
  * Which rows participate in numeric price filters. Developments still gate on
@@ -192,6 +196,8 @@ export function listingSearchQueryParams(
 ) {
 	// Sanity requires every $param referenced in GROQ to be supplied — use null for inactive facets.
 	return {
+		// $rateGBP/$rateUSD/$rateAED for the EUR-normalised price expression (PRICE_NUMERIC).
+		...rateQueryParams(),
 		...(scope.type === 'country' ||
 		scope.type === 'location' ||
 		scope.type === 'community'
