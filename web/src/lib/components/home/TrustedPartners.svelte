@@ -179,7 +179,10 @@
 
 	/* Category label: a quiet chip hugging the cell's bottom-left corner, clear of the
 	   centred logo so the logo stays the focus. A soft warm-neutral fill (a mix of the
-	   hairline tone with white) reads as a tag, not part of the mark. */
+	   hairline tone with white) reads as a tag, not part of the mark. A partner in several
+	   categories joins them with " · "; the two-line clamp keeps even a long join tidy in the
+	   corner rather than letting it climb the cell — the /partners directory carries the full,
+	   sectioned truth. */
 	.partner__category {
 		position: absolute;
 		left: 0.5rem;
@@ -197,6 +200,11 @@
 		text-align: left;
 		color: var(--charcoal);
 		transition: background var(--duration-hover) var(--ease);
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		overflow: hidden;
 	}
 
 	/* Real logos sit muted at rest and resolve on hover/focus, the standard

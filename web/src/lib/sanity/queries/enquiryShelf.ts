@@ -6,6 +6,7 @@ import {
 	SHELF_PARTNER_CATEGORIES,
 	SHELF_PARTNER_LIMIT,
 	disciplineFor,
+	disciplineForSlot,
 	shelfOverrideFor,
 	withoutShelfOverrides,
 	type EnquiryShelf,
@@ -39,7 +40,7 @@ export const enquiryShelfDefaultsQuery = defineQuery(`
     "partners": *[
       _type == "partner"
       && defined(slug.current)
-      && category->slug.current in $partnerCategories
+      && count(categories[@->slug.current in $partnerCategories]) > 0
       && $countrySlug in countries
     ] | order(coalesce(order, 999) asc, name asc) ${SHELF_PARTNER_PUBLIC}
   }
@@ -68,17 +69,34 @@ function toShelfPartner(raw: RawShelfPartner | null | undefined): ShelfPartner |
 }
 
 /**
- * Narrow the default partners to one per category, in the order a buyer needs them
- * (mortgage → currency → legal), rather than in Sanity's `order`. A category with no
+ * Narrow the default partners to one per discipline, in the order a buyer needs them
+ * (mortgage → currency → legal), rather than in Sanity's `order`. A discipline with no
  * partner is simply skipped, so the shelf shows two specialists rather than an empty cell.
+ *
+ * A partner may now cover several disciplines, so it is eligible for every slot it matches —
+ * but taken once: `used` holds the partners already placed, so the same firm never fills two
+ * rows. When it would, it takes the earlier discipline and the next-best partner fills the
+ * later one. The row's label is the SLOT's discipline (via `disciplineForSlot`), not the
+ * partner's whole list, so each row still reads as one clean discipline.
  */
 export function toDefaultShelfPartners(raw: RawShelfPartner[] | null | undefined): ShelfPartner[] {
 	const partners: ShelfPartner[] = [];
+	const used = new Set<string>();
 
 	for (const categorySlug of SHELF_PARTNER_CATEGORIES) {
-		const match = (raw ?? []).find((partner) => partner?.categorySlug === categorySlug);
-		const resolved = toShelfPartner(match);
-		if (resolved) partners.push(resolved);
+		const match = (raw ?? []).find(
+			(partner) =>
+				partner?.slug != null &&
+				!used.has(partner.slug) &&
+				(partner.categorySlugs ?? []).includes(categorySlug)
+		);
+		if (!match?.slug || !match.name) continue;
+		used.add(match.slug);
+		partners.push({
+			slug: match.slug,
+			name: match.name,
+			discipline: disciplineForSlot(categorySlug, match)
+		});
 	}
 
 	return partners.slice(0, SHELF_PARTNER_LIMIT);

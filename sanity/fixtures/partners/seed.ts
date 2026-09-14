@@ -206,7 +206,9 @@ function buildDocuments(): IdentifiedSanityDocumentStub[] {
 				_type: 'partner',
 				name: partner.name,
 				slug: { _type: 'slug', current: partner.slug },
-				category: { _type: 'reference', _ref: categoryId(category.slug) },
+				categories: [
+					{ _type: 'reference', _key: category.slug, _ref: categoryId(category.slug) }
+				],
 				countries: partner.countries,
 				coverage: partner.coverage,
 				description: partner.description,

@@ -3,11 +3,12 @@ import { PARTNER_CATEGORY_PUBLIC, PARTNER_LOGO_PUBLIC } from '../allowlists';
 import { buildImageSrcset, buildPublicImageUrl } from '../image';
 import { fetchPublic } from './fetch';
 import type { MediaAssetInput } from '../transforms/mediaFilter';
-import type {
-	Partner,
-	PartnerCategory,
-	PartnerIntroduction,
-	PartnerLogo
+import {
+	partnerCategoryLabel,
+	type Partner,
+	type PartnerCategory,
+	type PartnerIntroduction,
+	type PartnerLogo
 } from '$lib/partners/partners';
 import type { TrustedPartner } from '$lib/components/home/TrustedPartners.svelte';
 
@@ -37,7 +38,7 @@ export const partnerBySlugQuery = defineQuery(`
   *[_type == "partner" && slug.current == $slug][0]{
     name,
     "slug": slug.current,
-    "category": category->name
+    "categories": categories[]->name
   }
 `);
 
@@ -64,9 +65,14 @@ type RawLogoPartner = {
 	_id: string;
 	name?: string | null;
 	slug?: string | null;
-	category?: string | null;
+	categories?: Array<string | null> | null;
 	logo?: MediaAssetInput | null;
 };
+
+/** Category names from a `categories[]->name` projection, trimmed and emptied of holes. */
+function cleanCategoryNames(names: Array<string | null> | null | undefined): string[] {
+	return (names ?? []).map((name) => name?.trim() ?? '').filter(Boolean);
+}
 
 /** Resolve a logo asset to ready-to-render CDN URLs, or null when none is attached. */
 function toPartnerLogo(logo: MediaAssetInput | null | undefined, name: string): PartnerLogo | null {
@@ -127,7 +133,7 @@ export async function fetchPartnerIntroduction(
 	const raw = await fetchPublic<{
 		name?: string | null;
 		slug?: string | null;
-		category?: string | null;
+		categories?: Array<string | null> | null;
 	} | null>(partnerBySlugQuery, { params: { slug } });
 
 	if (!raw?.name || !raw.slug) return null;
@@ -135,7 +141,7 @@ export async function fetchPartnerIntroduction(
 	return {
 		name: raw.name,
 		slug: raw.slug,
-		category: raw.category?.trim() || null
+		categories: cleanCategoryNames(raw.categories)
 	};
 }
 
@@ -149,10 +155,11 @@ export async function fetchHomepagePartnerLogos(
 			if (!partner.slug || !partner.name) return null;
 			const logo = toPartnerLogo(partner.logo, partner.name);
 			if (!logo) return null;
+			const categoryLabel = partnerCategoryLabel(cleanCategoryNames(partner.categories));
 			return {
 				name: partner.name,
 				role: partner.name,
-				category: partner.category?.trim() || undefined,
+				category: categoryLabel || undefined,
 				logo: logo.url,
 				srcset: logo.srcset,
 				href: `/partners#partner-${partner.slug}`

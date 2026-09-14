@@ -1,4 +1,5 @@
 import { buildImageSrcset, buildPublicImageUrl } from '../image';
+import { partnerCategoryLabel } from '$lib/partners/partners';
 import type { MediaAssetInput } from './mediaFilter';
 
 /**
@@ -13,7 +14,7 @@ export type InsightPartnerLogoItemRaw = {
 		_id?: string | null;
 		name?: string | null;
 		slug?: string | null;
-		category?: string | null;
+		categories?: Array<string | null> | null;
 		logo?: MediaAssetInput | null;
 	} | null;
 };
@@ -60,7 +61,8 @@ export function toInsightPartnerLogoCard(
 		logo,
 		srcset: buildImageSrcset(partner.logo, LOGO_WIDTHS, { fit: 'max' }),
 		alt: partner.logo?.altText?.trim() || name,
-		serviceLabel: raw?.serviceLabel?.trim() || partner.category?.trim() || null
+		serviceLabel:
+			raw?.serviceLabel?.trim() || partnerCategoryLabel(partner.categories ?? []) || null
 	};
 }
 

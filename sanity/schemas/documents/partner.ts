@@ -28,12 +28,13 @@ export const partner = defineType({
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({
-			name: 'category',
-			title: 'Category',
-			type: 'reference',
-			to: [{ type: 'partnerCategory' }],
-			description: 'Which section of the Partners page this partner appears under.',
-			validation: (Rule) => Rule.required()
+			name: 'categories',
+			title: 'Categories',
+			type: 'array',
+			of: [{ type: 'reference', to: [{ type: 'partnerCategory' }] }],
+			description:
+				'Which sections of the Partners page this partner appears under — its full card shows in each. The FIRST is the primary discipline, used where only one label fits (the homepage badge, the contact introduction). Drag to reorder.',
+			validation: (Rule) => Rule.required().min(1).unique()
 		}),
 		defineField({
 			name: 'countries',
@@ -87,7 +88,8 @@ export const partner = defineType({
 			name: 'order',
 			title: 'Order',
 			type: 'number',
-			description: 'Manual ordering within the category. Lower numbers appear first.',
+			description:
+				'Manual ordering within a category — one value that positions this partner in every section it appears in. Lower numbers appear first.',
 			validation: (Rule) => Rule.min(0).integer()
 		})
 	],
@@ -98,10 +100,11 @@ export const partner = defineType({
 		select: {
 			title: 'name',
 			coverage: 'coverage',
-			category: 'category.name',
+			category: 'categories.0.name',
 			media: 'logo.asset'
 		},
 		prepare({ title, coverage, category, media }) {
+			// The primary (first) category leads the subtitle; the full list lives in the field.
 			return {
 				title: title || 'Partner',
 				subtitle: [category, coverage].filter(Boolean).join(' · ') || undefined,

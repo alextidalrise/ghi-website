@@ -17,7 +17,7 @@ const partner = (over: Partial<PartnerRaw> = {}): PartnerRaw => ({
 	_id: 'p-currency',
 	name: 'CurrencyCo',
 	slug: 'currencyco',
-	category: 'Currency',
+	categories: ['Currency'],
 	logo: { asset: { asset: { _ref: 'l' } }, altText: 'CurrencyCo logo' } as unknown as MediaAssetInput,
 	...over
 });
@@ -38,6 +38,13 @@ describe('toInsightPartnerLogoCard', () => {
 		expect(toInsightPartnerLogoCard(item({ serviceLabel: 'FX & Payments' }))!.serviceLabel).toBe(
 			'FX & Payments'
 		);
+	});
+
+	it('joins several categories into the fallback service label', () => {
+		const card = toInsightPartnerLogoCard(
+			item({ partner: partner({ categories: ['Legal & Tax', 'Mortgage'] }) })
+		);
+		expect(card!.serviceLabel).toBe('Legal & Tax · Mortgage');
 	});
 
 	it('fails closed on a null partner, missing name/slug, or no logo (a logo wall needs a logo)', () => {

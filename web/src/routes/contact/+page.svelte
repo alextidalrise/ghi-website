@@ -7,7 +7,11 @@
 	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
 	import TrustedPartners from '$lib/components/home/TrustedPartners.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
-	import { PARTNER_INTRO_PARAM, partnerIntroMessage } from '$lib/partners/partners';
+	import {
+		PARTNER_INTRO_PARAM,
+		partnerCategoryProse,
+		partnerIntroMessage
+	} from '$lib/partners/partners';
 	import { ENQUIRY_TOPIC_PARAM } from '$lib/contact/enquiryTopics';
 	import {
 		GENERAL_WHATSAPP_MESSAGE,
@@ -253,7 +257,7 @@
 						{#if partnerIntro}
 							<h3 class="panel__heading">{c.partnerFormHeading}</h3>
 							<p class="panel__intro">
-								To <strong class="panel__partner">{partnerIntro.name}</strong>{#if partnerIntro.category}, our {partnerIntro.category.toLowerCase()} specialist{/if}. {lead.firstName} will make the introduction personally.
+								To <strong class="panel__partner">{partnerIntro.name}</strong>{#if partnerIntro.categories.length > 0}, our {partnerCategoryProse(partnerIntro.categories).toLowerCase()} specialist{/if}. {lead.firstName} will make the introduction personally.
 							</p>
 						{:else if enquiryTopic}
 							<h3 class="panel__heading">{enquiryTopic.heading}</h3>
