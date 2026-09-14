@@ -37,9 +37,9 @@ subject: 'ستة منازل على حافة الملعب'
     alt="فيلا تطل على ملعب الغولف عند الغروب، وخلفها جبل لا كونتشا وسييرا بلانكا"
     width="600"
     height="400"
-  ></x-figure>
+   manifest-id="figure_01"></x-figure>
 
-  <x-section edit="lead" pt="40" pb="40">
+  <x-section edit="lead" pt="40" pb="40" manifest-id="section_01">
 
     <x-text variant="ui" tone="muted" gap="24">*|IF:FNAME|*عزيزي *|FNAME|*،*|ELSE:|*تحية طيبة،*|END:IF|*</x-text>
 
@@ -59,13 +59,13 @@ subject: 'ستة منازل على حافة الملعب'
     </x-text>
 
     <x-button
-      href="{{ page.site.origin }}/spain/andalucia?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline-ar"
+      href="{{ page.site.origin }}/spain?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline-ar"
       gap="0"
     >تصفّح المجموعة</x-button>
 
   </x-section>
 
-  <x-band edit="cta_section" pt="48" pb="48">
+  <x-band edit="cta_section" pt="48" pb="48" manifest-id="band_01">
 
     <x-heading level="2" tone="on-green" gap="16">اسأل عن منزل بعينه</x-heading>
 
@@ -82,7 +82,7 @@ subject: 'ستة منازل على حافة الملعب'
 
   </x-band>
 
-  <x-section edit="body" pt="40" pb="40">
+  <x-section edit="body" pt="40" pb="40" manifest-id="section_02">
 
     <x-heading level="2" gap="16">قبل السفر</x-heading>
 

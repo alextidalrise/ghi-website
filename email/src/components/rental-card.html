@@ -1,0 +1,14 @@
+<td data-component="rental-card" width="50%" valign="top" class="sm-stack sm-card-cell" style="width: 50%; padding: 0 8px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" height="{{ cardheight === '' ? 700 : cardheight }}" class="dm-border sm-equal-card" style="width: 100%; height: {{ cardheight === '' ? 700 : cardheight }}px; border: 1px solid {{ page.brand.border }}; background-color: {{ page.brand.white }};">
+    <tr><td valign="top"><a href="{{ href }}" style="text-decoration: none;"><img src="{{ src }}" width="260" height="174" alt="{{ alt }}" style="display: block; width: 100%; height: 174px; object-fit: cover; border: 0;"></a></td></tr>
+    <tr><td valign="top" class="sm-card-inner" style="padding: 20px;" mc:edit="{{ edit === '' ? 'rental_card_content' : edit }}">
+      <h3 style="margin: 0 0 6px; font-family: {{ page.font.serif }}; font-size: 22px; line-height: 27px; color: {{ page.brand.green }};">{{ title }}</h3>
+      <div style="font-family: {{ page.font.sans }}; font-size: 11px; line-height: 17px; text-transform: uppercase; color: {{ page.brand.muted }};">{{ location }}</div>
+      <div style="margin: 14px 0; border-top: 1px solid {{ page.brand.border }};"></div>
+      <div style="font-family: {{ page.font.sans }}; font-size: 13px; line-height: 21px; color: {{ page.brand.charcoal }};"><strong>Guests:</strong> {{ guests }} &nbsp; <strong>Bedrooms:</strong> {{ bedrooms }}<br><strong>From price:</strong> {{ price }}</div>
+      <div style="padding-top: 14px; font-family: {{ page.font.sans }}; font-size: 14px; line-height: 23px; color: {{ page.brand.charcoal }};">{{ body }}</div>
+      <div style="padding-top: 12px; font-family: {{ page.font.sans }}; font-size: 12px; line-height: 20px; color: {{ page.brand.muted }};"><strong>Highlights:</strong> {{ highlights }}</div>
+      <div style="padding-top: 16px;"><a href="{{ href }}" style="font-family: {{ page.font.sans }}; font-size: 11px; line-height: 16px; color: {{ page.brand.green }}; text-decoration: underline; text-transform: uppercase;">{{ cta }}</a></div>
+    </td></tr>
+  </table>
+</td>

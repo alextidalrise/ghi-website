@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "campaignId": "reference-ar",
+  "library": {
+    "id": "ghi-email-components",
+    "version": "1.0.0"
+  },
+  "source": "src/templates/reference-ar.html",
+  "dataSources": [
+    "repository://email/src/templates/reference-ar.html"
+  ],
+  "components": [
+    {
+      "instanceId": "figure_01",
+      "id": "ghi.figure.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/reference-ar.html"
+    },
+    {
+      "instanceId": "section_01",
+      "id": "ghi.section.v1",
+      "variant": "white",
+      "dataSource": "repository://email/src/templates/reference-ar.html"
+    },
+    {
+      "instanceId": "band_01",
+      "id": "ghi.band.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/reference-ar.html"
+    },
+    {
+      "instanceId": "section_02",
+      "id": "ghi.section.v1",
+      "variant": "white",
+      "dataSource": "repository://email/src/templates/reference-ar.html"
+    }
+  ]
+}

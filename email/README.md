@@ -4,9 +4,9 @@ The HTML email foundation for Golf Homes International: brand tokens translated
 to email-safe values, a component vocabulary, a deterministic build, a validator
 that enforces the brand rules, and a QA harness.
 
-This phase deliberately does **not** define template types, individual template
-designs, a component inventory, or campaign content structures. It makes those
-decisions cheap to execute later.
+The canonical versioned inventory lives at `component-library/v1/registry.json`.
+Every campaign template is paired with an ordered component manifest under
+`src/manifests/`; campaign source supplies data and composition, never layout HTML/CSS.
 
 ---
 
@@ -33,6 +33,8 @@ open email/qa/screens/index.html
 | `pnpm validate:self-test` | Prove the validator's 30 checks still fire |
 | `pnpm assets:social` | Regenerate the reusable 2x PNG social icons from their SVG sources |
 | `pnpm validate:components` | Prove the v1 semantic modules and Portugal retention contract |
+| `pnpm validate:registry` | Prove stable IDs, variants, plain-text contracts and master edit regions |
+| `pnpm validate:manifests` | Reject missing manifests, unknown IDs/variants, order drift and raw campaign layout code |
 | `pnpm plaintext` | Generate `.txt` alternatives |
 | `pnpm qa` | Screenshot every template across 8 scenarios |
 | `pnpm qa:long portugal-v15` | Segment a long email at desktop, 375px and 320px |
@@ -64,6 +66,8 @@ node bin/validate.mjs --delivered ~/Downloads/delivered.html
 | [10-portugal-v15-email-gap-matrix.md](docs/10-portugal-v15-email-gap-matrix.md) | Canonical target, retention choices and failed-build gaps |
 | [11-component-library-v1.md](docs/11-component-library-v1.md) | Semantic component contract and composition rules |
 | [12-portugal-v15-qa-and-mailchimp-readback.md](docs/12-portugal-v15-qa-and-mailchimp-readback.md) | Campaign QA, Mailchimp IDs, proof state and remaining gates |
+| [14-component-first-production-rule.md](docs/14-component-first-production-rule.md) | Canonical registry, mandatory manifests, extension gate, master regions and approval boundary |
+| [15-component-library-release-candidate-qa.md](docs/15-component-library-release-candidate-qa.md) | Reconciliation test evidence, warning disposition, responsive QA and outstanding release gates |
 
 ---
 
@@ -102,6 +106,7 @@ and every edge case the QA plan tests, so a system change shows up somewhere
 visible. Rebuild and read all 32 screenshots after any change to `lib/`,
 `src/layouts/`, `src/components/`, `src/css/` or `config*.js`.
 
-`src/templates/component-library-v1.html` is the separately versioned
-all-components showcase. It is not a production campaign recipe. Campaigns
-must include only the modules selected for that brief.
+`src/templates/component-library-v1.html` is the separately versioned all-components
+Mailchimp master source. It is not a production campaign recipe. Campaigns include
+only manifest-selected modules. The master remains a release candidate until its
+Mailchimp editable surface is read back and Alex approves it.

@@ -235,9 +235,23 @@ for (const testCase of cases) {
 	}
 }
 
+const multipleGreenBands = cases.find(({ name }) => name === 'two green bands in the body').html;
+const masterBandFindings = validate({ html: multipleGreenBands, name: 'component-library-v1' });
+const masterBandWarn = masterBandFindings.some((finding) => finding.check === 'brand' && finding.level === 'warn' && /all-components review master/.test(finding.message));
+const masterBandError = masterBandFindings.some((finding) => finding.check === 'brand' && finding.level === 'error' && /green bands/.test(finding.message));
+if (masterBandWarn && !masterBandError) console.log('  ok    all-components master records extra variant bands as a scoped warning');
+else {
+	console.error('  FAIL  all-components master green-band exception must warn without weakening campaign errors');
+	failures += 1;
+}
+
 const originalFetch = globalThis.fetch;
 try {
-	globalThis.fetch = async () => ({ status: 999, statusText: '', redirected: false });
+	const fetched = [];
+	globalThis.fetch = async (href) => {
+		fetched.push(href);
+		return { status: href.includes('linkedin.com') ? 999 : 200, statusText: '', redirected: false };
+	};
 	const linkedinFindings = await checkLinksLive('<a href="https://www.linkedin.com/company/golf-homes-international">LinkedIn</a>');
 	const linkedinWarn = linkedinFindings.some((finding) => finding.level === 'warn' && finding.check === 'links-live');
 	const linkedinError = linkedinFindings.some((finding) => finding.level === 'error');
@@ -246,11 +260,18 @@ try {
 		console.error('  FAIL  LinkedIn 999 bot block classification');
 		failures += 1;
 	}
+	await checkLinksLive('<a href="https://example.com/path?utm_source=mailchimp&amp;utm_medium=email&amp;utm_campaign=test">Example</a>');
+	if (fetched.includes('https://example.com/path?utm_source=mailchimp&utm_medium=email&utm_campaign=test') && !fetched.some((href) => href.includes('amp;utm_'))) {
+		console.log('  ok    live link fetch HTML-decodes multi-parameter URLs');
+	} else {
+		console.error(`  FAIL  live link fetch must decode HTML entities; fetched: ${fetched.join(', ')}`);
+		failures += 1;
+	}
 } finally {
 	globalThis.fetch = originalFetch;
 }
 
-const totalChecks = cases.length + 4;
+const totalChecks = cases.length + 6;
 console.log(`\n  ${totalChecks - failures}/${totalChecks} checks verified.`);
 
 if (failures) {

@@ -1,5 +1,8 @@
 GOLF HOMES INTERNATIONAL
 https://www.golfhomesinternational.com/?utm_source=mailchimp&utm_medium=email
+Component fixture edition
+The Home of Golf Property
+Editorial masthead variant for component review
 ========================================================================
 
 [Image: Example full-width destination hero]
@@ -138,6 +141,8 @@ https://www.golfhomesinternational.com/guides?utm_source=mailchimp&utm_medium=em
 
 For buyers
 
+Practical preparation and purchase guidance.
+
 Read the guide →
 (https://www.golfhomesinternational.com/guides?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
 
@@ -146,6 +151,8 @@ EXAMPLE INTERNATIONAL GUIDE
 https://www.golfhomesinternational.com/guides?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
 
 For international buyers
+
+A separate audience-specific introduction.
 
 Read the guide →
 (https://www.golfhomesinternational.com/guides?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
@@ -164,6 +171,246 @@ https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=e
 WHATSAPP OUR TEAM: https://wa.me/447496443109
 
 ------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+PARTNER AND ARTICLE PATTERNS
+----------------------------
+
+GHI Partner Insight
+
+A CO-BRANDED ARTICLE INTRODUCTION
+---------------------------------
+
+Introduce the partner, the reader benefit and the article’s commercial
+purpose without turning the email into a webpage.
+
+[Image: Example partner logo]
+
+[Image: Example partner villa courtyard]
+
+Example partner portfolio setting. Read the Partner Insight
+(https://www.golfhomesinternational.com/insights?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+FOUNDER AND PARTNERSHIP PROFILE
+-------------------------------
+
+Explain the founder’s role, the partner proposition and the boundary
+between the partner service and GHI property advice.
+
+[Image: Example partner founder portrait]
+
+Example founder
+
+Founder, example partner
+
+Dining and occasions Concise service detail for the first category.
+
+Travel without friction Concise service detail for the second category.
+
+Golf and time well spent Concise service detail for the third category.
+
+[Image: Example coastal rental and pool]
+
+EXAMPLE COASTAL RENTAL
+----------------------
+
+Comporta, Portugal
+
+Guests: 12 Bedrooms: 6
+
+From price: €2,250 per night
+
+A detailed rental summary keeps the useful buyer and stay context in
+live text.
+
+Highlights: Pool; spa; direct dune access
+
+View rental
+(https://www.golfhomesinternational.com/partners?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1&utm_content=example-rental-one)
+
+[Image: Example golf rental at dusk]
+
+EXAMPLE GOLF RENTAL
+-------------------
+
+Marbella, Spain
+
+Guests: 10 Bedrooms: 5
+
+From price: €2,200 per night
+
+The paired shell preserves equal desktop height and natural mobile
+stacking.
+
+Highlights: Golf frontage; indoor pool; terrace
+
+View rental
+(https://www.golfhomesinternational.com/partners?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1&utm_content=example-rental-two)
+
+Prices and availability are supplied by the partner and may change.
+Browse the partner portfolio
+(https://www.golfhomesinternational.com/partners?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1&utm_content=example-portfolio)
+
+FROM THE PARTNER SERVICE TO GHI PROPERTY ADVICE
+-----------------------------------------------
+
+A joined-up route
+
+State clearly which business handles the partner service and where Golf
+Homes International resumes the property conversation.
+
+[Image: Example GHI home in Benahavis]
+
+EXAMPLE GHI HOME
+----------------
+https://www.golfhomesinternational.com/spain?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+Benahavis, Spain
+
+Asking price: €7,470,000
+
+6 bedrooms · GHI reference GHI00001
+
+View listing
+(https://www.golfhomesinternational.com/spain?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+[Image: Example GHI residence in Marbella]
+
+EXAMPLE GHI RESIDENCE
+---------------------
+https://www.golfhomesinternational.com/spain?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+Marbella, Spain
+
+Asking price: €5,995,000
+
+5 bedrooms · GHI reference GHI00002
+
+View listing
+(https://www.golfhomesinternational.com/spain?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+See all properties in Spain
+(https://www.golfhomesinternational.com/spain?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+[Image: Example Portugal home]
+
+EXAMPLE PORTUGAL HOME
+---------------------
+https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+Algarve, Portugal
+
+Asking price: €2,400,000
+
+4 bedrooms · GHI reference GHI00003
+
+View listing
+(https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+[Image: Second example Portugal home]
+
+SECOND PORTUGAL HOME
+--------------------
+https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+Algarve, Portugal
+
+Asking price: €3,100,000
+
+5 bedrooms · GHI reference GHI00004
+
+View listing
+(https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+See all properties in Portugal
+(https://www.golfhomesinternational.com/portugal?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+Partner Insight H2 variant
+
+A SECONDARY CO-BRANDED ARTICLE INTRODUCTION
+-------------------------------------------
+
+The H2 treatment supports a partner article below an existing campaign
+heading.
+
+[Image: Example partner logo]
+
+[Image: Secondary partner article example]
+
+Secondary article caption. Read the secondary insight
+(https://www.golfhomesinternational.com/insights?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+APPROVED PRIMITIVE VARIANTS
+---------------------------
+
+LIVE-TEXT AND ACTION PRIMITIVES
+-------------------------------
+
+UI text variant with an inline default link
+(https://www.golfhomesinternational.com/?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+.
+
+Legal text remains readable and explicit in the plain-text alternative.
+
+PRIMARY BUTTON:
+https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+GREEN BAND PRIMITIVE
+--------------------
+
+On-green copy includes an on-green link
+(https://www.golfhomesinternational.com/?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+.
+
+GOLD BUTTON:
+https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+[Image: Linked figure variant example]
+
+Linked figure caption.
+
+COMPACT GUIDE CARD
+------------------
+https://www.golfhomesinternational.com/guides?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+Compact variant
+
+Read compact guide →
+(https://www.golfhomesinternational.com/guides?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1)
+
+WHITE ADVISORY VARIANT
+----------------------
+
+The approved white source treatment is bound to its named registry
+variant.
+
+OPEN ADVISORY ACTION:
+https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+------------------------------------------------------------------------
+
+FLUSH-FOOTER ENQUIRY VARIANT
+----------------------------
+
+This fixture proves the approved flush-footer treatment.
+
+PRIMARY FLUSH ACTION:
+https://www.golfhomesinternational.com/contact?utm_source=mailchimp&utm_medium=email&utm_campaign=component-library-v1
+
+SECONDARY FLUSH ACTION: https://wa.me/447496443109
 
 ------------------------------------------------------------------------
 

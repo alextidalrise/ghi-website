@@ -221,6 +221,16 @@ function* walk(body) {
 		if (image) {
 			const alt = attrOf(image[1], 'alt');
 			yield { type: 'image', alt: alt ? clean(alt) : '' };
+
+			// Image-led cells can also contain live profile copy, captions or links.
+			// Remove the image (and any link that wraps only that image), then retain
+			// the meaningful remainder in source order.
+			const remainder = inner
+				.replace(/<a\b[^>]*>\s*<img\b[^>]*>\s*<\/a>/gi, ' ')
+				.replace(/<img\b[^>]*>/gi, ' ');
+			for (const segment of withInlineLinkSegments(remainder)) {
+				yield { type: 'paragraph', text: segment };
+			}
 			continue;
 		}
 

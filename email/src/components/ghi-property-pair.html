@@ -1,0 +1,9 @@
+<tr data-component="ghi-property-pair" mc:repeatable="{{ repeat === '' ? 'ghi_property_pair' : repeat }}">
+  <td class="sm-gutter" style="background-color: {{ page.brand.white }}; padding: 0 32px 32px;">
+    <div style="padding-bottom: 12px; font-family: {{ page.font.sans }}; font-size: 11px; line-height: 16px; letter-spacing: {{ page.track.wide }}; text-transform: uppercase; color: {{ page.brand.green }};" mc:edit="{{ edit === '' ? 'ghi_property_pair_heading' : edit }}">{{ title }}</div>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%;">
+      <tr><yield></yield></tr>
+      <tr><td colspan="2" style="padding-top: 14px; font-family: {{ page.font.sans }}; font-size: 13px; line-height: 20px;" mc:edit="{{ ctaedit === '' ? 'ghi_property_pair_cta' : ctaedit }}"><a href="{{ href }}" style="color: {{ page.brand.green }}; text-decoration: underline;">{{ cta }}</a></td></tr>
+    </table>
+  </td>
+</tr>

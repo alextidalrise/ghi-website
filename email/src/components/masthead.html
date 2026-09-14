@@ -5,7 +5,7 @@
   inset green brand panel, logo/strapline, then the specialist descriptor. The
   original compact masthead remains available for other campaign recipes.
 -->
-<if condition="page.mastheadVariant === 'editorial'">
+<if condition="variant === 'editorial' || page.mastheadVariant === 'editorial'">
   <tr data-email-masthead-start>
     <td data-masthead-date align="center" bgcolor="{{ page.brand.white }}" class="dm-surface sm-gutter" style="background-color:{{ page.brand.white }};padding:24px 32px 16px;font-family:{{ page.font.sans }};font-size:11px;line-height:16px;mso-line-height-rule:exactly;font-weight:{{ page.weight.medium }};letter-spacing:1.6px;text-transform:uppercase;color:{{ page.brand.muted }};">
       {{ page.mastheadDate }}

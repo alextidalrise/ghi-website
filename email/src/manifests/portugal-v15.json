@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "campaignId": "portugal-v15",
+  "library": {
+    "id": "ghi-email-components",
+    "version": "1.0.0"
+  },
+  "source": "src/templates/portugal-v15.html",
+  "dataSources": [
+    "repository://email/src/templates/portugal-v15.html"
+  ],
+  "components": [
+    {
+      "instanceId": "editorial_lead_01",
+      "id": "ghi.editorial-lead.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "figure_01",
+      "id": "ghi.figure.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "editorial_lead_02",
+      "id": "ghi.editorial-lead.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "section_intro_01",
+      "id": "ghi.section-intro.v1",
+      "variant": "ruled",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "destination_feature_01",
+      "id": "ghi.destination-feature.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "destination_feature_02",
+      "id": "ghi.destination-feature.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "destination_feature_03",
+      "id": "ghi.destination-feature.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "destination_feature_04",
+      "id": "ghi.destination-feature.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "advisory_cta_01",
+      "id": "ghi.advisory-cta.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "section_intro_02",
+      "id": "ghi.section-intro.v1",
+      "variant": "ruled",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_01",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_02",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_03",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_04",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_05",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_06",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_07",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_08",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_09",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "development_card_10",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "section_intro_03",
+      "id": "ghi.section-intro.v1",
+      "variant": "ruled",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "card_pair_01",
+      "id": "ghi.card-pair.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "card_pair_02",
+      "id": "ghi.card-pair.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "section_intro_04",
+      "id": "ghi.section-intro.v1",
+      "variant": "ruled",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "partner_grid_row_01",
+      "id": "ghi.partner-grid-row.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "partner_grid_row_02",
+      "id": "ghi.partner-grid-row.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "partner_grid_row_03",
+      "id": "ghi.partner-grid-row.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "advisory_cta_02",
+      "id": "ghi.advisory-cta.v1",
+      "variant": "white",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "section_intro_05",
+      "id": "ghi.section-intro.v1",
+      "variant": "ruled",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "card_pair_03",
+      "id": "ghi.card-pair.v1",
+      "variant": "compact-guides",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "card_pair_04",
+      "id": "ghi.card-pair.v1",
+      "variant": "compact-guides",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    },
+    {
+      "instanceId": "dual_action_enquiry_01",
+      "id": "ghi.dual-action-enquiry.v1",
+      "variant": "flush-footer",
+      "dataSource": "repository://email/src/templates/portugal-v15.html"
+    }
+  ]
+}

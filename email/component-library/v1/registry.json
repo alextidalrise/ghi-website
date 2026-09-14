@@ -1,0 +1,1092 @@
+{
+  "schemaVersion": 1,
+  "id": "ghi-email-components",
+  "version": "1.0.0",
+  "status": "awaiting-human-approval",
+  "components": [
+    {
+      "id": "ghi.advisory-cta.v1",
+      "tag": "advisory-cta",
+      "source": "src/components/advisory-cta.html",
+      "variants": [
+        "default",
+        "white"
+      ],
+      "plaintext": {
+        "required": [
+          "heading",
+          "body",
+          "labelled CTA URL"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "ADVISORY PROMPT",
+              "START AN ENQUIRY"
+            ]
+          },
+          "white": {
+            "markers": [
+              "WHITE ADVISORY VARIANT",
+              "OPEN ADVISORY ACTION"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "tone",
+        "values": {
+          "": "default",
+          "white": "white"
+        }
+      }
+    },
+    {
+      "id": "ghi.band.v1",
+      "tag": "band",
+      "source": "src/components/band.html",
+      "variants": [
+        "green"
+      ],
+      "plaintext": {
+        "required": [
+          "all yielded headings, copy and links in reading order"
+        ],
+        "masterVariants": {
+          "green": {
+            "markers": [
+              "GREEN BAND PRIMITIVE"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "green"
+      }
+    },
+    {
+      "id": "ghi.button.v1",
+      "tag": "button",
+      "source": "src/components/button.html",
+      "variants": [
+        "primary",
+        "gold"
+      ],
+      "plaintext": {
+        "required": [
+          "CTA label and absolute destination URL"
+        ],
+        "masterVariants": {
+          "primary": {
+            "markers": [
+              "PRIMARY BUTTON"
+            ]
+          },
+          "gold": {
+            "markers": [
+              "GOLD BUTTON"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "variant",
+        "values": {
+          "": "primary",
+          "primary": "primary",
+          "gold": "gold"
+        }
+      }
+    },
+    {
+      "id": "ghi.card-pair.v1",
+      "tag": "card-pair",
+      "source": "src/components/card-pair.html",
+      "variants": [
+        "default",
+        "compact-guides"
+      ],
+      "plaintext": {
+        "required": [
+          "left item followed by right item"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "EXAMPLE GOLF COURSE",
+              "SECOND EXAMPLE COURSE"
+            ]
+          },
+          "compact-guides": {
+            "markers": [
+              "COMPACT GUIDE CARD"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "variant",
+        "values": {
+          "": "default",
+          "default": "default",
+          "compact-guides": "compact-guides"
+        }
+      }
+    },
+    {
+      "id": "ghi.course-feature.v1",
+      "tag": "course-feature",
+      "source": "src/components/course-feature.html",
+      "variants": [
+        "overlay"
+      ],
+      "plaintext": {
+        "required": [
+          "title",
+          "location",
+          "labelled course URL"
+        ],
+        "masterVariants": {
+          "overlay": {
+            "markers": [
+              "EXAMPLE GOLF COURSE",
+              "VIEW COURSE"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "overlay"
+      }
+    },
+    {
+      "id": "ghi.destination-feature.v1",
+      "tag": "destination-feature",
+      "source": "src/components/destination-feature.html",
+      "variants": [
+        "default"
+      ],
+      "plaintext": {
+        "required": [
+          "image alt",
+          "title",
+          "location",
+          "body",
+          "labelled destination URL"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "EXAMPLE DESTINATION",
+              "VIEW THE DESTINATION"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "default"
+      }
+    },
+    {
+      "id": "ghi.development-card.v1",
+      "tag": "development-card",
+      "source": "src/components/development-card.html",
+      "variants": [
+        "green"
+      ],
+      "plaintext": {
+        "required": [
+          "title",
+          "location",
+          "price",
+          "status",
+          "completion",
+          "labelled development URL"
+        ],
+        "masterVariants": {
+          "green": {
+            "markers": [
+              "EXAMPLE DEVELOPMENT",
+              "FROM €600,000"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "green"
+      }
+    },
+    {
+      "id": "ghi.dual-action-enquiry.v1",
+      "tag": "dual-action-enquiry",
+      "source": "src/components/dual-action-enquiry.html",
+      "variants": [
+        "default",
+        "flush-footer"
+      ],
+      "plaintext": {
+        "required": [
+          "heading",
+          "body",
+          "primary labelled URL",
+          "secondary labelled URL"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "DUAL-ACTION ENQUIRY",
+              "WHATSAPP OUR TEAM"
+            ]
+          },
+          "flush-footer": {
+            "markers": [
+              "FLUSH-FOOTER ENQUIRY VARIANT",
+              "SECONDARY FLUSH ACTION"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "flushfooter",
+        "values": {
+          "": "default",
+          "false": "default",
+          "true": "flush-footer"
+        }
+      }
+    },
+    {
+      "id": "ghi.editorial-lead.v1",
+      "tag": "editorial-lead",
+      "source": "src/components/editorial-lead.html",
+      "variants": [
+        "default"
+      ],
+      "plaintext": {
+        "required": [
+          "yielded heading and body in reading order"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "GHI EMAIL COMPONENT LIBRARY V1"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "default"
+      }
+    },
+    {
+      "id": "ghi.entity-card.v1",
+      "tag": "entity-card",
+      "source": "src/components/entity-card.html",
+      "variants": [
+        "default"
+      ],
+      "plaintext": {
+        "required": [
+          "image alt",
+          "title",
+          "location",
+          "optional facts",
+          "labelled entity URL"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "EXAMPLE GOLF COURSE TWO"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "default"
+      }
+    },
+    {
+      "id": "ghi.figure.v1",
+      "tag": "figure",
+      "source": "src/components/figure.html",
+      "variants": [
+        "default",
+        "linked"
+      ],
+      "plaintext": {
+        "required": [
+          "image alt or caption",
+          "linked destination URL when present"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "Example full-width destination hero"
+            ]
+          },
+          "linked": {
+            "markers": [
+              "Linked figure variant example",
+              "Linked figure caption"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "href",
+        "presence": {
+          "absent": "default",
+          "present": "linked"
+        }
+      }
+    },
+    {
+      "id": "ghi.footer-light.v1",
+      "tag": "footer-light",
+      "source": "src/components/footer-light.html",
+      "representativeMode": "layout-shell",
+      "variants": [
+        "light"
+      ],
+      "plaintext": {
+        "required": [
+          "permission reminder",
+          "company and address tags",
+          "archive, preferences and unsubscribe URLs",
+          "social labelled URLs"
+        ],
+        "masterVariants": {
+          "light": {
+            "markers": [
+              "Instagram: https://www.instagram.com",
+              "*|UNSUB|*"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "light"
+      }
+    },
+    {
+      "id": "ghi.footer.v1",
+      "tag": "footer",
+      "source": "src/components/footer.html",
+      "representativeMode": "layout-shell",
+      "variants": [
+        "green"
+      ],
+      "plaintext": {
+        "required": [
+          "permission reminder",
+          "company and address tags",
+          "archive, preferences and unsubscribe URLs",
+          "social labelled URLs"
+        ],
+        "masterVariants": {
+          "green": {
+            "markers": [
+              "LinkedIn: https://www.linkedin.com",
+              "*|UPDATE_PROFILE|*"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "green"
+      }
+    },
+    {
+      "id": "ghi.guide-card.v1",
+      "tag": "guide-card",
+      "source": "src/components/guide-card.html",
+      "variants": [
+        "default",
+        "compact"
+      ],
+      "plaintext": {
+        "required": [
+          "audience label",
+          "title",
+          "optional summary",
+          "labelled guide URL"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "EXAMPLE BUYING GUIDE",
+              "PRACTICAL PREPARATION"
+            ]
+          },
+          "compact": {
+            "markers": [
+              "COMPACT GUIDE CARD",
+              "READ COMPACT GUIDE"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "compact",
+        "values": {
+          "": "default",
+          "false": "default",
+          "true": "compact"
+        }
+      }
+    },
+    {
+      "id": "ghi.heading.v1",
+      "tag": "heading",
+      "source": "src/components/heading.html",
+      "variants": [
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "plaintext": {
+        "required": [
+          "heading text on its own line"
+        ],
+        "masterVariants": {
+          "h1": {
+            "markers": [
+              "A CO-BRANDED ARTICLE INTRODUCTION"
+            ]
+          },
+          "h2": {
+            "markers": [
+              "DESTINATION FEATURE"
+            ]
+          },
+          "h3": {
+            "markers": [
+              "LIVE-TEXT AND ACTION PRIMITIVES"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "level",
+        "values": {
+          "1": "h1",
+          "2": "h2",
+          "3": "h3",
+          "": "h2"
+        }
+      }
+    },
+    {
+      "id": "ghi.link.v1",
+      "tag": "link",
+      "source": "src/components/link.html",
+      "variants": [
+        "default",
+        "on-green"
+      ],
+      "plaintext": {
+        "required": [
+          "link label and absolute destination URL"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "inline default link"
+            ]
+          },
+          "on-green": {
+            "markers": [
+              "on-green link"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "tone",
+        "values": {
+          "": "default",
+          "default": "default",
+          "on-green": "on-green"
+        }
+      }
+    },
+    {
+      "id": "ghi.masthead.v1",
+      "tag": "masthead",
+      "source": "src/components/masthead.html",
+      "representativeMode": "layout-shell",
+      "variants": [
+        "compact",
+        "editorial"
+      ],
+      "plaintext": {
+        "required": [
+          "brand name",
+          "editorial date, strapline and descriptor when selected"
+        ],
+        "masterVariants": {
+          "compact": {
+            "markers": [
+              "GOLF HOMES INTERNATIONAL"
+            ]
+          },
+          "editorial": {
+            "markers": [
+              "COMPONENT FIXTURE EDITION",
+              "THE HOME OF GOLF PROPERTY"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "variant",
+        "values": {
+          "compact": "compact",
+          "editorial": "editorial"
+        }
+      }
+    },
+    {
+      "id": "ghi.overline.v1",
+      "tag": "overline",
+      "source": "src/components/overline.html",
+      "variants": [
+        "default"
+      ],
+      "plaintext": {
+        "required": [
+          "overline text"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "Component reference"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "default"
+      }
+    },
+    {
+      "id": "ghi.partner-cell.v1",
+      "tag": "partner-cell",
+      "source": "src/components/partner-cell.html",
+      "variants": [
+        "default"
+      ],
+      "plaintext": {
+        "required": [
+          "partner name",
+          "service label",
+          "labelled partner URL when present"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "EXAMPLE PARTNER",
+              "LEGAL AND TAX"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "default"
+      }
+    },
+    {
+      "id": "ghi.partner-grid-row.v1",
+      "tag": "partner-grid-row",
+      "source": "src/components/partner-grid-row.html",
+      "variants": [
+        "default"
+      ],
+      "plaintext": {
+        "required": [
+          "left partner followed by right partner"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "EXAMPLE PARTNER",
+              "EXAMPLE PARTNER TWO"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "default"
+      }
+    },
+    {
+      "id": "ghi.rule.v1",
+      "tag": "rule",
+      "source": "src/components/rule.html",
+      "variants": [
+        "border",
+        "gold"
+      ],
+      "plaintext": {
+        "required": [
+          "blank-line section boundary"
+        ],
+        "masterVariants": {
+          "border": {
+            "noOutput": "decorative structural component",
+            "markers": []
+          },
+          "gold": {
+            "noOutput": "decorative structural component",
+            "markers": []
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "tone",
+        "values": {
+          "": "border",
+          "default": "border",
+          "border": "border",
+          "gold": "gold"
+        }
+      }
+    },
+    {
+      "id": "ghi.section-intro.v1",
+      "tag": "section-intro",
+      "source": "src/components/section-intro.html",
+      "variants": [
+        "default",
+        "ruled"
+      ],
+      "plaintext": {
+        "required": [
+          "heading and supporting copy in reading order"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "APPROVED PRIMITIVE VARIANTS"
+            ]
+          },
+          "ruled": {
+            "markers": [
+              "DESTINATION FEATURE"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "ruled",
+        "values": {
+          "": "default",
+          "false": "default",
+          "true": "ruled"
+        }
+      }
+    },
+    {
+      "id": "ghi.section.v1",
+      "tag": "section",
+      "source": "src/components/section.html",
+      "variants": [
+        "white"
+      ],
+      "plaintext": {
+        "required": [
+          "all yielded content in reading order"
+        ],
+        "masterVariants": {
+          "white": {
+            "markers": [
+              "LIVE-TEXT AND ACTION PRIMITIVES",
+              "LEGAL TEXT REMAINS READABLE"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "white"
+      }
+    },
+    {
+      "id": "ghi.small-print.v1",
+      "tag": "small-print",
+      "source": "src/components/small-print.html",
+      "variants": [
+        "default"
+      ],
+      "plaintext": {
+        "required": [
+          "qualification or source note"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "The full-width development treatment"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "default"
+      }
+    },
+    {
+      "id": "ghi.spacer.v1",
+      "tag": "spacer",
+      "source": "src/components/spacer.html",
+      "variants": [
+        "default"
+      ],
+      "plaintext": {
+        "required": [
+          "no recipient-visible output"
+        ],
+        "masterVariants": {
+          "default": {
+            "noOutput": "decorative structural component",
+            "markers": []
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "default"
+      }
+    },
+    {
+      "id": "ghi.text.v1",
+      "tag": "text",
+      "source": "src/components/text.html",
+      "variants": [
+        "body",
+        "lead",
+        "ui",
+        "legal"
+      ],
+      "plaintext": {
+        "required": [
+          "paragraph text and any labelled URLs"
+        ],
+        "masterVariants": {
+          "body": {
+            "markers": [
+              "Campaigns include only selected blocks"
+            ]
+          },
+          "lead": {
+            "markers": [
+              "This internal proving fixture"
+            ]
+          },
+          "ui": {
+            "markers": [
+              "UI text variant"
+            ]
+          },
+          "legal": {
+            "markers": [
+              "Legal text remains readable"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "variant",
+        "values": {
+          "": "body",
+          "body": "body",
+          "lead": "lead",
+          "ui": "ui",
+          "legal": "legal"
+        }
+      }
+    },
+    {
+      "id": "ghi.partner-article-hero.v1",
+      "tag": "partner-article-hero",
+      "source": "src/components/partner-article-hero.html",
+      "variants": [
+        "split-h1",
+        "split-h2"
+      ],
+      "plaintext": {
+        "required": [
+          "partner label",
+          "heading",
+          "intro",
+          "article CTA URL",
+          "hero alt and caption"
+        ],
+        "masterVariants": {
+          "split-h1": {
+            "markers": [
+              "A CO-BRANDED ARTICLE INTRODUCTION",
+              "READ THE PARTNER INSIGHT"
+            ]
+          },
+          "split-h2": {
+            "markers": [
+              "A SECONDARY CO-BRANDED ARTICLE INTRODUCTION",
+              "READ THE SECONDARY INSIGHT"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "level",
+        "values": {
+          "": "split-h1",
+          "1": "split-h1",
+          "2": "split-h2"
+        }
+      },
+      "representativeAliases": {
+        "split-h1": [
+          {
+            "id": "ghi.heading.v1",
+            "variant": "h1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ghi.founder-profile-panel.v1",
+      "tag": "founder-profile-panel",
+      "source": "src/components/founder-profile-panel.html",
+      "variants": [
+        "image-right"
+      ],
+      "plaintext": {
+        "required": [
+          "heading",
+          "profile body",
+          "founder name and role",
+          "portrait alt"
+        ],
+        "masterVariants": {
+          "image-right": {
+            "markers": [
+              "FOUNDER AND PARTNERSHIP PROFILE",
+              "Example founder"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "image-right"
+      }
+    },
+    {
+      "id": "ghi.service-row-three.v1",
+      "tag": "service-row-three",
+      "source": "src/components/service-row-three.html",
+      "variants": [
+        "ruled"
+      ],
+      "plaintext": {
+        "required": [
+          "three service titles and descriptions in source order"
+        ],
+        "masterVariants": {
+          "ruled": {
+            "markers": [
+              "DINING AND OCCASIONS",
+              "TRAVEL WITHOUT FRICTION",
+              "GOLF AND TIME WELL SPENT"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "ruled"
+      }
+    },
+    {
+      "id": "ghi.rental-card.v1",
+      "tag": "rental-card",
+      "source": "src/components/rental-card.html",
+      "variants": [
+        "detailed"
+      ],
+      "plaintext": {
+        "required": [
+          "image alt",
+          "title",
+          "location",
+          "guests",
+          "bedrooms",
+          "price",
+          "description",
+          "highlights",
+          "labelled rental URL"
+        ],
+        "masterVariants": {
+          "detailed": {
+            "markers": [
+              "EXAMPLE COASTAL RENTAL",
+              "Guests: 12",
+              "Pool; spa; direct dune access"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "detailed"
+      }
+    },
+    {
+      "id": "ghi.rental-card-pair.v1",
+      "tag": "rental-card-pair",
+      "source": "src/components/rental-card-pair.html",
+      "variants": [
+        "equal-height"
+      ],
+      "plaintext": {
+        "required": [
+          "left rental followed by right rental"
+        ],
+        "masterVariants": {
+          "equal-height": {
+            "markers": [
+              "EXAMPLE COASTAL RENTAL",
+              "EXAMPLE GOLF RENTAL"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "equal-height"
+      }
+    },
+    {
+      "id": "ghi.availability-notice.v1",
+      "tag": "availability-notice",
+      "source": "src/components/availability-notice.html",
+      "variants": [
+        "sand"
+      ],
+      "plaintext": {
+        "required": [
+          "price or availability caveat",
+          "supporting link label and URL"
+        ],
+        "masterVariants": {
+          "sand": {
+            "markers": [
+              "Prices and availability are supplied by the partner",
+              "BROWSE THE PARTNER PORTFOLIO"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "sand"
+      }
+    },
+    {
+      "id": "ghi.compact-property-card.v1",
+      "tag": "compact-property-card",
+      "source": "src/components/compact-property-card.html",
+      "variants": [
+        "spain-height",
+        "portugal-height"
+      ],
+      "plaintext": {
+        "required": [
+          "image alt",
+          "title",
+          "location",
+          "price",
+          "bedrooms",
+          "GHI reference",
+          "labelled listing URL"
+        ],
+        "masterVariants": {
+          "spain-height": {
+            "markers": [
+              "EXAMPLE GHI HOME",
+              "GHI reference GHI00001"
+            ]
+          },
+          "portugal-height": {
+            "markers": [
+              "EXAMPLE PORTUGAL HOME",
+              "GHI reference GHI00003"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "variant",
+        "values": {
+          "spain-height": "spain-height",
+          "portugal-height": "portugal-height"
+        }
+      }
+    },
+    {
+      "id": "ghi.ghi-property-pair.v1",
+      "tag": "ghi-property-pair",
+      "source": "src/components/ghi-property-pair.html",
+      "variants": [
+        "spain-height",
+        "portugal-height"
+      ],
+      "plaintext": {
+        "required": [
+          "group label",
+          "left property then right property",
+          "collection link URL"
+        ],
+        "masterVariants": {
+          "spain-height": {
+            "markers": [
+              "SPAIN",
+              "SEE ALL PROPERTIES IN SPAIN"
+            ]
+          },
+          "portugal-height": {
+            "markers": [
+              "PORTUGAL",
+              "SEE ALL PROPERTIES IN PORTUGAL"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "attribute": "variant",
+        "values": {
+          "spain-height": "spain-height",
+          "portugal-height": "portugal-height"
+        }
+      }
+    },
+    {
+      "id": "ghi.partner-to-ghi-transition.v1",
+      "tag": "partner-to-ghi-transition",
+      "source": "src/components/partner-to-ghi-transition.html",
+      "variants": [
+        "default"
+      ],
+      "plaintext": {
+        "required": [
+          "eyebrow",
+          "heading",
+          "partnership boundary copy"
+        ],
+        "masterVariants": {
+          "default": {
+            "markers": [
+              "FROM THE PARTNER SERVICE TO GHI PROPERTY ADVICE"
+            ]
+          }
+        }
+      },
+      "variantSelector": {
+        "fixed": "default"
+      }
+    }
+  ]
+}

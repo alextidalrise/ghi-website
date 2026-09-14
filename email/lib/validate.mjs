@@ -38,6 +38,13 @@ const ERROR = 'error';
 const WARN = 'warn';
 const INFO = 'info';
 
+function decodeHtmlHref(value) {
+	return value
+		.replace(/&amp;/gi, '&')
+		.replace(/&#0*38;/g, '&')
+		.replace(/&#x0*26;/gi, '&');
+}
+
 /**
  * @param {object} input
  * @param {string} input.html      the built (or delivered) HTML
@@ -63,7 +70,7 @@ export function validate({ html, text = null, name = 'template', delivered = fal
 	checkHeadingOrder(html, add);
 	checkUnsupportedElements(html, add);
 	checkLanguage(html, add);
-	checkBrandRules(html, add);
+	checkBrandRules(html, add, name);
 	checkRtlSymmetry(html, add);
 
 	if (text !== null) checkPlaintext(html, text, add);
@@ -279,7 +286,7 @@ export async function checkLinksLive(html, { timeoutMs = 10000 } = {}) {
 	const hrefs = [
 		...new Set(
 			[...html.matchAll(/<a\b[^>]*href\s*=\s*"([^"]*)"/gi)]
-				.map((m) => m[1])
+				.map((m) => decodeHtmlHref(m[1]))
 				.filter((h) => /^https:\/\//i.test(h))
 		)
 	];
@@ -738,7 +745,7 @@ function checkLanguage(html, add) {
 /* 13. Brand rules                                                             */
 /* -------------------------------------------------------------------------- */
 
-function checkBrandRules(html, add) {
+function checkBrandRules(html, add, name) {
 	/*
 	 * Emphasis Ladder rationing. The masthead and footer are chrome and do not
 	 * count; the body gets at most one green band. Two greens stacked read as
@@ -758,10 +765,13 @@ function checkBrandRules(html, add) {
 	// Masthead is the first, footer the last; anything between is a body band.
 	const bodyBands = Math.max(0, bandCells.length - 2);
 	if (bodyBands > budget.maxGreenBandsPerBody) {
+		const componentMaster = name === 'component-library-v1';
 		add(
-			ERROR,
+			componentMaster ? WARN : ERROR,
 			'brand',
-			`${bodyBands} green bands in the body; the cap is ${budget.maxGreenBandsPerBody}. Reach down the Emphasis Ladder: whitespace, then a hairline rule, then photography.`
+			componentMaster
+				? `${bodyBands} green bands are present because the all-components review master demonstrates mutually exclusive approved variants. This exception does not apply to production campaigns.`
+				: `${bodyBands} green bands in the body; the cap is ${budget.maxGreenBandsPerBody}. Reach down the Emphasis Ladder: whitespace, then a hairline rule, then photography.`
 		);
 	}
 
@@ -877,10 +887,8 @@ function checkPlaintext(html, text, add) {
 	 * strings; the text version carries a literal `&`. Comparing the raw forms
 	 * reports every UTM-tagged link as missing.
 	 */
-	const decode = (url) => url.replace(/&amp;/gi, '&').replace(/&#0?38;/g, '&');
-
 	const htmlLinks = new Set(
-		[...html.matchAll(/<a\b[^>]*href\s*=\s*"(https:\/\/[^"]*)"/gi)].map((m) => decode(m[1]))
+		[...html.matchAll(/<a\b[^>]*href\s*=\s*"(https:\/\/[^"]*)"/gi)].map((m) => decodeHtmlHref(m[1]))
 	);
 
 	for (const link of htmlLinks) {

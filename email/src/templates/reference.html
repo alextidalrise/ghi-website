@@ -25,9 +25,9 @@ subject: 'Six houses on the fairway'
     alt="A villa above the fairway at dusk, with La Concha and the Sierra Blanca beyond"
     width="600"
     height="400"
-  ></x-figure>
+   manifest-id="figure_01"></x-figure>
 
-  <x-section edit="lead" pt="40" pb="40">
+  <x-section edit="lead" pt="40" pb="40" manifest-id="section_01">
 
     <!--
       Personalisation with a fallback. A bare *|FNAME|* renders "Dear ," for
@@ -55,12 +55,12 @@ subject: 'Six houses on the fairway'
       mean a garden that opens onto the ninth. At La Zagaleta it more often means a view
       across a valley you do not own and cannot build on, which is the more durable thing
       to buy. Our
-      <x-link href="{{ page.site.origin }}/guides/reading-a-frontline-listing?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline">note on how to read a frontline listing</x-link>
+      <x-link href="{{ page.site.origin }}/guides?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline&utm_content=frontline-guide">note on how to read a frontline listing</x-link>
       covers the distinction properly.
     </x-text>
 
     <x-button
-      href="{{ page.site.origin }}/spain/andalucia?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline"
+      href="{{ page.site.origin }}/spain?utm_source=mailchimp&utm_medium=email&utm_campaign=andalucia-frontline"
       gap="0"
     >View the collection</x-button>
 
@@ -82,7 +82,7 @@ subject: 'Six houses on the fairway'
     No hairline rule above it: the band's own edge is the divider, so a rule
     there would be redundant (DESIGN.md, "Stacking bands").
   -->
-  <x-band edit="cta_section" pt="48" pb="48">
+  <x-band edit="cta_section" pt="48" pb="48" manifest-id="band_01">
 
     <x-heading level="2" tone="on-green" gap="16">Ask about a specific house</x-heading>
 
@@ -100,7 +100,7 @@ subject: 'Six houses on the fairway'
 
   </x-band>
 
-  <x-section edit="body" pt="40" pb="40">
+  <x-section edit="body" pt="40" pb="40" manifest-id="section_02">
 
     <x-heading level="2" gap="16">Before you travel</x-heading>
 

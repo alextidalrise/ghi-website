@@ -1,0 +1,31 @@
+<tr data-component="partner-article-hero">
+  <td class="sm-gutter" style="background-color: {{ page.brand.white }}; padding: 40px 32px 16px;" mc:edit="{{ edit === '' ? 'partner_article_hero_copy' : edit }}">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%;">
+      <tr>
+        <td style="padding: 0; font-family: {{ page.font.sans }}; font-size: 11px; line-height: 16px; letter-spacing: {{ page.track.wide }}; text-transform: uppercase; color: {{ page.brand.muted }};">{{ label }}</td>
+      </tr>
+      <if condition="level == 2">
+        <x-heading level="2" gap="16">{{ title }}</x-heading>
+      </if>
+      <else>
+        <x-heading level="1" gap="16">{{ title }}</x-heading>
+      </else>
+      <tr>
+        <td style="padding: 0; font-family: {{ page.font.sans }}; font-size: 17px; line-height: 28px; color: {{ page.brand.charcoal }};">{{ body }}</td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr data-component="partner-article-hero-media">
+  <td class="sm-gutter" style="background-color: {{ page.brand.white }}; padding: 0 32px;" mc:edit="{{ mediaedit === '' ? 'partner_article_hero_media' : mediaedit }}">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="dm-border" style="width: 100%; border: 1px solid {{ page.brand.border }};">
+      <tr>
+        <td width="34%" align="center" valign="middle" class="sm-stack sm-card-inner" style="width: 34%; padding: 28px 20px;"><img src="{{ logosrc }}" width="170" alt="{{ logoalt }}" style="display: block; width: 100%; max-width: 170px; height: auto; border: 0;"></td>
+        <td width="66%" valign="top" class="sm-stack" style="width: 66%;"><a href="{{ href }}" style="text-decoration: none;"><img src="{{ src }}" width="354" alt="{{ alt }}" style="display: block; width: 100%; height: auto; border: 0;"></a></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr data-component="partner-article-hero-caption">
+  <td class="sm-gutter" style="background-color: {{ page.brand.white }}; padding: 10px 44px 40px; font-family: {{ page.font.sans }}; font-size: 12px; line-height: 18px; color: {{ page.brand.muted }};" mc:edit="{{ captionedit === '' ? 'partner_article_hero_caption' : captionedit }}">{{ caption }} <a href="{{ href }}" style="color: {{ page.brand.green }}; text-decoration: underline;">{{ cta }}</a></td>
+</tr>

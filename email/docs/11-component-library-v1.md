@@ -1,6 +1,6 @@
 # GHI approved email component library v1
 
-**Status:** implementation contract
+**Status:** source-controlled release candidate; Alex/Mailchimp approval outstanding
 
 This library extends the existing locked GHI shell and primitive components. It exists to reproduce the approved Portugal v15 content/design jobs safely in email and to support future destination, collection and editorial campaigns.
 
@@ -11,9 +11,13 @@ This library extends the existing locked GHI shell and primitive components. It 
 - New semantic components below: controlled combinations with stable props and email-safe rendering.
 - `src/templates/component-library-v1.html`: all-components proving fixture.
 - `src/templates/portugal-v15.html`: campaign render using only approved components.
+- `component-library/v1/registry.json`: canonical `1.0.0` registry of stable IDs, approved source variants and plain-text contracts.
+- `src/manifests/*.json`: mandatory ordered campaign compositions pinned to the registry version and authoritative data sources.
 - Compiled HTML and explicit plain text are committed and reviewed together.
 
 The all-components fixture is a review master. Production campaigns include only selected blocks; unused modules must not be hidden inside campaign HTML.
+
+The registry's `approved variants` are the variants permitted by source validation. They are not a claim of Alex's production approval while the registry status is `awaiting-human-approval`.
 
 ## Component contracts
 
@@ -113,6 +117,20 @@ The all-components fixture is a review master. Production campaigns include only
 
 **Rules:** exactly one visually dominant primary action; WhatsApp is subordinate and uses the canonical configured route; no third default action. The default retains a 24px white separation before the green footer; `flushfooter="true"` removes that row when the light footer follows directly.
 
+## Albany-derived reusable patterns
+
+The v1 release candidate back-ports the reusable visual and content jobs proved by the Albany partner email rather than retaining campaign-specific layout code:
+
+- `partner-article-hero`: co-branded logo/image split, live-text article introduction, caption and labelled article link; H1 and H2 master-fixture variants.
+- `founder-profile-panel`: partner/founder story with a top-aligned portrait identity card.
+- `service-row-three`: three equal service/concierge columns that stack in source order on mobile.
+- `rental-card` and `rental-card-pair`: detailed rental facts, description, highlights and action in equal desktop shells with natural mobile height.
+- `availability-notice`: sand-surface price/availability qualification plus a supporting labelled link.
+- `compact-property-card` and `ghi-property-pair`: top-aligned GHI cards with group-selected explicit shell heights, complete price/bedroom/reference facts and a collection link.
+- `partner-to-ghi-transition`: explicit responsibility boundary and narrative hand-off from partner service to GHI property advice.
+
+All examples are present in the all-components master with stable visible Mailchimp edit regions. Pair rows expose stable `mc:repeatable` identities.
+
 ## Reusable footer contract
 
 The locked shell provides two reusable variants with identical compliance content and reading order:
@@ -142,3 +160,5 @@ The social destinations use hosted email-safe 72px PNGs rendered at 36px, with g
 ## Mailchimp editable-region contract
 
 The component-library fixture may expose named regions for review, but a production campaign should use stable section names scoped to its structured plan. Locked shell content remains uneditable. Renaming an `mc:edit` key is a breaking API change and requires documentation and migration.
+
+See `docs/14-component-first-production-rule.md` for the mandatory manifest, extension, validation, Mailchimp mirror and human-approval gates.

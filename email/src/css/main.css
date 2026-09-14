@@ -128,6 +128,12 @@ p {
  */
 
 @media only screen and (max-width: 600px) {
+	.sm-service-cell {
+		display: block !important;
+		width: 100% !important;
+		padding: 0 0 20px !important;
+		border-left: 0 !important;
+	}
 	/* Side padding tightens so copy does not run to a 24px measure on a 320px screen. */
 	.sm-gutter {
 		padding-left: 24px !important;

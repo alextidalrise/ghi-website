@@ -100,15 +100,15 @@
             style="width: 100%; max-width: 600px; margin: 0 auto; background-color: {{ page.brand.white }};"
           >
 
-            <x-masthead></x-masthead>
+            <x-masthead variant="compact" plaintext-markers="GOLF HOMES INTERNATIONAL"></x-masthead>
 
             <yield></yield>
 
             <if condition="page.footerVariant === 'light'">
-              <x-footer-light></x-footer-light>
+              <x-footer-light plaintext-markers="Instagram: https://www.instagram.com;;*|UNSUB|*"></x-footer-light>
             </if>
             <else>
-              <x-footer></x-footer>
+              <x-footer plaintext-markers="LinkedIn: https://www.linkedin.com;;*|UPDATE_PROFILE|*"></x-footer>
             </else>
 
           </table>
