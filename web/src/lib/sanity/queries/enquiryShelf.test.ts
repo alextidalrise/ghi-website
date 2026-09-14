@@ -8,18 +8,27 @@ const guide = (title: string, slug: string) => ({
 	slug
 });
 
-const partner = (name: string, slug: string, categorySlug: string, category: string) => ({
+const partner = (
+	name: string,
+	slug: string,
+	categories: Array<[slug: string, name: string]>
+) => ({
 	_id: `partner.${slug}`,
 	name,
 	slug,
-	category,
-	categorySlug
+	categories: categories.map(([, categoryName]) => categoryName),
+	categorySlugs: categories.map(([categorySlug]) => categorySlug)
 });
 
-const MORTGAGE = partner('Foxes Finance', 'foxes-finance', 'mortgage', 'Mortgage');
-const CURRENCY = partner('Fiberpay', 'fiberpay', 'currency-exchange', 'Currency Exchange');
-const LEGAL = partner('Franke de la Fuente', 'franke', 'legal-tax', 'Legal & Tax');
-const WEALTH = partner('Atlas Bridge', 'atlas-bridge', 'wealth-management', 'Wealth Management');
+const MORTGAGE = partner('Foxes Finance', 'foxes-finance', [['mortgage', 'Mortgage']]);
+const CURRENCY = partner('Fiberpay', 'fiberpay', [['currency-exchange', 'Currency Exchange']]);
+const LEGAL = partner('Franke de la Fuente', 'franke', [['legal-tax', 'Legal & Tax']]);
+const WEALTH = partner('Atlas Bridge', 'atlas-bridge', [['wealth-management', 'Wealth Management']]);
+// One firm that covers two shelf disciplines at once.
+const MORTGAGE_AND_LEGAL = partner('Dual Advisors', 'dual-advisors', [
+	['mortgage', 'Mortgage'],
+	['legal-tax', 'Legal & Tax']
+]);
 
 const defaults: EnquiryShelf = {
 	guide: {
@@ -39,7 +48,7 @@ describe('toDefaultShelfPartners', () => {
 	});
 
 	it('takes one partner per category, never two from the same one', () => {
-		const second = partner('Other Broker', 'other-broker', 'mortgage', 'Mortgage');
+		const second = partner('Other Broker', 'other-broker', [['mortgage', 'Mortgage']]);
 		const partners = toDefaultShelfPartners([MORTGAGE, second, CURRENCY, LEGAL]);
 
 		expect(partners.map((p) => p.slug)).toEqual(['foxes-finance', 'fiberpay', 'franke']);
@@ -61,6 +70,25 @@ describe('toDefaultShelfPartners', () => {
 		const partners = toDefaultShelfPartners([{ ...MORTGAGE, slug: null }]);
 
 		expect(partners).toEqual([]);
+	});
+
+	it('lets a multi-discipline partner fill a slot, labelled by that slot', () => {
+		// Only firm available: it covers mortgage and legal, and has no currency partner beside
+		// it. It fills the mortgage slot (the earlier discipline) and the label is the slot's,
+		// not its whole list — the legal slot then has no other partner and is skipped.
+		const partners = toDefaultShelfPartners([MORTGAGE_AND_LEGAL]);
+
+		expect(partners.map((p) => p.slug)).toEqual(['dual-advisors']);
+		expect(partners.map((p) => p.discipline)).toEqual(['Mortgage']);
+	});
+
+	it('never places the same firm twice — the next-best partner fills the later slot', () => {
+		// Dual Advisors would match both mortgage and legal; it takes mortgage (the earlier one)
+		// and Franke, the dedicated legal firm, fills the legal slot rather than a blank row.
+		const partners = toDefaultShelfPartners([MORTGAGE_AND_LEGAL, LEGAL]);
+
+		expect(partners.map((p) => p.slug)).toEqual(['dual-advisors', 'franke']);
+		expect(partners.map((p) => p.discipline)).toEqual(['Mortgage', 'Legal & Tax']);
 	});
 });
 

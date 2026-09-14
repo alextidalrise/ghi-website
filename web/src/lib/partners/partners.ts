@@ -45,6 +45,35 @@ export type PartnerCategory = {
 	partners: Partner[];
 };
 
+/**
+ * A partner may sit in several categories. These two helpers render that list the two ways
+ * the site needs it, so the join rule lives in one place:
+ *
+ *  - `partnerCategoryLabel` — a compact " · " join for tight, tag-like surfaces (the homepage
+ *    logo badge, an enquiry-rail discipline, an article's service label).
+ *  - `partnerCategoryProse` — a grammatical list for running copy ("legal & tax, and mortgage").
+ *    The serial comma is deliberate: category names carry their own "&" ("Legal & Tax"), so a
+ *    plain "legal & tax and mortgage" would blur the two — the comma keeps them distinct.
+ */
+export function partnerCategoryLabel(
+	categories: ReadonlyArray<string | null | undefined>
+): string {
+	return cleanNames(categories).join(' · ');
+}
+
+export function partnerCategoryProse(
+	categories: ReadonlyArray<string | null | undefined>
+): string {
+	const names = cleanNames(categories);
+	if (names.length <= 1) return names[0] ?? '';
+	return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
+}
+
+/** Trim, drop blanks and holes — a `categories[]->name` projection can carry both. */
+function cleanNames(categories: ReadonlyArray<string | null | undefined>): string[] {
+	return categories.map((name) => name?.trim() ?? '').filter(Boolean);
+}
+
 /** Buyer-facing introduction-request link for a partner. */
 export function partnerIntroHref(partner: Pick<Partner, 'slug'>): string {
 	return `/contact?partner=${encodeURIComponent(partner.slug)}`;
@@ -60,8 +89,12 @@ export const PARTNER_INTRO_PARAM = 'partner';
 export type PartnerIntroduction = {
 	slug: string;
 	name: string;
-	/** Category display name, e.g. "Mortgage". Null when the category is missing. */
-	category: string | null;
+	/**
+	 * Category display names, e.g. ["Legal & Tax", "Mortgage"], in the partner's own order
+	 * (first is primary). Empty when no category resolved. Render with `partnerCategoryProse`
+	 * in copy, `partnerCategoryLabel` where a compact tag is wanted.
+	 */
+	categories: string[];
 };
 
 /** The message the enquiry form opens with when an introduction was requested. */
