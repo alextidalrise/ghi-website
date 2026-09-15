@@ -58,7 +58,7 @@ describe('parseListingSearchParams', () => {
 		);
 
 		expect(params.page).toBe(1);
-		expect(params.sort).toBe('newest');
+		expect(params.sort).toBeNull(); // unsorted: the grid leads with pinned listings
 		expect(params.propertyType).toBeNull();
 		expect(params.minPrice).toBeNull();
 		expect(params.maxPrice).toBeNull();
@@ -92,6 +92,12 @@ describe('serializeListingSearchParams', () => {
 		expect(parseListingSearchParams(new URL(`https://example.com/spain/marbella?${serialized}`))).toEqual(
 			parsed
 		);
+	});
+
+	it('omits sort when none was chosen, and clears it via a null override', () => {
+		const sorted = parseListingSearchParams(new URL('https://example.com/spain?sort=price_asc'));
+		expect(listingSearchParamsToQueryParams(sorted, { sort: null }).get('sort')).toBeNull();
+		expect(serializeListingSearchParams({ ...DEFAULT_LISTING_SEARCH_PARAMS }).has('sort')).toBe(false);
 	});
 
 	it('omits default values from the query string', () => {
@@ -151,7 +157,8 @@ describe('listingSearchParamsToQueryParams', () => {
 		const query = listingSearchParamsToQueryParams(params, { page: 3, sort: 'newest' });
 
 		expect(query.get('page')).toBe('3');
-		expect(query.get('sort')).toBeNull(); // newest is the default, so it is omitted
+		// An explicit Newest is kept: it is a strict sort, distinct from the unsorted default.
+		expect(query.get('sort')).toBe('newest');
 		expect(query.get('propertyType')).toBe('villa');
 	});
 });

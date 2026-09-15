@@ -1,6 +1,13 @@
 import { defineField, defineType } from 'sanity';
 import { LOCATION_TAXONOMY_TYPES } from '../constants/enums';
-import { createFeaturedListingMember, noDuplicateListings } from '../objects/featuredListings';
+import {
+	createFeaturedListingMember,
+	createPinnedListingMember,
+	noDuplicateListings,
+	PINNED_LISTINGS_DESCRIPTION,
+	PINNED_LISTINGS_MAX,
+	pinScopes
+} from '../objects/featuredListings';
 import { featuredLocationMember, noDuplicateLocations } from '../objects/featuredLocations';
 
 export const locationTaxonomy = defineType({
@@ -237,6 +244,19 @@ export const locationTaxonomy = defineType({
 
 					return true;
 				})
+		}),
+		defineField({
+			name: 'pinnedListings',
+			title: 'Pinned listings',
+			type: 'array',
+			of: [
+				createPinnedListingMember((document) =>
+					document?.type === 'country' ? pinScopes.country(document) : pinScopes.location(document)
+				)
+			],
+			description: PINNED_LISTINGS_DESCRIPTION,
+			hidden: ({ document }) => document?.type !== 'country' && document?.type !== 'location',
+			validation: (Rule) => Rule.max(PINNED_LISTINGS_MAX).custom(noDuplicateListings)
 		}),
 		defineField({
 			name: 'featuredListings',

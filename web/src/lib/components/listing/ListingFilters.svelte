@@ -62,13 +62,17 @@
 	// Select's placeholder owns the empty state instead.
 	const bedsOptions = MIN_BEDS_OPTIONS.filter((option) => option.value !== '');
 
+	// The unsorted state's label. Deliberately claims nothing about the order.
+	const SORT_PLACEHOLDER = 'Default order';
+
 	// Local, editable mirror of the applied params. Re-synced whenever navigation lands
 	// new searchParams (and when the drawer closes without applying).
 	let propertyType = $state('');
 	let minBeds = $state('');
 	let community = $state('');
 	let location = $state('');
-	let sort = $state<ListingSort>('newest');
+	// '' = no sort chosen: the grid leads with pinned listings, then newest.
+	let sort = $state('');
 	let minPrice = $state<number | null>(null);
 	let maxPrice = $state<number | null>(null);
 	let golfRelevance = $state<string[]>([]);
@@ -96,7 +100,7 @@
 		minBeds = searchParams.minBeds != null ? String(searchParams.minBeds) : '';
 		community = searchParams.community ?? '';
 		location = searchParams.location ?? '';
-		sort = searchParams.sort;
+		sort = searchParams.sort ?? '';
 		minPrice = searchParams.minPrice;
 		maxPrice = searchParams.maxPrice;
 		golfRelevance = [...searchParams.golfRelevance];
@@ -128,7 +132,8 @@
 			searchParams.maxPrice != null ||
 			searchParams.golfRelevance.length > 0 ||
 			searchParams.golfCourse.length > 0 ||
-			searchParams.features.length > 0
+			searchParams.features.length > 0 ||
+			searchParams.sort != null
 	);
 
 	// Active-filter count for the mobile trigger badge (sort isn't a filter).
@@ -143,14 +148,16 @@
 			searchParams.features.length
 	);
 
+	// Unsorted names no order: "Newest" or "Recommended" would misdescribe the natural rows
+	// that follow the pins.
 	const sortLabel = $derived(
-		SORT_OPTIONS.find((option) => option.value === searchParams.sort)?.label ?? 'Newest'
+		SORT_OPTIONS.find((option) => option.value === searchParams.sort)?.label ?? null
 	);
 
 	function nextParams(): ListingSearchParams {
 		return {
 			page: 1, // any filter change returns to the first page
-			sort: (SORT_VALUES as readonly string[]).includes(sort) ? sort : 'newest',
+			sort: (SORT_VALUES as readonly string[]).includes(sort) ? (sort as ListingSort) : null,
 			propertyType: (propertyType || null) as ListingSearchParams['propertyType'],
 			minPrice: minPrice ?? null,
 			maxPrice: maxPrice ?? null,
@@ -336,6 +343,7 @@
 				align="end"
 				label="Sort"
 				name="sort"
+				placeholder={SORT_PLACEHOLDER}
 				options={[...SORT_OPTIONS]}
 				activeWhenSet={false}
 				bind:value={sort}
@@ -358,7 +366,7 @@
 		</span>
 		<span class="lf-trigger__label">Filter &amp; sort</span>
 		{#if activeCount > 0}<span class="lf-trigger__badge">{activeCount}</span>{/if}
-		<span class="lf-trigger__meta">{sortLabel}</span>
+		{#if sortLabel}<span class="lf-trigger__meta">{sortLabel}</span>{/if}
 		<span class="lf-trigger__chev" aria-hidden="true"></span>
 	</button>
 </form>
@@ -552,7 +560,8 @@
 
 		<label class="lf-row lf-row--sort">
 			<span class="lf-row__label">Sort by</span>
-			<select class="lf-select" bind:value={sort}>
+			<select class="lf-select" class:is-empty={!sort} bind:value={sort}>
+				<option value="">{SORT_PLACEHOLDER}</option>
 				{#each SORT_OPTIONS as option (option.value)}
 					<option value={option.value}>{option.label}</option>
 				{/each}
@@ -673,6 +682,12 @@
 		font-family: var(--serif);
 		font-style: italic;
 		font-size: 1rem;
+	}
+
+	/* Unsorted: no meta to push the chevron to the end, so it takes the slack itself. */
+	.lf-trigger__label + .lf-trigger__chev,
+	.lf-trigger__badge + .lf-trigger__chev {
+		margin-left: auto;
 	}
 
 	.lf-trigger__chev {

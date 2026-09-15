@@ -14,7 +14,11 @@ import { fetchPublic } from './fetch';
 import {
 	buildListingCardsCountQuery,
 	buildPaginatedListingCardsQuery,
+	buildPinnedListingCardsQuery,
 	listingSearchQueryParams,
+	mergePinnedPage,
+	NATURAL_SORT,
+	pinnedRestStart,
 	type ListingSearchScope
 } from './listingSearch';
 
@@ -39,6 +43,9 @@ export async function fetchListingCards({
 }): Promise<ListingSearchResult> {
 	const start = (params.page - 1) * PAGE_SIZE;
 	const end = start + PAGE_SIZE;
+	// Pins lead only the unsorted grid; a visitor's chosen sort is always strict.
+	const pinnedQuery = params.sort ? null : buildPinnedListingCardsQuery(scope);
+	const restStart = pinnedRestStart(start);
 	const queryParams = listingSearchQueryParams(
 		scope,
 		{
@@ -52,16 +59,26 @@ export async function fetchListingCards({
 			golfCourse: params.golfCourse,
 			features: params.features,
 			start,
-			end
+			end,
+			...(pinnedQuery ? { restStart } : {})
 		},
 		rates
 	);
 
-	const cardsQuery = buildPaginatedListingCardsQuery(scope, params.sort);
 	const countQuery = buildListingCardsCountQuery(scope);
 
 	const [rawCards, total] = await Promise.all([
-		fetchPublic<RawSimilarListingItem[]>(cardsQuery, { params: queryParams }),
+		pinnedQuery
+			? fetchPublic<{ pinned?: RawSimilarListingItem[]; rest?: RawSimilarListingItem[] }>(
+					pinnedQuery,
+					{ params: queryParams }
+				).then((result) =>
+					mergePinnedPage(result?.pinned ?? [], result?.rest ?? [], { start, end, restStart })
+				)
+			: fetchPublic<RawSimilarListingItem[]>(
+					buildPaginatedListingCardsQuery(scope, params.sort ?? NATURAL_SORT),
+					{ params: queryParams }
+				),
 		fetchPublic<number>(countQuery, { params: queryParams })
 	]);
 

@@ -136,6 +136,7 @@ export const load: PageServerLoad = async ({
 		type: 'location' as const,
 		countrySlug: params.country,
 		locationSlug: params.location,
+		locationId: locationPage._id,
 		locationIds,
 		communityId: activeCommunity?._id ?? null
 	};

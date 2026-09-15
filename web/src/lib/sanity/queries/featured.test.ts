@@ -98,6 +98,7 @@ describe('fetchFrontlineListingCards', () => {
 				type: 'location',
 				countrySlug: 'spain',
 				locationSlug: 'costa-del-sol',
+				locationId: 'location-id',
 				locationIds: ['location-id']
 			}
 		});

@@ -32,6 +32,9 @@ const PRICE_FILTERABLE = /* groq */ `(
     || (_type == "propertyListing" && defined(pricing.price))
   )`;
 
+/** Order behind the unsorted grid (after any pins) — the pre-pinning default. */
+export const NATURAL_SORT: ListingSort = 'newest';
+
 /** Allowlisted sort fragments — only composed from validated ListingSort values. */
 export const SORT_ORDER_FRAGMENTS = {
 	price_asc: `${PRICE_NUMERIC} asc, _id asc`,
@@ -41,12 +44,15 @@ export const SORT_ORDER_FRAGMENTS = {
 } as const satisfies Record<ListingSort, string>;
 
 export type ListingSearchScope =
-	| { type: 'global' }
+	/** `pins: 'frontline'` leads with siteSettings.frontlinePinnedListings (Front Line Collection). */
+	| { type: 'global'; pins?: 'frontline' }
 	| { type: 'community'; countrySlug: string; locationSlug: string; communitySlug: string }
 	| {
 			type: 'location';
 			countrySlug: string;
 			locationSlug: string;
+			/** The page's own location doc — the one holding its pinned listings. */
+			locationId: string;
 			locationIds: string[];
 			communityId?: string | null;
 	  }
@@ -168,6 +174,77 @@ export function buildPaginatedListingCardsQuery(
   `;
 }
 
+/** Most listings a grid can pin; mirrors the Studio field's max. */
+export const PINNED_LISTINGS_LIMIT = 6;
+
+/**
+ * The document holding a scope's ordered pin list, or null when the scope has none.
+ * Every expression here is fixed text — only params vary.
+ */
+function pinSourceExpression(scope: ListingSearchScope): string | null {
+	switch (scope.type) {
+		case 'country':
+			return /* groq */ `*[_type == "locationTaxonomy" && type == "country" && slug.current == $countrySlug][0].pinnedListings`;
+		case 'location':
+			return /* groq */ `*[_id == $pinSourceId][0].pinnedListings`;
+		case 'golfCourse':
+			return /* groq */ `*[_id == $golfCourseId][0].pinnedListings`;
+		case 'global':
+			return scope.pins === 'frontline'
+				? /* groq */ `*[_type == "siteSettings" && _id == "siteSettings"][0].frontlinePinnedListings`
+				: null;
+		case 'community':
+			return null;
+	}
+}
+
+/**
+ * Unsorted grid query: the scope's pinned listings (editor order, same filters as the grid)
+ * followed by the rest in natural (newest) order.
+ *
+ * Returns `{ pinned, rest }`. Dereferencing the pin array preserves its order, and filtering
+ * that array with the full grid filter drops pins that are unpublished, out of scope, or
+ * excluded by the visitor's facets. `rest` excludes every pinned id so nothing repeats; the
+ * caller windows `pinned ++ rest` into the page (see mergePinnedPage), so `rest` is fetched
+ * from `$restStart` — up to PINNED_LISTINGS_LIMIT rows early — to cover any pin count.
+ * Returns null for scopes that cannot carry pins (caller uses the plain paginated query).
+ */
+export function buildPinnedListingCardsQuery(scope: ListingSearchScope): string | null {
+	const source = pinSourceExpression(scope);
+	if (!source) return null;
+	const pins = `coalesce(${source}[0...${PINNED_LISTINGS_LIMIT}], [])`;
+	return /* groq */ `{
+    "pinned": (${pins}[]->)[
+      ${listingFilter(scope)}
+    ]${LISTING_CARD_UNION},
+    "rest": *[
+      ${listingFilter(scope)}
+      && !(_id in ${pins}[]._ref)
+    ] | order(${SORT_ORDER_FRAGMENTS[NATURAL_SORT]})[$restStart...$end]${LISTING_CARD_UNION}
+  }`;
+}
+
+/**
+ * Window a page out of `pinned ++ rest`, given `rest` was fetched from `restStart`.
+ * Pins only ever occupy the leading slots, so page 2+ simply continues the natural order
+ * shifted by the pin count — total and page count are unchanged.
+ */
+export function mergePinnedPage<T>(
+	pinned: T[],
+	rest: T[],
+	{ start, end, restStart }: { start: number; end: number; restStart: number }
+): T[] {
+	const leading = pinned.slice(start, end);
+	const restFrom = Math.max(start - pinned.length, 0) - restStart;
+	const restTo = end - pinned.length - restStart;
+	return [...leading, ...rest.slice(Math.max(restFrom, 0), Math.max(restTo, 0))];
+}
+
+/** `rest` offset for a page window — early enough to cover the largest possible pin count. */
+export function pinnedRestStart(start: number): number {
+	return Math.max(start - PINNED_LISTINGS_LIMIT, 0);
+}
+
 /** Build allowlisted count query with identical filters to the card query. */
 export function buildListingCardsCountQuery(scope: ListingSearchScope): string {
 	return /* groq */ `
@@ -192,6 +269,8 @@ export function listingSearchQueryParams(
 		features?: string[];
 		start?: number;
 		end?: number;
+		/** Pinned query only: where the natural rows start (see pinnedRestStart). */
+		restStart?: number;
 	},
 	rates?: RateTable
 ) {
@@ -208,7 +287,9 @@ export function listingSearchQueryParams(
 		...(scope.type === 'location' || scope.type === 'community'
 			? { locationSlug: scope.locationSlug }
 			: {}),
-		...(scope.type === 'location' ? { locationIds: scope.locationIds } : {}),
+		...(scope.type === 'location'
+			? { locationIds: scope.locationIds, pinSourceId: scope.locationId }
+			: {}),
 		...(scope.type === 'location' && scope.communityId ? { communityId: scope.communityId } : {}),
 		...(scope.type === 'community' ? { communitySlug: scope.communitySlug } : {}),
 		...(scope.type === 'golfCourse' ? { golfCourseId: scope.golfCourseId } : {}),
@@ -226,7 +307,8 @@ export function listingSearchQueryParams(
 			params.golfCourse && params.golfCourse.length > 0 ? params.golfCourse : null,
 		features: params.features && params.features.length > 0 ? params.features : null,
 		start: params.start,
-		end: params.end
+		end: params.end,
+		...(params.restStart != null ? { restStart: params.restStart } : {})
 	};
 }
 
