@@ -146,8 +146,8 @@ listing being entered safely.
   - Needed by U-06. Field hidden unless `type == 'country'`, same pattern as `flag`
     (`locationTaxonomy.ts:168-176`).
 
-- [ ] **V-02** Extend `COUNTRY_OPTIONS`
-  - `sanity/schemas/constants/enums.ts:195-198` — currently `spain` / `portugal`. Value **must** equal
+- [x] **V-02** Extend `COUNTRY_OPTIONS` _(done in #171 — `uae` added, plus `montenegro`)_
+  - `sanity/schemas/constants/enums.ts:202` — was `spain` / `portugal`. Value **must** equal
     the country taxonomy slug (see the comment at L193). Drives `guide.ts:43-54` and
     `partner.ts:38-47`; without it no UAE guide or partner can be tagged and the enquiry shelf stays
     permanently empty.
