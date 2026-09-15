@@ -46,6 +46,7 @@ function rawCardFromFixture(
 		propertyType: raw.propertyType as RawPropertyCard['propertyType'],
 		transactionType: raw.transactionType as RawPropertyCard['transactionType'],
 		countrySlug: raw.location?.country?.slug ?? null,
+		countryFlagUrl: null,
 		locationSlug: raw.location?.location?.slug ?? null,
 		communitySlug: raw.location?.community?.slug ?? null,
 		isCatchAll: raw.location?.community?.isCatchAll ?? false,

@@ -56,6 +56,7 @@
 			heading={data.content.resultsHeading}
 			courseOptions={data.courseOptions}
 			showGolfRelevance={false}
+			showCountryFlag
 		/>
 	</div>
 </article>

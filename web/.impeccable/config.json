@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/lib/components/CountryFlagArt.svelte"
+        ],
+        "createdAt": "2026-09-14T15:04:48.929Z",
+        "reason": "false positive: <img src={flagUrl}> is guarded by {#if flagUrl}, never ships empty; pre-existing component"
+      }
+    ]
+  }
+}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CardCountryFlag from './CardCountryFlag.svelte';
 	import { trackListingSelected, type AnalyticsItem } from '$lib/analytics';
 	import { buildListingHref } from '$lib/listing/canonicalPath';
 	import {
@@ -26,6 +27,8 @@
 		showLocation?: boolean;
 		/** Supplied by the list container, which knows the card's list and position. */
 		item?: AnalyticsItem | null;
+		/** Mixed-country surfaces overlay a country flag stamp to disambiguate at a glance. */
+		showCountryFlag?: boolean;
 	} & (
 		| { kind?: 'property'; card: PublicPropertyCard }
 		| { kind: 'development'; card: PublicDevelopmentCard }
@@ -36,7 +39,8 @@
 		kind = 'property',
 		surface = 'light',
 		showLocation = false,
-		item = null
+		item = null,
+		showCountryFlag = false
 	}: Props = $props();
 
 	const href = $derived.by(() => {
@@ -152,6 +156,9 @@
 			/>
 		{:else}
 			<span class="spotlight-card__img spotlight-card__img--placeholder" aria-hidden="true"></span>
+		{/if}
+		{#if showCountryFlag}
+			<CardCountryFlag slug={card.countrySlug} flagUrl={card.countryFlagUrl} />
 		{/if}
 	</span>
 

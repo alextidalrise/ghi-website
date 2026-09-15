@@ -23,6 +23,7 @@ const listingRow = (over: Partial<RawPropertyCard> = {}): RawPropertyCard => ({
 	propertyType: 'villa',
 	transactionType: 'sale',
 	countrySlug: 'spain',
+	countryFlagUrl: null,
 	locationSlug: 'murcia',
 	communitySlug: 'santa-rosalia',
 	isCatchAll: false,

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CardCountryFlag from './CardCountryFlag.svelte';
 	import { trackListingSelected, type AnalyticsItem } from '$lib/analytics';
 	import { buildListingHref } from '$lib/listing/canonicalPath';
 	import { resolveCardLocationLine } from '$lib/listing/cardLocationLine';
@@ -16,9 +17,11 @@
 		item?: AnalyticsItem | null;
 		/** Eager-load this card's image (above-the-fold LCP candidate). */
 		priority?: boolean;
+		/** Mixed-country surfaces overlay a country flag stamp to disambiguate at a glance. */
+		showCountryFlag?: boolean;
 	};
 
-	let { card, item = null, priority = false }: Props = $props();
+	let { card, item = null, priority = false, showCountryFlag = false }: Props = $props();
 
 	const href = $derived(
 		buildListingHref({
@@ -53,17 +56,22 @@
 
 {#snippet cardBody()}
 	{#if card.heroImageUrl}
-		<img
-			class="property-card__image"
-			src={card.heroImageUrl}
-			alt={imageAlt}
-			width={CARD_HERO_IMAGE.width}
-			height={CARD_HERO_IMAGE.height}
-			loading={priority ? 'eager' : 'lazy'}
-			fetchpriority={priority ? 'high' : undefined}
-			decoding="async"
-			style:background-image={card.heroImageLqip ? `url(${card.heroImageLqip})` : undefined}
-		/>
+		<div class="property-card__media">
+			<img
+				class="property-card__image"
+				src={card.heroImageUrl}
+				alt={imageAlt}
+				width={CARD_HERO_IMAGE.width}
+				height={CARD_HERO_IMAGE.height}
+				loading={priority ? 'eager' : 'lazy'}
+				fetchpriority={priority ? 'high' : undefined}
+				decoding="async"
+				style:background-image={card.heroImageLqip ? `url(${card.heroImageLqip})` : undefined}
+			/>
+			{#if showCountryFlag}
+				<CardCountryFlag slug={card.countrySlug} flagUrl={card.countryFlagUrl} />
+			{/if}
+		</div>
 	{/if}
 
 	<div class="property-card__body">
@@ -117,6 +125,11 @@
 	a.property-card:hover .property-card__title,
 	a.property-card:focus-visible .property-card__title {
 		color: var(--green);
+	}
+
+	/* Positioning context for the overlaid country flag stamp (mixed-country surfaces). */
+	.property-card__media {
+		position: relative;
 	}
 
 	.property-card__image {
