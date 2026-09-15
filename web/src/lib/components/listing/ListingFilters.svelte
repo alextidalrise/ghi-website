@@ -27,7 +27,8 @@
 	type CountryOption = { label: string; value: string };
 	/** `country` (slug) lets the Location list cascade from the Country filter. */
 	type LocationOption = { label: string; value: string; country?: string };
-	type CourseOption = { label: string; value: string };
+	/** `countries`/`locations` (slugs) let the Course list narrow with Country and Location. */
+	type CourseOption = { label: string; value: string; countries?: string[]; locations?: string[] };
 	type FeatureOption = { label: string; value: string };
 
 	type Props = {
@@ -41,7 +42,10 @@
 		 * the Location filter. Options carrying `country` narrow to the chosen Country.
 		 */
 		locationOptions?: LocationOption[];
-		/** Golf course/club options. When non-empty, renders the Course filter. */
+		/**
+		 * Golf course/club options. When non-empty, renders the Course filter. Options carrying
+		 * `countries`/`locations` narrow to the chosen Country and Location.
+		 */
 		courseOptions?: CourseOption[];
 		/** Auto-derived feature-highlight options. When non-empty, renders the Features filter. */
 		featureOptions?: FeatureOption[];
@@ -252,20 +256,46 @@
 	// Both take the new value explicitly rather than trusting bind:value to have landed first:
 	// on the native sheet selects, the binding's listener and onchange share one event.
 
-	/** A new country drops a chosen location that no longer belongs to it. */
+	/** Whether a course has frontline stock in the locally chosen country and location. */
+	function courseFitsPlace(option: CourseOption): boolean {
+		return (
+			(!country || !option.countries || option.countries.includes(country)) &&
+			(!location || !option.locations || option.locations.includes(location))
+		);
+	}
+
+	// Golf course narrows with Country and Location the same way. Ticked courses stay listed
+	// so a selection never filters invisibly (a place change drops the ones that don't fit).
+	const visibleCourseOptions = $derived(
+		courseOptions.filter((option) => golfCourse.includes(option.value) || courseFitsPlace(option))
+	);
+
+	/** Untick courses with no stock in the newly chosen place. */
+	function dropUnplacedCourses() {
+		const fits = golfCourse.filter((value) => {
+			const option = courseOptions.find((candidate) => candidate.value === value);
+			return !option || courseFitsPlace(option);
+		});
+		if (fits.length !== golfCourse.length) golfCourse = fits;
+	}
+
+	/** A new country drops a chosen location (and courses) that no longer belong to it. */
 	function onCountryChange(next: string) {
 		country = next;
 		if (location && !visibleLocationOptions.some((option) => option.value === location)) {
 			location = '';
 		}
+		dropUnplacedCourses();
 	}
 
 	/** A location picked with no country set fills in its country, keeping the pair coherent. */
 	function onLocationChange(next: string) {
 		location = next;
-		if (!location || country || countryOptions.length === 0) return;
-		const owner = locationOptions.find((option) => option.value === location)?.country;
-		if (owner && countryOptions.some((option) => option.value === owner)) country = owner;
+		if (location && !country && countryOptions.length > 0) {
+			const owner = locationOptions.find((option) => option.value === location)?.country;
+			if (owner && countryOptions.some((option) => option.value === owner)) country = owner;
+		}
+		dropUnplacedCourses();
 	}
 
 	/** JS path: build a clean href from local state and SPA-navigate. */
@@ -404,7 +434,7 @@
 					variant="tray"
 					label="Golf course"
 					name="golfCourse"
-					options={courseOptions}
+					options={visibleCourseOptions}
 					bind:value={golfCourse}
 					onchange={applyNow}
 				/>
@@ -616,7 +646,7 @@
 				{#if golfCourseOpen}
 					<fieldset id="lf-golf-course-panel" class="lf-checks">
 						<legend class="sr-only">Golf course</legend>
-						{#each courseOptions as option (option.value)}
+						{#each visibleCourseOptions as option (option.value)}
 							<label class="lf-check">
 								<input type="checkbox" bind:group={golfCourse} value={option.value} />
 								<span>{option.label}</span>

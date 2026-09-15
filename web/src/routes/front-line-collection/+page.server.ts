@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 			params: { ...searchParams, golfRelevance: ['frontline_golf'] },
 			rates
 		}),
-		fetchFrontlineCourseOptions(),
+		fetchFrontlineCourseOptions({ params: searchParams, rates }),
 		fetchFrontlinePlaceOptions(),
 		fetchFrontlineHero(),
 		fetchFrontlineContent()

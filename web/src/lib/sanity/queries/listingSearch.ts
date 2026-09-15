@@ -249,6 +249,28 @@ export function pinnedRestStart(start: number): number {
 	return Math.max(start - PINNED_LISTINGS_LIMIT, 0);
 }
 
+/**
+ * Golf-course facet rows: for every row the grid's filters match, its place and the courses
+ * it links (the field the golfCourse facet matches on). Callers leave `golfCourse` unset so
+ * the facet never narrows itself, and `country`/`location` unset when the filter bar narrows
+ * by place on the client.
+ */
+export function buildGolfCourseFacetQuery(scope: ListingSearchScope): string {
+	return /* groq */ `{
+    "rows": *[
+      ${listingFilter(scope)}
+    ]{
+      "country": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),
+      "location": location.location->slug.current,
+      "courses": golf.linkedGolfCourses[]->{ "label": name, "value": slug.current }
+    },
+    "selected": *[_type == "golfCourse" && slug.current in $selectedCourses]{
+      "label": name,
+      "value": slug.current
+    }
+  }`;
+}
+
 /** Build allowlisted count query with identical filters to the card query. */
 export function buildListingCardsCountQuery(scope: ListingSearchScope): string {
 	return /* groq */ `
