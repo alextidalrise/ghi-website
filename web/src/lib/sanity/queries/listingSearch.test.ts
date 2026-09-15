@@ -82,6 +82,23 @@ describe('EUR-normalised price', () => {
 	});
 });
 
+describe('country facet filter', () => {
+	it('matches the listing country, falling back to the community ancestry', () => {
+		const query = buildListingCardsCountQuery({ type: 'global' });
+		expect(query).toContain('!defined($country)');
+		expect(query).toContain(
+			'coalesce(location.country->slug.current, location.community->parent->parent->slug.current) == $country'
+		);
+	});
+
+	it('supplies country, or null when unset', () => {
+		expect(listingSearchQueryParams({ type: 'global' }, { country: 'spain' })).toMatchObject({
+			country: 'spain'
+		});
+		expect(listingSearchQueryParams({ type: 'global' }, {})).toMatchObject({ country: null });
+	});
+});
+
 describe('golfCourse facet filter', () => {
 	it('matches on linked course slugs', () => {
 		const query = buildListingCardsCountQuery({ type: 'global' });

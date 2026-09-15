@@ -17,7 +17,7 @@ describe('parseListingSearchParams', () => {
 	it('parses valid filters and normalizes page to at least 1', () => {
 		const params = parseListingSearchParams(
 			new URL(
-				'https://example.com/spain/marbella?page=2&sort=price_asc&propertyType=villa&minPrice=500000&maxPrice=2000000&minBeds=3&community=nueva-andalucia&location=marbella&golfRelevance=frontline_golf&golfRelevance=golf_view&golfCourse=valderrama&golfCourse=la-reserva&features=Sea%20view&features=private%20pool'
+				'https://example.com/spain/marbella?page=2&sort=price_asc&propertyType=villa&minPrice=500000&maxPrice=2000000&minBeds=3&community=nueva-andalucia&country=Spain&location=marbella&golfRelevance=frontline_golf&golfRelevance=golf_view&golfCourse=valderrama&golfCourse=la-reserva&features=Sea%20view&features=private%20pool'
 			)
 		);
 
@@ -29,6 +29,7 @@ describe('parseListingSearchParams', () => {
 			maxPrice: 2_000_000,
 			minBeds: 3,
 			community: 'nueva-andalucia',
+			country: 'spain',
 			location: 'marbella',
 			golfRelevance: ['frontline_golf', 'golf_view'],
 			golfCourse: ['la-reserva', 'valderrama'],
@@ -81,10 +82,18 @@ describe('parseListingSearchParams', () => {
 	});
 });
 
+describe('parseListingSearchParams country', () => {
+	it('drops a country value that is not a slug', () => {
+		expect(
+			parseListingSearchParams(new URL('https://example.com/front-line-collection?country=spain%20or%201')).country
+		).toBeNull();
+	});
+});
+
 describe('serializeListingSearchParams', () => {
 	it('round-trips parsed params', () => {
 		const url = new URL(
-			'https://example.com/spain/marbella?page=3&sort=newest&propertyType=apartment&minPrice=250000&maxPrice=900000&minBeds=2&golfRelevance=near_golf'
+			'https://example.com/spain/marbella?page=3&sort=newest&propertyType=apartment&minPrice=250000&maxPrice=900000&minBeds=2&country=portugal&location=vilamoura&golfRelevance=near_golf'
 		);
 		const parsed = parseListingSearchParams(url);
 		const serialized = serializeListingSearchParams(parsed);

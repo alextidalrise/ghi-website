@@ -95,7 +95,7 @@ function scopeFilter(scope: ListingSearchScope): string {
  * The property-type and bedroom facets are unit-aware for developments: a
  * development matches if ANY of its visible+available unit types (for property
  * type — units inherit type from their parent so unit types are authoritative) or
- * units/unit types (for bedrooms) qualifies. Price, golf, community and location
+ * units/unit types (for bedrooms) qualifies. Price, golf, community, country and location
  * facets need no branching — developments carry the same fields as properties.
  */
 const FACET_FILTERS = /* groq */ `
@@ -108,6 +108,10 @@ const FACET_FILTERS = /* groq */ `
     )
   )
   && (!defined($community) || location.community->slug.current == $community)
+  && (
+    !defined($country)
+    || coalesce(location.country->slug.current, location.community->parent->parent->slug.current) == $country
+  )
   && (!defined($location) || location.location->slug.current == $location)
   && (
     !defined($minBeds)
@@ -260,6 +264,7 @@ export function listingSearchQueryParams(
 	params: {
 		propertyType?: string | null;
 		community?: string | null;
+		country?: string | null;
 		location?: string | null;
 		minPrice?: number | null;
 		maxPrice?: number | null;
@@ -295,6 +300,7 @@ export function listingSearchQueryParams(
 		...(scope.type === 'golfCourse' ? { golfCourseId: scope.golfCourseId } : {}),
 		propertyType: params.propertyType ?? null,
 		community: params.community ?? null,
+		country: params.country ?? null,
 		location: params.location ?? null,
 		minPrice: params.minPrice ?? null,
 		maxPrice: params.maxPrice ?? null,

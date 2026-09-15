@@ -21,7 +21,9 @@
 	import PriceMenu from '$lib/components/ui/PriceMenu.svelte';
 
 	type CommunityOption = { label: string; value: string };
-	type LocationOption = { label: string; value: string };
+	type CountryOption = { label: string; value: string };
+	/** `country` (slug) lets the Location list cascade from the Country filter. */
+	type LocationOption = { label: string; value: string; country?: string };
 	type CourseOption = { label: string; value: string };
 	type FeatureOption = { label: string; value: string };
 
@@ -29,7 +31,12 @@
 		basePath: string;
 		searchParams: ListingSearchParams;
 		communityOptions?: CommunityOption[];
-		/** Location options (country scope). When non-empty, renders the Location filter. */
+		/** Country options (Front Line Collection). When non-empty, renders the Country filter. */
+		countryOptions?: CountryOption[];
+		/**
+		 * Location options (country scope and Front Line Collection). When non-empty, renders
+		 * the Location filter. Options carrying `country` narrow to the chosen Country.
+		 */
 		locationOptions?: LocationOption[];
 		/** Golf course/club options. When non-empty, renders the Course filter. */
 		courseOptions?: CourseOption[];
@@ -37,16 +44,23 @@
 		featureOptions?: FeatureOption[];
 		/** Whether to show the generic golf-relevance filter (hidden on the frontline page). */
 		showGolfRelevance?: boolean;
+		/** Whether to show the Property type filter (hidden on the frontline page). */
+		showPropertyType?: boolean;
+		/** Whether to show the Bedrooms filter (hidden on the frontline page). */
+		showBedrooms?: boolean;
 	};
 
 	let {
 		basePath,
 		searchParams,
 		communityOptions = [],
+		countryOptions = [],
 		locationOptions = [],
 		courseOptions = [],
 		featureOptions = [],
-		showGolfRelevance = true
+		showGolfRelevance = true,
+		showPropertyType = true,
+		showBedrooms = true
 	}: Props = $props();
 
 	let form: HTMLFormElement | undefined;
@@ -70,6 +84,7 @@
 	let propertyType = $state('');
 	let minBeds = $state('');
 	let community = $state('');
+	let country = $state('');
 	let location = $state('');
 	// '' = no sort chosen: the grid leads with pinned listings, then newest.
 	let sort = $state('');
@@ -99,6 +114,7 @@
 		propertyType = searchParams.propertyType ?? '';
 		minBeds = searchParams.minBeds != null ? String(searchParams.minBeds) : '';
 		community = searchParams.community ?? '';
+		country = searchParams.country ?? '';
 		location = searchParams.location ?? '';
 		sort = searchParams.sort ?? '';
 		minPrice = searchParams.minPrice;
@@ -113,6 +129,7 @@
 		searchParams.propertyType;
 		searchParams.minBeds;
 		searchParams.community;
+		searchParams.country;
 		searchParams.location;
 		searchParams.sort;
 		searchParams.minPrice;
@@ -126,6 +143,7 @@
 	const hasActiveFilters = $derived(
 		searchParams.propertyType != null ||
 			searchParams.community != null ||
+			searchParams.country != null ||
 			searchParams.location != null ||
 			searchParams.minBeds != null ||
 			searchParams.minPrice != null ||
@@ -141,6 +159,7 @@
 		(searchParams.propertyType ? 1 : 0) +
 			(searchParams.minBeds != null ? 1 : 0) +
 			(searchParams.community ? 1 : 0) +
+			(searchParams.country ? 1 : 0) +
 			(searchParams.location ? 1 : 0) +
 			(searchParams.minPrice != null || searchParams.maxPrice != null ? 1 : 0) +
 			searchParams.golfRelevance.length +
@@ -163,6 +182,7 @@
 			maxPrice: maxPrice ?? null,
 			minBeds: minBeds ? Number(minBeds) : null,
 			community: community || null,
+			country: country || null,
 			location: location || null,
 			golfRelevance: [...golfRelevance] as ListingSearchParams['golfRelevance'],
 			golfCourse: [...golfCourse],
@@ -185,7 +205,7 @@
 			const allowedFeatures = new Set(featureOptions.map((option) => option.value));
 			trackSearchSubmitted({
 				placement: 'results_filters',
-				country: page.params.country,
+				country: applied.country ?? page.params.country,
 				location: applied.location ?? page.params.location,
 				community: applied.community ?? page.params.community,
 				propertyType: applied.propertyType,
@@ -196,6 +216,33 @@
 				golfRelevance: applied.golfRelevance
 			});
 		}, SEARCH_REPORT_DELAY);
+	}
+
+	// Location cascades from Country: once a country is chosen, only its locations are offered.
+	// Options without a `country` (the country page's own list) are never narrowed.
+	const visibleLocationOptions = $derived(
+		country
+			? locationOptions.filter((option) => !option.country || option.country === country)
+			: locationOptions
+	);
+
+	// Both take the new value explicitly rather than trusting bind:value to have landed first:
+	// on the native sheet selects, the binding's listener and onchange share one event.
+
+	/** A new country drops a chosen location that no longer belongs to it. */
+	function onCountryChange(next: string) {
+		country = next;
+		if (location && !visibleLocationOptions.some((option) => option.value === location)) {
+			location = '';
+		}
+	}
+
+	/** A location picked with no country set fills in its country, keeping the pair coherent. */
+	function onLocationChange(next: string) {
+		location = next;
+		if (!location || country || countryOptions.length === 0) return;
+		const owner = locationOptions.find((option) => option.value === location)?.country;
+		if (owner && countryOptions.some((option) => option.value === owner)) country = owner;
 	}
 
 	/** JS path: build a clean href from local state and SPA-navigate. */
@@ -254,38 +301,59 @@
 	<div class="filter-bar">
 		<!-- Core single-select narrowers share one tray, in the homepage design language. -->
 		<div class="filter-bar__tray fc-tray">
-			<!-- Location leads the country-scope tray: the first question on a country page
-			     is which area. Rendered only when location options are supplied. -->
+			<!-- Place leads the tray: the first question is which country (Front Line Collection)
+			     and which area. Each renders only when its options are supplied. -->
+			{#if countryOptions.length > 0}
+				<Select
+					variant="tray"
+					label="Country"
+					placeholder="All countries"
+					name="country"
+					options={countryOptions}
+					bind:value={country}
+					onchange={(next) => {
+						onCountryChange(next);
+						applyNow();
+					}}
+				/>
+			{/if}
 			{#if locationOptions.length > 0}
 				<Select
 					variant="tray"
 					label="Location"
 					placeholder="All locations"
 					name="location"
-					options={locationOptions}
+					options={visibleLocationOptions}
 					bind:value={location}
-					onchange={applyNow}
+					onchange={(next) => {
+						onLocationChange(next);
+						applyNow();
+					}}
 				/>
 			{/if}
 			<PriceMenu bind:minPrice bind:maxPrice onchange={applyNow} />
-			<Select
-				variant="tray"
-				label="Property type"
-				placeholder="Any type"
-				name="propertyType"
-				options={[...PROPERTY_TYPES]}
-				bind:value={propertyType}
-				onchange={applyNow}
-			/>
-			<Select
-				variant="tray"
-				label="Bedrooms"
-				placeholder="Any beds"
-				name="minBeds"
-				options={[...bedsOptions]}
-				bind:value={minBeds}
-				onchange={applyNow}
-			/>
+			{#if showPropertyType}
+				<Select
+					variant="tray"
+					label="Property type"
+					placeholder="Any type"
+					name="propertyType"
+					options={[...PROPERTY_TYPES]}
+					bind:value={propertyType}
+					onchange={applyNow}
+				/>
+			{/if}
+			{#if showBedrooms}
+				<Select
+					variant="tray"
+					label="Bedrooms"
+					placeholder="Any beds"
+					name="minBeds"
+					options={[...bedsOptions]}
+					bind:value={minBeds}
+					onchange={applyNow}
+				/>
+			{/if}
 			{#if communityOptions.length > 0}
 				<Select
 					variant="tray"
@@ -388,12 +456,34 @@
 	</div>
 
 	<div class="lf-sheet__body">
+		{#if countryOptions.length > 0}
+			<label class="lf-row">
+				<span class="lf-row__label">Country</span>
+				<select
+					class="lf-select"
+					class:is-empty={!country}
+					bind:value={country}
+					onchange={(event) => onCountryChange(event.currentTarget.value)}
+				>
+					<option value="">All countries</option>
+					{#each countryOptions as option (option.value)}
+						<option value={option.value}>{option.label}</option>
+					{/each}
+				</select>
+			</label>
+		{/if}
+
 		{#if locationOptions.length > 0}
 			<label class="lf-row">
 				<span class="lf-row__label">Location</span>
-				<select class="lf-select" class:is-empty={!location} bind:value={location}>
+				<select
+					class="lf-select"
+					class:is-empty={!location}
+					bind:value={location}
+					onchange={(event) => onLocationChange(event.currentTarget.value)}
+				>
 					<option value="">All locations</option>
-					{#each locationOptions as option (option.value)}
+					{#each visibleLocationOptions as option (option.value)}
 						<option value={option.value}>{option.label}</option>
 					{/each}
 				</select>
@@ -425,25 +515,29 @@
 			</div>
 		</div>
 
-		<label class="lf-row">
-			<span class="lf-row__label">Property type</span>
-			<select class="lf-select" class:is-empty={!propertyType} bind:value={propertyType}>
-				<option value="">Any type</option>
-				{#each PROPERTY_TYPES as option (option.value)}
-					<option value={option.value}>{option.label}</option>
-				{/each}
-			</select>
-		</label>
+		{#if showPropertyType}
+			<label class="lf-row">
+				<span class="lf-row__label">Property type</span>
+				<select class="lf-select" class:is-empty={!propertyType} bind:value={propertyType}>
+					<option value="">Any type</option>
+					{#each PROPERTY_TYPES as option (option.value)}
+						<option value={option.value}>{option.label}</option>
+					{/each}
+				</select>
+			</label>
+		{/if}
 
-		<label class="lf-row">
-			<span class="lf-row__label">Bedrooms</span>
-			<select class="lf-select" class:is-empty={!minBeds} bind:value={minBeds}>
-				<option value="">Any beds</option>
-				{#each bedsOptions as option (option.value)}
-					<option value={option.value}>{option.label}</option>
-				{/each}
-			</select>
-		</label>
+		{#if showBedrooms}
+			<label class="lf-row">
+				<span class="lf-row__label">Bedrooms</span>
+				<select class="lf-select" class:is-empty={!minBeds} bind:value={minBeds}>
+					<option value="">Any beds</option>
+					{#each bedsOptions as option (option.value)}
+						<option value={option.value}>{option.label}</option>
+					{/each}
+				</select>
+			</label>
+		{/if}
 
 		{#if communityOptions.length > 0}
 			<label class="lf-row">

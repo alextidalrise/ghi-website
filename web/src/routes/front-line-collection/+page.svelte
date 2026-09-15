@@ -54,8 +54,12 @@
 			total={data.listingResults.total}
 			pagination={data.listingResults.pagination}
 			heading={data.content.resultsHeading}
+			countryOptions={data.countryOptions}
+			locationOptions={data.locationOptions}
 			courseOptions={data.courseOptions}
 			showGolfRelevance={false}
+			showPropertyType={false}
+			showBedrooms={false}
 			showCountryFlag
 		/>
 	</div>
