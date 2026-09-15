@@ -131,6 +131,16 @@ export function getCurrency(): CurrencyStore {
 }
 
 /**
+ * Read the store if present, else `null`. Tolerant, like `getCurrencyRates()`: a filter
+ * control is content that must render in a preview or test where no context was provided.
+ * Callers read `.chosen`/`.rates` reactively off the returned store and treat `null` as
+ * "as listed" (EUR) — the SSR default, before the switcher hydrates.
+ */
+export function getCurrencyOptional(): CurrencyStore | null {
+	return getContext<CurrencyStore | undefined>(CURRENCY_KEY) ?? null;
+}
+
+/**
  * The rate table for rendering prices. Tolerant, unlike `getCurrency()`: a price rendered
  * outside the root layout (a component test, a preview) falls back to the static snapshot
  * instead of failing, because a price is content and must always render.
