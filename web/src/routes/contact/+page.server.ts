@@ -5,7 +5,7 @@ import { breadcrumbListJsonLd, type BreadcrumbItem } from '$lib/listing/breadcru
 import { loadReviews } from '$lib/reviews';
 import { fetchHomepagePartnerLogos, fetchPartnerIntroduction } from '$lib/sanity/queries/partners';
 import { fetchContactPage } from '$lib/sanity/queries';
-import { PARTNER_INTRO_PARAM } from '$lib/partners/partners';
+import { PARTNER_INTRO_PARAM, partnerCategoryLabel } from '$lib/partners/partners';
 import {
 	ENQUIRY_TOPIC_PARAM,
 	enquiryTopicLabel,
@@ -140,8 +140,9 @@ export const actions: Actions = {
 		// introduction is the more specific request, so it wins.
 		const partner = await fetchPartnerIntroduction(partnerSlug);
 		const topicLabel = partner ? null : enquiryTopicLabel(topicKey);
+		const partnerCategoryTag = partner ? partnerCategoryLabel(partner.categories) : '';
 		const context = partner
-			? `Introduction requested: ${partner.name}${partner.category ? ` (${partner.category})` : ''}`
+			? `Introduction requested: ${partner.name}${partnerCategoryTag ? ` (${partnerCategoryTag})` : ''}`
 			: topicLabel;
 		const submittedMessage = context ? `${context}\n\n${message}` : message;
 

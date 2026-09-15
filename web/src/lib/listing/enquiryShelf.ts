@@ -35,14 +35,45 @@ const SHELF_DISCIPLINE_LABELS: Record<string, string> = {
 	'currency-exchange': 'Currency'
 };
 
-export function disciplineFor(partner: {
-	category?: string | null;
-	categorySlug?: string | null;
-}): string | null {
-	const short = partner.categorySlug ? SHELF_DISCIPLINE_LABELS[partner.categorySlug] : undefined;
-	// `|| null`, not `?? null`: a whitespace-only category trims to "", which is not nullish
-	// and would ride through as an empty label rather than collapsing the row's label cell.
-	return short ?? (partner.category?.trim() || null);
+/** A partner's parallel category name / slug arrays, as projected by SHELF_PARTNER_PUBLIC. */
+type ShelfPartnerCategories = {
+	categories?: Array<string | null> | null;
+	categorySlugs?: Array<string | null> | null;
+};
+
+/**
+ * The label for a specific shelf slot a partner has been chosen to fill. The default shelf
+ * assigns one partner per discipline, so the label is the SLOT's discipline — a mortgage-and-legal
+ * partner filling the mortgage slot reads "Mortgage", not both, keeping each rail row one clean
+ * discipline. Falls back to the partner's own name for that category where no short label applies.
+ */
+export function disciplineForSlot(
+	categorySlug: string,
+	partner: ShelfPartnerCategories
+): string | null {
+	const short = SHELF_DISCIPLINE_LABELS[categorySlug];
+	if (short) return short;
+	const index = (partner.categorySlugs ?? []).indexOf(categorySlug);
+	// `|| null`, not `?? null`: a whitespace-only name trims to "", which is not nullish and
+	// would ride through as an empty label rather than collapsing the row's label cell.
+	return (index >= 0 ? partner.categories?.[index]?.trim() : undefined) || null;
+}
+
+/**
+ * The label for an editor-picked partner, where there is no slot to name. The rail is not
+ * discipline-partitioned in that case, so a multi-category partner shows all its disciplines,
+ * joined — with the short label swapped in per category where the full name is too wide.
+ */
+export function disciplineFor(partner: ShelfPartnerCategories): string | null {
+	const slugs = partner.categorySlugs ?? [];
+	const labels = (partner.categories ?? [])
+		.map((name, index) => {
+			const slug = slugs[index];
+			const short = slug ? SHELF_DISCIPLINE_LABELS[slug] : undefined;
+			return (short ?? name?.trim()) || null;
+		})
+		.filter((label): label is string => Boolean(label));
+	return labels.length > 0 ? labels.join(' · ') : null;
 }
 
 export type ShelfGuide = {
@@ -84,8 +115,9 @@ export type RawShelfPartner = {
 	_id?: string | null;
 	name?: string | null;
 	slug?: string | null;
-	category?: string | null;
-	categorySlug?: string | null;
+	/** Parallel arrays from `categories[]->name` / `categories[]->slug.current` — same order. */
+	categories?: Array<string | null> | null;
+	categorySlugs?: Array<string | null> | null;
 };
 
 /** The override half of a listing's `ctas`, as projected by CTA_PUBLIC. */

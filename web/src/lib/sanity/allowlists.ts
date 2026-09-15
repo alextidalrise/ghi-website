@@ -206,8 +206,8 @@ export const SHELF_PARTNER_PUBLIC = /* groq */ `{
   _id,
   name,
   "slug": slug.current,
-  "category": category->name,
-  "categorySlug": category->slug.current
+  "categories": categories[]->name,
+  "categorySlugs": categories[]->slug.current
 }`;
 
 /**
@@ -312,7 +312,7 @@ export const PARTNER_LOGO_PUBLIC = /* groq */ `{
   _id,
   name,
   "slug": slug.current,
-  "category": category->name,
+  "categories": categories[]->name,
   logo${MEDIA_ASSET_PUBLIC},
   logoAlt${MEDIA_ASSET_PUBLIC}
 }`;
