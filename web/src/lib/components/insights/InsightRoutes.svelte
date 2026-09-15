@@ -8,10 +8,13 @@
 	const value = $derived(portableText.value);
 	const heading = $derived(value.heading?.trim() || 'Two routes from here');
 	const labelId = $derived(`routes-${value._key}`);
+	// Unset is shown, so every block authored before the switch existed renders as it did.
+	const showOutcome = $derived(value.showOutcome !== false);
 
-	// A route without an action is a card-grid point, and an action without a stated outcome is
-	// the kind of CTA a reader hesitates over. Both are required by the schema; the filter is
-	// the render-time guard for documents authored before that validation existed.
+	// A route without an action is a card-grid point, so heading, body and action are all
+	// required by the schema; the filter is the render-time guard for documents authored before
+	// that validation existed. The outcome is not part of the filter: a compact block does not
+	// require one, and a shown block simply omits an empty one.
 	const routes = $derived(
 		(value.routes ?? [])
 			.map((route, i) => ({
@@ -30,7 +33,7 @@
 </script>
 
 {#if routes.length > 0}
-	<aside class="routes" aria-labelledby={labelId}>
+	<aside class="routes" class:routes--compact={!showOutcome} aria-labelledby={labelId}>
 		<p class="routes__label" id={labelId}>{heading}</p>
 		<div class="routes__grid">
 			{#each routes as route (route.key)}
@@ -38,7 +41,7 @@
 					<h3 class="routes__heading">{route.heading}</h3>
 					<p class="routes__body">{route.body}</p>
 					<a class="routes__action" href={route.href}>{route.label}</a>
-					{#if route.outcome}
+					{#if showOutcome && route.outcome}
 						<p class="routes__outcome">{route.outcome}</p>
 					{/if}
 				</div>
@@ -48,16 +51,28 @@
 {/if}
 
 <style>
-	/* The article's framed-block idiom (1px hairline, gold top edge, white bed) — the same
-	   plate the takeaways box and the inline CTA wear, so the decision aid reads as part of
-	   the same set rather than an import. Emphasis Ladder tier 2: the green band at the foot
-	   of the page stays the one heavy surface. */
+	/* The article's framed-block idiom (1px hairline, gold top edge) on the faint green bed
+	   the partner profile and reference card already use for a contained panel. The tint is
+	   what gives the actions a ground: on white, a white outline button is the same value as
+	   everything around it and the block's whole point recedes. Emphasis Ladder tier 2; the
+	   green band at the foot of the page stays the one heavy surface. */
 	.routes {
+		--routes-rule: color-mix(in oklch, var(--green) 14%, transparent);
 		margin-block: clamp(2rem, 5vw, 3rem);
 		padding: clamp(1.25rem, 3vw, 1.75rem) clamp(1.5rem, 4vw, 2rem);
 		border: 1px solid var(--border);
 		border-block-start: 1px solid var(--gold);
-		background: var(--white);
+		background: var(--surface-tint);
+	}
+
+	/* Consecutive route panels are one set split by theme (e.g. financial / legal and
+	   practical), so they sit close enough to read as a group, not as two separate asides. */
+	.routes:has(+ :global(.routes)) {
+		margin-block-end: var(--space-md);
+	}
+
+	:global(.routes) + .routes {
+		margin-block-start: var(--space-md);
 	}
 
 	/* Own our paragraph margins rather than inheriting the body's prose reset. */
@@ -65,8 +80,13 @@
 		margin: 0;
 	}
 
-	.routes__label {
-		margin-bottom: var(--space-sm);
+	/* The panel's header row: it names the set, so it is ruled off from the routes it names
+	   rather than floating as a caption just above the first heading. Container-scoped so its
+	   margin wins over the `.routes p` reset above. */
+	.routes .routes__label {
+		margin-bottom: var(--space-md);
+		padding-bottom: var(--space-sm);
+		border-bottom: 1px solid var(--routes-rule);
 		font-family: var(--sans);
 		font-size: var(--text-overline);
 		font-weight: 500;
@@ -108,7 +128,8 @@
 	}
 
 	/* Outline tier, not the filled green: two routes rank equally, and the page's filled
-	   button belongs to the enquiry further down. Scoped with the container class so it wins
+	   button belongs to the enquiry further down. A white bed lifts it off the tinted panel
+	   as a solid key rather than a line drawn on the surface. Scoped with the container class so it wins
 	   over `.insight-body :global(a)` (0,2,1), which would otherwise paint the label
 	   green-on-green and underline it. Full-bleed within its column so both actions present an
 	   identical target and a long label wraps inside a box rather than ragging. */
@@ -124,7 +145,7 @@
 		max-inline-size: 24rem;
 		margin-top: var(--space-sm);
 		padding: 0.7rem 1.25rem;
-		background: transparent;
+		background: var(--white);
 		color: var(--green);
 		border: 1px solid var(--green);
 		font-family: var(--sans);
@@ -170,7 +191,7 @@
 		inset-inline: 0;
 		inset-block-start: calc(var(--space-xl) * -0.5);
 		height: 1px;
-		background: var(--border);
+		background: var(--routes-rule);
 	}
 
 	@media (min-width: 48rem) {
@@ -196,6 +217,16 @@
 
 		.routes__body {
 			align-self: start;
+		}
+
+		/* Compact: no outcome track at all, rather than an empty fourth row, so nothing is
+		   reserved beneath the action and the frame closes on the button. */
+		.routes--compact .routes__grid {
+			grid-template-rows: auto 1fr auto;
+		}
+
+		.routes--compact .routes__route {
+			grid-row: span 3;
 		}
 
 		.routes .routes__action {
