@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 
 	const [listingResults, courseOptions, hero, rawContent] = await Promise.all([
 		fetchListingCards({
-			scope: { type: 'global' },
+			scope: { type: 'global', pins: 'frontline' },
 			params: { ...searchParams, golfRelevance: ['frontline_golf'] },
 			rates
 		}),

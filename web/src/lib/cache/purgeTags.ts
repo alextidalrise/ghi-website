@@ -123,6 +123,8 @@ export function tagsForDoc(payload: PurgePayload): string[] {
 			// A golf course's own page carries its `doc:` tag already; the sitemap lists its URL,
 			// so a create/publish/delete must also purge the sitemap.
 			add(cacheTag.sitemap);
+			// Its pinned listings reorder the course page's grid.
+			add(cacheTag.golf(payload._id));
 			break;
 		}
 		case 'partner': {

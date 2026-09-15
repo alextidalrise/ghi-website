@@ -129,9 +129,9 @@ describe('tagsForDoc', () => {
 		expect(tagsForDoc(base({ _type: 'exchangeRates' }))).toContain('nav');
 	});
 
-	it('gives a golf course its doc tag plus the sitemap tag', () => {
+	it('gives a golf course its doc, sitemap and grid tags', () => {
 		expect(tagsForDoc(base({ _id: 'gc-1', _type: 'golfCourse' }))).toEqual(
-			expect.arrayContaining(['doc:gc-1', 'sitemap'])
+			expect.arrayContaining(['doc:gc-1', 'sitemap', 'golf:gc-1'])
 		);
 	});
 

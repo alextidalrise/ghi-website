@@ -11,7 +11,11 @@ export const PAGE_SIZE = 24;
 
 export type ListingSearchParams = {
 	page: number;
-	sort: ListingSort;
+	/**
+	 * The visitor's explicit sort, or null when they haven't chosen one. Only the unsorted
+	 * grid leads with editor-pinned listings; any chosen sort (Newest included) is strict.
+	 */
+	sort: ListingSort | null;
 	propertyType: PropertyTypeValue | null;
 	minPrice: number | null;
 	maxPrice: number | null;
@@ -28,7 +32,7 @@ export type ListingSearchParams = {
 
 export const DEFAULT_LISTING_SEARCH_PARAMS: ListingSearchParams = {
 	page: 1,
-	sort: 'newest',
+	sort: null,
 	propertyType: null,
 	minPrice: null,
 	maxPrice: null,
@@ -55,7 +59,7 @@ function parsePositiveInt(value: string | null): number | null {
 	return parsed;
 }
 
-function parseSort(value: string | null): ListingSort {
+function parseSort(value: string | null): ListingSort | null {
 	if (value && (SORT_VALUES as readonly string[]).includes(value)) {
 		return value as ListingSort;
 	}
@@ -160,7 +164,7 @@ export function serializeListingSearchParams(params: ListingSearchParams): URLSe
 		searchParams.set('page', String(params.page));
 	}
 
-	if (params.sort !== DEFAULT_LISTING_SEARCH_PARAMS.sort) {
+	if (params.sort) {
 		searchParams.set('sort', params.sort);
 	}
 

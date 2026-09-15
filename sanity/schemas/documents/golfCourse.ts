@@ -1,4 +1,11 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import {
+	createPinnedListingMember,
+	noDuplicateListings,
+	PINNED_LISTINGS_DESCRIPTION,
+	PINNED_LISTINGS_MAX,
+	pinScopes
+} from '../objects/featuredListings';
 
 export const golfCourse = defineType({
 	name: 'golfCourse',
@@ -101,6 +108,15 @@ export const golfCourse = defineType({
 			of: [defineArrayMember({ type: 'mediaAssetMetadata' })],
 			options: { layout: 'grid' },
 			description: 'Photos of this golf course. Uploaded images appear on the website once the listing is published.'
+		}),
+		defineField({
+			name: 'pinnedListings',
+			title: 'Pinned listings',
+			type: 'array',
+			group: 'details',
+			of: [createPinnedListingMember(pinScopes.golfCourse)],
+			description: PINNED_LISTINGS_DESCRIPTION,
+			validation: (Rule) => Rule.max(PINNED_LISTINGS_MAX).custom(noDuplicateListings)
 		}),
 		defineField({
 			name: 'coordinates',

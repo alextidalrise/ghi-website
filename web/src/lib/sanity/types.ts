@@ -668,6 +668,9 @@ export type SiteSettings = {
     headline?: string;
     lead?: string;
   };
+  frontlinePinnedListings?: ArrayOf<
+    PropertyListingReference | DevelopmentReference
+  >;
   homepageFeaturedLocations?: Array<
     {
       _key: string;
@@ -1117,6 +1120,7 @@ export type GolfCourse = {
       _key: string;
     } & MediaAssetMetadata
   >;
+  pinnedListings?: ArrayOf<PropertyListingReference | DevelopmentReference>;
   coordinates?: Geopoint;
 };
 
@@ -1378,6 +1382,7 @@ export type LocationTaxonomy = {
   tagline?: string;
   coordinates?: Geopoint;
   isCatchAll?: boolean;
+  pinnedListings?: ArrayOf<PropertyListingReference | DevelopmentReference>;
   featuredListings?: ArrayOf<PropertyListingReference | DevelopmentReference>;
   featuredLocations?: Array<
     {

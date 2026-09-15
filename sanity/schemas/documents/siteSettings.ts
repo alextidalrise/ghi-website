@@ -1,5 +1,12 @@
 import { defineField, defineType } from 'sanity';
-import { featuredListingMember, noDuplicateListings } from '../objects/featuredListings';
+import {
+	createPinnedListingMember,
+	featuredListingMember,
+	noDuplicateListings,
+	PINNED_LISTINGS_DESCRIPTION,
+	PINNED_LISTINGS_MAX,
+	pinScopes
+} from '../objects/featuredListings';
 import { featuredLocationMember, noDuplicateLocations } from '../objects/featuredLocations';
 
 export const siteSettings = defineType({
@@ -156,6 +163,14 @@ export const siteSettings = defineType({
 					validation: (Rule) => Rule.max(280)
 				})
 			]
+		}),
+		defineField({
+			name: 'frontlinePinnedListings',
+			title: 'Front Line Collection pinned listings',
+			type: 'array',
+			of: [createPinnedListingMember(pinScopes.frontline)],
+			description: PINNED_LISTINGS_DESCRIPTION,
+			validation: (Rule) => Rule.max(PINNED_LISTINGS_MAX).custom(noDuplicateListings)
 		}),
 		defineField({
 			name: 'homepageFeaturedLocations',

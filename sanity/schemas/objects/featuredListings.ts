@@ -45,3 +45,67 @@ export function noDuplicateListings(listings: unknown): true | string {
 		? true
 		: 'The same listing is selected more than once — remove the duplicate.';
 }
+
+/** Most listings a grid can pin — mirrors PINNED_LISTINGS_LIMIT in the web listing search. */
+export const PINNED_LISTINGS_MAX = 6;
+
+type PinScope = { filter: string; params?: Record<string, unknown> };
+type PinScopeDocument = {
+	_id?: string;
+	linkedLocations?: Array<{ includeInGrid?: boolean; location?: ListingRef }>;
+} & Record<string, unknown>;
+
+const publishedId = (id: string | undefined) => (id ?? '').replace(/^drafts\./, '');
+
+/** Which listings a grid holds — kept in step with the web grid's scope filters. */
+export const pinScopes = {
+	country: (document: PinScopeDocument): PinScope => ({
+		filter: 'location.country._ref == $scopeId',
+		params: { scopeId: publishedId(document._id) }
+	}),
+	/** A location grid also holds linked locations marked "Include properties in grid". */
+	location: (document: PinScopeDocument): PinScope => ({
+		filter: 'location.location._ref in $scopeIds',
+		params: {
+			scopeIds: [
+				publishedId(document._id),
+				...(document.linkedLocations ?? [])
+					.filter((entry) => entry?.includeInGrid && entry.location?._ref)
+					.map((entry) => entry.location!._ref as string)
+			]
+		}
+	}),
+	golfCourse: (document: PinScopeDocument): PinScope => ({
+		filter: '$scopeId in golf.linkedGolfCourses[]._ref',
+		params: { scopeId: publishedId(document._id) }
+	}),
+	frontline: (): PinScope => ({ filter: 'golf.golfRelevance == "frontline_golf"' })
+};
+
+/**
+ * Array member for a grid's ordered pinned listings. The picker offers only listings that
+ * can appear on that grid (individual properties/units and developments inside its scope),
+ * minus ones already pinned. Pair with `noDuplicateListings` and `Rule.max(PINNED_LISTINGS_MAX)`.
+ */
+export function createPinnedListingMember(scope: (document: PinScopeDocument) => PinScope) {
+	return defineArrayMember({
+		type: 'reference',
+		to: [{ type: 'propertyListing' }, { type: 'development' }],
+		options: {
+			filter: ({ document, parent }) => {
+				const selected = (Array.isArray(parent) ? parent : [])
+					.map((item: ListingRef) => item?._ref)
+					.filter((ref): ref is string => Boolean(ref));
+				const { filter, params } = scope(document as PinScopeDocument);
+				return {
+					filter: `(_type == "development" || listingKind in ["property", "unit"]) && (${filter}) && !(_id in $ids) && !(_id in $draftIds)`,
+					params: { ...params, ids: selected, draftIds: selected.map((id) => `drafts.${id}`) }
+				};
+			}
+		}
+	});
+}
+
+/** Shared editor-facing description for every grid's pin field. */
+export const PINNED_LISTINGS_DESCRIPTION =
+	'Listings that open this page’s property grid, in this order, ahead of the rest (newest first). Up to 6. They lead only until a visitor picks a sort, and are hidden when a filter excludes them. No label marks them on the site.';
