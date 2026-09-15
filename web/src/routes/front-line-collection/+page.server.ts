@@ -7,6 +7,7 @@ import {
 	fetchFrontlineContent,
 	fetchFrontlineCourseOptions,
 	fetchFrontlineHero,
+	fetchFrontlinePlaceOptions,
 	fetchListingCards
 } from '$lib/sanity/queries';
 import { resolveFrontlineContent } from '$lib/sanity/transforms/pageContent';
@@ -24,13 +25,14 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	const canonicalUrl = `${url.origin}${BASE_PATH}`;
 	const { rates } = await locals.exchangeRates;
 
-	const [listingResults, courseOptions, hero, rawContent] = await Promise.all([
+	const [listingResults, courseOptions, placeOptions, hero, rawContent] = await Promise.all([
 		fetchListingCards({
 			scope: { type: 'global', pins: 'frontline' },
 			params: { ...searchParams, golfRelevance: ['frontline_golf'] },
 			rates
 		}),
 		fetchFrontlineCourseOptions(),
+		fetchFrontlinePlaceOptions(),
 		fetchFrontlineHero(),
 		fetchFrontlineContent()
 	]);
@@ -45,7 +47,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	const title = content.seo?.seoTitle?.trim() || 'Frontline Golf Homes | Golf Homes International';
 	const description =
 		content.seo?.metaDescription?.trim() ||
-		'Every property on the first line of a golf course, across Spain and Portugal. Filter the frontline collection by golf course, price, property type and bedrooms.';
+		'Every property on the first line of a golf course, across Spain and Portugal. Filter the frontline collection by country, location, price and golf course.';
 	const seo = {
 		title,
 		description,
@@ -64,6 +66,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		searchParams,
 		listingResults,
 		courseOptions,
+		countryOptions: placeOptions.countryOptions,
+		locationOptions: placeOptions.locationOptions,
 		hero,
 		content,
 		breadcrumbs,

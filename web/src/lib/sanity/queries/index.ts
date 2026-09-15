@@ -137,8 +137,10 @@ export {
 export {
 	fetchFrontlineCourseOptions,
 	fetchFrontlineHero,
+	fetchFrontlinePlaceOptions,
 	frontlineHeroQuery,
-	type CourseFilterOption
+	type CourseFilterOption,
+	type FrontlineLocationOption
 } from './frontline';
 
 export { sitemapListingsQuery, sitemapTaxonomyQuery, sitemapUnitsQuery } from './sitemap';

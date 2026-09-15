@@ -11,7 +11,9 @@
 	import type { SimilarListingCard } from '$lib/sanity/transforms/similarListingCard';
 
 	type CommunityOption = { label: string; value: string };
-	type LocationOption = { label: string; value: string };
+	type CountryOption = { label: string; value: string };
+	/** `country` (slug) lets the filter bar narrow locations to the chosen country. */
+	type LocationOption = { label: string; value: string; country?: string };
 	type CourseOption = { label: string; value: string };
 	type FeatureOption = { label: string; value: string };
 
@@ -23,12 +25,18 @@
 		pagination: PaginationMeta;
 		heading?: string;
 		communityOptions?: CommunityOption[];
-		/** Location options (country scope); passed straight to the filter bar. */
+		/** Country options (cross-country Front Line Collection); passed straight to the filter bar. */
+		countryOptions?: CountryOption[];
+		/** Location options (country scope and Front Line Collection); passed straight to the filter bar. */
 		locationOptions?: LocationOption[];
 		courseOptions?: CourseOption[];
 		/** Auto-derived feature-highlight options; when non-empty, renders the Features filter. */
 		featureOptions?: FeatureOption[];
 		showGolfRelevance?: boolean;
+		/** Show the Property type filter (default true). */
+		showPropertyType?: boolean;
+		/** Show the Bedrooms filter (default true). */
+		showBedrooms?: boolean;
 		/** Eager-load the first N card images; forwarded to ListingGrid. Default 0. */
 		priorityCount?: number;
 		/**
@@ -46,10 +54,13 @@
 		pagination,
 		heading = 'Properties',
 		communityOptions = [],
+		countryOptions = [],
 		locationOptions = [],
 		courseOptions = [],
 		featureOptions = [],
 		showGolfRelevance = true,
+		showPropertyType = true,
+		showBedrooms = true,
 		priorityCount = 0,
 		showCountryFlag = false
 	}: Props = $props();
@@ -59,6 +70,7 @@
 	const hasActiveFilters = $derived(
 		searchParams.propertyType != null ||
 			searchParams.community != null ||
+			searchParams.country != null ||
 			searchParams.location != null ||
 			searchParams.minPrice != null ||
 			searchParams.maxPrice != null ||
@@ -88,10 +100,13 @@
 			{basePath}
 			{searchParams}
 			{communityOptions}
+			{countryOptions}
 			{locationOptions}
 			{courseOptions}
 			{featureOptions}
 			{showGolfRelevance}
+			{showPropertyType}
+			{showBedrooms}
 		/>
 
 		{#if cards.length > 0}

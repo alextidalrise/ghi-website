@@ -51,6 +51,7 @@ export async function fetchListingCards({
 		{
 			propertyType: params.propertyType,
 			community: params.community,
+			country: params.country,
 			location: params.location,
 			minPrice: params.minPrice,
 			maxPrice: params.maxPrice,

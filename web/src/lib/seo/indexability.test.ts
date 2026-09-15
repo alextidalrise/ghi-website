@@ -47,6 +47,10 @@ describe('hasIndexAffectingQuery', () => {
 		expect(hasIndexAffectingQuery(withOverrides({ features: ['pool'] }))).toBe(true);
 	});
 
+	it('returns true for country filter', () => {
+		expect(hasIndexAffectingQuery(withOverrides({ country: 'spain' }))).toBe(true);
+	});
+
 	it('returns true for community filter', () => {
 		expect(hasIndexAffectingQuery(withOverrides({ community: 'marbella' }))).toBe(true);
 	});
