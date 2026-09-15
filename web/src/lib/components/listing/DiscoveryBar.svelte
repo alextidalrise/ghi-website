@@ -8,6 +8,9 @@
 	} from '$lib/listing/searchParams';
 	import Select from '$lib/components/ui/Select.svelte';
 	import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
+	import { getCurrencyOptional } from '$lib/currency/currency.svelte';
+	import { budgetBands } from '$lib/currency/filterPrice';
+	import { FALLBACK_RATES } from '$lib/currency/rates';
 	import {
 		cleanFeatureLabel,
 		DEFAULT_FEATURE_FILTER,
@@ -69,15 +72,15 @@
 	const isScoped = $derived(Boolean(scopedCountrySlug));
 
 	/* Budget bands. Each band emits the listing-search price params the destination
-	   location page already understands (minPrice / maxPrice); the band is just a
-	   friendlier surface than two number inputs. €, since the portfolio is ES + PT. */
-	const BUDGET_BANDS = [
-		{ value: 'b1', label: 'Up to €500k', min: null, max: 500_000 },
-		{ value: 'b2', label: '€500k – €1M', min: 500_000, max: 1_000_000 },
-		{ value: 'b3', label: '€1M – €2M', min: 1_000_000, max: 2_000_000 },
-		{ value: 'b4', label: '€2M – €5M', min: 2_000_000, max: 5_000_000 },
-		{ value: 'b5', label: '€5M+', min: 5_000_000, max: null }
-	] as const;
+	   location page already understands (minPrice / maxPrice, always EUR); the band is
+	   just a friendlier surface than two number inputs. The ladder is drawn in whatever
+	   currency the visitor picked in the switcher — round £/$/AED rungs, converted to EUR
+	   bounds for the query. Defaults to EUR (as listed, and the SSR render), which is
+	   byte-for-byte the pre-Step-4 ladder. See $lib/currency/filterPrice. */
+	const currency = getCurrencyOptional();
+	const displayCurrency = $derived(currency?.chosen ?? 'EUR');
+	const rates = currency?.rates ?? FALLBACK_RATES;
+	const BUDGET_BANDS = $derived(budgetBands(displayCurrency, rates));
 
 	/* When scoped to a country page, that country is fixed. Otherwise Spain is the larger,
 	   lead portfolio, so it's the default selection; fall back to the first country if Spain

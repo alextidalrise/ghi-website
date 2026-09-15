@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -19,6 +19,9 @@
 	import Select from '$lib/components/ui/Select.svelte';
 	import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
 	import PriceMenu from '$lib/components/ui/PriceMenu.svelte';
+	import { getCurrencyOptional } from '$lib/currency/currency.svelte';
+	import { currencyPrefix, displayFromEur, eurFromDisplay } from '$lib/currency/filterPrice';
+	import { FALLBACK_RATES } from '$lib/currency/rates';
 
 	type CommunityOption = { label: string; value: string };
 	type LocationOption = { label: string; value: string };
@@ -78,6 +81,26 @@
 	let golfRelevance = $state<string[]>([]);
 	let golfCourse = $state<string[]>([]);
 	let features = $state<string[]>([]);
+
+	// minPrice/maxPrice are canonically EUR (the URL and query never leave euros). The
+	// sheet's number inputs present them in the visitor's chosen currency — `null`/EUR mean
+	// "as listed" (the SSR default), where display equals EUR and nothing is approximated.
+	// The desktop bar uses <PriceMenu>, which manages its own conversion; this pair covers
+	// only the mobile sheet's plain inputs.
+	const currency = getCurrencyOptional();
+	const displayCurrency = $derived(currency?.chosen ?? 'EUR');
+	const rates = currency?.rates ?? FALLBACK_RATES;
+	const priceConverts = $derived(displayCurrency !== 'EUR');
+	const priceSymbol = $derived(currencyPrefix(displayCurrency));
+
+	// Chosen-currency mirror of the EUR min/max, reseeded whenever the applied values change
+	// or the currency switches; sheet inputs bind here and commit to EUR on apply.
+	let minPriceDisplay = $state<number | null>(null);
+	let maxPriceDisplay = $state<number | null>(null);
+	$effect(() => {
+		minPriceDisplay = minPrice != null ? displayFromEur(minPrice, displayCurrency, rates) : null;
+		maxPriceDisplay = maxPrice != null ? displayFromEur(maxPrice, displayCurrency, rates) : null;
+	});
 
 	// Mobile sheet: the multi-select groups collapse like the single-select rows above them,
 	// hidden until opened, mirroring the homepage DiscoveryBar's Features disclosure.
@@ -199,8 +222,13 @@
 	}
 
 	/** JS path: build a clean href from local state and SPA-navigate. */
-	function applyNow() {
+	async function applyNow() {
 		if (!browser) return;
+		// Wait for pending state to flush before reading it: a control that writes a bound
+		// value (e.g. PriceMenu committing minPrice/maxPrice, or a Select) and then calls
+		// applyNow in the same tick can otherwise be read here before its write has
+		// propagated, dropping that change from the built href.
+		await tick();
 		reportSearch();
 		goto(buildListingSearchHref(basePath, nextParams()), { noScroll: true, keepFocus: true });
 	}
@@ -224,6 +252,10 @@
 	}
 
 	function applyFromSheet() {
+		// Push the chosen-currency inputs back to EUR before the href is built. (The close
+		// event fires asynchronously, so applyNow reads these committed values first.)
+		minPrice = minPriceDisplay != null ? eurFromDisplay(minPriceDisplay, displayCurrency, rates) : null;
+		maxPrice = maxPriceDisplay != null ? eurFromDisplay(maxPriceDisplay, displayCurrency, rates) : null;
 		closeSheet();
 		applyNow();
 	}
@@ -400,30 +432,39 @@
 			</label>
 		{/if}
 
-		<div class="lf-row">
+		<div class="lf-row lf-row--price">
 			<span class="lf-row__label" id="lf-price-label">Price</span>
 			<div class="lf-price" role="group" aria-labelledby="lf-price-label">
-				<input
-					type="number"
-					inputmode="numeric"
-					min="0"
-					step="50000"
-					placeholder="No min"
-					aria-label="Minimum price"
-					bind:value={minPrice}
-				/>
+				<span class="lf-price__field">
+					<span class="lf-price__sym" aria-hidden="true">{priceSymbol}</span>
+					<input
+						type="number"
+						inputmode="numeric"
+						min="0"
+						step="50000"
+						placeholder="No min"
+						aria-label="Minimum price"
+						bind:value={minPriceDisplay}
+					/>
+				</span>
 				<span aria-hidden="true">–</span>
-				<input
-					type="number"
-					inputmode="numeric"
-					min="0"
-					step="50000"
-					placeholder="No max"
-					aria-label="Maximum price"
-					bind:value={maxPrice}
-				/>
+				<span class="lf-price__field">
+					<span class="lf-price__sym" aria-hidden="true">{priceSymbol}</span>
+					<input
+						type="number"
+						inputmode="numeric"
+						min="0"
+						step="50000"
+						placeholder="No max"
+						aria-label="Maximum price"
+						bind:value={maxPriceDisplay}
+					/>
+				</span>
 			</div>
 		</div>
+		{#if priceConverts}
+			<p class="lf-price-note">Approximate — homes are matched on their euro value.</p>
+		{/if}
 
 		<label class="lf-row">
 			<span class="lf-row__label">Property type</span>
@@ -862,11 +903,29 @@
 		color: var(--muted);
 	}
 
+	/* Currency mark inline before each number, sharing the field's hairline underline. */
+	.lf-price__field {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.3ch;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.lf-price__field:focus-within {
+		border-color: var(--green);
+	}
+
+	.lf-price__sym {
+		flex: none;
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		color: var(--muted);
+	}
+
 	.lf-price input {
-		width: 6.5rem;
+		width: 5.5rem;
 		padding: 0.4rem 0;
 		border: 0;
-		border-bottom: 1px solid var(--border);
 		background: transparent;
 		color: var(--charcoal);
 		font-family: var(--sans);
@@ -876,7 +935,16 @@
 
 	.lf-price input:focus {
 		outline: 0;
-		border-color: var(--green);
+	}
+
+	/* The approximation note sits under the price row, sharing its horizontal rhythm. */
+	.lf-price-note {
+		margin: 0;
+		padding: 0 0 1rem;
+		font-family: var(--sans);
+		font-size: var(--text-small);
+		line-height: 1.4;
+		color: var(--muted);
 	}
 
 	/* Each multi-select group is a disclosure: a header row (label + value + chevron, matching

@@ -1,7 +1,10 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { pointer, ensurePointer } from '$lib/ui/pointer.svelte';
 	import { autoPosition } from '$lib/ui/floating';
+	import { getCurrencyOptional } from '$lib/currency/currency.svelte';
+	import { currencyPrefix, displayFromEur, eurFromDisplay, formatMoneyRange } from '$lib/currency/filterPrice';
+	import { FALLBACK_RATES } from '$lib/currency/rates';
 	import './filterControls.css';
 
 	type Props = {
@@ -23,8 +26,62 @@
 	const labelId = `${uid}-label`;
 	const panelId = `${uid}-panel`;
 
+	// The public min/max are canonically EUR (the URL and query never leave euros). This
+	// control presents them in the currency the visitor chose in the switcher, converting
+	// to EUR only when it commits. `null`/EUR mean "as listed", the SSR default — then
+	// display equals EUR exactly and nothing is approximated.
+	const currency = getCurrencyOptional();
+	const displayCurrency = $derived(currency?.chosen ?? 'EUR');
+	const rates = currency?.rates ?? FALLBACK_RATES;
+	const converts = $derived(displayCurrency !== 'EUR');
+	const symbol = $derived(currencyPrefix(displayCurrency));
+
+	const toDisplay = (eur: number | null) =>
+		eur == null ? null : displayFromEur(eur, displayCurrency, rates);
+	const toEur = (shown: number | null) =>
+		shown == null ? null : eurFromDisplay(shown, displayCurrency, rates);
+
+	// Editable, chosen-currency mirror of the EUR min/max that the number inputs bind to.
+	// svelte-ignore state_referenced_locally
+	let minDisplay = $state<number | null>(toDisplay(minPrice));
+	// svelte-ignore state_referenced_locally
+	let maxDisplay = $state<number | null>(toDisplay(maxPrice));
+
+	// Reseed the mirror from the APPLIED EUR values when those change (a navigation, or the
+	// post-commit snap to the rounded figure). The currency is read untracked, so a switch —
+	// or the switcher hydrating mid-edit — never runs this branch and never wipes an
+	// in-progress entry (typing writes only the mirror; nothing reactively writes EUR back).
+	$effect(() => {
+		const eurMin = minPrice;
+		const eurMax = maxPrice;
+		untrack(() => {
+			minDisplay = eurMin == null ? null : displayFromEur(eurMin, displayCurrency, rates);
+			maxDisplay = eurMax == null ? null : displayFromEur(eurMax, displayCurrency, rates);
+		});
+	});
+
+	// When the visitor switches currency with the panel open, re-express whatever is in the
+	// inputs in the new currency (via EUR) rather than resetting it.
+	// svelte-ignore state_referenced_locally
+	let priorCurrency = displayCurrency;
+	$effect(() => {
+		const next = displayCurrency;
+		untrack(() => {
+			if (next === priorCurrency) return;
+			minDisplay = minDisplay == null ? null : displayFromEur(eurFromDisplay(minDisplay, priorCurrency, rates), next, rates);
+			maxDisplay = maxDisplay == null ? null : displayFromEur(eurFromDisplay(maxDisplay, priorCurrency, rates), next, rates);
+			priorCurrency = next;
+		});
+	});
+
+	/** Push the chosen-currency mirror back into the EUR min/max the URL is built from. */
+	function commit() {
+		minPrice = toEur(minDisplay);
+		maxPrice = toEur(maxDisplay);
+	}
+
 	const isEmpty = $derived(minPrice == null && maxPrice == null);
-	const valueText = $derived(formatRange(minPrice, maxPrice));
+	const valueText = $derived(formatMoneyRange(toDisplay(minPrice), toDisplay(maxPrice), displayCurrency));
 	const showCustom = $derived(pointer.enhanced);
 
 	let open = $state(false);
@@ -36,23 +93,6 @@
 		ensurePointer();
 		return () => detach?.();
 	});
-
-	function short(value: number): string {
-		if (value >= 1_000_000) {
-			const millions = value / 1_000_000;
-			const text = millions % 1 === 0 ? String(millions) : millions.toFixed(2).replace(/0+$/, '');
-			return `€${text}M`;
-		}
-		if (value >= 1000) return `€${Math.round(value / 1000)}k`;
-		return `€${value}`;
-	}
-
-	function formatRange(min: number | null, max: number | null): string {
-		if (min != null && max != null) return `${short(min)}–${short(max)}`;
-		if (min != null) return `${short(min)}+`;
-		if (max != null) return `Up to ${short(max)}`;
-		return '';
-	}
 
 	async function openPanel() {
 		if (open || !panelEl || !triggerEl) return;
@@ -78,6 +118,7 @@
 	}
 
 	function apply() {
+		commit();
 		closePanel();
 		onchange?.();
 	}
@@ -113,29 +154,38 @@
 	<div class="fc-price">
 		<label class="fc-price__field">
 			<span>Min</span>
-			<input
-				type="number"
-				name="minPrice"
-				min="0"
-				step="50000"
-				inputmode="numeric"
-				placeholder="No min"
-				bind:value={minPrice}
-			/>
+			<span class="fc-price__input">
+				<span class="fc-price__sym" aria-hidden="true">{symbol}</span>
+				<input
+					type="number"
+					name="minPrice"
+					min="0"
+					step="50000"
+					inputmode="numeric"
+					placeholder="No min"
+					bind:value={minDisplay}
+				/>
+			</span>
 		</label>
 		<label class="fc-price__field">
 			<span>Max</span>
-			<input
-				type="number"
-				name="maxPrice"
-				min="0"
-				step="50000"
-				inputmode="numeric"
-				placeholder="No max"
-				bind:value={maxPrice}
-			/>
+			<span class="fc-price__input">
+				<span class="fc-price__sym" aria-hidden="true">{symbol}</span>
+				<input
+					type="number"
+					name="maxPrice"
+					min="0"
+					step="50000"
+					inputmode="numeric"
+					placeholder="No max"
+					bind:value={maxDisplay}
+				/>
+			</span>
 		</label>
 	</div>
+	{#if converts}
+		<p class="fc-price__note">Approximate — homes are matched on their euro value.</p>
+	{/if}
 {/snippet}
 
 {#if showCustom}
@@ -181,7 +231,11 @@
 		</summary>
 		<div class="fc-panel fc-panel--price fc-panel--static">
 			{@render fields()}
-			<button class="fc-apply" type="submit">Apply price</button>
+			<!-- Touch/no-JS path. With JS the host form intercepts submit and reads the EUR
+			     min/max, so commit the chosen-currency mirror first; without JS the currency
+			     is always EUR (the switcher never hydrated), so the named inputs already hold
+			     euros and this handler simply never runs. -->
+			<button class="fc-apply" type="submit" onclick={commit}>Apply price</button>
 		</div>
 	</details>
 {/if}
@@ -189,6 +243,40 @@
 <style>
 	.fc-field--price {
 		position: relative;
+	}
+
+	/* Currency mark sits inline before each number, sharing the field's hairline underline. */
+	.fc-price__input {
+		display: flex;
+		align-items: baseline;
+		gap: 0.3ch;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.fc-price__input:focus-within {
+		border-color: var(--green);
+	}
+
+	.fc-price__sym {
+		flex: none;
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		color: var(--muted);
+	}
+
+	/* The mark owns the underline now, so the input drops its own. */
+	.fc-price__input input {
+		border-bottom: 0;
+	}
+
+	/* One quiet line, shown only when a conversion is in play, so the approximation is
+	   never a surprise: the figures are indicative and matched on the euro value. */
+	.fc-price__note {
+		margin: 0.75rem 0 0;
+		font-family: var(--sans);
+		font-size: var(--text-small);
+		line-height: 1.4;
+		color: var(--muted);
 	}
 
 	/* The custom-trigger cell mirrors a Select cell: value + drawn chevron. */
