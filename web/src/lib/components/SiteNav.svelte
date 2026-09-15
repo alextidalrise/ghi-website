@@ -16,6 +16,7 @@
 	import { CURRENCY_NAMES } from '$lib/currency/convert';
 	import { getCurrency } from '$lib/currency/currency.svelte';
 	import { CURRENCIES, type Currency } from '$lib/currency/rates';
+	import { trackCurrencySelected, type CurrencyPlacement } from '$lib/analytics';
 
 	let { nav = null }: { nav?: HeaderNav | null } = $props();
 
@@ -41,8 +42,19 @@
 	let currencyButton = $state<HTMLButtonElement>();
 	let currencyMenu = $state<HTMLElement>();
 
-	function chooseCurrency(code: Currency | null) {
+	// The single point where a currency choice is recorded, shared by the bar menu and the
+	// drawer. Read the prior choice before applying so the event can carry it, and report
+	// only a real change — re-picking the current currency is a no-op worth no measurement.
+	function selectCurrency(code: Currency | null, placement: CurrencyPlacement) {
+		const previous = currency.chosen;
 		currency.select(code);
+		if (code !== previous) {
+			trackCurrencySelected({ currency: code, previous, placement });
+		}
+	}
+
+	function chooseCurrency(code: Currency | null) {
+		selectCurrency(code, 'nav_bar');
 		openMenu = null;
 		currencyButton?.focus();
 	}
@@ -748,7 +760,7 @@
 						aria-pressed={currency.chosen === option.code}
 						aria-label={option.code ? option.name : option.label}
 						tabindex={open ? 0 : -1}
-						onclick={() => currency.select(option.code)}
+						onclick={() => selectCurrency(option.code, 'drawer')}
 					>
 						{option.label}
 					</button>

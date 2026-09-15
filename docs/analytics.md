@@ -155,6 +155,7 @@ renaming a GA4 event never requires a code change here.
 | `ghi_floorplan_request_started` | `floorplan_request_started` | Floorplan CTA opens the form | `PropertyDetail.svelte` |
 | `ghi_contact_clicked` | `contact_click` | WhatsApp, phone or email CTA chosen | `EnquiryRail`, `/contact`, `TalkToUsBand` |
 | `ghi_lead_submitted` | `generate_lead` | **HubSpot accepted a submission** | `EnquiryRail`, `/contact` |
+| `ghi_currency_select` | `currency_select` | Visitor changes their display currency (a real change, not a re-pick) | `SiteNav` (bar menu and drawer) |
 
 ### Parameters
 
@@ -203,6 +204,14 @@ non-positive amount. `currency` is only ever sent alongside a price.
 
 **Leads** — `lead_type` (`listing_enquiry` | `contact_enquiry` | `floorplan_request`),
 `form_location`, `listing_id`.
+
+**Currency** — `display_currency` and `previous_currency`, each one of `EUR`, `GBP`, `USD`,
+`AED` or `as_listed` (each listing's own currency, the default before a choice is made);
+`placement` (`nav_bar` | `drawer`). The event fires only on a genuine change, so the two
+currency values are never equal. Returning to the default is reported as `as_listed` rather
+than dropped, so it is a countable choice. This is a presentation preference, not an
+ecommerce action: it deliberately carries no GA4 `currency`/`value` pair (which would
+misread as a transaction) and no `items`.
 
 ### Lists
 
@@ -271,8 +280,9 @@ These cannot be done from this repository.
       twice — once by the tag, once by `ghi_virtual_page_view`.
 - [x] GA4 admin: disable enhanced measurement's **"page changes based on browser history
       events"**, for the same reason.
-- [x] Match all ten `ghi_*` events with `CE - GA4 Events` and translate their names through
+- [ ] Match all eleven `ghi_*` events with `CE - GA4 Events` and translate their names through
       `Lookup - GA4 Event Name` before sending them through the shared GA4 event tag.
+      (`ghi_currency_select` → `currency_select` is the new one; add it to the lookup table.)
 - [x] Add a blocking exception on all production GA4 tags for
       `ghi_environment equals debug`, so debug sessions cannot pollute real reporting.
 - [x] Do not add a `<noscript>` container snippet. It cannot respect consent state, and the
@@ -303,6 +313,10 @@ leaking out of an earlier event into the next one during client-side navigation.
       `country`, `location`, `community`, `property_type`, `price_band`, `lead_type`,
       `form_location`, `contact_method`, `search_placement`, `navigation_method`,
       `gallery_surface`.
+- [ ] Register event-scoped custom dimensions for the currency switcher: `display_currency`,
+      `previous_currency`, `placement`. (`placement` also rides `contact_click` and the
+      gallery events, so registering it now backfills those too.)
+- [ ] Leave `currency_select` a supporting event, **not** a key event.
 - [x] Mark **`generate_lead`** as a key event.
 - [x] Leave `contact_click`, `floorplan_request_started`, `gallery_open` and `search` as
       supporting events, **not** key events.
@@ -379,6 +393,9 @@ browser can confirm — run them in GTM Preview on a preview deployment via `?gh
 - [ ] Card click: `select_item` with the same `index` as the impression
 - [ ] A POA listing carries **no `price` key at all**
 - [ ] Gallery: open, arrows, thumbnails, swipe and keyboard all report the right method
+- [ ] Currency switch (bar and drawer): one `currency_select` with the right
+      `display_currency`/`previous_currency`/`placement`; re-picking the current currency
+      fires nothing; returning to "As listed" reports `display_currency: as_listed`
 
 **Leads — the ones that matter**
 - [ ] Successful listing enquiry: exactly one `generate_lead`, **after** the HubSpot round-trip

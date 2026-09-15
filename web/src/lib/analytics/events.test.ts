@@ -7,6 +7,7 @@ const { configureAnalytics, resetSession } = await import('./dataLayer');
 const {
 	priceBandLabel,
 	trackContactClicked,
+	trackCurrencySelected,
 	trackFloorplanRequestStarted,
 	trackGalleryImageViewed,
 	trackGalleryOpened,
@@ -211,6 +212,39 @@ describe('trackLeadSubmitted', () => {
 		resetSession();
 		trackLeadSubmitted(lead);
 		expect(layer()).toHaveLength(2);
+	});
+});
+
+describe('trackCurrencySelected', () => {
+	it('emits the chosen currency, the previous one and the placement', () => {
+		trackCurrencySelected({ currency: 'GBP', previous: 'EUR', placement: 'nav_bar' });
+		expect(last()).toMatchObject({
+			event: 'ghi_currency_select',
+			display_currency: 'GBP',
+			previous_currency: 'EUR',
+			placement: 'nav_bar'
+		});
+	});
+
+	it('reports the drawer as its own placement', () => {
+		trackCurrencySelected({ currency: 'AED', previous: 'GBP', placement: 'drawer' });
+		expect(last().placement).toBe('drawer');
+	});
+
+	it('records "as listed" as a countable choice rather than an empty dimension', () => {
+		// null on either side is the default (each listing's own currency). It must survive
+		// the empty-stripping sanitizer, so it is sent as a literal, not dropped.
+		trackCurrencySelected({ currency: null, previous: 'USD', placement: 'nav_bar' });
+		expect(last()).toMatchObject({
+			display_currency: 'as_listed',
+			previous_currency: 'USD'
+		});
+
+		trackCurrencySelected({ currency: 'USD', previous: null, placement: 'drawer' });
+		expect(last()).toMatchObject({
+			display_currency: 'USD',
+			previous_currency: 'as_listed'
+		});
 	});
 });
 

@@ -48,7 +48,8 @@ export type GhiEventName =
 	| 'ghi_gallery_image_viewed'
 	| 'ghi_floorplan_request_started'
 	| 'ghi_contact_clicked'
-	| 'ghi_lead_submitted';
+	| 'ghi_lead_submitted'
+	| 'ghi_currency_select';
 
 /** Kind of listing an event refers to. Mirrors the domain's `listingKind`. */
 export type ListingKind = 'property' | 'development' | 'unit';
