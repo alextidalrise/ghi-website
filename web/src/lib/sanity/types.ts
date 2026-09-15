@@ -1044,7 +1044,7 @@ export type Guide = {
   title: string;
   slug: Slug;
   guideCategory: "buying" | "location" | "golf";
-  country?: "spain" | "portugal";
+  country?: "spain" | "portugal" | "uae" | "montenegro";
   audienceLabel?: string;
   order?: number;
   tagline?: string;

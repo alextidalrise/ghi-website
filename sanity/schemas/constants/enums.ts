@@ -201,7 +201,9 @@ export const LOCATION_TAXONOMY_TYPES = [
  */
 export const COUNTRY_OPTIONS = [
 	{ title: 'Spain', value: 'spain' },
-	{ title: 'Portugal', value: 'portugal' }
+	{ title: 'Portugal', value: 'portugal' },
+	{ title: 'United Arab Emirates', value: 'uae' },
+	{ title: 'Montenegro', value: 'montenegro' }
 ] as const;
 
 export const DEVELOPMENT_DISPLAY_MODES = [
