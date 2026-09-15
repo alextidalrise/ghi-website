@@ -5,41 +5,102 @@ import {
 	type FrontlineHeroContent,
 	type FrontlineHeroInput
 } from '../transforms/frontlineHero';
+import type { RateTable } from '../../currency/rates';
+import type { ListingSearchParams } from '../../listing/searchParams';
 import { fetchPublic } from './fetch';
 import { PUBLIC_LISTING_FILTER } from './filters';
-
-export type CourseFilterOption = { label: string; value: string };
+import { buildGolfCourseFacetQuery, listingSearchQueryParams } from './listingSearch';
 
 /**
- * Golf courses that have at least one publishable frontline-golf listing on them
- * (as primary or linked course). Populating the filter from real frontline stock
- * means every option returns results — no dead-end selections.
+ * A golf-course option, with every country and location slug its matching frontline rows
+ * sit in (a listing links nearby courses, so one course can span locations). The filter
+ * bar uses these to narrow the list as Country and Location change.
  */
-const frontlineCourseOptionsQuery = /* groq */ `
-  *[
-    _type == "golfCourse"
-    && defined(slug.current)
-    && count(*[
-      _type == "propertyListing"
-      && listingKind in ["property", "unit"]
-      && ${PUBLIC_LISTING_FILTER}
-      && coalesce(golf.golfRelevance, "") == "frontline_golf"
-      && ^._id in golf.linkedGolfCourses[]._ref
-    ]) > 0
-  ] | order(name asc){
-    "label": name,
-    "value": slug.current
-  }
-`;
+export type CourseFilterOption = {
+	label: string;
+	value: string;
+	countries: string[];
+	locations: string[];
+};
 
-/** Course filter options for the Front Line Collection page. */
-export async function fetchFrontlineCourseOptions(): Promise<CourseFilterOption[]> {
-	const raw = await fetchPublic<Array<{ label?: string | null; value?: string | null }>>(
-		frontlineCourseOptionsQuery
-	);
-	return (raw ?? [])
-		.filter((row): row is CourseFilterOption => Boolean(row.label && row.value))
-		.map((row) => ({ label: row.label, value: row.value }));
+type RawCourseRef = { label?: string | null; value?: string | null };
+
+type RawCourseFacet = {
+	rows?: Array<{
+		country?: string | null;
+		location?: string | null;
+		courses?: Array<RawCourseRef | null> | null;
+	}> | null;
+	selected?: RawCourseRef[] | null;
+};
+
+/**
+ * Reduce facet rows to name-ordered course options. Courses the visitor already selected
+ * but no row matches (e.g. after a price change) are kept, with no places, so they stay
+ * visible and can be unticked rather than filtering invisibly.
+ */
+export function toFrontlineCourseOptions(raw: RawCourseFacet | null): CourseFilterOption[] {
+	const courses = new Map<string, { label: string; countries: Set<string>; locations: Set<string> }>();
+
+	for (const row of raw?.rows ?? []) {
+		for (const course of row.courses ?? []) {
+			if (!course?.label || !course.value) continue;
+			let entry = courses.get(course.value);
+			if (!entry) {
+				entry = { label: course.label, countries: new Set(), locations: new Set() };
+				courses.set(course.value, entry);
+			}
+			if (row.country) entry.countries.add(row.country);
+			if (row.location) entry.locations.add(row.location);
+		}
+	}
+
+	for (const course of raw?.selected ?? []) {
+		if (!course.label || !course.value || courses.has(course.value)) continue;
+		courses.set(course.value, { label: course.label, countries: new Set(), locations: new Set() });
+	}
+
+	return [...courses.entries()]
+		.map(([value, entry]) => ({
+			label: entry.label,
+			value,
+			countries: [...entry.countries].sort(),
+			locations: [...entry.locations].sort()
+		}))
+		.sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/**
+ * Course filter options for the Front Line Collection page: courses linked by the frontline
+ * rows (properties, units and developments) matching the visitor's other filters. Country
+ * and location are left out so the bar can narrow by place instantly on the client;
+ * golfCourse is left out so the facet never narrows itself.
+ */
+export async function fetchFrontlineCourseOptions({
+	params,
+	rates
+}: {
+	params: ListingSearchParams;
+	rates?: RateTable;
+}): Promise<CourseFilterOption[]> {
+	const scope = { type: 'global' } as const;
+	const raw = await fetchPublic<RawCourseFacet>(buildGolfCourseFacetQuery(scope), {
+		params: {
+			...listingSearchQueryParams(
+				scope,
+				{
+					...params,
+					country: null,
+					location: null,
+					golfCourse: [],
+					golfRelevance: ['frontline_golf']
+				},
+				rates
+			),
+			selectedCourses: params.golfCourse
+		}
+	});
+	return toFrontlineCourseOptions(raw);
 }
 
 /** A location option carries its country's slug so the filter bar can cascade. */

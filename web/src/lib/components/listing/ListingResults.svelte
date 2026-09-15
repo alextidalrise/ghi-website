@@ -14,7 +14,8 @@
 	type CountryOption = { label: string; value: string };
 	/** `country` (slug) lets the filter bar narrow locations to the chosen country. */
 	type LocationOption = { label: string; value: string; country?: string };
-	type CourseOption = { label: string; value: string };
+	/** `countries`/`locations` (slugs) let the filter bar narrow courses by place. */
+	type CourseOption = { label: string; value: string; countries?: string[]; locations?: string[] };
 	type FeatureOption = { label: string; value: string };
 
 	type Props = {
