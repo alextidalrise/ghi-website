@@ -7,11 +7,11 @@
 	 * never mount it.
 	 *
 	 * Legibility over unpredictable photography is the whole job. The flag sits on a small
-	 * WHITE MATTE tile so its own edges never touch the photo — that separates it on ~every
+	 * tight WHITE MATTE so its own edges never touch the photo — that separates it on ~every
 	 * image, dark ones especially, and protects flags that carry white/pale yellow (Spain's
-	 * gold, Portugal's yellow) against a bright sky. The one gap the white tile leaves is
-	 * white-on-white over a blown-out sky or pale sand; a 1px low-alpha CHARCOAL hairline
-	 * holds the tile edge there (the stone `--border` would vanish). No scrim, no shadow.
+	 * gold, Portugal's yellow) against a bright sky. No outline: an explicit hairline read as
+	 * a hard, over-bright chip on the photo, so the matte alone carries the separation (the
+	 * flag's own colour still reads against the rare white-on-white pale sky). No scrim, no shadow.
 	 *
 	 * Decorative only: aria-hidden and pointer-events:none, so it never intercepts the
 	 * card's own link and the country name in the text carries the meaning.
@@ -44,11 +44,9 @@
 		left: var(--space-xs);
 		z-index: 1;
 		display: block;
-		padding: 3px; /* white matting: the flag never touches the photo */
+		padding: 2px; /* tight white matting: the flag never touches the photo, no hard chip */
 		line-height: 0;
 		background: var(--white);
-		/* Holds the tile edge on pale/blown-out photo where a stone hairline would vanish. */
-		border: 1px solid rgba(43, 43, 43, 0.15);
 		pointer-events: none; /* decorative — let clicks fall through to the card link */
 	}
 
