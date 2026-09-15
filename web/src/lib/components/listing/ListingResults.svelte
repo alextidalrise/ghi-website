@@ -31,6 +31,11 @@
 		showGolfRelevance?: boolean;
 		/** Eager-load the first N card images; forwarded to ListingGrid. Default 0. */
 		priorityCount?: number;
+		/**
+		 * Overlay a country flag stamp on each card. Set only on the cross-country Front Line
+		 * Collection (scope: global); single-country country/location/golf pages leave it off.
+		 */
+		showCountryFlag?: boolean;
 	};
 
 	let {
@@ -45,7 +50,8 @@
 		courseOptions = [],
 		featureOptions = [],
 		showGolfRelevance = true,
-		priorityCount = 0
+		priorityCount = 0,
+		showCountryFlag = false
 	}: Props = $props();
 
 	const summary = $derived(formatSummary(total, pagination));
@@ -90,7 +96,7 @@
 
 		{#if cards.length > 0}
 			<div class="listing-results__grid">
-				<ListingGrid {cards} list={resultsList} {priorityCount} />
+				<ListingGrid {cards} list={resultsList} {priorityCount} {showCountryFlag} />
 			</div>
 			<Pagination {basePath} {searchParams} {pagination} />
 		{:else}

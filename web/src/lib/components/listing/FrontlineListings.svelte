@@ -15,9 +15,15 @@
 		/** Optional editorial subtitle; falls back to a plain count. */
 		summary?: string;
 		viewAllHref?: string;
+		/**
+		 * Overlay a country flag stamp on each card. On only where the rail spans countries
+		 * (the homepage shop window); the same component's country/location-page rails are
+		 * single-country, so they leave this off.
+		 */
+		showCountryFlag?: boolean;
 	};
 
-	let { cards, heading, summary, viewAllHref }: Props = $props();
+	let { cards, heading, summary, viewAllHref, showCountryFlag = false }: Props = $props();
 
 	const summaryLine = $derived(
 		summary ??
@@ -74,6 +80,7 @@
 						kind="development"
 						surface="green"
 						showLocation
+						{showCountryFlag}
 						item={analyticsItems[i] ?? null}
 					/>
 				{:else}
@@ -81,6 +88,7 @@
 						card={c.card}
 						surface="green"
 						showLocation
+						{showCountryFlag}
 						item={analyticsItems[i] ?? null}
 					/>
 				{/if}

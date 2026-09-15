@@ -46,6 +46,7 @@
 						kind="development"
 						surface="light"
 						showLocation
+						showCountryFlag
 						item={analyticsItems[i] ?? null}
 					/>
 				{:else}
@@ -53,6 +54,7 @@
 						card={item.card}
 						surface="light"
 						showLocation
+						showCountryFlag
 						item={analyticsItems[i] ?? null}
 					/>
 				{/if}

@@ -22,6 +22,17 @@ export const LISTING_COUNTRY_SLUG = /* groq */ `coalesce(
   location.community->parent->parent->slug.current
 )`;
 
+/**
+ * Country flag SVG url for a listing card — the country taxonomy's `flag` image asset,
+ * dereferenced to a raw url (crisp SVG) like the country hero / homepage selector do.
+ * Reached from the stored country ref, falling back to the community taxonomy parent
+ * chain, mirroring LISTING_COUNTRY_SLUG. Only mixed-country card surfaces read it.
+ */
+export const LISTING_COUNTRY_FLAG_URL = /* groq */ `coalesce(
+  location.country->flag.asset->url,
+  location.community->parent->parent->flag.asset->url
+)`;
+
 /** Location slug for listing URLs — from stored ref or community taxonomy parent chain. */
 export const LISTING_LOCATION_SLUG = /* groq */ `coalesce(
   location.location->slug.current,

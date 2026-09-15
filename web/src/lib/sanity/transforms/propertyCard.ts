@@ -18,6 +18,8 @@ export type PublicPropertyCard = {
 	title: RawPropertyCard['title'];
 	slug: RawPropertyCard['slug'];
 	countrySlug?: string | null;
+	/** Country flag SVG url — present only on mixed-country card surfaces; else null. */
+	countryFlagUrl?: string | null;
 	locationSlug?: string | null;
 	communitySlug?: string | null;
 	isCatchAll?: boolean | null;
@@ -43,6 +45,7 @@ export function toPublicPropertyCard(raw: RawPropertyCard): PublicPropertyCard {
 		title: raw.title,
 		slug: raw.slug,
 		countrySlug: raw.countrySlug,
+		countryFlagUrl: raw.countryFlagUrl ?? null,
 		locationSlug: raw.locationSlug,
 		communitySlug: raw.communitySlug,
 		isCatchAll: raw.isCatchAll,

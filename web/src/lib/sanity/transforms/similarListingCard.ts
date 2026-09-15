@@ -18,6 +18,7 @@ export type RawDevelopmentCard = {
 		| null;
 	developmentStatus?: string | null;
 	countrySlug?: string | null;
+	countryFlagUrl?: string | null;
 	locationSlug?: string | null;
 	communitySlug?: string | null;
 	isCatchAll?: boolean | null;
@@ -38,6 +39,7 @@ export type PublicDevelopmentCard = {
 	developmentDisplayMode: RawDevelopmentCard['developmentDisplayMode'];
 	developmentStatus?: string | null;
 	countrySlug?: string | null;
+	countryFlagUrl?: string | null;
 	locationSlug?: string | null;
 	communitySlug?: string | null;
 	isCatchAll?: boolean | null;
@@ -75,6 +77,7 @@ export function toPublicDevelopmentCard(raw: RawDevelopmentCard): PublicDevelopm
 		developmentDisplayMode: raw.developmentDisplayMode ?? 'flat_listing',
 		developmentStatus: raw.developmentStatus,
 		countrySlug: raw.countrySlug ?? null,
+		countryFlagUrl: raw.countryFlagUrl ?? null,
 		locationSlug: raw.locationSlug ?? null,
 		communitySlug: raw.communitySlug ?? null,
 		isCatchAll: raw.isCatchAll ?? null,

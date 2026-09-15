@@ -128,6 +128,7 @@
 		cards={data.featuredCards}
 		heading={c.featuredHeading}
 		summary={c.featuredSummary}
+		showCountryFlag
 	/>
 
 	<FrontlineListings
@@ -135,6 +136,7 @@
 		heading={c.frontlineHeading}
 		summary={c.frontlineSummary}
 		viewAllHref={FRONTLINE_COLLECTION_PATH}
+		showCountryFlag
 	/>
 
 	<!-- Buyer voice, then the professional network behind it: the two trust bands read as a

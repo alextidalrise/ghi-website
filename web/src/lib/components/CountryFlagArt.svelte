@@ -17,7 +17,7 @@
 	 * See the `flag` field description in sanity/schemas/documents/locationTaxonomy.ts.
 	 */
 	type Props = {
-		slug: string;
+		slug?: string | null;
 		flagUrl?: string | null;
 	};
 

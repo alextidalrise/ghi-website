@@ -15,9 +15,15 @@
 		 * country page — otherwise it steals bandwidth from the true LCP element.
 		 */
 		priorityCount?: number;
+		/**
+		 * Overlay a country flag stamp on each card. On only for mixed-country grids (the
+		 * Front Line Collection, scope: global); off for single-country pages (country /
+		 * location / golf), where every card repeats the page's one country.
+		 */
+		showCountryFlag?: boolean;
 	};
 
-	let { cards, list, priorityCount = 0 }: Props = $props();
+	let { cards, list, priorityCount = 0, showCountryFlag = false }: Props = $props();
 
 	// Built once here rather than per card: the grid owns the ordering, so this is the
 	// only place that can give impressions and clicks a consistent position.
@@ -40,12 +46,14 @@
 						card={item.card}
 						item={analyticsFor(item.card)}
 						priority={index < priorityCount}
+						{showCountryFlag}
 					/>
 				{:else}
 					<PropertyCard
 						card={item.card}
 						item={analyticsFor(item.card)}
 						priority={index < priorityCount}
+						{showCountryFlag}
 					/>
 				{/if}
 			</div>

@@ -1,5 +1,6 @@
 import {
 	LISTING_COMMUNITY_SLUG,
+	LISTING_COUNTRY_FLAG_URL,
 	LISTING_COUNTRY_SLUG,
 	LISTING_IS_CATCH_ALL,
 	LISTING_LOCATION_SLUG,
@@ -396,6 +397,7 @@ export const DEVELOPMENT_CARD_PUBLIC = /* groq */ `{
   developmentDisplayMode,
   developmentStatus,
   "countrySlug": ${LISTING_COUNTRY_SLUG},
+  "countryFlagUrl": ${LISTING_COUNTRY_FLAG_URL},
   "locationSlug": ${LISTING_LOCATION_SLUG},
   "communitySlug": ${LISTING_COMMUNITY_SLUG},
   "isCatchAll": ${LISTING_IS_CATCH_ALL},
@@ -431,6 +433,7 @@ export const PROPERTY_CARD_PUBLIC = /* groq */ `{
   propertyType,
   transactionType,
   "countrySlug": ${LISTING_COUNTRY_SLUG},
+  "countryFlagUrl": ${LISTING_COUNTRY_FLAG_URL},
   "locationSlug": ${LISTING_LOCATION_SLUG},
   "communitySlug": ${LISTING_COMMUNITY_SLUG},
   "isCatchAll": ${LISTING_IS_CATCH_ALL},

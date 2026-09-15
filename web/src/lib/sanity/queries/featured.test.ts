@@ -62,6 +62,7 @@ function baseCard(overrides: Partial<RawPropertyCard> = {}): RawPropertyCard {
 		propertyType: 'villa',
 		transactionType: 'sale',
 		countrySlug: goldenPropertyRaw.location?.country?.slug ?? null,
+		countryFlagUrl: null,
 		locationSlug: goldenPropertyRaw.location?.location?.slug ?? null,
 		communitySlug: goldenPropertyRaw.location?.community?.slug ?? null,
 		isCatchAll: goldenPropertyRaw.location?.community?.isCatchAll ?? false,
