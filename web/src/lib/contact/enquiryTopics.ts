@@ -58,6 +58,45 @@ const ENQUIRY_TOPICS = {
 			'{name} will send the residential terms once they are formally released, and nothing before then.',
 		confirmHeading: 'Thank you, we will keep you posted',
 		label: 'Nobu at Monte Rei — updates requested'
+	},
+	// Professional introductions. Market-neutral keys, because the FX, mortgage and legal
+	// advisers serve any overseas purchase; the relocation partner is UAE-specific and says so.
+	// Every intro keeps the article's own undertaking: optional, and agreed with the professional.
+	'fx-introduction': {
+		message:
+			'Please introduce me to your FX broker. I would like to plan the currency side of my purchase.',
+		heading: 'Request an FX introduction',
+		intro:
+			'Tell us a little about your purchase and timescale, and {name} will arrange the introduction. Any service is agreed directly with the broker.',
+		confirmHeading: 'Thank you, we will make the introduction',
+		label: 'FX broker — introduction requested'
+	},
+	'mortgage-introduction': {
+		message:
+			'Please introduce me to your mortgage broker. I would like to discuss financing an overseas purchase.',
+		heading: 'Request a mortgage introduction',
+		intro:
+			'Tell us a little about your purchase and timescale, and {name} will arrange the introduction. Any service is agreed directly with the broker.',
+		confirmHeading: 'Thank you, we will make the introduction',
+		label: 'Mortgage broker — introduction requested'
+	},
+	'legal-introduction': {
+		message:
+			'Please introduce me to your independent legal adviser. I would like advice on buying property abroad.',
+		heading: 'Request a legal introduction',
+		intro:
+			'Tell us a little about your purchase and timescale, and {name} will arrange the introduction. Any service is agreed directly with the adviser.',
+		confirmHeading: 'Thank you, we will make the introduction',
+		label: 'Legal adviser — introduction requested'
+	},
+	'uae-relocation-introduction': {
+		message:
+			'Please introduce me to your UAE relocation partner. I would like help with the practical side of setting up in the UAE.',
+		heading: 'Request a UAE relocation introduction',
+		intro:
+			'Tell us what you need help with, and {name} will arrange the introduction. Any service is agreed directly with the relocation partner.',
+		confirmHeading: 'Thank you, we will make the introduction',
+		label: 'UAE relocation partner — introduction requested'
 	}
 } as const satisfies Record<string, EnquiryTopicCopy>;
 

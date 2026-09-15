@@ -463,10 +463,36 @@ export const insightFaq = defineType({
 /**
  * One route in a `insightRoutes` decision aid. Unlike a card-grid point, a route is not
  * only a consideration — it is a path the reader can take, so it carries a single next
- * step and a plain statement of what happens once they take it. Both fields are required:
- * a route with no action is a card grid item, and an action with no stated outcome is the
- * kind of CTA that makes a reader hesitate.
+ * step and a plain statement of what happens once they take it. Both are required: a route
+ * with no action is a card grid item, and an action with no stated outcome is the kind of
+ * CTA that makes a reader hesitate.
+ *
+ * The one exception is a block that turns `showOutcome` off — a compact service grid where
+ * each action already says exactly what it does ("Request a legal introduction"). There the
+ * outcome is never displayed, so requiring it would only ask editors to maintain copy no
+ * reader sees, and which would surface unreviewed if the switch were ever flipped back.
  */
+function routesBlockShowsOutcome(context: {
+	document?: unknown;
+	path?: ReadonlyArray<unknown>;
+}): boolean {
+	// The route's own validation context only exposes the route as `parent`, so walk the
+	// document along the field path to the enclosing block: …, block, 'routes', {_key}, 'outcome'.
+	const blockPath = context.path?.slice(0, -3) ?? [];
+	let node: unknown = context.document;
+	for (const segment of blockPath) {
+		if (node == null) break;
+		if (typeof segment === 'object' && segment !== null && '_key' in segment) {
+			const key = (segment as { _key: string })._key;
+			node = Array.isArray(node) ? node.find((item) => item?._key === key) : undefined;
+		} else {
+			node = (node as Record<string | number, unknown>)[segment as string | number];
+		}
+	}
+	// Unset counts as shown; so does a path we could not resolve — fail towards the stricter rule.
+	return (node as { showOutcome?: boolean } | undefined)?.showOutcome !== false;
+}
+
 export const insightRoute = defineType({
 	name: 'insightRoute',
 	title: 'Route',
@@ -492,7 +518,7 @@ export const insightRoute = defineType({
 			title: 'Action label',
 			type: 'string',
 			description: 'The single next step, as a verb and object. Keep it short — it sets in a button.',
-			validation: (Rule) => Rule.required().max(32)
+			validation: (Rule) => Rule.required().max(40)
 		}),
 		defineField({
 			name: 'actionHref',
@@ -512,8 +538,15 @@ export const insightRoute = defineType({
 			type: 'text',
 			rows: 2,
 			description:
-				'What the reader gets after acting, and when. State only what GHI will actually do.',
-			validation: (Rule) => Rule.required().max(200)
+				'What the reader gets after acting, and when. State only what GHI will actually do. Not needed when the block hides "What happens next".',
+			validation: (Rule) =>
+				Rule.max(200).custom((value, context) =>
+					typeof value === 'string' && value.trim()
+						? true
+						: routesBlockShowsOutcome(context)
+							? 'Required while the block shows "What happens next".'
+							: true
+				)
 		})
 	],
 	preview: {
@@ -551,14 +584,28 @@ export const insightRoutes = defineType({
 			type: 'array',
 			of: [{ type: 'insightRoute' }],
 			validation: (Rule) => Rule.required().length(2)
+		}),
+		defineField({
+			name: 'showOutcome',
+			title: 'Show what happens next',
+			type: 'boolean',
+			description:
+				'Turn off for compact service-route grids where each action is self-explanatory. The routes then show heading, body and action only.',
+			initialValue: true
 		})
 	],
 	preview: {
-		select: { heading: 'heading', a: 'routes.0.heading', b: 'routes.1.heading' },
-		prepare({ heading, a, b }) {
+		select: {
+			heading: 'heading',
+			a: 'routes.0.heading',
+			b: 'routes.1.heading',
+			showOutcome: 'showOutcome'
+		},
+		prepare({ heading, a, b, showOutcome }) {
+			const label = heading || 'Buyer routes';
 			return {
 				title: [a, b].filter(Boolean).join('  /  ') || 'Buyer routes',
-				subtitle: heading || 'Buyer routes'
+				subtitle: showOutcome === false ? `${label} · compact` : label
 			};
 		}
 	}

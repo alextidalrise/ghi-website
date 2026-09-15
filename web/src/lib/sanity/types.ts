@@ -1533,6 +1533,7 @@ export type InsightRoutes = {
       _key: string;
     } & InsightRoute
   >;
+  showOutcome?: boolean;
 };
 
 export type InsightRoute = {
@@ -1541,7 +1542,7 @@ export type InsightRoute = {
   body: string;
   actionLabel: string;
   actionHref: string;
-  outcome: string;
+  outcome?: string;
 };
 
 export type InsightNumberedList = {
@@ -6984,6 +6985,7 @@ export type InsightBySlugQueryResult = {
               _key: string;
             } & InsightRoute
           >;
+          showOutcome?: boolean;
         }
       | {
           _key: string;

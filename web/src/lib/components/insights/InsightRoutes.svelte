@@ -8,10 +8,13 @@
 	const value = $derived(portableText.value);
 	const heading = $derived(value.heading?.trim() || 'Two routes from here');
 	const labelId = $derived(`routes-${value._key}`);
+	// Unset is shown, so every block authored before the switch existed renders as it did.
+	const showOutcome = $derived(value.showOutcome !== false);
 
-	// A route without an action is a card-grid point, and an action without a stated outcome is
-	// the kind of CTA a reader hesitates over. Both are required by the schema; the filter is
-	// the render-time guard for documents authored before that validation existed.
+	// A route without an action is a card-grid point, so heading, body and action are all
+	// required by the schema; the filter is the render-time guard for documents authored before
+	// that validation existed. The outcome is not part of the filter: a compact block does not
+	// require one, and a shown block simply omits an empty one.
 	const routes = $derived(
 		(value.routes ?? [])
 			.map((route, i) => ({
@@ -30,7 +33,7 @@
 </script>
 
 {#if routes.length > 0}
-	<aside class="routes" aria-labelledby={labelId}>
+	<aside class="routes" class:routes--compact={!showOutcome} aria-labelledby={labelId}>
 		<p class="routes__label" id={labelId}>{heading}</p>
 		<div class="routes__grid">
 			{#each routes as route (route.key)}
@@ -38,7 +41,7 @@
 					<h3 class="routes__heading">{route.heading}</h3>
 					<p class="routes__body">{route.body}</p>
 					<a class="routes__action" href={route.href}>{route.label}</a>
-					{#if route.outcome}
+					{#if showOutcome && route.outcome}
 						<p class="routes__outcome">{route.outcome}</p>
 					{/if}
 				</div>
@@ -196,6 +199,16 @@
 
 		.routes__body {
 			align-self: start;
+		}
+
+		/* Compact: no outcome track at all, rather than an empty fourth row, so nothing is
+		   reserved beneath the action and the frame closes on the button. */
+		.routes--compact .routes__grid {
+			grid-template-rows: auto 1fr auto;
+		}
+
+		.routes--compact .routes__route {
+			grid-row: span 3;
 		}
 
 		.routes .routes__action {

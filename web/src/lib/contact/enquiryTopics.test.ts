@@ -51,6 +51,26 @@ describe('resolveEnquiryTopic', () => {
 	});
 });
 
+describe('professional introduction topics', () => {
+	it.each([
+		['fx-introduction', 'Request an FX introduction', 'FX broker — introduction requested'],
+		['mortgage-introduction', 'Request a mortgage introduction', 'Mortgage broker — introduction requested'],
+		['legal-introduction', 'Request a legal introduction', 'Legal adviser — introduction requested'],
+		[
+			'uae-relocation-introduction',
+			'Request a UAE relocation introduction',
+			'UAE relocation partner — introduction requested'
+		]
+	])('%s opens the form on the request its button made', (key, heading, label) => {
+		const topic = resolveEnquiryTopic(key, ADVISOR);
+		expect(topic?.heading).toBe(heading);
+		expect(topic?.intro).toContain(ADVISOR);
+		expect(topic?.intro).not.toContain('{name}');
+		expect(topic?.message).toMatch(/^Please introduce me to your /);
+		expect(enquiryTopicLabel(key)).toBe(label);
+	});
+});
+
 describe('enquiryTopicLabel', () => {
 	it('returns the label for a known topic', () => {
 		expect(enquiryTopicLabel('monte-rei-shortlist')).toBe('Monte Rei — shortlist requested');

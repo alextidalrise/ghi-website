@@ -114,6 +114,8 @@ export type InsightRoutesBlock = {
 	_key: string;
 	heading?: string | null;
 	routes?: InsightRouteItem[] | null;
+	/** Unset counts as true. False is a compact grid: heading, body and action only. */
+	showOutcome?: boolean | null;
 };
 
 /** Large pulled-out quote. `filled` sets it on a tinted panel with a green accent edge. */
