@@ -88,23 +88,33 @@
 		}
 	}
 
+	/* Underlined at rest, by owner decision: in a plain list of titles an underline is the
+	   only thing that says "link". (The site's default text link underlines on hover only.)
+	   A quiet stone underline at rest, gold and green ink on hover/focus. */
 	.guides-index__link {
-		display: block;
+		display: inline-block;
 		padding-block: 0.6rem;
 		font-family: var(--sans);
 		font-weight: 300;
 		font-size: var(--text-ui);
-		color: var(--charcoal);
-		text-decoration: none;
-		transition: color var(--duration-hover) var(--ease);
+		color: var(--green);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-decoration-color: color-mix(in oklch, var(--green) 35%, transparent);
+		text-underline-offset: 0.3em;
+		transition:
+			color var(--duration-hover) var(--ease),
+			text-decoration-color var(--duration-hover) var(--ease);
 	}
 
 	.guides-index__link:hover,
 	.guides-index__link:focus-visible {
-		color: var(--green);
-		text-decoration: underline;
 		text-decoration-color: var(--gold);
-		text-underline-offset: 0.3em;
+	}
+
+	.guides-index__link:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 3px;
 	}
 
 	.guides-empty {

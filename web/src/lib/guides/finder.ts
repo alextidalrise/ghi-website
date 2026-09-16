@@ -42,7 +42,7 @@ export type FinderAlternate = { guide: FinderGuide; buyerType: BuyerType };
 export type FinderState = {
 	buyerTypes: BuyerType[];
 	markets: Market[];
-	/** The chosen buyer type, validated against the list; null when unanswered. */
+	/** The chosen buyer type (or the default), validated against the list; null only when none exist. */
 	buyerType: BuyerType | null;
 	market: Market | null;
 	answer: FinderAnswer;
@@ -109,10 +109,23 @@ export function resolveFinder(input: {
 	inSlug: string | null;
 }): FinderState {
 	const { guides, buyerTypes, markets } = input;
-	// Unknown or stale slugs count as unanswered rather than as an error: an old shared
-	// link should land on the questions, not on a broken answer.
-	const buyerType = buyerTypes.find((t) => t.slug === input.forSlug) ?? null;
-	const market = markets.find((m) => m.slug === input.inSlug) ?? null;
+
+	// Both questions arrive pre-answered with the first available option, so the hub opens
+	// on a real guide rather than an empty panel. An unknown or stale slug falls back to
+	// the same default: an old shared link lands on an answer, never on an error.
+	//
+	// "Available" for the market means one that actually has a guide for the chosen buyer
+	// type — so a newly added country ordered first, before its guide is written, does not
+	// make the hub open on "not written yet". Only when no market has one does it fall back
+	// to the first market in order.
+	const buyerType = buyerTypes.find((t) => t.slug === input.forSlug) ?? buyerTypes[0] ?? null;
+	const market =
+		markets.find((m) => m.slug === input.inSlug) ??
+		(buyerType
+			? markets.find((m) => bestGuide(guides, buyerType.slug, m.slug) != null)
+			: undefined) ??
+		markets[0] ??
+		null;
 
 	if (!buyerType || !market) {
 		return { buyerTypes, markets, buyerType, market, answer: { state: 'incomplete' } };

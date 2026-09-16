@@ -22,10 +22,38 @@ const ES_INTL = guide('es-intl', 'international-buyer', 'spain');
 const base = { buyerTypes: [UK, INTL], markets: [SPAIN, UAE] };
 
 describe('resolveFinder', () => {
-	it('waits for both answers', () => {
-		const state = resolveFinder({ ...base, guides: [ES_UK], forSlug: 'uk-buyer', inSlug: null });
+	it('pre-answers both questions with the first available options', () => {
+		const state = resolveFinder({ ...base, guides: [ES_UK, ES_INTL], forSlug: null, inSlug: null });
 
 		expect(state.buyerType).toEqual(UK);
+		expect(state.market).toEqual(SPAIN);
+		expect(state.answer).toMatchObject({ state: 'found', guide: { slug: 'es-uk' } });
+	});
+
+	it('defaults the market to the first one with a guide, not simply the first in order', () => {
+		// UAE ordered first but not written yet: the hub should still open on a real guide.
+		const state = resolveFinder({
+			...base,
+			markets: [UAE, SPAIN],
+			guides: [ES_UK],
+			forSlug: null,
+			inSlug: null
+		});
+
+		expect(state.market).toEqual(SPAIN);
+	});
+
+	it('keeps an explicit answer and defaults only the other question', () => {
+		const state = resolveFinder({ ...base, guides: [ES_UK], forSlug: null, inSlug: 'uae' });
+
+		expect(state.buyerType).toEqual(UK);
+		expect(state.market).toEqual(UAE);
+		expect(state.answer.state).toBe('missing');
+	});
+
+	it('is incomplete only when there is nothing to choose from', () => {
+		const state = resolveFinder({ buyerTypes: [], markets: [], guides: [], forSlug: null, inSlug: null });
+
 		expect(state.answer.state).toBe('incomplete');
 	});
 
@@ -72,12 +100,12 @@ describe('resolveFinder', () => {
 		).toMatchObject({ guide: { slug: 'uk-general' } });
 	});
 
-	it('treats an unknown slug as unanswered', () => {
+	it('falls back to the default for an unknown slug', () => {
 		const state = resolveFinder({ ...base, guides: [ES_UK], forSlug: 'martian', inSlug: 'spain' });
 
-		expect(state.buyerType).toBeNull();
+		expect(state.buyerType).toEqual(UK);
 		expect(state.market).toEqual(SPAIN);
-		expect(state.answer.state).toBe('incomplete');
+		expect(state.answer.state).toBe('found');
 	});
 });
 
