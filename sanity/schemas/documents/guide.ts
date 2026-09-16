@@ -1,5 +1,6 @@
 import { defineField, defineType } from 'sanity';
-import { COUNTRY_OPTIONS, GUIDE_CATEGORIES } from '../constants/enums';
+import { GUIDE_CATEGORIES } from '../constants/enums';
+import { COUNTRY_REFERENCE_OPTIONS, COUNTRY_REFERENCE_TO } from '../constants/countryRef';
 
 /**
  * A long-form editorial guide. One document type serves every guide kind: the
@@ -43,14 +44,12 @@ export const guide = defineType({
 		defineField({
 			name: 'country',
 			title: 'Country',
-			type: 'string',
+			type: 'reference',
+			to: COUNTRY_REFERENCE_TO,
+			options: COUNTRY_REFERENCE_OPTIONS,
 			group: 'content',
-			options: {
-				list: [...COUNTRY_OPTIONS],
-				layout: 'radio'
-			},
 			description:
-				'Which market this guide covers. Listings use it to surface the right buying guide in the enquiry shelf; leave blank for a guide that is not country-specific.'
+				'Which market this guide covers. It groups the guide under that country on the Guides hub, and listings in that country surface it in their enquiry shelf. Leave blank for a guide that is not market-specific — those lead the hub under "Start here".'
 		}),
 		defineField({
 			name: 'audienceLabel',
@@ -66,7 +65,7 @@ export const guide = defineType({
 			type: 'number',
 			group: 'content',
 			description:
-				'Manual ordering within the category on the Guides hub. Lower numbers appear first. Note that this also picks the default: the lowest-numbered buying guide for a country is the one shown on every listing in that country, so reordering the hub changes the listings too. To pin a different guide to a listing regardless, set it on the listing itself under Enquiry shelf: guide.',
+				'Manual ordering within this guide\'s country group on the Guides hub (the countries themselves are ordered by "Market order" on the country). Lower numbers appear first. Note that this also picks the default: the lowest-numbered buying guide for a country is the one shown on every listing in that country, so reordering the hub changes the listings too. To pin a different guide to a listing regardless, set it on the listing itself under Enquiry shelf: guide.',
 			validation: (Rule) => Rule.min(0).integer()
 		}),
 		defineField({

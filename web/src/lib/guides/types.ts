@@ -54,6 +54,10 @@ export type GuideCard = {
 	audienceLabel?: string | null;
 	tagline?: string | null;
 	heroImage?: MediaAssetInput | null;
+	/** Dereferenced country — the shape after the country-refs migration. */
+	market?: { name?: string | null; slug?: string | null } | null;
+	/** The raw `country` field, still a slug string on an unmigrated document. */
+	marketSlugRaw?: unknown;
 };
 
 export type GuideSeo = {

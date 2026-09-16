@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import { fetchMarkets } from '$lib/sanity/queries';
 import type { RequestHandler } from './$types';
 
 // Buyer-guide request from the homepage cards. This is a lead, not a newsletter sub: the
@@ -13,16 +14,26 @@ import type { RequestHandler } from './$types';
 // The HubSpot form behind that GUID must expose `email` and `buyer_guide`.
 //
 // ANALYTICS: deliberately silent here. When wired, add `buyer_guide_request` to LeadType and
-// emit `generate_lead` from BuyerGuideCard.svelte's success branch only — never a derived
+// emit `generate_lead` from the requesting component's success branch only — never a derived
 // state — updating docs/analytics.md's event dictionary in the same change.
+//
+// NOTE: the PDF-delivery workflow is still pending, so nothing currently POSTs here. It is
+// kept (rather than deleted with the unused BuyerGuideCard) because the HubSpot form behind
+// it is configured and the flow is planned work.
 
 // Deliberately forgiving: catches the obvious typos without rejecting the long tail of
 // valid addresses a stricter regex would.
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Which guide the email is requesting. Anything else is rejected as untrusted input.
-const GUIDES = ['spain', 'portugal'] as const;
-type Guide = (typeof GUIDES)[number];
+// Which market's guide the email is requesting. Validated against the live market list
+// rather than a hardcoded pair: this used to be ['spain', 'portugal'], so a UAE guide
+// request would have been rejected as untrusted input. The list is still an allowlist —
+// the value reaches HubSpot, so it is never taken on trust from the request body.
+async function isKnownMarket(value: string): Promise<boolean> {
+	if (!value.trim()) return false;
+	const markets = await fetchMarkets();
+	return markets.some((market) => market.slug === value);
+}
 
 export const POST: RequestHandler = async ({ request, url, getClientAddress }) => {
 	let email: unknown;
@@ -37,10 +48,11 @@ export const POST: RequestHandler = async ({ request, url, getClientAddress }) =
 	if (typeof email !== 'string' || !EMAIL.test(email.trim())) {
 		return json({ error: 'Please enter a valid email address.' }, { status: 422 });
 	}
-	if (!GUIDES.includes(guide as Guide)) {
+	// An async function cannot return a type predicate, so narrow to string here first.
+	if (typeof guide !== 'string' || !(await isKnownMarket(guide))) {
 		return json({ error: 'Please choose a guide.' }, { status: 422 });
 	}
-	const requestedGuide = guide as Guide;
+	const requestedGuide = guide;
 
 	const portalId = env.HUBSPOT_PORTAL_ID;
 	const formGuid = env.HUBSPOT_GUIDE_FORM_GUID;

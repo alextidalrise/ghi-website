@@ -12,6 +12,7 @@ import { insight } from './insight';
 import { locationTaxonomy } from './locationTaxonomy';
 import { partner } from './partner';
 import { partnerCategory } from './partnerCategory';
+import { partnersPage } from './partnersPage';
 import { propertyListing } from './propertyListing';
 import { siteSettings } from './siteSettings';
 import { unit } from './unit';
@@ -22,6 +23,7 @@ export const documentTypes: SchemaTypeDefinition[] = [
 	siteSettings,
 	exchangeRates,
 	guidesHubPage,
+	partnersPage,
 	aboutPage,
 	contactPage,
 	locationTaxonomy,
@@ -50,6 +52,7 @@ export {
 	locationTaxonomy,
 	partner,
 	partnerCategory,
+	partnersPage,
 	propertyListing,
 	siteSettings,
 	unit,

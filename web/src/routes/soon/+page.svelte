@@ -134,7 +134,7 @@
 			</h1>
 
 			<p class="holding__lead holding__rise" style="--d: 0.3s">
-				Residences on and near the finest golf courses of Spain and Portugal, chosen
+				Residences on and near the world's finest golf courses, chosen
 				one at a time. We are putting the final touches to the collection. Leave your
 				email and you will be among the first through the door.
 			</p>

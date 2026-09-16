@@ -22,6 +22,13 @@ export function buildGuideToc(sections: GuideSection[] | null | undefined): Guid
 
 export { GUIDES_PATH, guidePath } from './routes';
 export {
+	groupGuidesByMarket,
+	guideMarketSlug,
+	type GuideMarketGroup,
+	type GuideCategorySubgroup,
+	type GuidesHubGroups
+} from './markets';
+export {
 	GUIDE_CATEGORY_ORDER,
 	GUIDE_CATEGORY_META,
 	groupGuidesByCategory,

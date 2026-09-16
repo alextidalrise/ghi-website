@@ -47,7 +47,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	const title = content.seo?.seoTitle?.trim() || 'Frontline Golf Homes | Golf Homes International';
 	const description =
 		content.seo?.metaDescription?.trim() ||
-		'Every property on the first line of a golf course, across Spain and Portugal. Filter the frontline collection by country, location, price and golf course.';
+		'Every property on the first line of a golf course, in every market we cover. Filter the frontline collection by country, location, price and golf course.';
 	const seo = {
 		title,
 		description,

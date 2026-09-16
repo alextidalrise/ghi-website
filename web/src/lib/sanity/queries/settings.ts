@@ -5,6 +5,7 @@ import {
 	MEDIA_ASSET_PUBLIC
 } from '../allowlists';
 import { fetchPublic } from './fetch';
+import { MARKET_ORDERING } from './markets';
 import {
 	DEFAULT_FEATURE_FILTER,
 	type FeatureFilterSettings
@@ -36,6 +37,8 @@ export const homepageFeaturedLocationsQuery = defineQuery(`
   }
 `);
 
+// Ordered by the site's canonical market order (MARKET_ORDERING) rather than by name, so
+// the homepage index, the Guides hub and the partner coverage filter all agree.
 // The country selector is flag-led, not photo-led: it no longer requires (or projects)
 // heroImage. flagUrl dereferences the linked flag asset to its raw URL so the SVG ships
 // crisp and un-rasterised; a country with no flag yet still renders via a built-in stamp.
@@ -44,7 +47,7 @@ export const countriesWithHeroQuery = defineQuery(`
     _type == "locationTaxonomy"
     && type == "country"
     && defined(slug.current)
-  ] | order(name asc){
+  ] | ${MARKET_ORDERING} {
     name,
     "slug": slug.current,
     tagline,

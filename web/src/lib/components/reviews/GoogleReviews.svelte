@@ -22,7 +22,7 @@
 	let {
 		data,
 		heading = 'From keys-in-hand buyers',
-		deck = "Real reviews from people who've bought golf property with us in Spain and Portugal.",
+		deck = "Real reviews from people who've bought golf property with us.",
 		flushTop = false
 	}: Props = $props();
 
