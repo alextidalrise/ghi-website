@@ -14,6 +14,7 @@
 	 * rule everywhere, and a box that fills reads as "ticked" in the questionnaire idiom the
 	 * site's forms already use (bottom rules, no field boxes).
 	 */
+	import CountryFlagArt from '$lib/components/CountryFlagArt.svelte';
 	import { finderHref, type FinderState } from '$lib/guides/finder';
 	import { guidePath } from '$lib/guides/routes';
 	import { marketInProse } from '$lib/markets/markets';
@@ -97,6 +98,12 @@
 							data-sveltekit-keepfocus
 						>
 							<span class="choice__box" aria-hidden="true"></span>
+							<!-- The same 1px-framed 3:2 stamp the header shelf and the homepage country
+							     index use, so a market reads as a market everywhere. Decorative: the
+							     name carries the meaning. -->
+							<span class="choice__flag" aria-hidden="true">
+								<CountryFlagArt slug={m.slug} flagUrl={m.flagUrl} />
+							</span>
 							<span class="choice__label">{m.name}</span>
 						</a>
 					</li>
@@ -189,9 +196,12 @@
 		gap: var(--space-xl);
 	}
 
+	/* The buyer-type column takes only the width its choices need; the markets, which carry
+	   flags and grow as countries are added, get the rest so they stay on one line for as
+	   long as they can. */
 	@media (min-width: 56rem) {
 		.finder__questions {
-			grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+			grid-template-columns: auto minmax(0, 1fr);
 			gap: var(--space-2xl);
 		}
 	}
@@ -213,7 +223,7 @@
 	.question__choices {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0 var(--space-lg);
+		gap: 0 var(--space-md);
 		margin: 0;
 		padding: 0 0 var(--space-xs);
 		list-style: none;
@@ -239,6 +249,28 @@
 			background-color var(--duration-hover) var(--ease),
 			border-color var(--duration-hover) var(--ease),
 			box-shadow var(--duration-hover) var(--ease);
+	}
+
+	.choice__flag {
+		display: block;
+		flex-shrink: 0;
+		width: 1.5rem;
+		height: 1rem;
+		border: 1px solid var(--border);
+		overflow: hidden;
+	}
+
+	.choice__flag :global(img),
+	.choice__flag :global(svg) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/* The flag belongs to its name, so it sits a little closer to the label than to the box. */
+	.choice__flag + .choice__label {
+		margin-left: -0.2rem;
 	}
 
 	.choice__label {

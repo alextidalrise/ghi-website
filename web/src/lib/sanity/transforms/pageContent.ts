@@ -168,7 +168,7 @@ export function resolveGuidesHubContent(input: GuidesHubPageInput | null): Guide
 		heroTitle: s(input?.heroTitle, 'Guides'),
 		heroLead: s(
 			input?.heroLead,
-			'Considered, current guidance on buying and owning a home near the world\'s finest golf, market by market.'
+			'Considered, current guidance on buying a home near the world\'s finest golf, written for who you are and where you\'re buying.'
 		),
 		sectionHeading: s(input?.sectionHeading, 'Where to start'),
 		categoryMeta,

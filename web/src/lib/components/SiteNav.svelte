@@ -1649,7 +1649,7 @@
 
 	/* Collapse to the drawer while the full menu still has room. Re-measured 2026-09-10
 	   with the currency switcher in the bar and the six-item authored menu (Countries +
-	   Front Line Collection, Buying Guide, Partners, Insights, About + Contact), fonts
+	   Front Line Collection, Buying Guides, Partners, Insights, About + Contact), fonts
 	   loaded: the list is ~1085px wide, so with the logo and 1.5rem side padding it needs
 	   ~1273px. The hamburger takes over up to 1279px (79.9375rem); 1280px itself keeps the
 	   full bar, which is the ceiling the Step 3 brief set so a 13-inch laptop never gets
