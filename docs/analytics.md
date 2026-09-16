@@ -280,9 +280,14 @@ These cannot be done from this repository.
       twice — once by the tag, once by `ghi_virtual_page_view`.
 - [x] GA4 admin: disable enhanced measurement's **"page changes based on browser history
       events"**, for the same reason.
-- [ ] Match all eleven `ghi_*` events with `CE - GA4 Events` and translate their names through
+- [x] Match all eleven `ghi_*` events with `CE - GA4 Events` and translate their names through
       `Lookup - GA4 Event Name` before sending them through the shared GA4 event tag.
-      (`ghi_currency_select` → `currency_select` is the new one; add it to the lookup table.)
+      **`CE - GA4 Events` is a regex allowlist, not "All Custom Events":** despite the trigger
+      type, its condition is `Event matches RegEx ^(ghi_…|ghi_currency_select)$`. So **every new
+      `ghi_*` event must be added to that regex** as well as to the `Lookup - GA4 Event Name`
+      table — a new event is silently dropped otherwise (this cost a Preview debugging round on
+      `ghi_currency_select`). `ghi_currency_select` → `currency_select` was added to both, and
+      its params go through `GA4 - Event Settings` (2026-09-16).
 - [x] Add a blocking exception on all production GA4 tags for
       `ghi_environment equals debug`, so debug sessions cannot pollute real reporting.
 - [x] Do not add a `<noscript>` container snippet. It cannot respect consent state, and the
@@ -297,6 +302,7 @@ GA4 - Analytics Events              Block - Analytics Debug
 GA4 - Event Settings                Lookup - GA4 Event Name
 DLV - listing_id                    JS - selected_features
 DLV - lead_type                     JS - golf_relevance
+DLV - display_currency              DLV - previous_currency
 ```
 
 The two `JS -` variables turn the application's closed-vocabulary arrays into
@@ -313,10 +319,17 @@ leaking out of an earlier event into the next one during client-side navigation.
       `country`, `location`, `community`, `property_type`, `price_band`, `lead_type`,
       `form_location`, `contact_method`, `search_placement`, `navigation_method`,
       `gallery_surface`.
-- [ ] Register event-scoped custom dimensions for the currency switcher: `display_currency`,
+- [x] Register event-scoped custom dimensions for the currency switcher: `display_currency`,
       `previous_currency`, `placement`. (`placement` also rides `contact_click` and the
-      gallery events, so registering it now backfills those too.)
-- [ ] Leave `currency_select` a supporting event, **not** a key event.
+      gallery events, so registering it now backfills those too.) Done 2026-09-16.
+- [x] Backfill event-scoped custom dimensions for the parameters that were sent but never
+      registered — so they become reportable, not just present in the Data API / BigQuery:
+      `sort`, `selected_features`, `golf_relevance`, `min_beds`, `image_position`,
+      `image_count`. Registered as dimensions (discrete values you group and count by) rather
+      than metrics, 2026-09-16. Now 23 custom dimensions; only the six GA4 built-ins are left
+      off (`page_location`, `page_path`, `page_title`, `item_list_id`, `item_list_name`,
+      `items`).
+- [x] Leave `currency_select` a supporting event, **not** a key event.
 - [x] Mark **`generate_lead`** as a key event.
 - [x] Leave `contact_click`, `floorplan_request_started`, `gallery_open` and `search` as
       supporting events, **not** key events.
