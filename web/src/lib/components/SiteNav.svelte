@@ -1718,14 +1718,16 @@
 
 		/* The 1280px laptop is the ceiling the drawer breakpoint was set to protect, and
 		   the chip is wider than the word it replaced. Trim the word-links and the chip's
-		   own margins rather than letting the bar clip or the drawer take a laptop. */
+		   own margins rather than letting the bar clip or the drawer take a laptop.
+		   Re-measured 2026-09-16 after "Buying Guide" became "Buying Guides": 0.8rem left
+		   1.5px of slack at 1280px, so 0.75rem restores ~11px against font-metric drift. */
 		.site-nav__link {
-			padding: 0 0.8rem;
+			padding: 0 0.75rem;
 		}
 
 		.site-nav__link::after {
-			left: 0.8rem;
-			right: 0.8rem;
+			left: 0.75rem;
+			right: 0.75rem;
 		}
 
 		.site-nav__ccy {
