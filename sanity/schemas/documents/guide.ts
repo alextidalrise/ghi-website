@@ -56,7 +56,8 @@ export const guide = defineType({
 			title: 'Audience label',
 			type: 'string',
 			group: 'content',
-			description: 'Short chip shown on the hub and hero, e.g. "For UK buyers".',
+			description:
+				'Short chip shown on the guide hero, e.g. "For UK buyers". Not shown on the Guides hub rows, where the title already names the audience.',
 			validation: (Rule) => Rule.max(40)
 		}),
 		defineField({

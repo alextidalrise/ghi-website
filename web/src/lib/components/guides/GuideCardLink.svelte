@@ -35,10 +35,10 @@
 		</div>
 	{/if}
 
+	<!-- No audience chip on the row: every title names its audience ("…as a UK Buyer"),
+	     so a boxed "FOR UK BUYERS" above it only repeated the heading. The label still
+	     shows on the guide's own hero, where the title is the only other context. -->
 	<div class="guide-card__body">
-		{#if card.audienceLabel}
-			<span class="guide-card__chip">{card.audienceLabel}</span>
-		{/if}
 		<h3 class="guide-card__title">{card.title}</h3>
 		{#if card.tagline}
 			<p class="guide-card__tagline">{card.tagline}</p>
@@ -86,19 +86,6 @@
 
 	.guide-card__body {
 		min-width: 0;
-	}
-
-	.guide-card__chip {
-		display: inline-block;
-		margin-bottom: var(--space-sm);
-		padding: 0.3rem 0.7rem;
-		border: 1px solid var(--border);
-		font-family: var(--sans);
-		font-size: var(--text-overline);
-		font-weight: 500;
-		letter-spacing: var(--tracking-overline);
-		text-transform: uppercase;
-		color: var(--muted);
 	}
 
 	.guide-card__title {
