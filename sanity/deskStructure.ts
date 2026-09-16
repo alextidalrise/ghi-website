@@ -237,7 +237,14 @@ export const deskStructure: StructureResolver = (S) =>
 								.title('All guides')
 								.id('guides-all')
 								.schemaType('guide')
-								.child(S.documentTypeList('guide').title('All guides'))
+								.child(S.documentTypeList('guide').title('All guides')),
+							S.divider(),
+							S.listItem()
+								.title('Buyer types')
+								.id('guides-buyer-types')
+								.icon(UsersIcon)
+								.schemaType('buyerType')
+								.child(S.documentTypeList('buyerType').title('Buyer types'))
 						])
 				),
 			S.listItem()

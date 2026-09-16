@@ -37,10 +37,34 @@ export const guideBySlugQuery = defineQuery(`
   }
 `);
 
-/** All guides for the hub, ordered for grouping by category on the page. */
+/**
+ * Every guide, shaped for the hub's two-question finder: who it is for, where, and what
+ * it covers. Chapter headings are the proof the answer panel shows, so they ride along;
+ * the section bodies do not.
+ *
+ * `coalesce(country->slug.current, country)` reads the market in either stored shape.
+ */
 export const guidesHubQuery = defineQuery(`
   *[_type == "guide" && defined(slug.current)]
-    | order(coalesce(order, 999) asc, title asc) ${GUIDE_CARD_PUBLIC}
+    | order(coalesce(order, 999) asc, title asc){
+      "slug": slug.current,
+      title,
+      tagline,
+      guideCategory,
+      lastReviewed,
+      "chapters": sections[defined(heading)].heading,
+      "audience": audience->slug.current,
+      "market": coalesce(country->slug.current, country)
+    }
+`);
+
+/** The answers to "Who are you buying as?", in editor order. */
+export const buyerTypesQuery = defineQuery(`
+  *[_type == "buyerType" && defined(slug.current)]
+    | order(coalesce(order, 999) asc, name asc){
+      name,
+      "slug": slug.current
+    }
 `);
 
 /** Indexable guide slugs for the sitemap. */

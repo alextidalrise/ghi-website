@@ -2,6 +2,7 @@ import type { SchemaTypeDefinition } from 'sanity';
 
 import { aboutPage } from './aboutPage';
 import { author } from './author';
+import { buyerType } from './buyerType';
 import { contactPage } from './contactPage';
 import { development } from './development';
 import { exchangeRates } from './exchangeRates';
@@ -33,6 +34,7 @@ export const documentTypes: SchemaTypeDefinition[] = [
 	unit,
 	propertyListing,
 	guide,
+	buyerType,
 	insight,
 	author,
 	partnerCategory,
@@ -42,6 +44,7 @@ export const documentTypes: SchemaTypeDefinition[] = [
 export {
 	aboutPage,
 	author,
+	buyerType,
 	contactPage,
 	development,
 	exchangeRates,
