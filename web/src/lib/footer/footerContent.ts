@@ -35,7 +35,7 @@ const FALLBACK: ResolvedFooter = {
 			heading: 'Explore',
 			links: [
 				{ label: 'Front Line Collection', href: '/front-line-collection', external: false },
-				{ label: 'Buying Guide', href: '/guides', external: false },
+				{ label: 'Buying Guides', href: '/guides', external: false },
 				{ label: 'About Us', href: '/about', external: false },
 				{ label: 'Contact', href: '/contact', external: false }
 			],

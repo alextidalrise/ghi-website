@@ -146,7 +146,7 @@ export {
 
 export { sitemapListingsQuery, sitemapTaxonomyQuery, sitemapUnitsQuery } from './sitemap';
 
-export { guideBySlugQuery, guidesHubQuery, sitemapGuidesQuery } from './guide';
+export { buyerTypesQuery, guideBySlugQuery, guidesHubQuery, sitemapGuidesQuery } from './guide';
 
 export { insightsHubQuery, insightBySlugQuery, sitemapInsightsQuery } from './insight';
 

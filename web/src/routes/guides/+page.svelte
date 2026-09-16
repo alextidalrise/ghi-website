@@ -1,18 +1,12 @@
 <script lang="ts">
 	import GuideTextHero from '$lib/components/guides/GuideTextHero.svelte';
-	import GuideCardLink from '$lib/components/guides/GuideCardLink.svelte';
-	import GuideMarketGroup from '$lib/components/guides/GuideMarketGroup.svelte';
+	import GuideFinder from '$lib/components/guides/GuideFinder.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
 	let { data } = $props();
 
-	const general = $derived(data.groups.general);
-	const markets = $derived(data.groups.markets);
-	// The hub has content whenever a guide exists anywhere. A market with none of its own
-	// still renders its row, saying so — that is the point, not an empty state.
-	const hasGuides = $derived(general.length > 0 || markets.some((group) => !group.isEmpty));
-
 	const c = $derived(data.content);
+	const hasGuides = $derived(data.index.length > 0);
 
 	const pageTitle = $derived(c.seo?.seoTitle?.trim() || 'Guides | Golf Homes International');
 	const metaDescription = $derived(
@@ -27,8 +21,8 @@
 	<title>{pageTitle}</title>
 	<meta name="description" content={metaDescription} />
 	<link rel="canonical" href={data.canonicalUrl} />
-	{#if c.seo?.noindex}
-		<meta name="robots" content="noindex" />
+	{#if c.seo?.noindex || data.noindex}
+		<meta name="robots" content="noindex, follow" />
 	{/if}
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={data.canonicalUrl} />
@@ -41,74 +35,97 @@
 	title={c.heroTitle}
 	lead={c.heroLead}
 	breadcrumbs={data.breadcrumbs}
+	compact
 />
 
-<div class="guides-hub">
-	{#if hasGuides}
-		{#if general.length > 0}
-			<!-- Guides that belong to no single market lead the page: they are what to read
-			     before choosing a country, so they sit above the market index. -->
-			<section class="guides-hub__group content-wrap" aria-labelledby="guides-general">
-				<div class="guides-hub__group-head">
-					<h2 class="guides-hub__group-heading" id="guides-general">{c.sectionHeading}</h2>
-				</div>
-				<ul class="guides-hub__list">
-					{#each general as card (card._id)}
-						<li class="guides-hub__item">
-							<GuideCardLink {card} />
-						</li>
-					{/each}
-				</ul>
-			</section>
-		{/if}
+{#if hasGuides}
+	<GuideFinder finder={data.finder} />
 
-		<div class="guides-hub__markets content-wrap">
-			{#each markets as group (group.market.slug)}
-				<GuideMarketGroup {group} />
+	<!-- Every guide, as a plain index. The consultation above is the way in; this is for the
+	     reader who would rather scan, and it keeps every guide one link from the hub. -->
+	<nav class="guides-index content-wrap" aria-labelledby="guides-index-heading">
+		<h2 class="guides-index__heading" id="guides-index-heading">All guides</h2>
+		<ul class="guides-index__list">
+			{#each data.index as item (item.href)}
+				<li><a class="guides-index__link" href={item.href}>{item.title}</a></li>
 			{/each}
-		</div>
-	{:else}
-		<section class="guides-hub__empty content-wrap">
-			<p>{c.emptyStateMessage}</p>
-		</section>
-	{/if}
-</div>
+		</ul>
+	</nav>
+{:else}
+	<section class="guides-empty content-wrap">
+		<p>{c.emptyStateMessage}</p>
+	</section>
+{/if}
 
 <style>
-	.guides-hub {
-		padding-block: var(--space-2xl);
+	.guides-index {
+		padding-bottom: var(--space-2xl);
 	}
 
-	/* The market index. Generous separation between countries, because each block is a
-	   destination in its own right rather than a row in a list. */
-	.guides-hub__markets {
+	/* The rule sits on the heading, inside the content column: on the padded wrapper it
+	   would run past the column's edges. */
+	.guides-index__heading {
+		margin: 0 0 var(--space-sm);
+		padding-top: var(--space-lg);
+		border-top: 1px solid var(--border);
+		font-family: var(--serif);
+		font-weight: 400;
+		font-size: var(--text-h4);
+		color: var(--green);
+	}
+
+	.guides-index__list {
 		display: grid;
-		gap: var(--section-gap);
-	}
-
-	.guides-hub__group + .guides-hub__markets {
-		margin-top: var(--section-gap);
-	}
-
-	.guides-hub__group-head {
-		max-width: 44rem;
-		margin-bottom: var(--space-md);
-	}
-
-	.guides-hub__list {
-		list-style: none;
+		column-gap: var(--space-xl);
 		margin: 0;
 		padding: 0;
-		border-top: 1px solid var(--border);
+		list-style: none;
 	}
 
-	.guides-hub__item {
-		border-bottom: 1px solid var(--border);
+	@media (min-width: 40rem) {
+		.guides-index__list {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 	}
 
-	.guides-hub__empty {
-		padding-block: var(--space-xl);
+	/* Underlined at rest, by owner decision: in a plain list of titles an underline is the
+	   only thing that says "link". (The site's default text link underlines on hover only.)
+	   A quiet stone underline at rest, gold and green ink on hover/focus. */
+	.guides-index__link {
+		display: inline-block;
+		padding-block: 0.6rem;
+		font-family: var(--sans);
+		font-weight: 300;
+		font-size: var(--text-ui);
+		color: var(--green);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-decoration-color: color-mix(in oklch, var(--green) 35%, transparent);
+		text-underline-offset: 0.3em;
+		transition:
+			color var(--duration-hover) var(--ease),
+			text-decoration-color var(--duration-hover) var(--ease);
+	}
+
+	.guides-index__link:hover,
+	.guides-index__link:focus-visible {
+		text-decoration-color: var(--gold);
+	}
+
+	.guides-index__link:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 3px;
+	}
+
+	.guides-empty {
+		padding-block: var(--space-2xl);
 		font-family: var(--sans);
 		color: var(--muted);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.guides-index__link {
+			transition: none;
+		}
 	}
 </style>

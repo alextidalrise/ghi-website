@@ -11,12 +11,18 @@
 		hideCurrentCrumb?: boolean;
 		/** Optional row rendered beneath the lead (e.g. meta chips). */
 		meta?: Snippet;
+		/**
+		 * Tighter block padding, for a page whose real content has to land in the first
+		 * viewport under the hero (the Guides hub's answer panel).
+		 */
+		compact?: boolean;
 	};
 
-	let { title, lead, breadcrumbs, hideCurrentCrumb = false, meta }: Props = $props();
+	let { title, lead, breadcrumbs, hideCurrentCrumb = false, meta, compact = false }: Props =
+		$props();
 </script>
 
-<section class="guide-text-hero on-dark">
+<section class="guide-text-hero on-dark" class:guide-text-hero--compact={compact}>
 	{#if breadcrumbs && breadcrumbs.length > 0}
 		<div class="guide-text-hero__top content-wrap">
 			<Breadcrumbs items={breadcrumbs} onDark hideCurrent={hideCurrentCrumb} />
@@ -37,6 +43,10 @@
 		background: var(--green);
 		border-bottom: 1px solid var(--gold);
 		padding-block: clamp(2.5rem, 6vw, 4.5rem);
+	}
+
+	.guide-text-hero--compact {
+		padding-block: clamp(2rem, 4vw, 3rem);
 	}
 
 	.guide-text-hero__top {

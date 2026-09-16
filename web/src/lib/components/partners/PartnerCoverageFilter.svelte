@@ -17,6 +17,7 @@
 	 * Links, not buttons: the filter is URL state (`?covering=uae`), so it works without
 	 * JavaScript, survives a refresh, and is linkable from the country page's routes panel.
 	 */
+	import CountryFlagArt from '$lib/components/CountryFlagArt.svelte';
 	import type { MarketWithCount } from '$lib/markets/markets';
 	import { partnersPath } from '$lib/markets/markets';
 
@@ -56,6 +57,11 @@
 						aria-current={isActive ? 'true' : undefined}
 						data-sveltekit-noscroll
 					>
+						<!-- The same 1px-framed 3:2 stamp as the Guides hub choices and the header
+						     shelf. Decorative: the name carries the meaning. -->
+						<span class="coverage__flag" aria-hidden="true">
+							<CountryFlagArt slug={market.slug} flagUrl={market.flagUrl} />
+						</span>
 						{market.name}
 						<span class="coverage__count">{market.count}</span>
 					</a>
@@ -96,6 +102,30 @@
 			border-color var(--duration-hover) var(--ease),
 			background-color var(--duration-hover) var(--ease),
 			color var(--duration-hover) var(--ease);
+	}
+
+	.coverage__flag {
+		display: block;
+		flex-shrink: 0;
+		align-self: center;
+		width: 1.5rem;
+		height: 1rem;
+		border: 1px solid var(--border);
+		overflow: hidden;
+	}
+
+	.coverage__flag :global(img),
+	.coverage__flag :global(svg) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/* On the gold active fill a stone frame disappears; a faint green one keeps the stamp
+	   edged. */
+	.coverage__chip--active .coverage__flag {
+		border-color: color-mix(in oklch, var(--green) 25%, transparent);
 	}
 
 	.coverage__count {
