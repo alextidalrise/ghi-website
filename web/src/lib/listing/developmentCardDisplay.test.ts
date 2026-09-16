@@ -67,7 +67,7 @@ describe('formatDevelopmentCardPrice', () => {
 });
 
 describe('developmentPriceParts', () => {
-	const rates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25 };
+	const rates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25, RUB: 0.01 };
 
 	it('frames a bare single figure as a starting price without inspecting the string', () => {
 		expect(developmentPriceParts({ price: 525_000, currency: 'EUR' })).toMatchObject({

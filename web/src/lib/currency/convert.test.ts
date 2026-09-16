@@ -4,7 +4,7 @@ import { FALLBACK_RATES, ratesFromPerEur } from './rates';
 
 // A table with clean reciprocals so the expectations are readable by hand:
 // 1 GBP = 1.25 EUR, 1 USD = 0.8 EUR, 1 AED = 0.25 EUR.
-const RATES = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25 };
+const RATES = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25, RUB: 0.01 };
 
 describe('roundSignificant', () => {
 	it.each([

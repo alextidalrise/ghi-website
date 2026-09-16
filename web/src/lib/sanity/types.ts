@@ -605,6 +605,8 @@ export type ExchangeRates = {
   gbpPerEur?: number;
   usdPerEur?: number;
   asOf?: string;
+  rubPerEur?: number;
+  rubAsOf?: string;
   updatedByCron?: string;
   gbpOverride?: number;
   usdOverride?: number;

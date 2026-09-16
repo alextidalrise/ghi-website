@@ -16,7 +16,7 @@
 	import { CURRENCY_NAMES } from '$lib/currency/convert';
 	import { getCurrency } from '$lib/currency/currency.svelte';
 	import { CURRENCIES, type Currency } from '$lib/currency/rates';
-	import { trackCurrencySelected, type CurrencyPlacement } from '$lib/analytics';
+	import { trackCurrencySelected } from '$lib/analytics';
 
 	let { nav = null }: { nav?: HeaderNav | null } = $props();
 
@@ -24,93 +24,130 @@
 	const navItems = $derived(site.items);
 	const cta = $derived(site.cta);
 
-	// The display-currency switcher is the bar's last text item, before Contact. It shares
-	// the dropdown state machine with the CMS items (one open menu at a time, same hover
-	// intent, Escape, focus-out), addressed by the index just past the authored list.
+	// The display-currency picker. It is a control, not a destination, so it sits outside
+	// the authored menu list and is addressed by a sentinel index in the same one-open-at-
+	// a-time state machine the CMS dropdowns use — no authored item can ever collide with
+	// it. Unlike those dropdowns it does not open on hover: a pointer crossing the bar on
+	// its way to Contact must not drop a picker over the page.
+	const CURRENCY_MENU = -1;
 	const currency = getCurrency();
-	const currencyIndex = $derived(navItems.length);
 	const currencyOptions: { code: Currency | null; label: string; name: string }[] = [
 		{ code: null, label: 'As listed', name: "Each listing's own currency" },
 		...CURRENCIES.map((code) => ({ code, label: code, name: CURRENCY_NAMES[code] }))
 	];
-	const ratesDate = $derived(
-		new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(
-			new Date(`${currency.asOf}T00:00:00Z`)
-		)
+
+	// Non-breaking spaces inside the date: the note is two short lines in a 19.5rem panel,
+	// and "15 Sept 2026" splitting across the break reads as two separate facts.
+	const formatRateDate = (iso: string) =>
+		new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+			.format(new Date(`${iso}T00:00:00Z`))
+			.replace(/ /g, '\u00A0');
+
+	/**
+	 * The panel's one line of fine print, named for what is actually behind the chosen
+	 * figure. The rouble is not an ECB rate — the ECB has published none since March 2022 —
+	 * so it cites its own hand-maintained quote and date rather than borrowing the ECB's.
+	 *
+	 * This is the only part of the switcher that depends on `chosen` at render time rather
+	 * than through CSS. That is safe because it lives inside a panel that cannot be opened
+	 * before hydration, so an edge-cached document never shows a stale sentence.
+	 */
+	const currencyNote = $derived(
+		currency.chosen === null
+			? 'Each home is shown in the currency it is listed in.'
+			: currency.chosen === 'RUB'
+				? `Approximate, at the rouble rate of ${formatRateDate(currency.rubAsOf)}.`
+				: `Approximate, at ECB reference rates of ${formatRateDate(currency.asOf)}.`
 	);
 
 	let currencyButton = $state<HTMLButtonElement>();
 	let currencyMenu = $state<HTMLElement>();
+	let currencyRoot = $state<HTMLElement>();
 
-	// The single point where a currency choice is recorded, shared by the bar menu and the
-	// drawer. Read the prior choice before applying so the event can carry it, and report
-	// only a real change — re-picking the current currency is a no-op worth no measurement.
-	function selectCurrency(code: Currency | null, placement: CurrencyPlacement) {
+	// The single point where a currency choice is recorded. Read the prior choice before
+	// applying so the event can carry it, and report only a real change — re-picking the
+	// current currency is a no-op worth no measurement.
+	function chooseCurrency(code: Currency | null) {
 		const previous = currency.chosen;
 		currency.select(code);
 		if (code !== previous) {
-			trackCurrencySelected({ currency: code, previous, placement });
+			trackCurrencySelected({ currency: code, previous, placement: 'nav_bar' });
 		}
-	}
-
-	function chooseCurrency(code: Currency | null) {
-		selectCurrency(code, 'nav_bar');
 		openMenu = null;
 		currencyButton?.focus();
 	}
 
-	// Menu-button pattern: opening from the keyboard moves focus onto the checked row so the
-	// arrow keys work at once; Escape hands focus back to the button. A pointer click leaves
-	// focus where it is (the click already put it on the button).
-	async function openCurrencyMenuFromKeyboard() {
-		openMenu = currencyIndex;
+	function toggleCurrencyPicker() {
+		if (currencyOpen) openMenu = null;
+		else void openCurrencyPicker();
+	}
+
+	// Opening moves focus onto the chosen cell so the arrow keys work at once; Escape hands
+	// focus back to the chip. The picker and the mobile drawer are both bar-level overlays,
+	// so one opening closes the other rather than stacking them.
+	async function openCurrencyPicker() {
+		open = false;
+		openMenu = CURRENCY_MENU;
 		await tick();
 		// After the DOM update, and one frame later so the panel has computed as visible
 		// (an element that still computes hidden refuses focus).
 		requestAnimationFrame(() => {
-			currencyMenu
-				?.querySelector<HTMLButtonElement>('[role="menuitemradio"][aria-checked="true"]')
-				?.focus();
+			currencyMenu?.querySelector<HTMLButtonElement>('[role="radio"][aria-checked="true"]')?.focus();
 		});
 	}
 
 	function onCurrencyButtonKeydown(event: KeyboardEvent) {
-		const isOpen = openMenu === currencyIndex;
 		if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
 			event.preventDefault();
-			void openCurrencyMenuFromKeyboard();
+			void openCurrencyPicker();
 		} else if (event.key === 'Enter' || event.key === ' ') {
 			// Handled here rather than by the synthesised click so the open moves focus.
 			event.preventDefault();
-			if (isOpen) openMenu = null;
-			else void openCurrencyMenuFromKeyboard();
+			toggleCurrencyPicker();
 		}
 	}
 
-	// Arrow keys walk the currency menu's rows like a native menu; Home/End jump.
+	/**
+	 * Radio-group keys across the picker's cells: arrows move focus, Home/End jump, and the
+	 * choice is taken with Enter or Space. Focus deliberately does not select as it moves —
+	 * the usual radio-group shortcut — because selecting here writes a cookie, repaints
+	 * every price on the page and reports an analytics event; arrowing past four currencies
+	 * to reach the fifth would fire all four.
+	 */
 	function onCurrencyMenuKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
 			openMenu = null;
 			currencyButton?.focus();
 			return;
 		}
-		if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
-		const rows = Array.from(
-			(event.currentTarget as HTMLElement).querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]')
+		const keys = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'];
+		if (!keys.includes(event.key)) return;
+		const cells = Array.from(
+			(event.currentTarget as HTMLElement).querySelectorAll<HTMLButtonElement>('[role="radio"]')
 		);
-		if (rows.length === 0) return;
-		const current = rows.indexOf(document.activeElement as HTMLButtonElement);
-		let next = current;
-		if (event.key === 'ArrowDown') next = (current + 1) % rows.length;
-		else if (event.key === 'ArrowUp') next = (current - 1 + rows.length) % rows.length;
+		if (cells.length === 0) return;
+		const current = cells.indexOf(document.activeElement as HTMLButtonElement);
+		let next: number;
+		if (event.key === 'ArrowDown' || event.key === 'ArrowRight') next = (current + 1) % cells.length;
+		else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft')
+			next = (current - 1 + cells.length) % cells.length;
 		else if (event.key === 'Home') next = 0;
-		else next = rows.length - 1;
+		else next = cells.length - 1;
 		event.preventDefault();
-		rows[next]?.focus();
+		cells[next]?.focus();
+	}
+
+	// The picker opens on activation, not on hover, so nothing closes it when the pointer
+	// wanders off. A press anywhere outside it does — the same guard a filter popover uses.
+	function onWindowPointerDown(event: PointerEvent) {
+		if (!currencyOpen) return;
+		if (currencyRoot?.contains(event.target as Node)) return;
+		openMenu = null;
 	}
 
 	let open = $state(false); // mobile drawer
 	let openMenu = $state<number | null>(null); // desktop dropdown / panel index, if any
+	const currencyOpen = $derived(openMenu === CURRENCY_MENU);
 	// Mobile accordion key, if any: `${i}` for a top-level dropdown, `${i}.${g}` for a
 	// country inside a panel item (the drawer flattens the panel's first tier to a label,
 	// so its countries are the drawer's own accordions).
@@ -149,7 +186,12 @@
 	// group. No active section collapses everything.
 	function toggleDrawer() {
 		open = !open;
-		if (open) expanded = activeAccordionKey();
+		// The picker hangs off the same bar; opening the drawer over it would leave two
+		// overlays on screen with one scrim between them.
+		if (open) {
+			openMenu = null;
+			expanded = activeAccordionKey();
+		}
 	}
 
 	function toggleAccordion(key: string) {
@@ -299,7 +341,7 @@
 	});
 </script>
 
-<svelte:window onkeydown={onWindowKeydown} />
+<svelte:window onkeydown={onWindowKeydown} onpointerdown={onWindowPointerDown} />
 
 <!-- One polite sentence when the display currency changes; silent otherwise. -->
 <span class="visually-hidden" role="status" aria-live="polite">{currency.announcement}</span>
@@ -482,74 +524,84 @@
 				</li>
 			{/if}
 		{/each}
-		<!-- The currency switcher: a fourth nav voice, not a widget. Its label is the chosen
-		     code (or "Currency" until a choice is made), selected in CSS from the same root
-		     attribute that selects every price, so the bar never flashes on load either. -->
-		<!-- Unlike the link items, focus alone does not open this menu: a menu button opens on
-		     activation (Enter, Space, arrows, click), otherwise focus returning to the button
-		     after a choice would pop the menu straight back open. -->
-		<li
-			class="site-nav__item site-nav__item--currency"
-			onpointerenter={() => pointerEnterItem(currencyIndex)}
-			onpointerleave={() => pointerLeaveItem(currencyIndex)}
-			onfocusout={(event) => handleItemFocusOut(event, currencyIndex)}
+	</ul>
+
+	<!-- The display-currency picker. It sits outside the menu list, and outside the drawer,
+	     because it belongs to the prices on the page rather than to the site's structure:
+	     it is the one control the visitor may want at any moment, so it stays in the fixed
+	     bar at every width instead of hiding inside a scrolling drawer on a phone.
+
+	     The chip's label is one of six spans chosen by the same root attribute that chooses
+	     every price (see $lib/styles/currency.css), so the bar and the figures agree from
+	     the first frame, before any script runs. -->
+	<div
+		class="site-nav__ccy"
+		bind:this={currencyRoot}
+		onfocusout={(event) => handleItemFocusOut(event, CURRENCY_MENU)}
+	>
+		<button
+			bind:this={currencyButton}
+			type="button"
+			class="site-nav__ccy-trigger"
+			class:is-open={currencyOpen}
+			aria-label="Display currency"
+			aria-haspopup="true"
+			aria-expanded={currencyOpen}
+			aria-controls="site-nav-currency"
+			onclick={toggleCurrencyPicker}
+			onkeydown={onCurrencyButtonKeydown}
 		>
-			<button
-				bind:this={currencyButton}
-				type="button"
-				class="site-nav__link site-nav__link--button site-nav__currency"
-				aria-label="Show prices in"
-				aria-haspopup="menu"
-				aria-expanded={openMenu === currencyIndex}
-				onclick={() => toggleDropdown(currencyIndex)}
-				onkeydown={onCurrencyButtonKeydown}
-			>
-				<span class="site-nav__currency-label" data-ccy="">Prices</span>
+			<span class="site-nav__ccy-value">
+				<span class="site-nav__ccy-label" data-ccy="">As listed</span>
 				{#each CURRENCIES as code (code)}
-					<span class="site-nav__currency-label" data-ccy={code}>{code}</span>
+					<span class="site-nav__ccy-label" data-ccy={code}>{code}</span>
 				{/each}
-				{@render chevron('sm', openMenu === currencyIndex)}
-			</button>
-			<ul
+			</span>
+			{@render chevron('sm', currencyOpen)}
+		</button>
+
+		<div
+			id="site-nav-currency"
+			class="site-nav__ccy-panel"
+			class:is-open={currencyOpen}
+		>
+			<p class="site-nav__ccy-title" id="site-nav-currency-title">Show prices in</p>
+			<div
 				bind:this={currencyMenu}
-				class="site-nav__submenu site-nav__currency-menu"
-				class:is-open={openMenu === currencyIndex}
-				role="menu"
-				aria-label="Show prices in"
+				class="site-nav__ccy-grid"
+				role="radiogroup"
+				aria-labelledby="site-nav-currency-title"
+				tabindex={-1}
 				onkeydown={onCurrencyMenuKeydown}
 			>
 				{#each currencyOptions as option (option.label)}
-					<li role="none">
-						<button
-							type="button"
-							role="menuitemradio"
-							class="site-nav__submenu-link site-nav__currency-option"
-							class:is-active={currency.chosen === option.code}
-							aria-checked={currency.chosen === option.code}
-							tabindex={openMenu === currencyIndex ? 0 : -1}
-							onclick={() => chooseCurrency(option.code)}
-						>
-							<span class="site-nav__currency-code">{option.label}</span>
-							<span class="site-nav__currency-name">{option.name}</span>
-						</button>
-					</li>
+					<button
+						type="button"
+						role="radio"
+						class="site-nav__ccy-cell"
+						class:site-nav__ccy-cell--reset={option.code === null}
+						class:is-active={currency.chosen === option.code}
+						aria-checked={currency.chosen === option.code}
+						aria-label={option.name}
+						tabindex={currencyOpen && currency.chosen === option.code ? 0 : -1}
+						onclick={() => chooseCurrency(option.code)}
+					>
+						{option.label}
+					</button>
 				{/each}
-				<li role="none" class="site-nav__currency-note">
-					Converted prices are approximate · ECB rates {ratesDate}
-				</li>
-			</ul>
-		</li>
-		<li class="site-nav__cta-item">
-			<a
-				href={cta.href}
-				class="site-nav__cta"
-				target={cta.external ? '_blank' : undefined}
-				rel={cta.external ? 'noopener noreferrer' : undefined}
-			>
-				{cta.label}{@render newTabHint(cta.external)}
-			</a>
-		</li>
-	</ul>
+			</div>
+			<p class="site-nav__ccy-note">{currencyNote}</p>
+		</div>
+	</div>
+
+	<a
+		href={cta.href}
+		class="site-nav__cta"
+		target={cta.external ? '_blank' : undefined}
+		rel={cta.external ? 'noopener noreferrer' : undefined}
+	>
+		{cta.label}{@render newTabHint(cta.external)}
+	</a>
 
 	<button
 		bind:this={toggleButton}
@@ -746,27 +798,6 @@
 				</li>
 			{/if}
 		{/each}
-		<!-- Display currency: a utility, not a destination, so it sits in the drawer's
-		     recessed well rather than among the rows. "As listed" takes a row of its own
-		     above the four codes: five segments never fit the phone drawer side by side. -->
-		<li class="site-nav__drawer-section site-nav__drawer-currency">
-			<span class="site-nav__drawer-overline" id="drawer-currency-label">Show prices in</span>
-			<div class="site-nav__drawer-segments" role="group" aria-labelledby="drawer-currency-label">
-				{#each currencyOptions as option (option.label)}
-					<button
-						type="button"
-						class="site-nav__drawer-segment"
-						class:is-active={currency.chosen === option.code}
-						aria-pressed={currency.chosen === option.code}
-						aria-label={option.code ? option.name : option.label}
-						tabindex={open ? 0 : -1}
-						onclick={() => selectCurrency(option.code, 'drawer')}
-					>
-						{option.label}
-					</button>
-				{/each}
-			</div>
-		</li>
 	</ul>
 	<div class="site-nav__drawer-footer">
 		<a
@@ -978,94 +1009,199 @@
 		background: rgba(255, 255, 255, 0.04);
 	}
 
-	/* ---- Currency switcher (bar) -------------------------------------------------
-	   The label is one of five spans, selected by the same root attribute that selects
-	   every price on the page — set before first paint, so the bar and the prices agree
-	   from the first frame. "Currency" shows until a choice exists. */
-	.site-nav__currency-label {
-		display: none;
-	}
-
-	:global(html:not([data-currency='EUR']):not([data-currency='GBP']):not([data-currency='USD']):not(
-			[data-currency='AED']
-		))
-		.site-nav__currency-label[data-ccy=''] {
-		display: inline;
-	}
-
-	:global(html[data-currency='EUR']) .site-nav__currency-label[data-ccy='EUR'],
-	:global(html[data-currency='GBP']) .site-nav__currency-label[data-ccy='GBP'],
-	:global(html[data-currency='USD']) .site-nav__currency-label[data-ccy='USD'],
-	:global(html[data-currency='AED']) .site-nav__currency-label[data-ccy='AED'] {
-		display: inline;
-	}
-
-	/* The menu hangs from the bar's right side, so it opens toward the page, not off it. */
-	.site-nav__currency-menu {
-		left: auto;
-		right: 0;
-		min-width: 16.5rem;
-	}
-
-	/* Rows are buttons wearing the submenu-link vocabulary: code in Regular caps, the
-	   currency's name in Light beside it, same hairline between rows. */
-	.site-nav__currency-option {
-		display: flex;
-		align-items: baseline;
-		gap: 0.9rem;
-		width: 100%;
-		background: none;
-		border: 0;
-		cursor: pointer;
-		text-align: left;
-	}
-
-	.site-nav__currency-option {
+	/* ---- Currency picker ----------------------------------------------------------
+	   A control, not a destination. The bar's other items are unframed Light-300 words;
+	   this one is a framed chip in Regular 400, set off by a vertical hairline, so the eye
+	   reads it as an instrument before it reads the label. The chip keeps the bar's height
+	   so its panel hangs from the bar's edge like every other. */
+	.site-nav__ccy {
 		position: relative;
+		display: flex;
+		align-items: center;
+		height: var(--nav-height);
+		margin: 0 1rem 0 0.9rem;
 	}
 
-	/* Keyboard focus takes the same gold ring the drawer segments use, inset so it sits
-	   within the row rather than clipping against the panel's edge. */
-	.site-nav__currency-option:focus-visible {
-		outline: 2px solid var(--gold);
-		outline-offset: -2px;
-	}
-
-	/* The checked row: gold ink (the dropdown's active vocabulary) plus the drawer's 2px
-	   leading marker, so the current choice reads at a glance and not by hue alone. */
-	.site-nav__currency-option[aria-checked='true']::before {
+	/* The hairline that separates instrument from menu. */
+	.site-nav__ccy::before {
 		content: '';
 		position: absolute;
-		left: 0;
-		top: 0.7rem;
-		bottom: 0.7rem;
-		width: 2px;
-		background: var(--gold);
+		left: -0.9rem;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 1px;
+		height: 1.5rem;
+		background: rgba(255, 255, 255, 0.16);
 	}
 
-	.site-nav__currency-code {
-		flex: 0 0 5.75rem;
-	}
-
-	.site-nav__currency-name {
-		font-weight: 300;
+	.site-nav__ccy-trigger {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.6rem;
+		background: none;
+		border: 1px solid rgba(245, 241, 232, 0.3);
+		color: var(--on-green);
+		font-family: var(--sans);
 		font-size: 0.75rem;
-		letter-spacing: 0.04em;
+		font-weight: 400;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			color var(--duration-hover) var(--ease),
+			border-color var(--duration-hover) var(--ease);
+	}
+
+	/* One fixed slot for the label, so the bar never reflows when the visitor picks a
+	   currency and "AS LISTED" gives way to "GBP". The indent optically centres the tracked
+	   caps, whose trailing letter-space would otherwise push them left. */
+	.site-nav__ccy-value {
+		min-width: 4.5rem;
+		text-align: center;
+		text-indent: 0.12em;
+		white-space: nowrap;
+	}
+
+	.site-nav__ccy-trigger:hover,
+	.site-nav__ccy-trigger:focus-visible,
+	.site-nav__ccy-trigger.is-open {
+		color: var(--gold);
+		border-color: var(--gold);
+	}
+
+	.site-nav__ccy-trigger:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 2px;
+	}
+
+	/* The panel wears the dropdown's shell — deep green, 2px gold top rule, the same deep
+	   shadow — but holds a grid, not a list of rows: six options read at a glance instead of
+	   scanning a six-deep column, and a seventh currency costs a cell rather than a row. */
+	.site-nav__ccy-panel {
+		position: absolute;
+		top: 100%;
+		right: 0;
+		width: 19.5rem;
+		max-width: calc(100vw - 2rem);
+		background: var(--green-deep);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-top: 2px solid var(--gold);
+		box-shadow: 0 22px 48px rgba(15, 22, 17, 0.4);
+		padding: 1.15rem 1.25rem 1.1rem;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-0.5rem);
+		pointer-events: none;
+		/* Visibility flips instantly on open and only after the fade on close: an element
+		   mid-transition still computes as hidden and refuses to take focus. */
+		transition:
+			opacity var(--duration-hover) var(--ease),
+			transform var(--duration-hover) var(--ease),
+			visibility 0s linear var(--duration-hover);
+		z-index: 2;
+	}
+
+	.site-nav__ccy-panel.is-open {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		pointer-events: auto;
+		transition-delay: 0s;
+	}
+
+	.site-nav__ccy-title {
+		font-family: var(--sans);
+		font-size: var(--text-overline);
+		font-weight: 500;
+		letter-spacing: var(--tracking-overline);
+		line-height: 1;
+		text-transform: uppercase;
+		color: var(--on-green);
+		margin-bottom: 0.9rem;
+	}
+
+	.site-nav__ccy-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	/* Neighbours share one hairline: each cell pulls over its left and top neighbour's
+	   edge, and the chosen one rises above them all to show its gold frame unbroken. */
+	.site-nav__ccy-cell {
+		min-height: 2.75rem;
+		padding: 0 0.35rem;
+		margin: -1px 0 0 -1px;
+		background: none;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		font-family: var(--sans);
+		font-size: 0.8125rem;
+		font-weight: 400;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		white-space: nowrap;
+		color: var(--on-green);
+		cursor: pointer;
+		transition:
+			color var(--duration-hover) var(--ease),
+			border-color var(--duration-hover) var(--ease);
+	}
+
+	.site-nav__ccy-cell:nth-child(3n + 1) {
+		margin-left: 0;
+	}
+
+	.site-nav__ccy-cell:nth-child(-n + 3) {
+		margin-top: 0;
+	}
+
+	/* "As listed" is not a currency, and says so in a different voice: Light 300 in
+	   sentence case where the codes are Regular 400 tracked caps. */
+	.site-nav__ccy-cell--reset {
+		font-weight: 300;
+		font-size: 0.875rem;
+		letter-spacing: 0.02em;
 		text-transform: none;
 	}
 
-	/* The rates line: the one piece of fine print, set in Light below a hairline. */
-	.site-nav__currency-note {
-		margin-top: 0.4rem;
-		padding: 0.7rem 1.75rem 0.45rem 1.25rem;
+	.site-nav__ccy-cell:hover,
+	.site-nav__ccy-cell:focus-visible {
+		color: var(--gold);
+	}
+
+	/* The focus ring is ivory, not gold, because inside this panel gold already means
+	   "this is the one you chose" — two gold frames would say the same thing twice and
+	   leave a keyboard user unable to tell where they are from what they picked. */
+	.site-nav__ccy-cell:focus-visible {
+		outline: 2px solid var(--on-green);
+		outline-offset: -3px;
+		position: relative;
+		z-index: 2;
+	}
+
+	/* The chosen cell: gold ink and a gold frame, never a fill — a fill here would read as
+	   a second Contact button. */
+	.site-nav__ccy-cell.is-active {
+		position: relative;
+		z-index: 1;
+		color: var(--gold);
+		border-color: var(--gold);
+	}
+
+	/* The one piece of fine print, below a hairline: what the figures are and where the
+	   rate came from. */
+	.site-nav__ccy-note {
+		margin-top: 0.9rem;
+		padding-top: 0.75rem;
 		border-top: 1px solid rgba(255, 255, 255, 0.12);
 		font-family: var(--sans);
 		font-size: var(--text-small);
 		font-weight: 300;
 		letter-spacing: 0.02em;
-		line-height: 1.4;
+		line-height: 1.45;
+		text-wrap: pretty;
 		color: var(--on-green);
-		white-space: nowrap;
 	}
 
 	/* ---- The wide panel ----------------------------------------------------------
@@ -1211,13 +1347,8 @@
 
 	/* Contact: the bar's one accent. Gold reads against deep green where a green
 	   button would disappear. Separated from the text links so it parses as an action. */
-	.site-nav__cta-item {
-		display: flex;
-		align-items: center;
-		margin-left: 1rem;
-	}
-
 	.site-nav__cta {
+		flex: none;
 		font-family: var(--sans);
 		font-size: 0.8125rem;
 		font-weight: 400;
@@ -1247,6 +1378,7 @@
 	.site-nav__toggle {
 		display: none;
 		margin-left: auto;
+		flex: none;
 		width: 2.75rem;
 		height: 2.75rem;
 		flex-direction: column;
@@ -1522,77 +1654,6 @@
 		color: var(--gold);
 	}
 
-	/* ---- Currency switcher (drawer) ----------------------------------------------
-	   A utility, not a destination: the block sits in the drawer's recessed well (the same
-	   dark-green tint the location lists use), which is what separates it from the rows
-	   above without a heavier device. Inside: the overline, then "As listed" on a row of
-	   its own and the four codes beneath it, all hairline segments in the drawer's Regular
-	   caps. The chosen segment takes gold ink and a gold frame — the drawer's "you are
-	   here" — never a fill, which would read as a second Contact. */
-	.site-nav__drawer-currency {
-		margin-top: 1rem;
-		margin-bottom: 0;
-		padding: 1.1rem 0 1.4rem;
-		background: rgba(14, 20, 16, 0.4);
-		border-top: 1px solid rgba(255, 255, 255, 0.08);
-		border-bottom: 0;
-	}
-
-	.site-nav__drawer-segments {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		padding: 0.25rem 2rem 0;
-	}
-
-	.site-nav__drawer-segment {
-		min-height: 2.75rem;
-		padding: 0 0.5rem;
-		/* Neighbours share one hairline: each segment pulls over its left and top
-		   neighbour's edge, and the chosen one rises above them to show its gold frame. */
-		margin: -1px 0 0 -1px;
-		background: none;
-		border: 1px solid rgba(255, 255, 255, 0.18);
-		font-family: var(--sans);
-		font-size: 0.8125rem;
-		font-weight: 400;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		white-space: nowrap;
-		color: var(--on-green);
-		cursor: pointer;
-		transition:
-			color var(--duration-hover) var(--ease),
-			border-color var(--duration-hover) var(--ease);
-	}
-
-	.site-nav__drawer-segment:first-child {
-		grid-column: 1 / -1;
-		margin: 0;
-	}
-
-	.site-nav__drawer-segment:nth-child(2) {
-		margin-left: 0;
-	}
-
-	.site-nav__drawer-segment:hover,
-	.site-nav__drawer-segment:focus-visible {
-		color: var(--gold);
-	}
-
-	.site-nav__drawer-segment:focus-visible {
-		outline: 2px solid var(--gold);
-		outline-offset: -2px;
-		position: relative;
-		z-index: 2;
-	}
-
-	.site-nav__drawer-segment.is-active {
-		position: relative;
-		z-index: 1;
-		color: var(--gold);
-		border-color: var(--gold);
-	}
-
 	/* The drawer's closing gesture: the CTA sits in a pinned footer beneath a hairline,
 	   always on screen however long the list or short the viewport. */
 	.site-nav__drawer-footer {
@@ -1645,6 +1706,26 @@
 		.site-nav {
 			padding: 0 1.5rem;
 		}
+
+		/* The 1280px laptop is the ceiling the drawer breakpoint was set to protect, and
+		   the chip is wider than the word it replaced. Trim the word-links and the chip's
+		   own margins rather than letting the bar clip or the drawer take a laptop. */
+		.site-nav__link {
+			padding: 0 0.8rem;
+		}
+
+		.site-nav__link::after {
+			left: 0.8rem;
+			right: 0.8rem;
+		}
+
+		.site-nav__ccy {
+			margin: 0 0.75rem 0 0.7rem;
+		}
+
+		.site-nav__ccy::before {
+			left: -0.7rem;
+		}
 	}
 
 	/* Collapse to the drawer while the full menu still has room. Re-measured 2026-09-10
@@ -1659,12 +1740,40 @@
 			padding: 0 1.25rem;
 		}
 
-		.site-nav__menu {
+		.site-nav__menu,
+		.site-nav__cta {
 			display: none;
+		}
+
+		/* The picker survives the collapse — it is the reason it never lived in the drawer.
+		   With the menu gone it takes the free space and leads the hamburger, and its
+		   separating hairline has nothing left to separate it from. */
+		.site-nav__ccy {
+			position: static;
+			margin: 0 0.6rem 0 auto;
+		}
+
+		/* A phone taps this; the desktop chip's 30px would be a mean target for the older
+		   hands PRODUCT.md asks us to design for. It matches the hamburger beside it. */
+		.site-nav__ccy-trigger {
+			min-height: 2.75rem;
+			padding: 0 0.7rem;
+		}
+
+		.site-nav__ccy::before {
+			display: none;
+		}
+
+		/* The chip is no longer the panel's positioning context, so the panel hangs from
+		   the bar itself, inset to the bar's own gutter rather than to the chip's edge —
+		   a 19.5rem panel anchored to a chip 3rem from the edge would run off a phone. */
+		.site-nav__ccy-panel {
+			right: 1.25rem;
 		}
 
 		.site-nav__toggle {
 			display: flex;
+			margin-left: 0;
 		}
 
 		.site-nav__drawer {
@@ -1673,6 +1782,35 @@
 
 		.site-nav__scrim {
 			display: block;
+		}
+	}
+
+	/* Narrow phones (≤380px). Logo, chip and hamburger are all fixed-width, so below this
+	   the row stops fitting: the gutter tightens and the wordmark steps down, which keeps
+	   the chip on one line and the hamburger at its full 44px target. */
+	@media (max-width: 23.75rem) {
+		.site-nav {
+			padding: 0 1rem;
+		}
+
+		.site-nav__logo {
+			width: 112px;
+		}
+
+		.site-nav__ccy {
+			margin-right: 0.5rem;
+		}
+
+		.site-nav__ccy-trigger {
+			padding: 0 0.6rem;
+		}
+
+		.site-nav__ccy-value {
+			min-width: 4.25rem;
+		}
+
+		.site-nav__ccy-panel {
+			right: 1rem;
 		}
 	}
 
@@ -1692,7 +1830,9 @@
 		.site-nav__submenu-link,
 		.site-nav__column-head,
 		.site-nav__column-link,
-		.site-nav__drawer-segment {
+		.site-nav__ccy-trigger,
+		.site-nav__ccy-panel,
+		.site-nav__ccy-cell {
 			transition: none;
 		}
 	}

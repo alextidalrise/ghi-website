@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	budgetBands,
+	currencyPrefix,
 	displayFromEur,
 	eurFromDisplay,
 	formatMoneyRange,
@@ -8,7 +9,7 @@ import {
 } from './filterPrice';
 
 // 1 GBP = 1.25 EUR, 1 USD = 0.8 EUR, 1 AED = 0.25 EUR: clean reciprocals for readable sums.
-const rates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25 };
+const rates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25, RUB: 0.01 };
 
 describe('eurFromDisplay / displayFromEur', () => {
 	it('passes EUR through untouched in both directions', () => {
@@ -31,7 +32,7 @@ describe('eurFromDisplay / displayFromEur', () => {
 	it('round-trips a round figure back to itself', () => {
 		// The reason display rounds to 3 s.f. and EUR to 4: a figure the visitor typed comes
 		// back unchanged when they reopen the filter, even at an awkward real-world rate.
-		const real = { EUR: 1, GBP: 1 / 0.85898, USD: 1 / 1.1652, AED: 1 / (1.1652 * 3.6725) };
+		const real = { EUR: 1, GBP: 1 / 0.85898, USD: 1 / 1.1652, AED: 1 / (1.1652 * 3.6725), RUB: 1 / 97.3 };
 		for (const currency of ['GBP', 'USD', 'AED'] as const) {
 			for (const typed of [500_000, 1_000_000, 2_000_000, 5_000_000]) {
 				const eur = eurFromDisplay(typed, currency, real);
@@ -95,5 +96,32 @@ describe('budgetBands', () => {
 			'AED 20M+'
 		]);
 		expect(aed[0].max).toBe(500_000); // AED 2M = €500k
+	});
+});
+
+describe('the rouble', () => {
+	// ~97 RUB to the euro, so the euro ladder converted mechanically would read
+	// "₽48.65M – ₽97.3M". The rouble gets its own round rungs instead.
+	const rubRates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25, RUB: 1 / 97.3 };
+
+	it('uses its own round edges rather than converted euro ones', () => {
+		const labels = budgetBands('RUB', rubRates).map((band) => band.label);
+		expect(labels).toEqual([
+			'Up to ₽50M',
+			'₽50M – ₽100M',
+			'₽100M – ₽200M',
+			'₽200M – ₽500M',
+			'₽500M+'
+		]);
+	});
+
+	it('still emits euro bounds, so the rungs line up with the euro market', () => {
+		const [, second] = budgetBands('RUB', rubRates);
+		expect(second.min).toBeCloseTo(513_900, 0);
+		expect(second.max).toBeCloseTo(1_028_000, 0);
+	});
+
+	it('takes the rouble sign as its input adornment', () => {
+		expect(currencyPrefix('RUB')).toBe('₽');
 	});
 });

@@ -209,7 +209,11 @@ export function trackLeadSubmitted(params: {
 	});
 }
 
-/** Which surface of the switcher the visitor used. */
+/**
+ * Which surface of the switcher the visitor used. Only `nav_bar` is emitted now that the
+ * picker lives in the bar at every width; `drawer` is kept so the historic series (the
+ * drawer control that shipped 2026-09-10) stays readable in GA4 alongside it.
+ */
 export type CurrencyPlacement = 'nav_bar' | 'drawer';
 
 /**

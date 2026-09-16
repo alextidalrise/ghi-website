@@ -23,20 +23,23 @@ const SYMBOL: Record<Currency, string> = {
 	EUR: '€',
 	GBP: '£',
 	USD: '$',
-	AED: 'AED '
+	AED: 'AED ',
+	RUB: '₽'
 };
 
 /**
  * Budget-band edges per currency, expressed in that currency's own round numbers rather
  * than a mechanical conversion of the euro edges — a GBP visitor reads "£500k", a dirham
  * visitor reads "AED 2M". The euro market's ladder is the default; AED is scaled to the
- * dirham's magnitude (~4× the euro) so its rungs stay round.
+ * dirham's magnitude (~4× the euro) and RUB to the rouble's (~100× the euro) so their
+ * rungs stay round.
  */
 const LADDER_EDGES: Record<Currency, readonly [number, number, number, number]> = {
 	EUR: [500_000, 1_000_000, 2_000_000, 5_000_000],
 	GBP: [500_000, 1_000_000, 2_000_000, 5_000_000],
 	USD: [500_000, 1_000_000, 2_000_000, 5_000_000],
-	AED: [2_000_000, 5_000_000, 10_000_000, 20_000_000]
+	AED: [2_000_000, 5_000_000, 10_000_000, 20_000_000],
+	RUB: [50_000_000, 100_000_000, 200_000_000, 500_000_000]
 };
 
 /**

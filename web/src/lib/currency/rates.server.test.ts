@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { exchangeRatesFromDoc } from './rates.server';
-import { FALLBACK_RATES, RATES_AS_OF, ratesFromPerEur } from './rates';
+import { FALLBACK_RATES, RATES_AS_OF, RUB_PER_EUR, RUB_RATE_AS_OF, ratesFromPerEur } from './rates';
 
 describe('exchangeRatesFromDoc', () => {
 	it('converts base quotes into a EUR-per-unit table', () => {
@@ -37,6 +37,38 @@ describe('exchangeRatesFromDoc', () => {
 		expect(result.source).toBe('fallback');
 		expect(result.rates).toEqual(FALLBACK_RATES);
 		expect(result.asOf).toBe(RATES_AS_OF);
+		expect(result.rubAsOf).toBe(RUB_RATE_AS_OF);
+	});
+
+	// The rouble has no ECB quote to derive from (suspended March 2022), so it is a hand-
+	// maintained figure with its own date rather than anything the daily cron can supply.
+	describe('the rouble', () => {
+		const base = { gbpPerEur: 0.85898, usdPerEur: 1.1652, asOf: '2026-09-09' };
+
+		it('takes the editor-maintained quote and its own date', () => {
+			const result = exchangeRatesFromDoc({ ...base, rubPerEur: 95, rubAsOf: '2026-09-14' });
+			expect(result.rates.RUB).toBeCloseTo(1 / 95, 10);
+			expect(result.rubAsOf).toBe('2026-09-14');
+			// It never disturbs the ECB-sourced date.
+			expect(result.asOf).toBe('2026-09-09');
+		});
+
+		it('falls back to the code snapshot when the document has no quote', () => {
+			const result = exchangeRatesFromDoc(base);
+			expect(result.rates.RUB).toBeCloseTo(1 / RUB_PER_EUR, 10);
+			expect(result.rubAsOf).toBe(RUB_RATE_AS_OF);
+		});
+
+		it('does not borrow the ECB date for a quote with none of its own', () => {
+			const result = exchangeRatesFromDoc({ ...base, rubPerEur: 95 });
+			expect(result.rubAsOf).toBe(RUB_RATE_AS_OF);
+		});
+
+		it('ignores an unusable quote', () => {
+			const result = exchangeRatesFromDoc({ ...base, rubPerEur: 0, rubAsOf: '2026-09-14' });
+			expect(result.rates.RUB).toBeCloseTo(1 / RUB_PER_EUR, 10);
+			expect(result.rubAsOf).toBe(RUB_RATE_AS_OF);
+		});
 	});
 
 	it('ignores a non-positive override and keeps the derived rate', () => {

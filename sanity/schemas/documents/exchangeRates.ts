@@ -8,6 +8,10 @@ import { defineField, defineType } from 'sanity';
  * to a EUR-equivalent for cross-currency sort and filtering (AED is derived from the USD
  * peg). The base rates are cron-owned; the per-rate overrides are the manual lever — set one
  * to pin that currency's rate (as EUR per 1 unit), and the cron leaves it alone.
+ *
+ * The rouble is wholly manual. The ECB suspended its RUB reference rate in March 2022, so
+ * the feed carries no quote for it and the cron never writes `rubPerEur`/`rubAsOf`: an
+ * editor maintains both, and the site shows `rubAsOf` as the date behind a rouble price.
  */
 export const exchangeRates = defineType({
 	name: 'exchangeRates',
@@ -37,6 +41,21 @@ export const exchangeRates = defineType({
 			title: 'Rates as of',
 			type: 'date',
 			description: 'ECB publication date of the base rates above. Written by the cron.'
+		}),
+		defineField({
+			name: 'rubPerEur',
+			title: 'RUB per 1 EUR',
+			type: 'number',
+			description:
+				'Roubles per 1 euro. NOT written by the cron — the ECB has published no rouble reference rate since March 2022, so this is maintained by hand. A good source is the Central Bank of Russia daily rate. Leave it empty to use the code snapshot.',
+			validation: (Rule) => Rule.positive()
+		}),
+		defineField({
+			name: 'rubAsOf',
+			title: 'Rouble rate as of',
+			type: 'date',
+			description:
+				'The date the rouble quote above was taken. Shown to visitors beneath a rouble price, so update it whenever you update the rate.'
 		}),
 		defineField({
 			name: 'updatedByCron',

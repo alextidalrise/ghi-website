@@ -51,7 +51,7 @@ describe('formatListingPrice', () => {
 
 describe('formatListingPrice — converted display', () => {
 	// 1 GBP = 1.25 EUR, 1 USD = 0.8 EUR, 1 AED = 0.25 EUR: clean reciprocals for readable sums.
-	const rates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25 };
+	const rates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25, RUB: 0.01 };
 
 	it('converts to the target currency, rounds to 3 s.f. and marks it approximate', () => {
 		expect(formatListingPrice({ price: 1_245_000, currency: 'EUR' }, { to: 'GBP', rates })).toBe(
@@ -123,7 +123,7 @@ describe('formatListingPriceParts', () => {
 	it('composes back to the one-line form', () => {
 		const parts = formatListingPriceParts(
 			{ price: 1_000_000, currency: 'EUR', priceQualifier: 'guide' },
-			{ to: 'USD', rates: { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25 } }
+			{ to: 'USD', rates: { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25, RUB: 0.01 } }
 		)!;
 		expect(composePrice(parts)).toBe('Guide approx. $1,250,000');
 	});

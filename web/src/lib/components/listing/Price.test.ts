@@ -4,11 +4,11 @@ import Price from './Price.svelte';
 import { CURRENCY_CONTEXT_KEY, CurrencyStore } from '$lib/currency/currency.svelte';
 
 // 1 GBP = 1.25 EUR, 1 USD = 0.8 EUR, 1 AED = 0.25 EUR — clean sums for readable assertions.
-const rates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25 };
+const rates = { EUR: 1, GBP: 1.25, USD: 0.8, AED: 0.25, RUB: 0.01 };
 
 function renderPrice(props: Record<string, unknown>, withContext = true): string {
 	const context = withContext
-		? new Map<symbol, unknown>([[CURRENCY_CONTEXT_KEY, new CurrencyStore({ rates, asOf: '2026-09-09' })]])
+		? new Map<symbol, unknown>([[CURRENCY_CONTEXT_KEY, new CurrencyStore({ rates, asOf: '2026-09-09', rubAsOf: '2026-09-16' })]])
 		: undefined;
 	// Hydration markers are noise for these assertions.
 	return render(Price, { props: props as never, context }).body.replace(/<!--[^>]*-->/g, '');

@@ -95,6 +95,7 @@ export const load: LayoutServerLoad = async ({
 		headerNav,
 		analytics: analyticsState,
 		rates: rates.rates,
-		ratesAsOf: rates.asOf
+		ratesAsOf: rates.asOf,
+		ratesRubAsOf: rates.rubAsOf
 	};
 };

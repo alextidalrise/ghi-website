@@ -155,7 +155,7 @@ renaming a GA4 event never requires a code change here.
 | `ghi_floorplan_request_started` | `floorplan_request_started` | Floorplan CTA opens the form | `PropertyDetail.svelte` |
 | `ghi_contact_clicked` | `contact_click` | WhatsApp, phone or email CTA chosen | `EnquiryRail`, `/contact`, `TalkToUsBand` |
 | `ghi_lead_submitted` | `generate_lead` | **HubSpot accepted a submission** | `EnquiryRail`, `/contact` |
-| `ghi_currency_select` | `currency_select` | Visitor changes their display currency (a real change, not a re-pick) | `SiteNav` (bar menu and drawer) |
+| `ghi_currency_select` | `currency_select` | Visitor changes their display currency (a real change, not a re-pick) | `SiteNav` (the bar's currency picker) |
 
 ### Parameters
 
@@ -206,8 +206,10 @@ non-positive amount. `currency` is only ever sent alongside a price.
 `form_location`, `listing_id`.
 
 **Currency** — `display_currency` and `previous_currency`, each one of `EUR`, `GBP`, `USD`,
-`AED` or `as_listed` (each listing's own currency, the default before a choice is made);
-`placement` (`nav_bar` | `drawer`). The event fires only on a genuine change, so the two
+`AED`, `RUB` or `as_listed` (each listing's own currency, the default before a choice is
+made); `placement`, now always `nav_bar` — the picker moved into the bar at every width on
+2026-09-16, so the `drawer` value only appears in data from before that date. The event
+fires only on a genuine change, so the two
 currency values are never equal. Returning to the default is reported as `as_listed` rather
 than dropped, so it is a countable choice. This is a presentation preference, not an
 ecommerce action: it deliberately carries no GA4 `currency`/`value` pair (which would
@@ -406,7 +408,7 @@ browser can confirm — run them in GTM Preview on a preview deployment via `?gh
 - [ ] Card click: `select_item` with the same `index` as the impression
 - [ ] A POA listing carries **no `price` key at all**
 - [ ] Gallery: open, arrows, thumbnails, swipe and keyboard all report the right method
-- [ ] Currency switch (bar and drawer): one `currency_select` with the right
+- [ ] Currency switch (the bar picker, desktop and phone): one `currency_select` with the right
       `display_currency`/`previous_currency`/`placement`; re-picking the current currency
       fires nothing; returning to "As listed" reports `display_currency: as_listed`
 
