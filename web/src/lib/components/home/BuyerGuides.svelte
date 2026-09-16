@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { CountryFeatureCard } from '$lib/sanity/transforms/taxonomyHero';
+	import CountryFlagArt from '$lib/components/CountryFlagArt.svelte';
 
 	type Props = {
 		/** Country cards from the homepage load — used only for their flag SVGs, so the
@@ -13,7 +14,7 @@
 	let {
 		countries = [],
 		heading = 'Everything to know before you buy',
-		deck = 'The process, the costs, the tax and the mortgage — set out plainly for non-resident buyers in Spain and Portugal.',
+		deck = 'The process, the costs, the tax and the mortgage — set out plainly for non-resident buyers, market by market.',
 		cta = "Read the buyer's guides"
 	}: Props = $props();
 
@@ -24,37 +25,30 @@
 		return href.replace(/^\//, '').split('/')[0];
 	}
 
-	type Stamp = { slug: 'spain' | 'portugal'; flagUrl: string | null };
+	/**
+	 * The signpost carries every market, in the order the homepage country index below it
+	 * uses — it was a hardcoded Spain/Portugal pair, typed as a two-value union, so the two
+	 * markets added since launch were invisible here.
+	 *
+	 * Capped because this is a signpost, not an index: past four stamps the row starts to
+	 * compete with the heading it sits above, and the countries themselves are listed in
+	 * full further down the page.
+	 */
+	const MAX_STAMPS = 4;
 
-	// The signpost always carries Spain + Portugal. Prefer the same Sanity-uploaded
-	// flag the country index uses (matched by slug); fall back to null so the built-in
-	// stamp renders until an editor uploads the flag — identical to DestinationsByCountry.
-	const stamps = $derived<Stamp[]>(
-		(['spain', 'portugal'] as const).map((slug) => ({
-			slug,
-			flagUrl: countries.find((c) => slugOf(c.href) === slug)?.flagUrl ?? null
+	const stamps = $derived(
+		countries.slice(0, MAX_STAMPS).map((country) => ({
+			slug: slugOf(country.href),
+			flagUrl: country.flagUrl
 		}))
 	);
 </script>
 
-<!-- Flag stamp: prefer the SVG linked in Sanity; fall back to a hand-drawn stamp
-     (matching DestinationsByCountry and the old buyer-guide cards). Decorative — the
-     heading and deck carry the Spain/Portugal meaning, so the flags are aria-hidden. -->
-{#snippet flag(stamp: Stamp)}
-	{#if stamp.flagUrl}
-		<img src={stamp.flagUrl} alt="" width="34" height="23" loading="lazy" decoding="async" />
-	{:else if stamp.slug === 'spain'}
-		<svg viewBox="0 0 30 20" aria-hidden="true">
-			<rect width="30" height="20" fill="#AA151B" />
-			<rect y="5" width="30" height="10" fill="#F1BF00" />
-		</svg>
-	{:else}
-		<svg viewBox="0 0 30 20" aria-hidden="true">
-			<rect width="30" height="20" fill="#DA291C" />
-			<rect width="12" height="20" fill="#046A38" />
-			<circle cx="12" cy="10" r="3.1" fill="#FFE12C" stroke="#046A38" stroke-width="0.7" />
-		</svg>
-	{/if}
+<!-- Flag artwork resolution (Sanity SVG → built-in stamp → neutral field) lives in
+     CountryFlagArt, the same component the header shelf, the homepage country index and
+     the Guides hub use. Decorative: the heading and deck carry the meaning. -->
+{#snippet flag(stamp: { slug: string; flagUrl: string | null })}
+	<CountryFlagArt slug={stamp.slug} flagUrl={stamp.flagUrl} />
 {/snippet}
 
 <!-- A compact signpost: a full-bleed band washed in a faint brand-green tint
@@ -127,8 +121,10 @@
 		overflow: hidden;
 	}
 
+	/* :global because the artwork is rendered by CountryFlagArt, a child component — a
+	   scoped selector would not reach it. */
 	.guides__flag :global(svg),
-	.guides__flag img {
+	.guides__flag :global(img) {
 		width: 100%;
 		height: 100%;
 		display: block;

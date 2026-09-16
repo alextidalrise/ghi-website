@@ -98,6 +98,7 @@ export {
 	fetchHomepageContent,
 	fetchFrontlineContent,
 	fetchGuidesHubPage,
+	fetchPartnersPage,
 	fetchAboutPage,
 	fetchContactPage
 } from './pages';
@@ -145,17 +146,29 @@ export {
 
 export { sitemapListingsQuery, sitemapTaxonomyQuery, sitemapUnitsQuery } from './sitemap';
 
-export { guideBySlugQuery, guidesHubQuery, sitemapGuidesQuery } from './guide';
+export { buyerTypesQuery, guideBySlugQuery, guidesHubQuery, sitemapGuidesQuery } from './guide';
 
 export { insightsHubQuery, insightBySlugQuery, sitemapInsightsQuery } from './insight';
 
 export {
 	partnerCategoriesQuery,
+	partnerCategoryTotalQuery,
+	partnerTotalQuery,
 	homepagePartnerLogosQuery,
 	HOMEPAGE_PARTNER_LOGOS_LIMIT,
 	fetchPartnerCategories,
+	fetchPartnerCategoryTotal,
+	fetchPartnerTotal,
 	fetchHomepagePartnerLogos
 } from './partners';
+
+export {
+	marketsQuery,
+	marketsWithPartnerCountsQuery,
+	fetchMarkets,
+	fetchMarketsWithPartnerCounts,
+	MARKET_ORDERING
+} from './markets';
 
 export {
 	attachEnquiryShelf,

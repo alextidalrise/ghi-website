@@ -187,6 +187,21 @@ export const locationTaxonomy = defineType({
 			hidden: ({ document }) => document?.type !== 'country'
 		}),
 		defineField({
+			name: 'displayOrder',
+			title: 'Market order',
+			type: 'number',
+			// The site's single canonical country order. Before this field existed, every
+			// surface that enumerates markets invented its own: the homepage index sorted by
+			// featured-location count, the header shelf and footer by their authored menu
+			// order. Three orders on one site. Every market enumeration now reads this —
+			// the Guides hub groups, the /partners coverage filter, the homepage guide
+			// signpost stamps — so reordering here reorders the whole site at once.
+			description:
+				'Where this country sits wherever the site lists its markets (the Guides hub, the Partners coverage filter, the homepage guide signpost). Lower numbers come first; countries without a number fall to the end, alphabetically. Locations and communities ignore this.',
+			hidden: ({ document }) => document?.type !== 'country',
+			validation: (Rule) => Rule.min(0).integer()
+		}),
+		defineField({
 			name: 'tagline',
 			title: 'Tagline',
 			type: 'string',

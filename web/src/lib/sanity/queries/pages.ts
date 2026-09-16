@@ -5,6 +5,7 @@ import {
 	FRONTLINE_CONTENT_PUBLIC,
 	GUIDES_HUB_PUBLIC,
 	HOMEPAGE_CONTENT_PUBLIC,
+	PARTNERS_PAGE_PUBLIC,
 	SEO_PUBLIC
 } from '../allowlists';
 import { fetchPublic } from './fetch';
@@ -13,7 +14,8 @@ import type {
 	ContactPageInput,
 	FrontlineContentInput,
 	GuidesHubPageInput,
-	HomepageContentInput
+	HomepageContentInput,
+	PartnersPageInput
 } from '../transforms/pageContent';
 
 export const homepageContentQuery = defineQuery(`
@@ -32,6 +34,10 @@ export const frontlineContentQuery = defineQuery(`
 
 export const guidesHubPageQuery = defineQuery(`
   *[_type == "guidesHubPage"][0]${GUIDES_HUB_PUBLIC}
+`);
+
+export const partnersPageQuery = defineQuery(`
+  *[_type == "partnersPage"][0]${PARTNERS_PAGE_PUBLIC}
 `);
 
 export const aboutPageQuery = defineQuery(`
@@ -71,6 +77,11 @@ export async function fetchFrontlineContent(): Promise<FrontlineContentInput> {
 export async function fetchGuidesHubPage(): Promise<GuidesHubPageInput> {
 	const result = await fetchPublic<GuidesHubPageInput>(guidesHubPageQuery);
 	return result ?? ({} as GuidesHubPageInput);
+}
+
+export async function fetchPartnersPage(): Promise<PartnersPageInput> {
+	const result = await fetchPublic<PartnersPageInput>(partnersPageQuery);
+	return result ?? ({} as PartnersPageInput);
 }
 
 export async function fetchAboutPage(): Promise<AboutPageInput> {

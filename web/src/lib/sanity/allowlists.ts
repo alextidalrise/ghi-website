@@ -207,7 +207,8 @@ export const SHELF_PARTNER_PUBLIC = /* groq */ `{
   name,
   "slug": slug.current,
   "categories": categories[]->name,
-  "categorySlugs": categories[]->slug.current
+  "categorySlugs": categories[]->slug.current,
+  "categoryPriorities": categories[]->shelfPriority
 }`;
 
 /**
@@ -274,6 +275,26 @@ export const GUIDE_SECTION_PUBLIC = /* groq */ `{
 }`;
 
 /**
+ * The markets a partner covers.
+ *
+ * Projected twice on purpose. `markets` dereferences the country documents, which is the
+ * shape after the country-refs migration. `marketSlugsRaw` is the field verbatim, which
+ * still holds plain slug strings on any document the migration has not reached yet — the
+ * transform reads whichever arrived, so the directory renders correctly either side of
+ * the deploy instead of silently dropping every tag.
+ */
+export const PARTNER_MARKETS = /* groq */ `
+  "markets": countries[]->{ name, "slug": slug.current },
+  "marketSlugsRaw": countries
+`;
+
+/** The single market a guide covers, with the same legacy-string tolerance. */
+export const GUIDE_MARKET = /* groq */ `
+  "market": country->{ name, "slug": slug.current },
+  "marketSlugRaw": country
+`;
+
+/**
  * Public partner projection. `referralUrl` is deliberately excluded — it is the GHI
  * team's internal handoff and must never reach the browser.
  */
@@ -283,7 +304,8 @@ export const PARTNER_PUBLIC = /* groq */ `{
   "slug": slug.current,
   coverage,
   description,
-  logo${MEDIA_ASSET_PUBLIC}
+  logo${MEDIA_ASSET_PUBLIC},
+  ${PARTNER_MARKETS}
 }`;
 
 /**
@@ -291,6 +313,17 @@ export const PARTNER_PUBLIC = /* groq */ `{
  * a usable slug. Categories with no partners are dropped at the query level so the page
  * never renders an empty section header.
  */
+/**
+ * Matches a partner covering the market in `$covering`, or every partner when `$covering`
+ * is the empty string (the unfiltered directory). Both shapes are accepted so the page
+ * reads correctly either side of the country-refs migration.
+ */
+export const PARTNER_COVERS_MARKET = /* groq */ `(
+  $covering == ""
+  || count(countries[@->slug.current == $covering]) > 0
+  || $covering in countries
+)`;
+
 export const PARTNER_CATEGORY_PUBLIC = /* groq */ `{
   "id": slug.current,
   name,
@@ -300,6 +333,7 @@ export const PARTNER_CATEGORY_PUBLIC = /* groq */ `{
     _type == "partner"
     && references(^._id)
     && defined(slug.current)
+    && ${PARTNER_COVERS_MARKET}
   ] | order(coalesce(order, 999) asc, name asc) ${PARTNER_PUBLIC}
 }`;
 
@@ -325,7 +359,8 @@ export const GUIDE_CARD_PUBLIC = /* groq */ `{
   guideCategory,
   audienceLabel,
   tagline,
-  heroImage${MEDIA_ASSET_PUBLIC}
+  heroImage${MEDIA_ASSET_PUBLIC},
+  ${GUIDE_MARKET}
 }`;
 
 /** Public author projection — the byline on an Insights card, the article, and the bio. */
@@ -983,6 +1018,21 @@ export const GUIDES_HUB_PUBLIC = /* groq */ `{
   sectionHeading,
   categories[]{ key, label, blurb },
   emptyStateMessage,
+  seo${SEO_PUBLIC}
+}`;
+
+/** Public partners page singleton projection. */
+export const PARTNERS_PAGE_PUBLIC = /* groq */ `{
+  heroTitle,
+  heroLead,
+  heroMarkers,
+  whyHeading,
+  whyBody,
+  whyAttributes,
+  becomeHeading,
+  becomeBody,
+  becomeCta,
+  becomeSupport,
   seo${SEO_PUBLIC}
 }`;
 

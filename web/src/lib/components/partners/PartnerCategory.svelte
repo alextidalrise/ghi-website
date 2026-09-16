@@ -4,9 +4,11 @@
 
 	type Props = {
 		category: PartnerCategory;
+		/** Passed through to the cards: the market slug the directory is filtered to. */
+		activeMarket?: string | null;
 	};
 
-	let { category }: Props = $props();
+	let { category, activeMarket = null }: Props = $props();
 </script>
 
 {#if category.partners.length > 0}
@@ -23,7 +25,7 @@
 		     grid without changing the markup. Each card adapts its own internals. -->
 		<div class="category__cards">
 			{#each category.partners as partner (partner.slug)}
-				<PartnerCard {partner} />
+				<PartnerCard {partner} {activeMarket} />
 			{/each}
 		</div>
 	</section>

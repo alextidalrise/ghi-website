@@ -63,7 +63,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 	const title = content.seo?.seoTitle?.trim() || 'Contact | Golf Homes International';
 	const description =
 		content.seo?.metaDescription?.trim() ||
-		'Speak to the Golf Homes International team about golf property in Spain and Portugal. Message us on WhatsApp, call, or send an enquiry and we will reply within a working day.';
+		'Speak to the Golf Homes International team about golf property in any of our markets. Message us on WhatsApp, call, or send an enquiry and we will reply within a working day.';
 	const seo = {
 		title,
 		description,

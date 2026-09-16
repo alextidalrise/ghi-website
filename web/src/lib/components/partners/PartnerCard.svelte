@@ -1,13 +1,21 @@
 <script lang="ts">
-	import { type Partner, partnerIntroHref } from '$lib/partners/partners';
+	import { type Partner, partnerCoverageLabel, partnerIntroHref } from '$lib/partners/partners';
 
 	type Props = {
 		partner: Partner;
+		/**
+		 * The market slug the directory is filtered to, or null. The card then leaves that
+		 * market out of its tag ("Also Spain and Portugal") — it is already the page title.
+		 */
+		activeMarket?: string | null;
 	};
 
-	let { partner }: Props = $props();
+	let { partner, activeMarket = null }: Props = $props();
 
 	const introHref = $derived(partnerIntroHref(partner));
+	const coverage = $derived(
+		partnerCoverageLabel(partner, { activeMarket })
+	);
 </script>
 
 <!-- The card is a query container: it goes logo-left/body-right when it has the room
@@ -31,7 +39,9 @@
 		<div class="partner-card__body">
 			<div class="partner-card__head">
 				<h3 class="partner-card__name">{partner.name}</h3>
-				<p class="partner-card__coverage">{partner.coverage}</p>
+				{#if coverage}
+					<p class="partner-card__coverage">{coverage}</p>
+				{/if}
 			</div>
 
 			<p class="partner-card__desc">{partner.description}</p>

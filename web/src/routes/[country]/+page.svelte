@@ -5,6 +5,7 @@
 	import FeaturedListings from '$lib/components/listing/FeaturedListings.svelte';
 	import FrontlineListings from '$lib/components/listing/FrontlineListings.svelte';
 	import GoogleReviewsCompact from '$lib/components/reviews/GoogleReviewsCompact.svelte';
+	import CountryRoutes from '$lib/components/country/CountryRoutes.svelte';
 	import { countryHeadline, countryOverviewHeading } from '$lib/home/headlines';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
 
@@ -92,6 +93,18 @@
 				<p class="country-page__lead">{placeholderBody}</p>
 			{/if}
 		</div>
+
+		<!-- Having seen the stock and read the place, the reader's next question is how any of
+		     this actually works here. A contained routes panel answers it in two moves — the
+		     market's buying guide, and the firms vetted to cover it — and is the only route
+		     from a country page into the partner directory, which is filtered rather than
+		     sectioned by market. Tier 2, contained: the page's one green surface is the
+		     Frontline rail above. -->
+		<CountryRoutes
+			routes={data.countryRoutes}
+			countryName={data.location.name}
+			countrySlug={data.location.slug}
+		/>
 
 		<!-- Trust closes the page. The reader has seen the inventory and read the country
 		     context; the last word before the footer is other buyers'. Compact by design —

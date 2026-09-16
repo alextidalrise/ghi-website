@@ -3,9 +3,10 @@
  * on a listing page — the buying guide for the listing's country, and the specialists
  * behind the purchase.
  *
- * Both default from the listing itself (country → guide; country + three fixed categories →
- * partners, one specialist per category that covers the listing's country) and are
- * optionally overridden per listing in Sanity via `ctas.railGuide` / `ctas.railPartners`. This module holds only the buyer-facing shapes and the resolution
+ * Both default from the listing itself (country → guide; country → partners, one
+ * specialist per discipline, walked in `shelfPriority` order over whatever that market
+ * actually has) and are optionally overridden per listing in Sanity via `ctas.railGuide` /
+ * `ctas.railPartners`. This module holds only the buyer-facing shapes and the resolution
  * rule; the fetching lives in $lib/sanity/queries/enquiryShelf.
  *
  * The specialists carry one CTA between them, and it goes to /partners — the vetted network,
@@ -14,14 +15,64 @@
  */
 
 /**
- * The specialists a buyer needs at the point of doing the arithmetic, in the order they
- * need them. One partner per category, so the shelf reads as three disciplines rather
- * than three logos that might all be lawyers.
+ * How many disciplines the shelf reaches for, and in what order, is no longer a constant
+ * here — it is `shelfPriority` on each `partnerCategory` document.
+ *
+ * It used to be a hardcoded `['mortgage', 'currency-exchange', 'legal-tax']`, which held
+ * while GHI sold in two markets that happened to have all three. It broke the moment UAE
+ * and Montenegro went live with 33 listings between them: neither has a mortgage or a
+ * legal partner, so two of the three slots were structurally unfillable and every listing
+ * in those markets showed a single specialist labelled "Currency".
+ *
+ * The shelf now walks every discipline in priority order and fills up to
+ * SHELF_PARTNER_LIMIT slots from whatever that market actually has. A market missing a
+ * discipline drops to the next one instead of rendering a gap.
  */
-export const SHELF_PARTNER_CATEGORIES = ['mortgage', 'currency-exchange', 'legal-tax'] as const;
 
 /** Hard cap, matching the Sanity override's `Rule.max(3)`. Three fits the narrow rail. */
 export const SHELF_PARTNER_LIMIT = 3;
+
+/**
+ * The floor under `shelfPriority`, used only for a category that has none.
+ *
+ * This is NOT the market list coming back in through the side door — that list was
+ * unscalable because a new *market* required a code change. A discipline list is the
+ * opposite: small, stable, and business logic rather than geography. What it buys is that
+ * the shelf degrades sensibly rather than alphabetically when a value is missing — a
+ * category an editor creates in Studio without setting a priority, or the window between
+ * this deploy and the migration that seeds them. Sanity always wins where it has a value.
+ *
+ * Mortgage first (can this purchase happen at all), then Legal & Tax (a lawyer is
+ * instructed before the reservation deposit, and it is the trust anchor of the brand),
+ * then Currency. Relocation ranks fourth because it is the dominant motive in the Gulf,
+ * and is the discipline that actually fills a UAE slot.
+ */
+export const DEFAULT_SHELF_PRIORITY: Record<string, number> = {
+	mortgage: 0,
+	'legal-tax': 1,
+	'currency-exchange': 2,
+	'relocation-partner': 3,
+	'wealth-management': 4,
+	'rental-investment': 5,
+	'project-management': 6,
+	insurance: 7,
+	'holiday-rentals': 8
+};
+
+/** Sorts behind every ranked discipline. Matches the GROQ `coalesce(..., 999)` convention. */
+export const UNRANKED_SHELF_PRIORITY = 999;
+
+/**
+ * The priority to sort a discipline by: the editor's value when set, else the code floor,
+ * else last.
+ */
+export function shelfPriorityFor(
+	categorySlug: string,
+	authored: number | null | undefined
+): number {
+	if (typeof authored === 'number') return authored;
+	return DEFAULT_SHELF_PRIORITY[categorySlug] ?? UNRANKED_SHELF_PRIORITY;
+}
 
 /**
  * The rail's short form for a discipline, where the category's own name is too long for it.
@@ -93,7 +144,15 @@ export type ShelfPartner = {
 	discipline: string | null;
 };
 
+/** The listing's own market, so the shelf can name it in a fallback line. */
+export type ShelfMarket = {
+	slug: string;
+	name: string;
+};
+
 export type EnquiryShelf = {
+	/** The listing's country. Null only when the country itself could not be resolved. */
+	market: ShelfMarket | null;
 	guide: ShelfGuide | null;
 	partners: ShelfPartner[];
 };
@@ -118,6 +177,8 @@ export type RawShelfPartner = {
 	/** Parallel arrays from `categories[]->name` / `categories[]->slug.current` — same order. */
 	categories?: Array<string | null> | null;
 	categorySlugs?: Array<string | null> | null;
+	/** `categories[]->shelfPriority`, same order again. Null where an editor left it unset. */
+	categoryPriorities?: Array<number | null> | null;
 };
 
 /** The override half of a listing's `ctas`, as projected by CTA_PUBLIC. */
@@ -164,8 +225,12 @@ export function withoutShelfOverrides<T extends ShelfHost>(data: T): T {
 	return scrubbed;
 }
 
-/** Nothing resolved: the aside renders the enquiry panel alone, as it did before. */
-export const EMPTY_ENQUIRY_SHELF: EnquiryShelf = { guide: null, partners: [] };
+/**
+ * Nothing resolved at all — an unknown country, or the fetch failed. With no market to
+ * name, there is no honest fallback to offer either, so the aside renders the enquiry
+ * panel alone. This is the only case where the shelf is silent.
+ */
+export const EMPTY_ENQUIRY_SHELF: EnquiryShelf = { market: null, guide: null, partners: [] };
 
 export function shelfIsEmpty(shelf: EnquiryShelf | null | undefined): boolean {
 	return !shelf || (shelf.guide == null && shelf.partners.length === 0);

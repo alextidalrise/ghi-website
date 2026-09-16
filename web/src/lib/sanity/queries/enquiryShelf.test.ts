@@ -11,13 +11,16 @@ const guide = (title: string, slug: string) => ({
 const partner = (
 	name: string,
 	slug: string,
-	categories: Array<[slug: string, name: string]>
+	categories: Array<[slug: string, name: string, priority?: number]>
 ) => ({
 	_id: `partner.${slug}`,
 	name,
 	slug,
 	categories: categories.map(([, categoryName]) => categoryName),
-	categorySlugs: categories.map(([categorySlug]) => categorySlug)
+	categorySlugs: categories.map(([categorySlug]) => categorySlug),
+	// Null is the common case in the data: most categories rely on the code floor
+	// (DEFAULT_SHELF_PRIORITY) rather than an authored shelfPriority.
+	categoryPriorities: categories.map(([, , priority]) => priority ?? null)
 });
 
 const MORTGAGE = partner('Foxes Finance', 'foxes-finance', [['mortgage', 'Mortgage']]);
@@ -30,7 +33,10 @@ const MORTGAGE_AND_LEGAL = partner('Dual Advisors', 'dual-advisors', [
 	['legal-tax', 'Legal & Tax']
 ]);
 
+const SPAIN = { slug: 'spain', name: 'Spain' };
+
 const defaults: EnquiryShelf = {
+	market: SPAIN,
 	guide: {
 		title: 'How to Buy Property in Spain as a UK Buyer',
 		href: '/guides/buying-property-in-spain-uk-buyers'
@@ -44,14 +50,14 @@ describe('toDefaultShelfPartners', () => {
 		// sequence a buyer needs (mortgage → currency → legal).
 		const partners = toDefaultShelfPartners([LEGAL, CURRENCY, MORTGAGE]);
 
-		expect(partners.map((p) => p.slug)).toEqual(['foxes-finance', 'fiberpay', 'franke']);
+		expect(partners.map((p) => p.slug)).toEqual(['foxes-finance', 'franke', 'fiberpay']);
 	});
 
 	it('takes one partner per category, never two from the same one', () => {
 		const second = partner('Other Broker', 'other-broker', [['mortgage', 'Mortgage']]);
 		const partners = toDefaultShelfPartners([MORTGAGE, second, CURRENCY, LEGAL]);
 
-		expect(partners.map((p) => p.slug)).toEqual(['foxes-finance', 'fiberpay', 'franke']);
+		expect(partners.map((p) => p.slug)).toEqual(['foxes-finance', 'franke', 'fiberpay']);
 	});
 
 	it('skips a category with no partner rather than leaving a hole', () => {
@@ -60,10 +66,50 @@ describe('toDefaultShelfPartners', () => {
 		expect(partners.map((p) => p.discipline)).toEqual(['Mortgage', 'Legal & Tax']);
 	});
 
-	it('ignores categories that are not shelf disciplines', () => {
+	it('fills a slot from whatever discipline the market actually has', () => {
+		// The regression this replaces: the shelf used to accept only mortgage, currency and
+		// legal, so a market whose only partner was a wealth manager showed an empty shelf.
+		// That is what put every UAE and Montenegro listing on a single row.
 		const partners = toDefaultShelfPartners([WEALTH]);
 
-		expect(partners).toEqual([]);
+		expect(partners.map((p) => p.slug)).toEqual(['atlas-bridge']);
+		expect(partners.map((p) => p.discipline)).toEqual(['Wealth Management']);
+	});
+
+	it('ranks a thin market by need, not alphabetically', () => {
+		// The live UAE set: a currency/insurance firm and a relocation specialist, neither of
+		// which is a mortgage broker or a lawyer. Currency outranks relocation on the code
+		// floor; sorted by slug it would have been the other way round.
+		const willu = partner('WillU Group', 'willu', [
+			['currency-exchange', 'Currency Exchange'],
+			['insurance', 'Insurance']
+		]);
+		const equity = partner('Equity', 'equity', [['relocation-partner', 'Relocation Partner']]);
+
+		const partners = toDefaultShelfPartners([willu, equity]);
+
+		expect(partners.map((p) => p.slug)).toEqual(['willu', 'equity']);
+		expect(partners.map((p) => p.discipline)).toEqual(['Currency', 'Relocation Partner']);
+	});
+
+	it('lets an authored shelfPriority beat the code floor', () => {
+		// Sanity is the control surface: an editor who puts legal ahead of mortgage gets that,
+		// without a deploy.
+		const legalFirst = partner('Franke de la Fuente', 'franke', [['legal-tax', 'Legal & Tax', 0]]);
+		const mortgageSecond = partner('Foxes Finance', 'foxes-finance', [
+			['mortgage', 'Mortgage', 1]
+		]);
+
+		const partners = toDefaultShelfPartners([mortgageSecond, legalFirst]);
+
+		expect(partners.map((p) => p.slug)).toEqual(['franke', 'foxes-finance']);
+	});
+
+	it('never shows more than three disciplines', () => {
+		const partners = toDefaultShelfPartners([MORTGAGE, LEGAL, CURRENCY, WEALTH]);
+
+		expect(partners).toHaveLength(3);
+		expect(partners.map((p) => p.slug)).toEqual(['foxes-finance', 'franke', 'fiberpay']);
 	});
 
 	it('drops a partner with no slug', () => {
@@ -140,6 +186,15 @@ describe('resolveEnquiryShelf', () => {
 
 		expect(shelf.guide).toBeNull();
 		expect(shelf.partners).toEqual([]);
+		expect(shelf.market).toBeNull();
+	});
+
+	it('keeps the market through an override — it is the listing’s own country', () => {
+		// The market is what the fallback rows name ("a specialist in Montenegro"), so an
+		// editor overriding the guide must not cost the shelf its ability to say where it is.
+		const shelf = resolveEnquiryShelf(defaults, { railPartners: [WEALTH] });
+
+		expect(shelf.market).toEqual(SPAIN);
 	});
 });
 

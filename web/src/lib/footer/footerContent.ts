@@ -17,7 +17,7 @@ export type ResolvedFooter = {
 // carry the full country/location index.
 const FALLBACK: ResolvedFooter = {
 	brandStatement:
-		'Curated residential property on and near the finest golf courses of Spain and Portugal.',
+		"Curated residential property on and near the world's finest golf courses.",
 	inviteLead: 'Considering a move?',
 	invite: { label: 'Make an enquiry', href: '/contact', external: false },
 	columns: [
@@ -35,7 +35,7 @@ const FALLBACK: ResolvedFooter = {
 			heading: 'Explore',
 			links: [
 				{ label: 'Front Line Collection', href: '/front-line-collection', external: false },
-				{ label: 'Buying Guide', href: '/guides', external: false },
+				{ label: 'Buying Guides', href: '/guides', external: false },
 				{ label: 'About Us', href: '/about', external: false },
 				{ label: 'Contact', href: '/contact', external: false }
 			],

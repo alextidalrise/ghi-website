@@ -83,7 +83,7 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 	const title = content.seo?.seoTitle?.trim() || 'About Us | Golf Homes International';
 	const description =
 		content.seo?.metaDescription?.trim() ||
-		'Specialists in golf property across Spain and Portugal, built around people, not just listings. Meet the team and the trusted network that makes buying abroad simpler and safer.';
+		'Specialists in golf property across every region we cover, built around people, not just listings. Meet the team and the trusted network that makes buying abroad simpler and safer.';
 	const seo = {
 		title,
 		description,

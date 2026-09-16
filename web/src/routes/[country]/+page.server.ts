@@ -20,6 +20,7 @@ import {
 	fetchPublic,
 	locationsByCountryQuery
 } from '$lib/sanity/queries';
+import { fetchCountryRoutes } from '$lib/sanity/queries/countryRoutes';
 import type { CountryBySlugQueryResult } from '$lib/sanity/types';
 import { addCacheTags } from '$lib/cache/tagContext';
 import { cacheTag } from '$lib/cache/tags';
@@ -62,7 +63,8 @@ export const load: PageServerLoad = async ({
 		listingResults,
 		featureLabels,
 		featureFilter,
-		reviews
+		reviews,
+		countryRoutes
 	] = await Promise.all([
 		fetchMaybePreview<CountryBySlugQueryResult>(
 			countryBySlugQuery,
@@ -78,7 +80,8 @@ export const load: PageServerLoad = async ({
 		fetchListingCards({ scope: listingScope, params: searchParams, rates }),
 		fetchCountryFeatureLabels(params.country),
 		fetchFeatureFilterSettings(),
-		loadReviews(fetch)
+		loadReviews(fetch),
+		fetchCountryRoutes(params.country)
 	]);
 
 	if (!country?.slug) {
@@ -104,7 +107,14 @@ export const load: PageServerLoad = async ({
 	/* Structural tags for new documents this page's live queries would surface: a new
 	   country-wide listing and a new frontline listing in this country. Curated featured
 	   listings/locations are already covered by their `doc:` tags (and the country doc's). */
-	addCacheTags(cacheTag.gridCountry(country.slug), cacheTag.frontlineCountry(country.slug));
+	/* The cross-link panel is a live query over guides and partners, so publishing either
+	   must purge every country page along with the hubs they belong to. */
+	addCacheTags(
+		cacheTag.gridCountry(country.slug),
+		cacheTag.frontlineCountry(country.slug),
+		cacheTag.hubGuides,
+		cacheTag.partners
+	);
 
 	const canonicalPath = `/${country.slug}`;
 
@@ -133,6 +143,7 @@ export const load: PageServerLoad = async ({
 		listingResults,
 		featureOptions,
 		locationOptions,
+		countryRoutes,
 		canonicalUrl,
 		breadcrumbs,
 		seo,

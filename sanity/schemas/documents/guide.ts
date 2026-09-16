@@ -1,5 +1,6 @@
 import { defineField, defineType } from 'sanity';
-import { COUNTRY_OPTIONS, GUIDE_CATEGORIES } from '../constants/enums';
+import { GUIDE_CATEGORIES } from '../constants/enums';
+import { COUNTRY_REFERENCE_OPTIONS, COUNTRY_REFERENCE_TO } from '../constants/countryRef';
 
 /**
  * A long-form editorial guide. One document type serves every guide kind: the
@@ -43,21 +44,29 @@ export const guide = defineType({
 		defineField({
 			name: 'country',
 			title: 'Country',
-			type: 'string',
+			type: 'reference',
+			to: COUNTRY_REFERENCE_TO,
+			options: COUNTRY_REFERENCE_OPTIONS,
 			group: 'content',
-			options: {
-				list: [...COUNTRY_OPTIONS],
-				layout: 'radio'
-			},
 			description:
-				'Which market this guide covers. Listings use it to surface the right buying guide in the enquiry shelf; leave blank for a guide that is not country-specific.'
+				'Which market this guide covers. On the Guides hub it answers "Where are you looking?", and listings in that country surface it in their enquiry shelf. Leave blank for a guide that is not market-specific — the hub then offers it for its buyer type wherever a market has no guide of its own.'
+		}),
+		defineField({
+			name: 'audience',
+			title: 'Buyer type',
+			type: 'reference',
+			to: [{ type: 'buyerType' }],
+			group: 'content',
+			description:
+				'Who this guide is written for. The Guides hub asks "Who are you buying as?" and "Where are you looking?", and shows the guide matching both. Leave blank for a guide that applies to every buyer in its country.'
 		}),
 		defineField({
 			name: 'audienceLabel',
 			title: 'Audience label',
 			type: 'string',
 			group: 'content',
-			description: 'Short chip shown on the hub and hero, e.g. "For UK buyers".',
+			description:
+				'Short chip shown on the guide page hero, e.g. "For UK buyers". The Guides hub uses Buyer type above instead.',
 			validation: (Rule) => Rule.max(40)
 		}),
 		defineField({
@@ -66,7 +75,7 @@ export const guide = defineType({
 			type: 'number',
 			group: 'content',
 			description:
-				'Manual ordering within the category on the Guides hub. Lower numbers appear first. Note that this also picks the default: the lowest-numbered buying guide for a country is the one shown on every listing in that country, so reordering the hub changes the listings too. To pin a different guide to a listing regardless, set it on the listing itself under Enquiry shelf: guide.',
+				'Manual ordering. Decides which guide the Guides hub shows when more than one matches the same buyer type and country, and the order of the "All guides" list. Lower numbers appear first. Note that this also picks the default: the lowest-numbered buying guide for a country is the one shown on every listing in that country, so reordering the hub changes the listings too. To pin a different guide to a listing regardless, set it on the listing itself under Enquiry shelf: guide.',
 			validation: (Rule) => Rule.min(0).integer()
 		}),
 		defineField({

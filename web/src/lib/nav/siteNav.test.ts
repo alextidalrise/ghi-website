@@ -27,7 +27,7 @@ describe('buildSiteNav', () => {
 		expect(items.map((item) => item.label)).toEqual([
 			'Countries',
 			'Front Line Collection',
-			'Buying Guide',
+			'Buying Guides',
 			'Insights',
 			'About Us'
 		]);

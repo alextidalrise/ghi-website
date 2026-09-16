@@ -19,7 +19,7 @@
 
 	const pageTitle = 'Insights | Golf Homes International';
 	const metaDescription =
-		'Perspective on golf-property markets, lifestyle and relocation across Spain and Portugal — the thinking behind a considered purchase, from Golf Homes International.';
+		'Perspective on golf-property markets, lifestyle and relocation across every region we cover — the thinking behind a considered purchase, from Golf Homes International.';
 	const ogTitle = 'Insights | Golf Homes International';
 	const ogDescription = metaDescription;
 </script>
@@ -37,7 +37,7 @@
 
 <InsightsHero
 	title="Insights"
-	lead="Perspective on the markets, the lifestyle and the practicalities of owning a home by the finest golf in Spain and Portugal."
+	lead="Perspective on the markets, the lifestyle and the practicalities of owning a home by the world's finest golf."
 	breadcrumbs={data.breadcrumbs}
 />
 

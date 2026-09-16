@@ -2,6 +2,7 @@ import type { SchemaTypeDefinition } from 'sanity';
 
 import { aboutPage } from './aboutPage';
 import { author } from './author';
+import { buyerType } from './buyerType';
 import { contactPage } from './contactPage';
 import { development } from './development';
 import { exchangeRates } from './exchangeRates';
@@ -12,6 +13,7 @@ import { insight } from './insight';
 import { locationTaxonomy } from './locationTaxonomy';
 import { partner } from './partner';
 import { partnerCategory } from './partnerCategory';
+import { partnersPage } from './partnersPage';
 import { propertyListing } from './propertyListing';
 import { siteSettings } from './siteSettings';
 import { unit } from './unit';
@@ -22,6 +24,7 @@ export const documentTypes: SchemaTypeDefinition[] = [
 	siteSettings,
 	exchangeRates,
 	guidesHubPage,
+	partnersPage,
 	aboutPage,
 	contactPage,
 	locationTaxonomy,
@@ -31,6 +34,7 @@ export const documentTypes: SchemaTypeDefinition[] = [
 	unit,
 	propertyListing,
 	guide,
+	buyerType,
 	insight,
 	author,
 	partnerCategory,
@@ -40,6 +44,7 @@ export const documentTypes: SchemaTypeDefinition[] = [
 export {
 	aboutPage,
 	author,
+	buyerType,
 	contactPage,
 	development,
 	exchangeRates,
@@ -50,6 +55,7 @@ export {
 	locationTaxonomy,
 	partner,
 	partnerCategory,
+	partnersPage,
 	propertyListing,
 	siteSettings,
 	unit,
