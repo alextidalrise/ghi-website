@@ -9,6 +9,7 @@
 export {
 	priceBandLabel,
 	trackContactClicked,
+	trackCurrencySelected,
 	trackFloorplanRequestStarted,
 	trackGalleryImageViewed,
 	trackGalleryOpened,
@@ -17,6 +18,7 @@ export {
 	trackListingSelected,
 	trackListingViewed,
 	trackSearchSubmitted,
+	type CurrencyPlacement,
 	type GalleryNavigation,
 	type GallerySurface,
 	type SearchParams,

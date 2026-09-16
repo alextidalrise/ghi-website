@@ -24,7 +24,8 @@ export const ALLOWED_EVENTS: ReadonlySet<GhiEventName> = new Set<GhiEventName>([
 	'ghi_gallery_image_viewed',
 	'ghi_floorplan_request_started',
 	'ghi_contact_clicked',
-	'ghi_lead_submitted'
+	'ghi_lead_submitted',
+	'ghi_currency_select'
 ]);
 
 /** The exact union of top-level keys the typed builders in `events.ts` can produce. */
@@ -62,7 +63,10 @@ export const ALLOWED_KEYS: ReadonlySet<string> = new Set([
 	'contact_method',
 	'placement',
 	'lead_type',
-	'form_location'
+	'form_location',
+	// currency switcher
+	'display_currency',
+	'previous_currency'
 ]);
 
 /** Keys permitted inside a GA4 `items[]` entry. */

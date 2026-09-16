@@ -208,3 +208,31 @@ export function trackLeadSubmitted(params: {
 		items: params.item ? [params.item] : undefined
 	});
 }
+
+/** Which surface of the switcher the visitor used. */
+export type CurrencyPlacement = 'nav_bar' | 'drawer';
+
+/**
+ * The visitor changed their display currency.
+ *
+ * `null` for either value means "as listed" — each listing's own currency, the default
+ * before a choice is made. It is reported as the literal `as_listed` rather than dropped,
+ * so returning to the default is a visible, countable choice rather than an absent one.
+ *
+ * The call site fires this only when the currency actually changed, so `display_currency`
+ * and `previous_currency` are never equal. No price or listing is involved: this is a
+ * presentation preference, not an ecommerce event, which is why it carries neither a GA4
+ * `currency`/`value` pair nor an `items` array.
+ */
+export function trackCurrencySelected(params: {
+	currency: string | null;
+	previous: string | null;
+	placement: CurrencyPlacement;
+}): void {
+	push({
+		event: 'ghi_currency_select',
+		display_currency: params.currency ?? 'as_listed',
+		previous_currency: params.previous ?? 'as_listed',
+		placement: params.placement
+	});
+}
