@@ -45,7 +45,7 @@ describe('exchangeRatesFromDoc', () => {
 	describe('the rouble', () => {
 		const base = { gbpPerEur: 0.85898, usdPerEur: 1.1652, asOf: '2026-09-09' };
 
-		it('takes the editor-maintained quote and its own date', () => {
+		it('takes the CBR quote and its own date', () => {
 			const result = exchangeRatesFromDoc({ ...base, rubPerEur: 95, rubAsOf: '2026-09-14' });
 			expect(result.rates.RUB).toBeCloseTo(1 / 95, 10);
 			expect(result.rubAsOf).toBe('2026-09-14');
@@ -68,6 +68,11 @@ describe('exchangeRatesFromDoc', () => {
 			const result = exchangeRatesFromDoc({ ...base, rubPerEur: 0, rubAsOf: '2026-09-14' });
 			expect(result.rates.RUB).toBeCloseTo(1 / RUB_PER_EUR, 10);
 			expect(result.rubAsOf).toBe(RUB_RATE_AS_OF);
+		});
+
+		it('lets a manual pin win over the CBR quote, like the other currencies', () => {
+			const result = exchangeRatesFromDoc({ ...base, rubPerEur: 95, rubOverride: 0.0102 });
+			expect(result.rates.RUB).toBe(0.0102);
 		});
 	});
 

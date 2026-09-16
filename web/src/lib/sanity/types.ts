@@ -611,6 +611,7 @@ export type ExchangeRates = {
   gbpOverride?: number;
   usdOverride?: number;
   aedOverride?: number;
+  rubOverride?: number;
 };
 
 export type PropertyListingReference = {

@@ -44,20 +44,29 @@
 			.replace(/ /g, '\u00A0');
 
 	/**
-	 * The panel's one line of fine print, named for what is actually behind the chosen
-	 * figure. The rouble is not an ECB rate — the ECB has published none since March 2022 —
-	 * so it cites its own hand-maintained quote and date rather than borrowing the ECB's.
+	 * The panel's one line of fine print: what the figures are, and how fresh the rate
+	 * behind them is. It is always present and always dated — a visitor deciding whether to
+	 * trust a converted price should not have to make a selection to find out when the rate
+	 * was set.
+	 *
+	 * Only the attribution moves. The rouble is not an ECB rate (the ECB has published none
+	 * since March 2022), so while roubles are showing the line cites the Central Bank of
+	 * Russia's fixing and its own date, which the two banks' different calendars can put a
+	 * day or two apart.
 	 *
 	 * This is the only part of the switcher that depends on `chosen` at render time rather
 	 * than through CSS. That is safe because it lives inside a panel that cannot be opened
 	 * before hydration, so an edge-cached document never shows a stale sentence.
 	 */
+	// The attribution ("ECB rates 15 Sept 2026") is one fact, so it is bound with
+	// non-breaking spaces: the line wraps at the middot, never between a bank and its date.
+	const rateSource = (bank: string, iso: string) => `${bank}\u00A0rates\u00A0${formatRateDate(iso)}`;
 	const currencyNote = $derived(
-		currency.chosen === null
-			? 'Each home is shown in the currency it is listed in.'
-			: currency.chosen === 'RUB'
-				? `Approximate, at the rouble rate of ${formatRateDate(currency.rubAsOf)}.`
-				: `Approximate, at ECB reference rates of ${formatRateDate(currency.asOf)}.`
+		`Converted prices are approximate · ${
+			currency.chosen === 'RUB'
+				? rateSource('CBR', currency.rubAsOf)
+				: rateSource('ECB', currency.asOf)
+		}`
 	);
 
 	let currencyButton = $state<HTMLButtonElement>();

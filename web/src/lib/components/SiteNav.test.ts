@@ -121,8 +121,11 @@ describe('SiteNav — three-tier countries menu', () => {
 		// Codes are spoken by name, not spelled out letter by letter.
 		expect(bar).toMatch(/aria-label="Russian rouble"[^>]*>RUB</);
 		expect(bar).toMatch(/aria-checked="true"[^>]*aria-label="Each listing's own currency"/);
-		// No choice yet, so the note explains the default rather than citing a rate.
-		expect(bar).toContain('Each home is shown in the currency it is listed in.');
+		// The dated rate line is always present, whether or not a choice has been made: how
+		// fresh the rate is should not be something you have to pick a currency to discover.
+		// The bank and its date are bound with non-breaking spaces, so the line wraps at the
+		// middot rather than stranding "ECB" at the end of the first line.
+		expect(bar).toContain('Converted prices are approximate · ECB\u00A0rates\u00A09\u00A0Sept\u00A02026');
 	});
 
 	it('keeps the currency control out of the drawer entirely', () => {
