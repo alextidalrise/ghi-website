@@ -114,14 +114,14 @@ describe('SiteNav — three-tier countries menu', () => {
 		expect(bar.indexOf('site-nav__ccy')).toBeLessThan(bar.indexOf('site-nav__cta'));
 	});
 
-	it('offers the six currency options as one radio group, defaulting to "Original"', () => {
+	it('offers the six currency options as one radio group, defaulting to "As listed"', () => {
 		const html = renderNav();
 		const bar = html.slice(0, html.indexOf('id="site-nav-drawer"'));
 		expect(bar).toContain('role="radiogroup"');
 		expect(bar.match(/role="radio"/g)).toHaveLength(6);
 		// Codes are spoken by name, not spelled out letter by letter.
 		expect(bar).toMatch(/aria-label="Russian rouble"[^>]*>RUB</);
-		expect(bar).toMatch(/aria-checked="true"[^>]*aria-label="Each listing's own currency"[^>]*>\s*Original\s*</);
+		expect(bar).toMatch(/aria-checked="true"[^>]*aria-label="Each listing's own currency"[^>]*>\s*As listed\s*</);
 		// The dated rate line is always present, whether or not a choice has been made: how
 		// fresh the rate is should not be something you have to pick a currency to discover.
 		// The bank and its date are bound with non-breaking spaces, so the line wraps at the

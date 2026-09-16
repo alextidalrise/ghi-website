@@ -32,7 +32,7 @@
 	const CURRENCY_MENU = -1;
 	const currency = getCurrency();
 	const currencyOptions: { code: Currency | null; label: string; name: string }[] = [
-		{ code: null, label: 'Original', name: "Each listing's own currency" },
+		{ code: null, label: 'As listed', name: "Each listing's own currency" },
 		...CURRENCIES.map((code) => ({ code, label: code, name: CURRENCY_NAMES[code] }))
 	];
 
@@ -542,8 +542,9 @@
 
 	     Before a choice the chip reads "Currency": an invitation, not a status. GHI shows
 	     each home in its own currency until asked otherwise, and no short label names that
-	     state honestly ("As listed" was tried and read as unexplained). After a choice it
-	     reads the code. The label is one of six spans chosen by the same root attribute that
+	     state honestly on the chip ("As listed" was tried there and read as unexplained, so
+	     it lives only inside the panel, under "Show prices in", where it has that context).
+	     After a choice the chip reads the code. The label is one of six spans chosen by the same root attribute that
 	     chooses every price (see $lib/styles/currency.css), so the bar and the figures agree
 	     from the first frame, before any script runs. -->
 	<div
@@ -1170,7 +1171,7 @@
 		margin-top: 0;
 	}
 
-	/* "Original" is not a currency, and says so in a different voice: Light 300 in
+	/* "As listed" is not a currency, and says so in a different voice: Light 300 in
 	   sentence case where the codes are Regular 400 tracked caps. */
 	.site-nav__ccy-cell--reset {
 		font-weight: 300;
