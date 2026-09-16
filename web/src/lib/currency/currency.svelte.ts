@@ -2,7 +2,13 @@ import { browser } from '$app/environment';
 import { getContext, setContext } from 'svelte';
 import { CURRENCY_NAMES } from './convert';
 import { readCurrencyCookie, serializeCurrencyCookie } from './currencyCookie';
-import { FALLBACK_RATES, RATES_AS_OF, type Currency, type RateTable } from './rates';
+import {
+	FALLBACK_RATES,
+	RATES_AS_OF,
+	RUB_RATE_AS_OF,
+	type Currency,
+	type RateTable
+} from './rates';
 
 /**
  * The visitor's display currency and the public API the switcher drives.
@@ -22,9 +28,14 @@ import { FALLBACK_RATES, RATES_AS_OF, type Currency, type RateTable } from './ra
 
 export const CURRENCY_ATTRIBUTE = 'data-currency';
 
-export type RatesContext = { rates: RateTable; asOf: string };
+/** The rate table plus the two publication dates behind it (see `rates.server.ts`). */
+export type RatesContext = { rates: RateTable; asOf: string; rubAsOf: string };
 
-const FALLBACK_CONTEXT: RatesContext = { rates: FALLBACK_RATES, asOf: RATES_AS_OF };
+const FALLBACK_CONTEXT: RatesContext = {
+	rates: FALLBACK_RATES,
+	asOf: RATES_AS_OF,
+	rubAsOf: RUB_RATE_AS_OF
+};
 
 export class CurrencyStore {
 	#chosen = $state<Currency | null>(null);
@@ -32,10 +43,12 @@ export class CurrencyStore {
 	#announcement = $state('');
 	readonly rates: RateTable;
 	readonly asOf: string;
+	readonly rubAsOf: string;
 
 	constructor(context: RatesContext = FALLBACK_CONTEXT, initial: Currency | null = null) {
 		this.rates = context.rates;
 		this.asOf = context.asOf;
+		this.rubAsOf = context.rubAsOf;
 		this.#chosen = initial;
 	}
 
@@ -109,7 +122,11 @@ export function createCurrencyContext(
 	return setContext(
 		CURRENCY_KEY,
 		new CurrencyStore(
-			{ rates: context.rates ?? FALLBACK_RATES, asOf: context.asOf ?? RATES_AS_OF },
+			{
+				rates: context.rates ?? FALLBACK_RATES,
+				asOf: context.asOf ?? RATES_AS_OF,
+				rubAsOf: context.rubAsOf ?? RUB_RATE_AS_OF
+			},
 			initial
 		)
 	);
@@ -147,5 +164,7 @@ export function getCurrencyOptional(): CurrencyStore | null {
  */
 export function getCurrencyRates(): RatesContext {
 	const store = getContext<CurrencyStore | undefined>(CURRENCY_KEY);
-	return store ? { rates: store.rates, asOf: store.asOf } : FALLBACK_CONTEXT;
+	return store
+		? { rates: store.rates, asOf: store.asOf, rubAsOf: store.rubAsOf }
+		: FALLBACK_CONTEXT;
 }

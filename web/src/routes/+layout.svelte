@@ -33,7 +33,7 @@
 	// page converts with the same rates the server sorted by. Read untracked and once —
 	// the rates are constant for the life of a page and a rate change purges the cache.
 	const currencyStore = createCurrencyContext(
-		untrack(() => ({ rates: data.rates, asOf: data.ratesAsOf }))
+		untrack(() => ({ rates: data.rates, asOf: data.ratesAsOf, rubAsOf: data.ratesRubAsOf }))
 	);
 
 	// Clear per-page dedupe state before the new DOM commits. It has to happen here rather

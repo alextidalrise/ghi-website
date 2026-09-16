@@ -76,7 +76,7 @@ describe('EUR-normalised price', () => {
 		const params = listingSearchQueryParams(
 			{ type: 'global' },
 			{ start: 0, end: 12 },
-			{ EUR: 1, GBP: 1.2, USD: 0.9, AED: 0.25 }
+			{ EUR: 1, GBP: 1.2, USD: 0.9, AED: 0.25, RUB: 0.01 }
 		);
 		expect(params).toMatchObject({ rateGBP: 1.2, rateUSD: 0.9, rateAED: 0.25 });
 	});

@@ -99,37 +99,47 @@ describe('SiteNav — three-tier countries menu', () => {
 		expect(drawer.indexOf('site-nav__drawer-section')).toBeLessThan(drawer.indexOf('Insights'));
 	});
 
-	it('renders the currency switcher in the bar, before Contact, with every label variant', () => {
+	it('renders the currency chip in the bar, outside the menu and before Contact', () => {
 		const html = renderNav();
 		const bar = html.slice(0, html.indexOf('id="site-nav-drawer"'));
-		expect(bar).toContain('aria-haspopup="menu"');
-		// Label spans for the unchosen state and each code; CSS shows exactly one.
-		expect(bar).toMatch(/data-ccy=""[^>]*>Prices</);
-		for (const code of ['EUR', 'GBP', 'USD', 'AED']) {
-			expect(bar).toMatch(new RegExp(`site-nav__currency-label[^>]*data-ccy="${code}"[^>]*>${code}<`));
+		// Label spans for the unchosen state and each code; currency.css shows exactly one,
+		// so the chip agrees with the prices before any script runs.
+		// Before a choice the chip names the control rather than a state.
+		expect(bar).toMatch(/data-ccy=""[^>]*>Currency</);
+		for (const code of ['EUR', 'GBP', 'USD', 'AED', 'RUB']) {
+			expect(bar).toMatch(new RegExp(`site-nav__ccy-label" data-ccy="${code}">${code}<`));
 		}
-		// The switcher precedes the Contact action.
-		expect(bar.indexOf('site-nav__item--currency')).toBeLessThan(bar.indexOf('site-nav__cta-item'));
-		// Five radio rows, "As listed" checked by default, plus the dated rates line.
-		expect(bar.match(/role="menuitemradio"/g)).toHaveLength(5);
-		expect(bar).toMatch(/aria-checked="true"[^>]*>\s*<span[^>]*>As listed</);
-		expect(bar).toContain('ECB rates 9 Sept 2026');
+		// The chip is a bar-level control, not a menu item, and leads the Contact action.
+		expect(bar.indexOf('site-nav__ccy')).toBeGreaterThan(bar.indexOf('</ul>'));
+		expect(bar.indexOf('site-nav__ccy')).toBeLessThan(bar.indexOf('site-nav__cta'));
 	});
 
-	it('renders the switcher as a flat five-segment row in the drawer', () => {
+	it('offers the six currency options as one radio group, defaulting to "As listed"', () => {
+		const html = renderNav();
+		const bar = html.slice(0, html.indexOf('id="site-nav-drawer"'));
+		expect(bar).toContain('role="radiogroup"');
+		expect(bar.match(/role="radio"/g)).toHaveLength(6);
+		// Codes are spoken by name, not spelled out letter by letter.
+		expect(bar).toMatch(/aria-label="Russian rouble"[^>]*>RUB</);
+		expect(bar).toMatch(/aria-checked="true"[^>]*aria-label="Each listing's own currency"[^>]*>\s*As listed\s*</);
+		// The dated rate line is always present, whether or not a choice has been made: how
+		// fresh the rate is should not be something you have to pick a currency to discover.
+		// The bank and its date are bound with non-breaking spaces, so the line wraps at the
+		// middot rather than stranding "ECB" at the end of the first line.
+		expect(bar).toContain('Converted prices are approximate · ECB\u00A0rates\u00A09\u00A0Sept\u00A02026');
+	});
+
+	it('keeps the currency control out of the drawer entirely', () => {
 		const html = renderNav();
 		const drawer = html.slice(html.indexOf('id="site-nav-drawer"'));
-		expect(drawer).toContain('Show prices in');
-		expect(drawer.match(/site-nav__drawer-segment /g)).toHaveLength(5);
-		expect(drawer).toMatch(/aria-pressed="true"[^>]*aria-label="As listed"/);
+		// It lives in the fixed bar at every width, so a phone never has to scroll to it.
+		expect(drawer).not.toContain('Show prices in');
+		expect(drawer).not.toContain('site-nav__ccy');
 		// Countries speak in the serif country voice; editorial rows do not.
 		expect(drawer.match(/site-nav__drawer-link--country/g)).toHaveLength(2);
 		expect(drawer).toMatch(/href="\/insights" class="site-nav__drawer-link(?! site-nav__drawer-link--country)/);
-		// It sits after the editorial items and before the pinned Contact footer.
-		expect(drawer.indexOf('Insights')).toBeLessThan(drawer.indexOf('site-nav__drawer-currency'));
-		expect(drawer.indexOf('site-nav__drawer-currency')).toBeLessThan(
-			drawer.indexOf('site-nav__drawer-footer')
-		);
+		// The pinned Contact footer closes the drawer.
+		expect(drawer.indexOf('Insights')).toBeLessThan(drawer.indexOf('site-nav__drawer-footer'));
 	});
 
 	it('keeps a narrow dropdown for the fallback menu, whose countries carry no locations', () => {

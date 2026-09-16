@@ -90,27 +90,10 @@
 		display: inline;
 	}
 
-	/* Exactly one variant is visible. Which one is decided on <html>, by the pre-paint script
-	   and then by CurrencyStore — never by the server, so the cached document stays identical
-	   for every visitor. The native variant shows whenever the root carries no recognised
-	   choice, so a stale or tampered value can never blank a price. */
-	.price__v {
-		display: none;
-	}
-
-	:global(html:not([data-currency='EUR']):not([data-currency='GBP']):not([data-currency='USD']):not(
-			[data-currency='AED']
-		))
-		.price__v[data-native] {
-		display: inline;
-	}
-
-	:global(html[data-currency='EUR']) .price__v[data-ccy='EUR'],
-	:global(html[data-currency='GBP']) .price__v[data-ccy='GBP'],
-	:global(html[data-currency='USD']) .price__v[data-ccy='USD'],
-	:global(html[data-currency='AED']) .price__v[data-ccy='AED'] {
-		display: inline;
-	}
+	/* Exactly one variant is visible, and which one is decided on <html> — by the pre-paint
+	   script and then by CurrencyStore, never by the server, so the cached document stays
+	   identical for every visitor. The code-by-code pairing lives in
+	   `$lib/styles/currency.css`; everything here is the variant's own typography. */
 
 	/* The marker: the site's UI sans at a small size, inheriting the figure's colour so it
 	   clears contrast wherever the figure does (white cards, the green band). */
@@ -125,9 +108,9 @@
 	}
 
 	/* The listing's own price beneath a conversion (detail summaries, unit rows). Present in
-	   the markup for every listing; visible only while a different currency is showing. */
+	   the markup for every listing; `currency.css` reveals it only while a different
+	   currency is showing. */
 	.price__native {
-		display: none;
 		font-family: var(--sans);
 		font-size: var(--text-small);
 		font-weight: 400;
@@ -137,17 +120,6 @@
 		text-transform: none;
 		color: var(--muted);
 		margin-top: 0.4rem;
-	}
-
-	:global(html[data-currency]) .price__native {
-		display: block;
-	}
-
-	:global(html[data-currency='EUR']) .price[data-native-ccy='EUR'] .price__native,
-	:global(html[data-currency='GBP']) .price[data-native-ccy='GBP'] .price__native,
-	:global(html[data-currency='USD']) .price[data-native-ccy='USD'] .price__native,
-	:global(html[data-currency='AED']) .price[data-native-ccy='AED'] .price__native {
-		display: none;
 	}
 
 	.visually-hidden {

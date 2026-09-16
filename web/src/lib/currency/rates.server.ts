@@ -7,6 +7,11 @@
  * the three currencies can be pinned with a per-rate override (EUR-per-unit), which the cron
  * never touches and which wins here.
  *
+ * The rouble comes from a second feed rather than the ECB, which has published no RUB
+ * reference rate since March 2022: the cron writes `rubPerEur`/`rubAsOf` from the Central
+ * Bank of Russia's daily fixing, and it falls back to the static snapshot in `./rates`. It
+ * keeps its own `asOf` because the two banks publish on different calendars.
+ *
  * This is the ONLY currency module allowed to touch Sanity. It never throws: a missing doc,
  * malformed numbers, or a fetch failure fall back to the static snapshot so a rates problem
  * can never take a page load down — the worst case is yesterday's (or the snapshot's) rates.
@@ -19,6 +24,8 @@ import { publicClient } from '../sanity/client';
 import {
 	FALLBACK_RATES,
 	RATES_AS_OF,
+	RUB_PER_EUR,
+	RUB_RATE_AS_OF,
 	ratesFromPerEur,
 	type Currency,
 	type RateTable
@@ -30,20 +37,26 @@ export type ExchangeRates = {
 	rates: RateTable;
 	/** ECB publication date the base rates were sourced from (or the snapshot date). */
 	asOf: string;
+	/** Date the rouble quote was sourced — it moves on its own, non-ECB schedule. */
+	rubAsOf: string;
 	source: 'sanity' | 'fallback';
 };
 
 type ExchangeRatesDoc = {
 	gbpPerEur?: number | null;
 	usdPerEur?: number | null;
+	rubPerEur?: number | null;
 	asOf?: string | null;
+	rubAsOf?: string | null;
 	gbpOverride?: number | null;
 	usdOverride?: number | null;
 	aedOverride?: number | null;
+	rubOverride?: number | null;
 };
 
 const EXCHANGE_RATES_QUERY = /* groq */ `*[_id == "${EXCHANGE_RATES_DOC_ID}"][0]{
-  gbpPerEur, usdPerEur, asOf, gbpOverride, usdOverride, aedOverride
+  gbpPerEur, usdPerEur, rubPerEur, asOf, rubAsOf,
+  gbpOverride, usdOverride, aedOverride, rubOverride
 }`;
 
 /** A usable positive, finite rate — guards against null, 0, NaN and negatives. */
@@ -51,7 +64,12 @@ function isPositive(value: unknown): value is number {
 	return typeof value === 'number' && Number.isFinite(value) && value > 0;
 }
 
-const FALLBACK: ExchangeRates = { rates: FALLBACK_RATES, asOf: RATES_AS_OF, source: 'fallback' };
+const FALLBACK: ExchangeRates = {
+	rates: FALLBACK_RATES,
+	asOf: RATES_AS_OF,
+	rubAsOf: RUB_RATE_AS_OF,
+	source: 'fallback'
+};
 
 /**
  * Turn a raw `exchangeRates` document into an `ExchangeRates`, applying per-rate overrides
@@ -61,7 +79,12 @@ const FALLBACK: ExchangeRates = { rates: FALLBACK_RATES, asOf: RATES_AS_OF, sour
 export function exchangeRatesFromDoc(doc: ExchangeRatesDoc | null | undefined): ExchangeRates {
 	if (!doc || !isPositive(doc.gbpPerEur) || !isPositive(doc.usdPerEur)) return FALLBACK;
 
-	const base = ratesFromPerEur({ usdPerEur: doc.usdPerEur, gbpPerEur: doc.gbpPerEur });
+	const rubPerEur = isPositive(doc.rubPerEur) ? doc.rubPerEur : RUB_PER_EUR;
+	const base = ratesFromPerEur({
+		usdPerEur: doc.usdPerEur,
+		gbpPerEur: doc.gbpPerEur,
+		rubPerEur
+	});
 	const override = (value: unknown, derived: number): number =>
 		isPositive(value) ? value : derived;
 
@@ -69,10 +92,19 @@ export function exchangeRatesFromDoc(doc: ExchangeRatesDoc | null | undefined): 
 		EUR: 1,
 		GBP: override(doc.gbpOverride, base.GBP),
 		USD: override(doc.usdOverride, base.USD),
-		AED: override(doc.aedOverride, base.AED)
+		AED: override(doc.aedOverride, base.AED),
+		RUB: override(doc.rubOverride, base.RUB)
 	} satisfies Record<Currency, number>;
 
-	return { rates, asOf: typeof doc.asOf === 'string' ? doc.asOf : RATES_AS_OF, source: 'sanity' };
+	// The rouble and the ECB quotes come from different banks on different calendars, so
+	// each keeps its own date. A rouble quote with no date of its own falls back to the
+	// snapshot's rather than borrowing the ECB one, which would overstate how fresh it is.
+	return {
+		rates,
+		asOf: typeof doc.asOf === 'string' ? doc.asOf : RATES_AS_OF,
+		rubAsOf: isPositive(doc.rubPerEur) && typeof doc.rubAsOf === 'string' ? doc.rubAsOf : RUB_RATE_AS_OF,
+		source: 'sanity'
+	};
 }
 
 /** Fetch the live rates. Never throws — falls back to the static snapshot on any problem. */

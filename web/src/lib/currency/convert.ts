@@ -14,7 +14,8 @@ export const CURRENCY_NAMES: Record<Currency, string> = {
 	EUR: 'Euro',
 	GBP: 'Pound sterling',
 	USD: 'US dollar',
-	AED: 'UAE dirham'
+	AED: 'UAE dirham',
+	RUB: 'Russian rouble'
 };
 
 export function isCurrency(value: unknown): value is Currency {

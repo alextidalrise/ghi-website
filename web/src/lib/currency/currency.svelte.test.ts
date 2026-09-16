@@ -15,10 +15,12 @@ describe('CurrencyStore (server-side / pre-hydration)', () => {
 	});
 
 	it('carries the live table it is given', () => {
-		const rates = { EUR: 1, GBP: 1.2, USD: 0.9, AED: 0.25 };
-		const store = new CurrencyStore({ rates, asOf: '2026-09-10' });
+		const rates = { EUR: 1, GBP: 1.2, USD: 0.9, AED: 0.25, RUB: 0.01 };
+		const store = new CurrencyStore({ rates, asOf: '2026-09-10', rubAsOf: '2026-09-11' });
 		expect(store.rates).toBe(rates);
 		expect(store.asOf).toBe('2026-09-10');
+		// The rouble carries its own date: no ECB feed refreshes it (see rates.server.ts).
+		expect(store.rubAsOf).toBe('2026-09-11');
 	});
 
 	it('adopt() is the DOM-free hydration transition', () => {

@@ -10,7 +10,7 @@ import {
 } from './rates';
 
 // A deliberately-different table so tests can tell a threaded table apart from the fallback.
-const CUSTOM: RateTable = { EUR: 1, GBP: 1.2, USD: 0.9, AED: 0.25 };
+const CUSTOM: RateTable = { EUR: 1, GBP: 1.2, USD: 0.9, AED: 0.25, RUB: 0.01 };
 
 describe('toEur', () => {
 	it('leaves EUR unchanged', () => {

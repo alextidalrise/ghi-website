@@ -1,0 +1,81 @@
+/**
+ * Display-currency selection — the one place the currency codes are enumerated in CSS.
+ *
+ * Public pages are edge-cached as visitor-invariant HTML, so the server cannot know the
+ * visitor's chosen currency. Instead every price is pre-rendered in every currency and a
+ * `data-currency` attribute on <html> reveals exactly one of them. The nav's currency chip
+ * works the same way, so its label agrees with the prices from the very first frame.
+ *
+ * CSS cannot correlate the value of one element's attribute with another's, so the pairing
+ * has to be written out code by code. It lives here, global and un-scoped, rather than
+ * inside the two components that need it — which is what makes adding a currency a single
+ * edit rather than a hunt through component <style> blocks.
+ *
+ * ADDING A CURRENCY: add its code to the `:not()` chain in the "no recognised choice" rule
+ * and add one line to each of the two selector lists below. Then follow the checklist in
+ * `$lib/currency/rates.ts` for the rest of the stack.
+ *
+ * The `:not()` chain is not paranoia. When a currency is added, visitors still holding
+ * cached HTML from the previous deploy have no variant for the new code — without the
+ * fallback their prices would render blank rather than merely un-converted.
+ */
+
+/* ---- Prices (Price.svelte) ---------------------------------------------------- */
+
+.price__v {
+	display: none;
+}
+
+html:not([data-currency='EUR']):not([data-currency='GBP']):not([data-currency='USD']):not(
+		[data-currency='AED']
+	):not([data-currency='RUB'])
+	.price__v[data-native] {
+	display: inline;
+}
+
+html[data-currency='EUR'] .price__v[data-ccy='EUR'],
+html[data-currency='GBP'] .price__v[data-ccy='GBP'],
+html[data-currency='USD'] .price__v[data-ccy='USD'],
+html[data-currency='AED'] .price__v[data-ccy='AED'],
+html[data-currency='RUB'] .price__v[data-ccy='RUB'] {
+	display: inline;
+}
+
+/* The listing's own price, shown beneath a conversion — and hidden again whenever the
+   chosen currency is the one the listing is already priced in. */
+.price__native {
+	display: none;
+}
+
+html[data-currency] .price__native {
+	display: block;
+}
+
+html[data-currency='EUR'] .price[data-native-ccy='EUR'] .price__native,
+html[data-currency='GBP'] .price[data-native-ccy='GBP'] .price__native,
+html[data-currency='USD'] .price[data-native-ccy='USD'] .price__native,
+html[data-currency='AED'] .price[data-native-ccy='AED'] .price__native,
+html[data-currency='RUB'] .price[data-native-ccy='RUB'] .price__native {
+	display: none;
+}
+
+/* ---- The nav's currency chip (SiteNav.svelte) ---------------------------------- */
+
+.site-nav__ccy-label {
+	display: none;
+}
+
+html:not([data-currency='EUR']):not([data-currency='GBP']):not([data-currency='USD']):not(
+		[data-currency='AED']
+	):not([data-currency='RUB'])
+	.site-nav__ccy-label[data-ccy=''] {
+	display: block;
+}
+
+html[data-currency='EUR'] .site-nav__ccy-label[data-ccy='EUR'],
+html[data-currency='GBP'] .site-nav__ccy-label[data-ccy='GBP'],
+html[data-currency='USD'] .site-nav__ccy-label[data-ccy='USD'],
+html[data-currency='AED'] .site-nav__ccy-label[data-ccy='AED'],
+html[data-currency='RUB'] .site-nav__ccy-label[data-ccy='RUB'] {
+	display: block;
+}
