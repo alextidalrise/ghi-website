@@ -98,6 +98,7 @@ export {
 	fetchHomepageContent,
 	fetchFrontlineContent,
 	fetchGuidesHubPage,
+	fetchPartnersPage,
 	fetchAboutPage,
 	fetchContactPage
 } from './pages';
@@ -151,11 +152,23 @@ export { insightsHubQuery, insightBySlugQuery, sitemapInsightsQuery } from './in
 
 export {
 	partnerCategoriesQuery,
+	partnerCategoryTotalQuery,
+	partnerTotalQuery,
 	homepagePartnerLogosQuery,
 	HOMEPAGE_PARTNER_LOGOS_LIMIT,
 	fetchPartnerCategories,
+	fetchPartnerCategoryTotal,
+	fetchPartnerTotal,
 	fetchHomepagePartnerLogos
 } from './partners';
+
+export {
+	marketsQuery,
+	marketsWithPartnerCountsQuery,
+	fetchMarkets,
+	fetchMarketsWithPartnerCounts,
+	MARKET_ORDERING
+} from './markets';
 
 export {
 	attachEnquiryShelf,

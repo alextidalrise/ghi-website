@@ -1,3 +1,5 @@
+import { marketNames, type Market } from '$lib/markets/markets';
+
 /**
  * Shared shapes for the vetted partner network shown on /partners and the homepage
  * Trusted Partners wall.
@@ -27,8 +29,14 @@ export type Partner = {
 	name: string;
 	/** One tight paragraph, brand voice. */
 	description: string;
-	/** Where the partner operates; shown as a quiet label on the card. */
+	/**
+	 * Optional refinement WITHIN the markets below, e.g. "Costa del Sol". No longer the
+	 * record of which countries the partner covers — `markets` is, and this drifted out of
+	 * step with it when it was (WillU read "Spain, Portugal & UAE" while covering four).
+	 */
 	coverage: string;
+	/** The markets this partner covers, named and in canonical order. */
+	markets: Market[];
 	/** Resolved logo, or null while none has been uploaded (placeholder renders). */
 	logo: PartnerLogo | null;
 };
@@ -72,6 +80,52 @@ export function partnerCategoryProse(
 /** Trim, drop blanks and holes — a `categories[]->name` projection can carry both. */
 function cleanNames(categories: ReadonlyArray<string | null | undefined>): string[] {
 	return categories.map((name) => name?.trim() ?? '').filter(Boolean);
+}
+
+/**
+ * The quiet line under a partner's name: the markets it covers, plus any regional
+ * refinement the editor added.
+ *
+ * "Spain and Portugal" · "Spain — Costa del Sol" · on a page filtered to the UAE,
+ * "Also Spain, Portugal and Montenegro" (the active market is already the page title).
+ */
+export function partnerCoverageLabel(
+	partner: Pick<Partner, 'markets' | 'coverage'>,
+	options: { activeMarket?: string | null } = {}
+): string {
+	const raw = partner.coverage?.trim() ?? '';
+	// A label that only names countries says nothing the markets do not, and before the
+	// country-refs migration clears them it would print the markets twice ("Spain and
+	// Portugal — Spain & Portugal") or contradict them. Real regional detail survives.
+	const detail = restatesMarkets(raw, partner.markets) ? '' : raw;
+
+	// Filtered to one market, that market is already the page's title, so the tag drops it
+	// but keeps the rest: a buyer on the UAE view still learns WillU also covers Spain.
+	if (options.activeMarket) {
+		const others = partner.markets.filter((market) => market.slug !== options.activeMarket);
+		const also = others.length > 0 ? `Also ${marketNames(others)}` : '';
+		return [detail, also].filter(Boolean).join(' · ');
+	}
+
+	const names = marketNames(partner.markets);
+	if (!names) return detail;
+	return detail ? `${names} — ${detail}` : names;
+}
+
+/**
+ * Whether a coverage label is nothing but market names and joining words — the same test
+ * the country-refs migration uses to decide which labels to clear.
+ */
+function restatesMarkets(label: string, markets: ReadonlyArray<Pick<Market, 'name' | 'slug'>>): boolean {
+	if (!label) return false;
+	let rest = label.toLowerCase();
+	for (const market of markets) {
+		for (const token of [market.name, market.slug]) {
+			rest = rest.split(token.toLowerCase()).join(' ');
+		}
+	}
+	rest = rest.replace(/\b(and|plus|only|across|in|the)\b|&/g, ' ').replace(/[^a-z]/g, '');
+	return rest.length === 0;
 }
 
 /** Buyer-facing introduction-request link for a partner. */

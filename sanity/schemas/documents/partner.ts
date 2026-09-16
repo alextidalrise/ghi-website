@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity';
-import { COUNTRY_OPTIONS } from '../constants/enums';
+import { COUNTRY_REFERENCE_OPTIONS, COUNTRY_REFERENCE_TO } from '../constants/countryRef';
 
 /**
  * A single vetted partner shown on /partners (and, where a logo is supplied, on the
@@ -40,18 +40,24 @@ export const partner = defineType({
 			name: 'countries',
 			title: 'Countries',
 			type: 'array',
-			of: [{ type: 'string' }],
-			options: { list: [...COUNTRY_OPTIONS], layout: 'grid' },
+			of: [
+				{ type: 'reference', to: COUNTRY_REFERENCE_TO, options: COUNTRY_REFERENCE_OPTIONS }
+			],
 			description:
-				'Which markets this partner covers. A listing shows this partner in its enquiry shelf only when the listing sits in one of these countries — so a partner with no country here appears on no listing. This is the structured filter; "Coverage" below is the human-readable label.',
+				'Which markets this partner covers. Drives the coverage filter on the Partners page, the market tags on its card, and whether the partner can appear in a listing\'s enquiry shelf — a partner with no country here appears on no listing.',
 			validation: (Rule) => Rule.required().min(1).unique()
 		}),
 		defineField({
 			name: 'coverage',
-			title: 'Coverage',
+			title: 'Coverage detail',
 			type: 'string',
+			// Was the only record of which markets a partner covered, and it drifted: WillU
+			// carried "Spain, Portugal & UAE" while its structured countries included
+			// Montenegro. The countries above are now the truth and the card renders their
+			// names itself, so this field keeps only what they cannot say — the region
+			// inside a market.
 			description:
-				'Where the partner operates — shown as a quiet label on the card, e.g. "Spain · Costa del Sol".',
+				'Optional refinement WITHIN those markets, e.g. "Costa del Sol and Sotogrande". Leave blank unless the partner is genuinely regional — the card already names the countries above, so repeating them here just duplicates them.',
 			validation: (Rule) => Rule.max(80)
 		}),
 		defineField({

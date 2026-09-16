@@ -1,18 +1,47 @@
 <script lang="ts">
 	import Breadcrumbs from '$lib/components/property/Breadcrumbs.svelte';
 	import PartnerCategory from '$lib/components/partners/PartnerCategory.svelte';
+	import PartnerCoverageFilter from '$lib/components/partners/PartnerCoverageFilter.svelte';
 	import { jsonLdScriptHtml } from '$lib/listing/breadcrumbs';
+	import { marketInProse, marketPath } from '$lib/markets/markets';
 
 	let { data } = $props();
 
-	const heroMarkers = ['Independently verified', 'No referral pressure', 'Your choice'];
-	const attributes = ['Independent', 'Vetted', 'English-speaking', 'No hidden incentives'];
+	const c = $derived(data.content);
+	const market = $derived(data.activeMarket);
 
-	const related = [
-		{ href: '/spain', title: 'Buying in Spain', desc: 'Areas, golf and the buying process' },
-		{ href: '/portugal', title: 'Buying in Portugal', desc: 'The Portugal-specific route' },
-		{ href: '/contact', title: 'Contact us', desc: 'General questions and enquiries' }
-	];
+	// The honest-coverage line. It only appears on a filtered view, and only when that
+	// market is short of the full discipline set — which is the case the coverage filter
+	// exists to tell the truth about. A market with everything says nothing.
+	const showCoverageNote = $derived(
+		market != null && data.coveredDisciplines < data.categoryTotal
+	);
+
+	// Derived from the live market list, in the site's canonical order, rather than the
+	// hardcoded Spain/Portugal pair this page shipped with. Contact closes the row.
+	// The related row must not grow with the market count. Unfiltered, it points at the
+	// hubs that already index every market; filtered, at that one market's own page.
+	const related = $derived(
+		market
+			? [
+					{
+						href: marketPath(market),
+						title: `Buying in ${marketInProse(market.name)}`,
+						desc: 'Areas, golf and the buying process'
+					},
+					{ href: '/guides', title: "Buyer's guides", desc: 'The process and the costs, market by market' },
+					{ href: '/contact', title: 'Contact us', desc: 'General questions and enquiries' }
+				]
+			: [
+					{ href: '/guides', title: "Buyer's guides", desc: 'The process and the costs, market by market' },
+					{
+						href: '/front-line-collection',
+						title: 'Front Line Collection',
+						desc: 'Homes directly on the fairway'
+					},
+					{ href: '/contact', title: 'Contact us', desc: 'General questions and enquiries' }
+				]
+	);
 </script>
 
 <svelte:head>
@@ -37,13 +66,10 @@
 	<!-- Hero: white editorial. The single green band is reserved for the closing CTA. -->
 	<header class="hero content-wrap">
 		<p class="text-overline">Vetted only</p>
-		<h1 class="hero__title">Our Trusted Partners</h1>
-		<p class="hero__lead">
-			Independent legal, tax, financial and property professionals across Spain and Portugal, each
-			vetted to protect buyers at every stage of the purchase.
-		</p>
+		<h1 class="hero__title">{market ? `Trusted Partners in ${marketInProse(market.name)}` : c.heroTitle}</h1>
+		<p class="hero__lead">{c.heroLead}</p>
 		<ul class="hero__markers">
-			{#each heroMarkers as marker (marker)}
+			{#each c.heroMarkers as marker (marker)}
 				<li>{marker}</li>
 			{/each}
 		</ul>
@@ -51,26 +77,53 @@
 
 	<!-- Why we work with partners -->
 	<section class="why content-wrap" aria-labelledby="why-heading">
-		<h2 id="why-heading" class="why__heading">Why we work with partners</h2>
-		<p class="why__body">
-			Buying abroad means trusting people you have never met with decisions that matter. We keep a
-			deliberately small network of independent professionals, each chosen for their record with
-			international buyers, not for what they pay us. We hold no referral fees that could sway our
-			advice. When you are ready, we make a personal introduction. Who you work with, and whether to
-			proceed, stays entirely your decision.
-		</p>
+		<h2 id="why-heading" class="why__heading">{c.whyHeading}</h2>
+		<p class="why__body">{c.whyBody}</p>
 		<ul class="why__attrs">
-			{#each attributes as attribute (attribute)}
+			{#each c.whyAttributes as attribute (attribute)}
 				<li>{attribute}</li>
 			{/each}
 		</ul>
 	</section>
 
+	<!-- Coverage filter: the market is a facet over one network, not a section of it. -->
+	<div class="content-wrap">
+		<PartnerCoverageFilter
+			markets={data.markets}
+			active={market?.slug ?? null}
+			total={data.partnerTotal}
+		/>
+	</div>
+
 	<!-- Partner directory -->
 	<div class="directory content-wrap">
 		{#each data.categories as category (category.id)}
-			<PartnerCategory {category} />
+			<PartnerCategory {category} activeMarket={market?.slug ?? null} />
 		{/each}
+
+		{#if showCoverageNote}
+			<!--
+				The honest-coverage line. A filtered market shows only the disciplines it has, so
+				UAE renders two sections of nine — and saying so plainly, with the offer to make
+				the introduction anyway, is worth more than a full shelf of firms who do not work
+				in the buyer's country. This is the whole reason the filter carries counts.
+			-->
+			<aside class="coverage-note">
+				<p class="coverage-note__body">
+					{data.coveredDisciplines} of {data.categoryTotal} disciplines are covered in {marketInProse(market?.name ?? '')}
+					so far. Tell us what you need and we will make the introduction.
+				</p>
+				<a
+					class="coverage-note__cta"
+					href={`/contact?enquiry=specialist&country=${market?.slug}`}
+				>
+					Ask for an introduction
+					<svg width="18" height="9" viewBox="0 0 18 9" fill="none" aria-hidden="true">
+						<path d="M0 4.5h15.5M12 1l4 3.5-4 3.5" stroke="currentColor" stroke-width="1.25" />
+					</svg>
+				</a>
+			</aside>
+		{/if}
 	</div>
 
 	<!-- Become a partner: the page's one green band -->
@@ -78,18 +131,12 @@
 		<div class="become__inner content-wrap">
 			<div class="become__copy">
 				<p class="text-overline become__overline">Become a partner</p>
-				<h2 id="become-heading" class="become__heading">Are you a professional in this space?</h2>
-				<p class="become__body">
-					We work with a small number of vetted legal, tax, financial and property specialists. If
-					you would like to be considered, we would be glad to hear from you.
-				</p>
+				<h2 id="become-heading" class="become__heading">{c.becomeHeading}</h2>
+				<p class="become__body">{c.becomeBody}</p>
 			</div>
 			<div class="become__action">
-				<a class="become__button" href="/contact?enquiry=partner">Apply to partner with us</a>
-				<p class="become__support">
-					Inbound partnership enquiries only.<br />
-					Average response within five working days.
-				</p>
+				<a class="become__button" href="/contact?enquiry=partner">{c.becomeCta}</a>
+				<p class="become__support">{c.becomeSupport}</p>
 			</div>
 		</div>
 	</section>
@@ -208,10 +255,13 @@
 		background: var(--gold);
 	}
 
-	/* Directory — stacked categories separated by whitespace. */
+	/* Directory — stacked categories separated by whitespace. The top padding matches the
+	   gap between categories, so the first one sits off the coverage filter's rule by the
+	   same interval as every category below it. */
 	.directory {
 		display: grid;
 		gap: var(--section-gap);
+		padding-top: var(--section-gap);
 		padding-bottom: var(--section-gap);
 	}
 
@@ -294,12 +344,86 @@
 		font-size: var(--text-small);
 		line-height: 1.6;
 		color: rgba(245, 241, 232, 0.7);
+		/* The copy is CMS-authored and its line break is the editor's, not a <br> in markup. */
+		white-space: pre-line;
 	}
 
 	@media (min-width: 760px) {
 		.become__inner {
 			grid-template-columns: 1fr auto;
 			gap: var(--space-2xl);
+		}
+	}
+
+	/*
+	 * The honest-coverage note. Deliberately NOT a card and not a callout: it closes the
+	 * directory, so it takes the same hairline top rule the categories are separated by and
+	 * sits flush in the column. A framed box here would read as heavier than the partner
+	 * cards it is apologising for.
+	 */
+	.coverage-note {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--space-sm) var(--space-lg);
+		padding-top: var(--space-lg);
+		border-top: 1px solid var(--border);
+	}
+
+	.coverage-note__body {
+		font-family: var(--sans);
+		font-weight: 300;
+		font-size: var(--text-body);
+		line-height: 1.7;
+		color: var(--muted);
+		max-width: 52ch;
+	}
+
+	.coverage-note__cta {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		color: var(--green);
+		text-decoration: none;
+		white-space: nowrap;
+		border-bottom: 1px solid transparent;
+		transition:
+			color var(--duration-hover) var(--ease),
+			border-color var(--duration-hover) var(--ease);
+	}
+
+	.coverage-note__cta svg {
+		transition: transform var(--duration-hover) var(--ease);
+	}
+
+	.coverage-note__cta:hover,
+	.coverage-note__cta:focus-visible {
+		color: var(--gold);
+		border-bottom-color: var(--gold);
+	}
+
+	.coverage-note__cta:hover svg,
+	.coverage-note__cta:focus-visible svg {
+		transform: translateX(3px);
+	}
+
+	.coverage-note__cta:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 3px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.coverage-note__cta,
+		.coverage-note__cta svg {
+			transition: none;
+		}
+
+		.coverage-note__cta:hover svg,
+		.coverage-note__cta:focus-visible svg {
+			transform: none;
 		}
 	}
 

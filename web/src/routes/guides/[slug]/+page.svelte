@@ -32,7 +32,7 @@
 	const advisorHeading = $derived(guide.advisorHeading?.trim() || 'Speak to an advisor');
 	const advisorBody = $derived(
 		guide.advisorBody?.trim() ||
-			'We guide buyers through every step of a purchase in Spain and Portugal, from the first viewing to the keys. Tell us what you have in mind and we will be in touch.'
+			'We guide buyers through every step of a purchase, from the first viewing to the keys. Tell us what you have in mind and we will be in touch.'
 	);
 
 	const MONTHS = [

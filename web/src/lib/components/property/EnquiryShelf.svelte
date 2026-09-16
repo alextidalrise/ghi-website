@@ -29,6 +29,7 @@
 	 * Both items carry exactly one action. Nothing else in this block is clickable.
 	 */
 	import type { EnquiryShelf } from '$lib/listing/enquiryShelf';
+	import { marketInProse } from '$lib/markets/markets';
 
 	type Props = {
 		shelf?: EnquiryShelf | null;
@@ -38,6 +39,19 @@
 
 	const guide = $derived(shelf?.guide ?? null);
 	const partners = $derived(shelf?.partners ?? []);
+	const market = $derived(shelf?.market ?? null);
+	const marketName = $derived(market ? marketInProse(market.name) : '');
+
+	// A market that has not been written up or staffed yet still gets both rows — it just
+	// gets the truth in them. Silently dropping the row (what this did before) reads to a
+	// buyer in Montenegro as though GHI has no presence there, which is exactly the
+	// impression the shelf exists to prevent. The offer is real: the team makes the
+	// introduction by hand.
+	const introHref = $derived(
+		market ? `/contact?enquiry=specialist&country=${encodeURIComponent(market.slug)}` : '/contact'
+	);
+	const showGuideFallback = $derived(!guide && market != null);
+	const showPartnersFallback = $derived(partners.length === 0 && market != null);
 </script>
 
 {#snippet arrow()}
@@ -46,7 +60,7 @@
 	</svg>
 {/snippet}
 
-{#if guide || partners.length > 0}
+{#if guide || partners.length > 0 || market}
 	<div class="shelf">
 		{#if guide}
 			<section class="shelf__item" aria-labelledby="shelf-guide-heading">
@@ -58,6 +72,17 @@
 				<p class="shelf__deck">The process, the costs and the tax, set out plainly.</p>
 				<a class="shelf__cta" href={guide.href}>
 					Read the guide
+					{@render arrow()}
+				</a>
+			</section>
+		{:else if showGuideFallback}
+			<section class="shelf__item" aria-labelledby="shelf-guide-heading">
+				<h2 id="shelf-guide-heading" class="shelf__heading">Before you buy</h2>
+				<p class="shelf__deck">
+					No written guide to buying in {marketName} yet — we will talk you through it.
+				</p>
+				<a class="shelf__cta" href={introHref}>
+					Ask how it works
 					{@render arrow()}
 				</a>
 			</section>
@@ -88,6 +113,17 @@
 				     and promise a form that isn't at the other end of the click. -->
 				<a class="shelf__cta" href="/partners">
 					See the full network
+					{@render arrow()}
+				</a>
+			</section>
+		{:else if showPartnersFallback}
+			<section class="shelf__item" aria-labelledby="shelf-partners-heading">
+				<h2 id="shelf-partners-heading" class="shelf__heading">The specialists</h2>
+				<p class="shelf__deck">
+					We will introduce you to a vetted lawyer, broker or currency specialist in {marketName}.
+				</p>
+				<a class="shelf__cta" href={introHref}>
+					Request an introduction
 					{@render arrow()}
 				</a>
 			</section>

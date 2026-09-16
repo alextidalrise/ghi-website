@@ -3,17 +3,18 @@ import { SHELF_GUIDE_PUBLIC, SHELF_PARTNER_PUBLIC } from '../allowlists';
 import { fetchPublic } from './fetch';
 import {
 	EMPTY_ENQUIRY_SHELF,
-	SHELF_PARTNER_CATEGORIES,
 	SHELF_PARTNER_LIMIT,
 	disciplineFor,
 	disciplineForSlot,
 	shelfOverrideFor,
+	shelfPriorityFor,
 	withoutShelfOverrides,
 	type EnquiryShelf,
 	type RawShelfGuide,
 	type RawShelfPartner,
 	type ShelfGuide,
 	type ShelfHost,
+	type ShelfMarket,
 	type ShelfOverride,
 	type ShelfPartner
 } from '$lib/listing/enquiryShelf';
@@ -23,30 +24,42 @@ import {
  * parallel with the listing fetch rather than after it (the country slug is a route
  * param, known before anything is loaded).
  *
- * The guide is the lowest-`order` buying guide for the country, which makes the UK-buyer
- * guide the default in both markets. Partners are fetched across the three shelf
- * categories, scoped to those that cover the listing's country, and narrowed to
- * one-per-category in `toDefaultShelfPartners` below, where the category priority is
- * explicit and testable. A category with no partner for the country is simply skipped.
+ * The guide is the lowest-`order` buying guide for the country. Partners are every firm
+ * covering that country, in editor order; `toDefaultShelfPartners` below narrows them to
+ * one per discipline, walking `shelfPriority`, where the rule is explicit and testable.
+ *
+ * Both the guide's `country` and the partner's `countries` are matched two ways. The
+ * dereferenced form is the shape after the country-refs migration; the bare comparison
+ * still matches the legacy slug strings. Keeping both means the deploy and the migration
+ * do not have to be simultaneous — and a listing page is the last place that should go
+ * quiet because a content migration ran an hour late.
+ *
+ * The market's own name rides along so the shelf can say "a specialist in Montenegro"
+ * when a market has no partner in a discipline yet, rather than dropping the row.
  */
 export const enquiryShelfDefaultsQuery = defineQuery(`
   {
+    "market": *[
+      _type == "locationTaxonomy"
+      && type == "country"
+      && slug.current == $countrySlug
+    ][0]{ name, "slug": slug.current },
     "guide": *[
       _type == "guide"
-      && country == $countrySlug
+      && (country->slug.current == $countrySlug || country == $countrySlug)
       && guideCategory == "buying"
       && defined(slug.current)
     ] | order(coalesce(order, 999) asc, title asc)[0] ${SHELF_GUIDE_PUBLIC},
     "partners": *[
       _type == "partner"
       && defined(slug.current)
-      && count(categories[@->slug.current in $partnerCategories]) > 0
-      && $countrySlug in countries
+      && (count(countries[@->slug.current == $countrySlug]) > 0 || $countrySlug in countries)
     ] | order(coalesce(order, 999) asc, name asc) ${SHELF_PARTNER_PUBLIC}
   }
 `);
 
 type RawShelfDefaults = {
+	market?: { name?: string | null; slug?: string | null } | null;
 	guide?: RawShelfGuide | null;
 	partners?: RawShelfPartner[] | null;
 };
@@ -68,29 +81,62 @@ function toShelfPartner(raw: RawShelfPartner | null | undefined): ShelfPartner |
 	};
 }
 
+function toShelfMarket(raw: RawShelfDefaults['market']): ShelfMarket | null {
+	if (!raw?.slug || !raw.name) return null;
+	return { slug: raw.slug, name: raw.name };
+}
+
 /**
- * Narrow the default partners to one per discipline, in the order a buyer needs them
- * (mortgage → currency → legal), rather than in Sanity's `order`. A discipline with no
- * partner is simply skipped, so the shelf shows two specialists rather than an empty cell.
+ * The disciplines available in this market, in the order a buyer needs them.
  *
- * A partner may now cover several disciplines, so it is eligible for every slot it matches —
- * but taken once: `used` holds the partners already placed, so the same firm never fills two
- * rows. When it would, it takes the earlier discipline and the next-best partner fills the
- * later one. The row's label is the SLOT's discipline (via `disciplineForSlot`), not the
- * partner's whole list, so each row still reads as one clean discipline.
+ * Derived from the partners actually returned rather than from a fixed list, which is the
+ * whole fix: a market with no mortgage broker simply has no mortgage discipline in its
+ * walk, and the next one moves up. A discipline held by several partners keeps its best
+ * (lowest) priority. Ties break on slug so the order is stable between requests.
+ */
+function disciplinesFor(partners: RawShelfPartner[]): string[] {
+	const priorities = new Map<string, number>();
+
+	for (const partner of partners) {
+		const slugs = partner?.categorySlugs ?? [];
+		slugs.forEach((slug, index) => {
+			if (!slug) return;
+			const priority = shelfPriorityFor(slug, partner.categoryPriorities?.[index]);
+			const best = priorities.get(slug);
+			if (best === undefined || priority < best) priorities.set(slug, priority);
+		});
+	}
+
+	return [...priorities.entries()]
+		.sort(([slugA, a], [slugB, b]) => a - b || slugA.localeCompare(slugB))
+		.map(([slug]) => slug);
+}
+
+/**
+ * Narrow the market's partners to one per discipline, walking `shelfPriority`.
+ *
+ * A partner may cover several disciplines, so it is eligible for every slot it matches —
+ * but taken once: `used` holds the partners already placed, so the same firm never fills
+ * two rows. When it would, it takes the earlier discipline and the next-best partner
+ * fills the later one. The row's label is the SLOT's discipline (via `disciplineForSlot`),
+ * not the partner's whole list, so each row still reads as one clean discipline.
  */
 export function toDefaultShelfPartners(raw: RawShelfPartner[] | null | undefined): ShelfPartner[] {
+	const available = (raw ?? []).filter((partner): partner is RawShelfPartner => partner != null);
 	const partners: ShelfPartner[] = [];
 	const used = new Set<string>();
 
-	for (const categorySlug of SHELF_PARTNER_CATEGORIES) {
-		const match = (raw ?? []).find(
+	for (const categorySlug of disciplinesFor(available)) {
+		if (partners.length >= SHELF_PARTNER_LIMIT) break;
+
+		const match = available.find(
 			(partner) =>
-				partner?.slug != null &&
+				partner.slug != null &&
 				!used.has(partner.slug) &&
 				(partner.categorySlugs ?? []).includes(categorySlug)
 		);
 		if (!match?.slug || !match.name) continue;
+
 		used.add(match.slug);
 		partners.push({
 			slug: match.slug,
@@ -99,7 +145,7 @@ export function toDefaultShelfPartners(raw: RawShelfPartner[] | null | undefined
 		});
 	}
 
-	return partners.slice(0, SHELF_PARTNER_LIMIT);
+	return partners;
 }
 
 /** Editor picks win wholesale and keep their authored order. */
@@ -112,16 +158,15 @@ function toOverrideShelfPartners(raw: RawShelfPartner[] | null | undefined): She
 
 /**
  * Merge the listing's overrides over the country defaults, per item. A listing that
- * overrides only the guide keeps the default specialists, and vice versa.
+ * overrides only the guide keeps the default specialists, and vice versa. The market is
+ * never overridable — it is the listing's own country.
  */
-export function resolveEnquiryShelf(
-	defaults: EnquiryShelf,
-	override: ShelfOverride
-): EnquiryShelf {
+export function resolveEnquiryShelf(defaults: EnquiryShelf, override: ShelfOverride): EnquiryShelf {
 	const overrideGuide = toShelfGuide(override?.railGuide);
 	const overridePartners = toOverrideShelfPartners(override?.railPartners);
 
 	return {
+		market: defaults.market,
 		guide: overrideGuide ?? defaults.guide,
 		partners: overridePartners.length > 0 ? overridePartners : defaults.partners
 	};
@@ -154,13 +199,11 @@ export async function fetchEnquiryShelfDefaults(
 	if (!countrySlug) return EMPTY_ENQUIRY_SHELF;
 
 	const raw = await fetchPublic<RawShelfDefaults>(enquiryShelfDefaultsQuery, {
-		params: {
-			countrySlug,
-			partnerCategories: [...SHELF_PARTNER_CATEGORIES]
-		}
+		params: { countrySlug }
 	});
 
 	return {
+		market: toShelfMarket(raw?.market),
 		guide: toShelfGuide(raw?.guide),
 		partners: toDefaultShelfPartners(raw?.partners)
 	};

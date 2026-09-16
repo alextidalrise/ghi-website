@@ -47,6 +47,21 @@ export const partnerCategory = defineType({
 			type: 'number',
 			description: 'Manual ordering on the Partners page. Lower numbers appear first.',
 			validation: (Rule) => Rule.min(0).integer()
+		}),
+		defineField({
+			name: 'shelfPriority',
+			title: 'Enquiry shelf priority',
+			type: 'number',
+			// Deliberately a second number rather than a reuse of `order`. They answer
+			// different questions: `order` is how disciplines stack on the Partners page
+			// (Legal & Tax leads, as the section a browsing buyer wants first); this is
+			// urgency in a 300px rail beside a specific property, where financing leads.
+			// The shelf walks this order and fills up to three slots from whatever the
+			// listing's country actually has, so a market missing a discipline drops to
+			// the next one instead of showing a gap.
+			description:
+				'Which disciplines the listing enquiry shelf reaches for first. It shows up to three, walking this order and skipping any discipline with no partner in that listing\'s country. Lower numbers come first; categories without a number are considered last.',
+			validation: (Rule) => Rule.min(0).integer()
 		})
 	],
 	orderings: [

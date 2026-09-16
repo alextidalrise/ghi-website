@@ -38,7 +38,7 @@
 			{ name: 'Holiday Rentals', role: 'Holiday Rentals' }
 		],
 		heading = 'Trusted Partners',
-		subhead = 'Legal, financial and local expertise across Spain and Portugal.',
+		subhead = 'Legal, financial and local expertise in every region we cover.',
 		ctaLabel = 'Request introduction',
 		ctaHref = '/contact',
 		ctaSupport = "Tell us what you need and we'll connect you with the right specialist."

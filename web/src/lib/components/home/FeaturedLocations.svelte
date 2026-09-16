@@ -15,7 +15,7 @@
 	let {
 		locations,
 		heading = 'Featured locations',
-		summary = 'Ten destinations across Spain and Portugal.',
+		summary = 'Destinations across every market we cover.',
 		maxColumns = 4,
 		priorityCount = 0
 	}: Props = $props();

@@ -35,25 +35,23 @@
 	};
 
 	// The country is the spine: every country renders, with its featured locations slotted
-	// beneath. A country with no featured locations yet (e.g. Portugal before its set is
-	// attached) degrades to a header-only row — preserving the old "Explore by country"
-	// entry — and gains its grid the moment editors populate it. Most-populated countries
-	// lead, so the homepage opens on the content it actually has.
+	// beneath. A country with no featured locations yet degrades to a header-only row —
+	// preserving the "Explore by country" entry — and gains its grid the moment editors
+	// populate it.
+	//
+	// Order is the query's, which is the site's canonical market order (displayOrder on the
+	// country document). It used to sort by how many featured locations a country had, which
+	// meant this index, the header shelf and the footer could each show the markets in a
+	// different sequence, and an editor attaching a location silently reordered the homepage.
 	let groups = $derived.by<CountryGroup[]>(() =>
-		countries
-			.map((country) => {
-				const slug = slugOf(country.href);
-				return {
-					country,
-					slug,
-					locations: locations.filter((loc) => loc.countrySlug === slug)
-				};
-			})
-			.sort(
-				(a, b) =>
-					b.locations.length - a.locations.length ||
-					a.country.name.localeCompare(b.country.name)
-			)
+		countries.map((country) => {
+			const slug = slugOf(country.href);
+			return {
+				country,
+				slug,
+				locations: locations.filter((loc) => loc.countrySlug === slug)
+			};
+		})
 	);
 </script>
 

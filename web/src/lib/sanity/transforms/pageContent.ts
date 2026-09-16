@@ -65,24 +65,24 @@ export function resolveHomepageContent(input: HomepageContentInput | null): Home
 		buyerIntroHeading: s(input?.buyerIntroHeading, 'Everything to know before you buy'),
 		buyerIntroDeck: s(
 			input?.buyerIntroDeck,
-			'The process, the costs, the tax and the mortgage — set out plainly for non-resident buyers in Spain and Portugal.'
+			'The process, the costs, the tax and the mortgage — set out plainly for non-resident buyers, market by market.'
 		),
 		buyerIntroCta: s(input?.buyerIntroCta, "Read the buyer's guides"),
 		featuredHeading: s(input?.featuredHeading, 'Featured properties'),
 		featuredSummary: s(
 			input?.featuredSummary,
-			'Hand-picked listings across Spain and Portugal.'
+			'Hand-picked listings from every market we cover.'
 		),
 		frontlineHeading: s(input?.frontlineHeading, 'Frontline Golf Properties'),
 		frontlineSummary: s(
 			input?.frontlineSummary,
-			'Homes directly on the fairway, in Spain and Portugal.'
+			'Homes directly on the fairway, wherever we operate.'
 		),
 		destinationsHeading: s(input?.destinationsHeading, 'Explore by country'),
 		partnersHeading: s(input?.partnersHeading, 'Trusted Partners'),
 		partnersSubhead: s(
 			input?.partnersSubhead,
-			'Legal, financial and local expertise across Spain and Portugal.'
+			'Legal, financial and local expertise in every region we cover.'
 		),
 		partnersCta: s(input?.partnersCta, 'Request introduction'),
 		partnersCtaSupport: s(
@@ -92,7 +92,7 @@ export function resolveHomepageContent(input: HomepageContentInput | null): Home
 		reviewsHeading: s(input?.reviewsHeading, 'From keys-in-hand buyers'),
 		reviewsDeck: s(
 			input?.reviewsDeck,
-			"Real reviews from people who've bought golf property with us in Spain and Portugal."
+			"Real reviews from people who've bought golf property with us."
 		),
 		seo: input?.seo ?? null
 	};
@@ -168,13 +168,90 @@ export function resolveGuidesHubContent(input: GuidesHubPageInput | null): Guide
 		heroTitle: s(input?.heroTitle, 'Guides'),
 		heroLead: s(
 			input?.heroLead,
-			'Considered, current guidance on buying and owning a home near the finest golf in Spain and Portugal.'
+			'Considered, current guidance on buying and owning a home near the world\'s finest golf, market by market.'
 		),
 		sectionHeading: s(input?.sectionHeading, 'Where to start'),
 		categoryMeta,
 		emptyStateMessage: s(
 			input?.emptyStateMessage,
 			'The first guides are being written. Check back shortly.'
+		),
+		seo: input?.seo ?? null
+	};
+}
+
+// ---------------------------------------------------------------------------
+// Partners
+// ---------------------------------------------------------------------------
+
+export type PartnersPageInput = {
+	heroTitle?: string | null;
+	heroLead?: string | null;
+	heroMarkers?: string[] | null;
+	whyHeading?: string | null;
+	whyBody?: string | null;
+	whyAttributes?: string[] | null;
+	becomeHeading?: string | null;
+	becomeBody?: string | null;
+	becomeCta?: string | null;
+	becomeSupport?: string | null;
+	seo?: SeoInput;
+};
+
+export type PartnersPageContent = {
+	heroTitle: string;
+	heroLead: string;
+	heroMarkers: string[];
+	whyHeading: string;
+	whyBody: string;
+	whyAttributes: string[];
+	becomeHeading: string;
+	becomeBody: string;
+	becomeCta: string;
+	becomeSupport: string;
+	seo: SeoInput;
+};
+
+/**
+ * Defaults for /partners, which until now had no Sanity singleton at all — its copy was
+ * literal in the Svelte component, which is why it still read "across Spain and Portugal"
+ * two markets after that stopped being true.
+ *
+ * These follow the market copy rule: prose never enumerates markets, structure does. The
+ * coverage filter directly beneath this hero lists the countries from live data, so the
+ * lead does not name them and cannot go stale.
+ */
+export function resolvePartnersPageContent(
+	input: PartnersPageInput | null
+): PartnersPageContent {
+	return {
+		heroTitle: s(input?.heroTitle, 'Our Trusted Partners'),
+		heroLead: s(
+			input?.heroLead,
+			'Independent legal, tax, financial and property professionals in every region we cover, each vetted to protect buyers at every stage of the purchase.'
+		),
+		heroMarkers:
+			input?.heroMarkers?.filter(Boolean)?.length
+				? input.heroMarkers.filter((marker): marker is string => Boolean(marker?.trim()))
+				: ['Independently verified', 'No referral pressure', 'Your choice'],
+		whyHeading: s(input?.whyHeading, 'Why we work with partners'),
+		whyBody: s(
+			input?.whyBody,
+			'Buying abroad means trusting people you have never met with decisions that matter. We keep a deliberately small network of independent professionals, each chosen for their record with international buyers, not for what they pay us. We hold no referral fees that could sway our advice. When you are ready, we make a personal introduction. Who you work with, and whether to proceed, stays entirely your decision.'
+		),
+		whyAttributes:
+			input?.whyAttributes?.filter(Boolean)?.length
+				? input.whyAttributes.filter((attr): attr is string => Boolean(attr?.trim()))
+				: ['Independent', 'Vetted', 'English-speaking', 'No hidden incentives'],
+		becomeHeading: s(input?.becomeHeading, 'Are you a professional in this space?'),
+		becomeBody: s(
+			input?.becomeBody,
+			'We work with a small number of vetted legal, tax, financial and property specialists. If you would like to be considered, we would be glad to hear from you.'
+		),
+		becomeCta: s(input?.becomeCta, 'Apply to partner with us'),
+		becomeSupport: s(
+			input?.becomeSupport,
+			'Inbound partnership enquiries only.\nAverage response within five working days.'
 		),
 		seo: input?.seo ?? null
 	};
@@ -256,7 +333,7 @@ export function resolveAboutContent(input: AboutPageInput | null): AboutContent 
 		heroTitle: s(input?.heroTitle, 'Built around people, not just listings'),
 		heroLead: s(
 			input?.heroLead,
-			'Specialists in golf property across Spain and Portugal, here to make buying abroad simpler, safer and a lot less daunting.'
+			'Specialists in golf property across every region we cover, here to make buying abroad simpler, safer and a lot less daunting.'
 		),
 		storyHeading: s(input?.storyHeading, 'Our story'),
 		storyBody: input?.storyBody ?? null,
@@ -267,7 +344,7 @@ export function resolveAboutContent(input: AboutPageInput | null): AboutContent 
 		networkHeading: s(input?.networkHeading, 'The right people around you'),
 		networkBody: s(
 			input?.networkBody,
-			'We work with a trusted group of professionals across the whole buying process, and people on the ground in Spain and Portugal. You are free to use your own; but if you would like, we can introduce you to people we know and trust. The right person at the right stage takes a huge amount of stress out of buying abroad, and in our experience that is exactly the part most people overlook.'
+			'We work with a trusted group of professionals across the whole buying process, and people on the ground in every market we cover. You are free to use your own; but if you would like, we can introduce you to people we know and trust. The right person at the right stage takes a huge amount of stress out of buying abroad, and in our experience that is exactly the part most people overlook.'
 		),
 		networkChips:
 			input?.networkChips?.length
@@ -374,7 +451,7 @@ export function resolveContactContent(input: ContactPageInput | null): ContactCo
 		heroTitle: s(input?.heroTitle, "Tell us what you're looking for"),
 		heroLead: s(
 			input?.heroLead,
-			'Whether you are ready to view or just starting to picture it, we are here to help you buy golf property in Spain and Portugal. Tell us a little about what you have in mind and the right person will be in touch.'
+			'Whether you are ready to view or just starting to picture it, we are here to help you buy golf property wherever we operate. Tell us a little about what you have in mind and the right person will be in touch.'
 		),
 		contactName,
 		contactFirstName: firstName,

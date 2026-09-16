@@ -82,6 +82,15 @@ export const deskStructure: StructureResolver = (S) =>
 										.title('About')
 								),
 							S.listItem()
+								.title('Partners page')
+								.icon(UsersIcon)
+								.child(
+									S.document()
+										.schemaType('partnersPage')
+										.documentId('partnersPage')
+										.title('Partners page')
+								),
+							S.listItem()
 								.title('Contact')
 								.icon(EnvelopeIcon)
 								.child(
