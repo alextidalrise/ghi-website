@@ -32,7 +32,7 @@
 	const CURRENCY_MENU = -1;
 	const currency = getCurrency();
 	const currencyOptions: { code: Currency | null; label: string; name: string }[] = [
-		{ code: null, label: 'As listed', name: "Each listing's own currency" },
+		{ code: null, label: 'Original', name: "Each listing's own currency" },
 		...CURRENCIES.map((code) => ({ code, label: code, name: CURRENCY_NAMES[code] }))
 	];
 
@@ -540,9 +540,12 @@
 	     it is the one control the visitor may want at any moment, so it stays in the fixed
 	     bar at every width instead of hiding inside a scrolling drawer on a phone.
 
-	     The chip's label is one of six spans chosen by the same root attribute that chooses
-	     every price (see $lib/styles/currency.css), so the bar and the figures agree from
-	     the first frame, before any script runs. -->
+	     Before a choice the chip reads "Currency": an invitation, not a status. GHI shows
+	     each home in its own currency until asked otherwise, and no short label names that
+	     state honestly ("As listed" was tried and read as unexplained). After a choice it
+	     reads the code. The label is one of six spans chosen by the same root attribute that
+	     chooses every price (see $lib/styles/currency.css), so the bar and the figures agree
+	     from the first frame, before any script runs. -->
 	<div
 		class="site-nav__ccy"
 		bind:this={currencyRoot}
@@ -561,7 +564,7 @@
 			onkeydown={onCurrencyButtonKeydown}
 		>
 			<span class="site-nav__ccy-value">
-				<span class="site-nav__ccy-label" data-ccy="">As listed</span>
+				<span class="site-nav__ccy-label" data-ccy="">Currency</span>
 				{#each CURRENCIES as code (code)}
 					<span class="site-nav__ccy-label" data-ccy={code}>{code}</span>
 				{/each}
@@ -1063,12 +1066,14 @@
 			border-color var(--duration-hover) var(--ease);
 	}
 
-	/* One fixed slot for the label, so the bar never reflows when the visitor picks a
-	   currency and "AS LISTED" gives way to "GBP". The indent optically centres the tracked
-	   caps, whose trailing letter-space would otherwise push them left. */
+	/* The chip fits its label: "CURRENCY" before a choice, then just "EUR". A fixed slot
+	   was tried so the bar would never reflow, but it left a three-letter code floating in
+	   a chip sized for a nine-letter word. The trade is that the menu words shift once, at
+	   the moment of choosing — feedback on the visitor's own click, with the panel open —
+	   and every later page paints at the new width from the pre-paint attribute. The
+	   indent optically centres the tracked caps, whose trailing letter-space would
+	   otherwise push them left. */
 	.site-nav__ccy-value {
-		min-width: 4.5rem;
-		text-align: center;
 		text-indent: 0.12em;
 		white-space: nowrap;
 	}
@@ -1165,7 +1170,7 @@
 		margin-top: 0;
 	}
 
-	/* "As listed" is not a currency, and says so in a different voice: Light 300 in
+	/* "Original" is not a currency, and says so in a different voice: Light 300 in
 	   sentence case where the codes are Regular 400 tracked caps. */
 	.site-nav__ccy-cell--reset {
 		font-weight: 300;
@@ -1731,11 +1736,11 @@
 		}
 
 		.site-nav__ccy {
-			margin: 0 0.75rem 0 0.7rem;
+			margin: 0 0.6rem 0 0.6rem;
 		}
 
 		.site-nav__ccy::before {
-			left: -0.7rem;
+			left: -0.6rem;
 		}
 	}
 
@@ -1813,11 +1818,7 @@
 		}
 
 		.site-nav__ccy-trigger {
-			padding: 0 0.6rem;
-		}
-
-		.site-nav__ccy-value {
-			min-width: 4.25rem;
+			padding: 0 0.5rem;
 		}
 
 		.site-nav__ccy-panel {
