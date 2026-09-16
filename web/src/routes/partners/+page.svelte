@@ -65,7 +65,6 @@
 
 	<!-- Hero: white editorial. The single green band is reserved for the closing CTA. -->
 	<header class="hero content-wrap">
-		<p class="text-overline">Vetted only</p>
 		<h1 class="hero__title">{market ? `Trusted Partners in ${marketInProse(market.name)}` : c.heroTitle}</h1>
 		<p class="hero__lead">{c.heroLead}</p>
 		<ul class="hero__markers">
@@ -130,7 +129,6 @@
 	<section class="become on-dark" aria-labelledby="become-heading">
 		<div class="become__inner content-wrap">
 			<div class="become__copy">
-				<p class="text-overline become__overline">Become a partner</p>
 				<h2 id="become-heading" class="become__heading">{c.becomeHeading}</h2>
 				<p class="become__body">{c.becomeBody}</p>
 			</div>
@@ -168,8 +166,8 @@
 		padding-bottom: var(--section-gap);
 	}
 
+	/* No overline above: the title carries the section on its own. */
 	.hero__title {
-		margin-top: var(--space-sm);
 		margin-bottom: var(--space-md);
 		max-width: 16ch;
 	}
@@ -282,12 +280,7 @@
 		align-items: end;
 	}
 
-	.become__overline {
-		color: var(--gold);
-	}
-
 	.become__heading {
-		margin-top: var(--space-md);
 		color: var(--on-green);
 		max-width: 18ch;
 	}
