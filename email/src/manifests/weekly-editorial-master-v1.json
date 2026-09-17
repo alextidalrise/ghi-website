@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "campaignId": "weekly-editorial-master-v1",
+  "library": {
+    "id": "ghi-email-components",
+    "version": "1.0.0"
+  },
+  "source": "src/templates/weekly-editorial-master-v1.html",
+  "dataSources": [
+    "repository://email/src/templates/weekly-editorial-master-v1.html"
+  ],
+  "components": [
+    {
+      "instanceId": "weekly_hero_figure_01",
+      "id": "ghi.figure.v1",
+      "variant": "linked",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "weekly_lead_01",
+      "id": "ghi.editorial-lead.v1",
+      "variant": "default",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "new_listings_intro_01",
+      "id": "ghi.section-intro.v1",
+      "variant": "ruled",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "new_listings_pair_01",
+      "id": "ghi.ghi-property-pair.v1",
+      "variant": "spain-height",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "new_developments_intro_01",
+      "id": "ghi.section-intro.v1",
+      "variant": "ruled",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "new_development_01",
+      "id": "ghi.development-card.v1",
+      "variant": "green",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "new_partner_intro_01",
+      "id": "ghi.section-intro.v1",
+      "variant": "ruled",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "new_partner_feature_01",
+      "id": "ghi.partner-article-hero.v1",
+      "variant": "split-h2",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "existing_opportunities_intro_01",
+      "id": "ghi.section-intro.v1",
+      "variant": "ruled",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "existing_opportunities_pair_01",
+      "id": "ghi.ghi-property-pair.v1",
+      "variant": "portugal-height",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    },
+    {
+      "instanceId": "weekly_enquiry_01",
+      "id": "ghi.dual-action-enquiry.v1",
+      "variant": "flush-footer",
+      "dataSource": "repository://email/src/templates/weekly-editorial-master-v1.html"
+    }
+  ]
+}
