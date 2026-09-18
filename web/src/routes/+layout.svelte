@@ -82,7 +82,20 @@
 		void import('@sanity/visual-editing').then(({ enableVisualEditing }) => {
 			enableVisualEditing();
 		});
-		useLiveMode({ studioUrl });
+		// `client` is not optional, whatever the @sanity/svelte-loader README's example shows:
+		// the default store is built with `ssr: true`, and that makes core-loader throw
+		// "The `client` option in `enableLiveMode` is required" before live mode ever starts.
+		// Without it Presentation stayed connected-looking but inert — drafts rendered from the
+		// server and overlays worked, so the only symptom was edits not reaching the iframe
+		// until a reload.
+		//
+		// Dynamically imported for the same reason as the overlays above: `createClient` pulls
+		// ~120KB of @sanity/client, and core-loader's eager chunk does not already carry it —
+		// only its lazy live-mode chunk does. A static import here would move that weight onto
+		// every public visitor to serve a code path none of them ever run.
+		void import('$lib/sanity/browserClient').then(({ browserClient }) => {
+			useLiveMode({ client: browserClient, studioUrl });
+		});
 	});
 </script>
 
