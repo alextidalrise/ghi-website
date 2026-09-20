@@ -13,22 +13,6 @@ export type SitemapListingRow = CanonicalSegments & {
 	_updatedAt?: string | null;
 };
 
-/**
- * A standalone `_type == "unit"` document's canonical path segments. Mirrors the fields
- * UNIT_CANONICAL_PATH_FIELDS projects: the parent development's URL segments plus the unit
- * slug. `communitySlug` is absent (and `isCatchAll` true) when the parent development is a
- * catch-all community, served without a community segment.
- */
-export type SitemapUnitRow = {
-	countrySlug?: string | null;
-	locationSlug?: string | null;
-	communitySlug?: string | null;
-	isCatchAll?: boolean | null;
-	developmentSlug?: string | null;
-	unitSlug?: string | null;
-	_updatedAt?: string | null;
-};
-
 export type SitemapGolfCourseRow = {
 	countrySlug?: string | null;
 	locationSlug?: string | null;
@@ -77,31 +61,6 @@ export function buildListingPath(row: SitemapListingRow): string | null {
 	return buildCanonicalPath(row);
 }
 
-/**
- * Nested canonical unit path: the parent development's canonical path + the unit slug. Reuses
- * buildCanonicalPath so the catch-all (3-segment) vs standard (4-segment) development rules are
- * applied identically to how the unit page (buildUnitDetailPageData) and the /u/[ghiId] permalink
- * resolve them — the emitted URL is byte-identical to the one a request canonicalises to, so it
- * never 301s.
- *   Standard:   /{country}/{location}/{community}/{developmentSlug}/{unitSlug}
- *   Catch-all:  /{country}/{location}/{developmentSlug}/{unitSlug}
- */
-export function buildUnitPath(row: SitemapUnitRow): string | null {
-	const developmentPath = buildCanonicalPath({
-		countrySlug: row.countrySlug,
-		locationSlug: row.locationSlug,
-		communitySlug: row.communitySlug,
-		slug: row.developmentSlug,
-		isCatchAll: row.isCatchAll
-	});
-
-	if (!developmentPath || !row.unitSlug) {
-		return null;
-	}
-
-	return `${developmentPath}/${row.unitSlug}`;
-}
-
 export function buildGolfCoursePath(row: SitemapGolfCourseRow): string | null {
 	if (!row.countrySlug || !row.locationSlug || !row.communitySlug || !row.slug) {
 		return null;
@@ -138,8 +97,7 @@ export function collectSitemapEntries(
 	listingRows: SitemapListingRow[],
 	golfCourseRows: SitemapGolfCourseRow[] = [],
 	guideRows: SitemapGuideRow[] = [],
-	insightRows: SitemapInsightRow[] = [],
-	unitRows: SitemapUnitRow[] = []
+	insightRows: SitemapInsightRow[] = []
 ): SitemapEntry[] {
 	const byPath = new Map<string, SitemapEntry>();
 
@@ -173,9 +131,14 @@ export function collectSitemapEntries(
 		add(buildListingPath(row), row._updatedAt);
 	}
 
-	for (const row of unitRows) {
-		add(buildUnitPath(row), row._updatedAt);
-	}
+	/* UNITS ARE DELIBERATELY ABSENT (they were members from PR #148 until this change).
+	   Sibling units are ~97% identical, so buildUnitDetailPageData now points their
+	   rel=canonical at the parent development. A sitemap entry says "index this url" while
+	   that canonical says "index a different one" — submitting both is the contradiction that
+	   fills GSC's "Alternate page with proper canonical" bucket. The development entry, added
+	   by the listingRows loop above, already represents every one of its units.
+	   If units are ever made genuinely distinct, restore the canonical FIRST, then re-add
+	   them here and to purgeTags' sitemap tag. */
 
 	for (const row of golfCourseRows) {
 		add(buildGolfCoursePath(row), row._updatedAt);

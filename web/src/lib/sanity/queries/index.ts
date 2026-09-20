@@ -144,7 +144,7 @@ export {
 	type FrontlineLocationOption
 } from './frontline';
 
-export { sitemapListingsQuery, sitemapTaxonomyQuery, sitemapUnitsQuery } from './sitemap';
+export { sitemapListingsQuery, sitemapTaxonomyQuery } from './sitemap';
 
 export { buyerTypesQuery, guideBySlugQuery, guidesHubQuery, sitemapGuidesQuery } from './guide';
 
