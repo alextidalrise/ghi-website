@@ -519,15 +519,39 @@ export function toPublicUnitListing(
 	const locationLabel =
 		dev.location?.community?.name ?? dev.location?.location?.name ?? null;
 	const composedTitle = composeUnitTitle(raw);
+
+	/* De-duplicate the title parts. A development whose name matches its community — Natura
+	   Village, the development, sitting in Natura Village, the community — otherwise produced
+	   "9-A, Natura Village, Natura Village". Compared case-insensitively on the trimmed value,
+	   first occurrence wins, so ordering (unit, development, location) is preserved. */
 	const seoTitle = [composedTitle, dev.title, locationLabel]
+		.map((part) => part?.trim())
 		.filter((part): part is string => Boolean(part))
+		.filter(
+			(part, index, parts) =>
+				parts.findIndex((seen) => seen.toLowerCase() === part.toLowerCase()) === index
+		)
 		.join(', ');
+
+	/* The unit's OWN copy outranks the development's SEO blurb. Reading dev.seo.metaDescription
+	   first handed every sibling in a development the identical description — Cortesin Hill Club
+	   Cortijo 1 units C10/C13/C15 all read "Cortijo 1 is a collection of 13 four-bedroom…" while
+	   each unit's own shortDescription said something genuinely distinct ("Unit C15 is recorded
+	   as sold in the August 2026 schedule…"). 536 of 626 units carry their own shortDescription,
+	   so the good copy was already there and was being discarded.
+
+	   Resolved from raw.content / unitType.content explicitly rather than from the merged
+	   `content` ladder: that ladder falls through to dev.content, and a development's body copy
+	   is a worse fallback than its purpose-written seo.metaDescription. A unit type is narrower
+	   than a development, so it still outranks it. */
+	const unitOwnDescription =
+		raw.content?.shortDescription?.trim() || unitType?.content?.shortDescription?.trim() || null;
 
 	const seo: PublicSeo = {
 		...(devSeo ?? { openGraphImage: null }),
 		seoTitle,
 		metaDescription:
-			dev.seo?.metaDescription ?? content?.shortDescription ?? null,
+			unitOwnDescription ?? dev.seo?.metaDescription ?? content?.shortDescription ?? null,
 		noindex: dev.seo?.noindex ?? false
 	};
 
