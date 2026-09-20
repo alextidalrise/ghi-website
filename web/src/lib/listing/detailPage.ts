@@ -265,6 +265,20 @@ export function buildUnitDetailPageData(
 	}
 
 	const canonicalUrl = `${siteOrigin}${canonicalPath}`;
+
+	/* A unit page declares its PARENT DEVELOPMENT as the SEO canonical, not itself.
+	   Sibling units are ~97% identical — same hero image, same development-level meta
+	   description, differing only in unit code, price, bed count and floor area — so Google
+	   read the pattern and parked them under "Discovered - currently not indexed" rather than
+	   spending crawl on near-duplicates. Pointing rel=canonical at the development
+	   consolidates them onto the one page that can actually rank.
+
+	   `canonicalUrl` above stays the unit's OWN url on purpose: it is the path-normalisation
+	   target for the 301 just above (catch-all vs standard segment count) and the {#key} the
+	   page component remounts on. Only the SEO canonical moves. A unit still serves 200 at its
+	   own url and stays fully crawlable — that is what lets Google see the canonical at all. */
+	const seoCanonicalUrl = `${siteOrigin}${developmentPath}`;
+
 	const breadcrumbs = buildUnitBreadcrumbs(
 		listing,
 		context.developmentTitle,
@@ -272,11 +286,9 @@ export function buildUnitDetailPageData(
 		canonicalPath
 	);
 	const seo = options.preview
-		? applyPreviewSeo(buildPropertySeo(listing, canonicalUrl))
-		: buildPropertySeo(listing, canonicalUrl);
+		? applyPreviewSeo(buildPropertySeo(listing, seoCanonicalUrl))
+		: buildPropertySeo(listing, seoCanonicalUrl);
 	const breadcrumbJsonLd = breadcrumbListJsonLd(breadcrumbs, siteOrigin);
-	const listingJsonLd =
-		options.preview || seo.noindex ? null : buildRealEstateListingJsonLd(listing, canonicalUrl);
 
 	return {
 		pageType: 'property',
@@ -285,7 +297,10 @@ export function buildUnitDetailPageData(
 		breadcrumbs,
 		seo,
 		breadcrumbJsonLd,
-		listingJsonLd,
+		/* Null, like a development's. A per-unit RealEstateListing carrying the unit's own url
+		   would contradict the rel=canonical now pointing at the development — two different
+		   answers to "which url is this page?". The development page carries the offer data. */
+		listingJsonLd: null,
 		similarCards: options.similarCards ?? [],
 		// A unit is stored as a property but is its own page type for reporting, so the
 		// kind is set explicitly here rather than inferred from the document.

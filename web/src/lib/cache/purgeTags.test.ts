@@ -136,13 +136,12 @@ describe('tagsForDoc', () => {
 	});
 
 	describe('sitemap tag', () => {
-		// The sitemap lists every indexable listing, development, unit, taxonomy node, golf
-		// course, guide and insight, with a per-URL lastmod — so a change to any of those must
-		// purge it, while doc types that contribute no sitemap URL must not.
+		// The sitemap lists every indexable listing, development, taxonomy node, golf course,
+		// guide and insight, with a per-URL lastmod — so a change to any of those must purge
+		// it, while doc types that contribute no sitemap URL must not.
 		it.each([
 			['propertyListing'],
 			['development'],
-			['unit'],
 			['locationTaxonomy'],
 			['golfCourse'],
 			['guide'],
@@ -151,7 +150,13 @@ describe('tagsForDoc', () => {
 			expect(tagsForDoc(base({ _type }))).toContain('sitemap');
 		});
 
+		/* `unit` sits in the second list deliberately. Units are canonicalised to their parent
+		   development and are no longer sitemap members, so publishing one cannot change the
+		   sitemap's URL set — it only refreshes the parent development's page, via that doc
+		   tag. Re-adding `unit` above without first re-adding units to collectSitemapEntries
+		   would purge the sitemap on every unit publish for no reason. */
 		it.each([
+			['unit'],
 			['unitType'],
 			['author'],
 			['partner'],

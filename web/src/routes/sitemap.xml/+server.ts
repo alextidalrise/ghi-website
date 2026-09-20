@@ -8,8 +8,7 @@ import {
 	sitemapGuidesQuery,
 	sitemapInsightsQuery,
 	sitemapListingsQuery,
-	sitemapTaxonomyQuery,
-	sitemapUnitsQuery
+	sitemapTaxonomyQuery
 } from '$lib/sanity/queries';
 
 export const GET: RequestHandler = async ({ url }) => {
@@ -19,14 +18,13 @@ export const GET: RequestHandler = async ({ url }) => {
 	// applies the edge TTL + browser cache-control, so this route sets no cache header itself.
 	addCacheTags(cacheTag.sitemap);
 
-	const [taxonomyRows, listingRows, golfCourseRows, guideRows, insightRows, unitRows] =
+	const [taxonomyRows, listingRows, golfCourseRows, guideRows, insightRows] =
 		await Promise.all([
 			fetchPublic<Parameters<typeof collectSitemapEntries>[0]>(sitemapTaxonomyQuery),
 			fetchPublic<Parameters<typeof collectSitemapEntries>[1]>(sitemapListingsQuery),
 			fetchPublic<Parameters<typeof collectSitemapEntries>[2]>(sitemapGolfCoursesQuery),
 			fetchPublic<Parameters<typeof collectSitemapEntries>[3]>(sitemapGuidesQuery),
-			fetchPublic<Parameters<typeof collectSitemapEntries>[4]>(sitemapInsightsQuery),
-			fetchPublic<Parameters<typeof collectSitemapEntries>[5]>(sitemapUnitsQuery)
+			fetchPublic<Parameters<typeof collectSitemapEntries>[4]>(sitemapInsightsQuery)
 		]);
 
 	const entries = collectSitemapEntries(
@@ -34,8 +32,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		listingRows ?? [],
 		golfCourseRows ?? [],
 		guideRows ?? [],
-		insightRows ?? [],
-		unitRows ?? []
+		insightRows ?? []
 	);
 	const body = renderSitemapXml(url.origin, entries);
 

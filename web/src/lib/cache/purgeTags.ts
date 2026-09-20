@@ -84,8 +84,11 @@ export function tagsForDoc(payload: PurgePayload): string[] {
 			add(locationId && cacheTag.gridLocation(locationId));
 			add(countrySlug && cacheTag.gridCountry(countrySlug));
 			addFrontline();
-			// A unit is its own sitemap URL; a unit type is not (it has no page of its own).
-			add(_type === 'unit' && cacheTag.sitemap);
+			/* No sitemap tag. Neither a unit nor a unit type is a sitemap member: unit types have
+			   no page at all, and unit pages now canonicalise to their parent development, so
+			   they were dropped from the sitemap (see listing/sitemap.ts). Publishing a unit
+			   therefore cannot change the sitemap's URL set — only the parent development's
+			   page, refreshed via its doc tag above. */
 			break;
 		}
 		case 'locationTaxonomy': {
