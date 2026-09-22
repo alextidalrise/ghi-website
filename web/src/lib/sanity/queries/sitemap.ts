@@ -35,11 +35,20 @@ export const sitemapTaxonomyQuery = defineQuery(`
  * slug duplicates the location, e.g. vilamoura/vilamoura) canonicalise to the 3-segment
  * form. Projecting only communitySlug — as this query used to — left isCatchAll undefined,
  * so the sitemap emitted the 4-segment path that then 301s to the 3-segment canonical.
+ *
+ * DEVELOPMENTS ONLY, deliberately (2026-09-22). Two months after launch Google had indexed
+ * only the homepage, every other URL sat in "Discovered – currently not indexed", and crawl
+ * stats showed ~300 requests in 90 days. With that little crawl budget, advertising ~420
+ * individual properties (197 of them Kyero-feed imports whose text is syndicated elsewhere)
+ * spent it on the least distinctive pages. Property pages stay live, linked and indexable —
+ * they're just not submitted. Once Google indexes the core pages and crawls regularly,
+ * restore the previous type filter here:
+ *   _type in ["propertyListing", "development"]
+ *   && (_type != "propertyListing" || listingKind in ["property", "unit"])
  */
 export const sitemapListingsQuery = defineQuery(`
   *[
-    _type in ["propertyListing", "development"]
-    && (_type != "propertyListing" || listingKind in ["property", "unit"])
+    _type == "development"
     && defined(slug.current)
     && ${PUBLIC_LISTING_FILTER}
     && coalesce(seo.noindex, false) != true
