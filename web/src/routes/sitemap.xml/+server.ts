@@ -4,7 +4,6 @@ import { addCacheTags } from '$lib/cache/tagContext';
 import { cacheTag } from '$lib/cache/tags';
 import {
 	fetchPublic,
-	sitemapGolfCoursesQuery,
 	sitemapGuidesQuery,
 	sitemapInsightsQuery,
 	sitemapListingsQuery,
@@ -18,19 +17,21 @@ export const GET: RequestHandler = async ({ url }) => {
 	// applies the edge TTL + browser cache-control, so this route sets no cache header itself.
 	addCacheTags(cacheTag.sitemap);
 
-	const [taxonomyRows, listingRows, golfCourseRows, guideRows, insightRows] =
-		await Promise.all([
-			fetchPublic<Parameters<typeof collectSitemapEntries>[0]>(sitemapTaxonomyQuery),
-			fetchPublic<Parameters<typeof collectSitemapEntries>[1]>(sitemapListingsQuery),
-			fetchPublic<Parameters<typeof collectSitemapEntries>[2]>(sitemapGolfCoursesQuery),
-			fetchPublic<Parameters<typeof collectSitemapEntries>[3]>(sitemapGuidesQuery),
-			fetchPublic<Parameters<typeof collectSitemapEntries>[4]>(sitemapInsightsQuery)
-		]);
+	/* Golf course pages (116 of them) are deliberately not fetched: the sitemap is trimmed to
+	   the core pages plus developments while Google's crawl budget for the site is tiny — see
+	   sitemapListingsQuery. To restore them, fetch sitemapGolfCoursesQuery again and pass the
+	   rows as collectSitemapEntries' third argument. */
+	const [taxonomyRows, listingRows, guideRows, insightRows] = await Promise.all([
+		fetchPublic<Parameters<typeof collectSitemapEntries>[0]>(sitemapTaxonomyQuery),
+		fetchPublic<Parameters<typeof collectSitemapEntries>[1]>(sitemapListingsQuery),
+		fetchPublic<Parameters<typeof collectSitemapEntries>[3]>(sitemapGuidesQuery),
+		fetchPublic<Parameters<typeof collectSitemapEntries>[4]>(sitemapInsightsQuery)
+	]);
 
 	const entries = collectSitemapEntries(
 		taxonomyRows ?? [],
 		listingRows ?? [],
-		golfCourseRows ?? [],
+		[],
 		guideRows ?? [],
 		insightRows ?? []
 	);
