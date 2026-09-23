@@ -47,7 +47,7 @@ export const siteSettings = defineType({
 			title: 'Footer',
 			type: 'object',
 			description:
-				'The site footer. Leave any field empty to fall back to its built-in default. The countries and their locations are not set here: the footer lists the countries under the header menu's Countries item, with the same locations, so edit them there.',
+				'The site footer. Leave any field empty to fall back to its built-in default. The countries and their locations are not set here: the footer lists the countries under the header menu’s Countries item, with the same locations, so edit them there.',
 			options: { collapsible: true, collapsed: true },
 			fields: [
 				defineField({
