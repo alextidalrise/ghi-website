@@ -84,11 +84,11 @@ export async function fetchFrontlineListingCards({
 		.filter((card): card is SimilarListingCard => card !== null);
 }
 
-/** Site-wide frontline golf spotlight for the homepage. */
+/** Homepage spotlight: the newest members of the curated Front Line Collection. */
 export async function fetchHomepageFrontlineListingCards(
 	rates?: RateTable
 ): Promise<SimilarListingCard[]> {
-	return fetchFrontlineListingCards({ scope: { type: 'global' }, rates });
+	return fetchFrontlineListingCards({ scope: { type: 'frontlineCollection' }, rates });
 }
 
 /** Hand-picked homepage featured cards from siteSettings.homepageFeaturedListings. */

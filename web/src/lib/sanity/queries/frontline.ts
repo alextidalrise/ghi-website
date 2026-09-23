@@ -8,7 +8,7 @@ import {
 import type { RateTable } from '../../currency/rates';
 import type { ListingSearchParams } from '../../listing/searchParams';
 import { fetchPublic } from './fetch';
-import { PUBLIC_LISTING_FILTER } from './filters';
+import { FRONTLINE_COLLECTION_FILTER, PUBLIC_LISTING_FILTER } from './filters';
 import { buildGolfCourseFacetQuery, listingSearchQueryParams } from './listingSearch';
 
 /**
@@ -71,7 +71,7 @@ export function toFrontlineCourseOptions(raw: RawCourseFacet | null): CourseFilt
 }
 
 /**
- * Course filter options for the Front Line Collection page: courses linked by the frontline
+ * Course filter options for the Front Line Collection page: courses linked by the collection
  * rows (properties, units and developments) matching the visitor's other filters. Country
  * and location are left out so the bar can narrow by place instantly on the client;
  * golfCourse is left out so the facet never narrows itself.
@@ -83,7 +83,7 @@ export async function fetchFrontlineCourseOptions({
 	params: ListingSearchParams;
 	rates?: RateTable;
 }): Promise<CourseFilterOption[]> {
-	const scope = { type: 'global' } as const;
+	const scope = { type: 'frontlineCollection' } as const;
 	const raw = await fetchPublic<RawCourseFacet>(buildGolfCourseFacetQuery(scope), {
 		params: {
 			...listingSearchQueryParams(
@@ -119,7 +119,7 @@ type RawFrontlinePlace = {
 };
 
 /**
- * Where every publishable frontline-golf grid row sits. The same rows the collection grid
+ * Where every publishable Front Line Collection row sits. The same rows the collection grid
  * shows (properties, units and developments), and the same fields its Country and Location
  * facets match on, so every option returns results.
  */
@@ -130,7 +130,7 @@ const frontlinePlacesQuery = /* groq */ `
       || _type == "development"
     )
     && ${PUBLIC_LISTING_FILTER}
-    && coalesce(golf.golfRelevance, "") == "frontline_golf"
+    && ${FRONTLINE_COLLECTION_FILTER}
   ]{
     "countryName": coalesce(location.country->name, location.community->parent->parent->name),
     "countrySlug": coalesce(location.country->slug.current, location.community->parent->parent->slug.current),
@@ -139,7 +139,7 @@ const frontlinePlacesQuery = /* groq */ `
   }
 `;
 
-/** Reduce frontline rows to de-duplicated, name-ordered country and location options. */
+/** Reduce collection rows to de-duplicated, name-ordered country and location options. */
 export function toFrontlinePlaceOptions(rows: RawFrontlinePlace[]): FrontlinePlaceOptions {
 	const countries = new Map<string, { label: string; value: string }>();
 	const locations = new Map<string, FrontlineLocationOption>();

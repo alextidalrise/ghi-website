@@ -17,8 +17,8 @@ import { cacheTag } from '$lib/cache/tags';
 const BASE_PATH = FRONTLINE_COLLECTION_PATH;
 
 export const load: PageServerLoad = async ({ url, locals }) => {
-	// The grid is the global "newest frontline_golf" query, so a new frontline listing
-	// anywhere must purge this page.
+	// The grid is every curated collection member, so a frontline listing changing anywhere
+	// (including its collection switch) must purge this page.
 	addCacheTags(cacheTag.frontline);
 
 	const searchParams = parseListingSearchParams(url);
@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 
 	const [listingResults, courseOptions, placeOptions, hero, rawContent] = await Promise.all([
 		fetchListingCards({
-			scope: { type: 'global', pins: 'frontline' },
+			scope: { type: 'frontlineCollection' },
 			params: { ...searchParams, golfRelevance: ['frontline_golf'] },
 			rates
 		}),
@@ -47,7 +47,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	const title = content.seo?.seoTitle?.trim() || 'Frontline Golf Homes | Golf Homes International';
 	const description =
 		content.seo?.metaDescription?.trim() ||
-		'Every property on the first line of a golf course, in every market we cover. Filter the frontline collection by country, location, price and golf course.';
+		'A hand-picked collection of homes on the first line of a golf course, across every market we cover. Filter by country, location, price and golf course.';
 	const seo = {
 		title,
 		description,

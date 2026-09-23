@@ -151,13 +151,26 @@ describe('buildPinnedListingCardsQuery', () => {
 		expect(buildPinnedListingCardsQuery({ type: 'golfCourse', golfCourseId: 'gc' })).toContain(
 			'*[_id == $golfCourseId][0].pinnedListings'
 		);
-		expect(buildPinnedListingCardsQuery({ type: 'global', pins: 'frontline' })).toContain(
+		expect(buildPinnedListingCardsQuery({ type: 'frontlineCollection' })).toContain(
 			'.frontlinePinnedListings'
 		);
 	});
 
 	it('returns null for scopes without pins', () => {
 		expect(buildPinnedListingCardsQuery({ type: 'global' })).toBeNull();
+	});
+
+	it('limits the Front Line Collection to curated frontline listings, pins included', () => {
+		const query = buildPinnedListingCardsQuery({ type: 'frontlineCollection' })!;
+		// Both the pinned rows and the natural rows carry the curated filter.
+		expect(query.match(/includeInFrontlineCollection == true/g)).toHaveLength(2);
+		expect(query).toContain('coalesce(golf.golfRelevance, "") == "frontline_golf"');
+		expect(buildListingCardsCountQuery({ type: 'frontlineCollection' })).toContain(
+			'includeInFrontlineCollection == true'
+		);
+		expect(buildListingCardsCountQuery({ type: 'global' })).not.toContain(
+			'includeInFrontlineCollection'
+		);
 	});
 
 	it('filters pins like the grid, caps them, and keeps them out of the natural rows', () => {
