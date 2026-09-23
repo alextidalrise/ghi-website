@@ -129,7 +129,7 @@
 		{@render children()}
 	</main>
 
-	<Footer footer={data.footer} />
+	<Footer footer={data.footer} nav={data.headerNav} />
 {/if}
 
 <style>

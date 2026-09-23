@@ -1,17 +1,42 @@
 <script lang="ts">
-	import { buildFooter } from '$lib/footer/footerContent';
+	import { onMount } from 'svelte';
+	import { page } from '$app/state';
+	import CountryFlagArt from '$lib/components/CountryFlagArt.svelte';
+	import { buildFooter, footerCountries, type FooterCountry } from '$lib/footer/footerContent';
+	import { buildSiteNav, isNavItemActive } from '$lib/nav/siteNav';
 	import { getConsent } from '$lib/analytics';
-	import type { FooterContent, FooterSocialPlatform } from '$lib/sanity/queries';
+	import type { FooterContent, FooterSocialPlatform, HeaderNav } from '$lib/sanity/queries';
 
 	type Props = {
 		footer: FooterContent | null;
+		nav: HeaderNav | null;
 	};
 
-	let { footer }: Props = $props();
+	let { footer, nav }: Props = $props();
 
-	// The whole footer — columns, CTA, legal, socials — is authored in Sanity, falling
-	// back to the built-in defaults when a piece is left empty or the dataset is empty.
-	const content = $derived(buildFooter(footer));
+	// The footer's words, Explore links, legal and socials are authored in Sanity (with
+	// built-in defaults). Its geography is not: the country index is read from the header
+	// nav, so a country added to the header's Countries item appears here too.
+	const content = $derived(buildFooter(footer, footerCountries(buildSiteNav(nav))));
+
+	const isActive = (href: string | null) => isNavItemActive(href, page.url.pathname);
+	const isCurrent = (href: string | null) => href?.split('?')[0] === page.url.pathname;
+	const countryActive = (country: FooterCountry) =>
+		isActive(country.href) || country.locations.some((place) => isActive(place.href));
+
+	// Below 56rem each country folds to one row with a toggle, as in the drawer. Folding
+	// waits for hydration: without JS every location stays listed, which is also what
+	// crawlers read, since the links are in the HTML either way. The country holding the
+	// current page arrives unfolded, so "where am I" is never tucked away.
+	let enhanced = $state(false);
+	let unfolded = $state<Record<number, boolean>>({});
+	onMount(() => {
+		enhanced = true;
+	});
+	const isUnfolded = (i: number, country: FooterCountry) => unfolded[i] ?? countryActive(country);
+	function toggle(i: number, country: FooterCountry) {
+		unfolded[i] = !isUnfolded(i, country);
+	}
 
 	const SOCIAL_LABELS: Record<FooterSocialPlatform, string> = {
 		instagram: 'Instagram',
@@ -81,7 +106,15 @@
 	</svg>
 {/snippet}
 
-<footer class="footer on-dark">
+<!-- The header's flag stamp: the same art (uploaded SVG, else the built-in stamp) in the
+     same 1px-framed 3:2 box. Decorative: the name beside it carries the meaning. -->
+{#snippet stamp(country: FooterCountry)}
+	<span class="footer__stamp" aria-hidden="true">
+		<CountryFlagArt slug={country.slug} flagUrl={country.flag} />
+	</span>
+{/snippet}
+
+<footer class="footer on-dark" class:is-enhanced={enhanced}>
 	<div class="footer__inner content-wrap">
 		<!-- Tier 1: brand + invitation -->
 		<div class="footer__masthead">
@@ -111,79 +144,161 @@
 			</div>
 		</div>
 
-		<!-- Tier 2: index columns + newsletter -->
-		<div class="footer__columns">
-			{#each content.columns as column (column.heading)}
-				<nav class="footer__col" aria-label={column.heading}>
-					<h2 class="footer__heading">{column.heading}</h2>
-					<ul class="footer__list">
-						{#each column.links as link (link.href)}
-							<li>
-								<a
-									class="footer__link"
-									href={link.href}
-									target={link.external ? '_blank' : undefined}
-									rel={link.external ? 'noopener noreferrer' : undefined}
-								>
-									{link.label}
-								</a>
+		<!-- Tier 2: the country index beside the editorial links and the newsletter. One
+		     row per country, so a new market adds a short row, never a column. -->
+		<div class="footer__index">
+			{#if content.countries.length}
+				<nav class="footer__countries" aria-labelledby="footer-countries-heading">
+					<h2 class="footer__heading" id="footer-countries-heading">Countries</h2>
+					<!-- Unkeyed: the rows come from CMS labels, which are not guaranteed unique. -->
+					<ul class="footer__country-list">
+						{#each content.countries as country, i}
+							{@const open = isUnfolded(i, country)}
+							<li class="footer__country">
+								<div class="footer__country-head">
+									{#if country.href}
+										<a
+											class="footer__country-name"
+											class:is-active={countryActive(country)}
+											href={country.href}
+											aria-current={isCurrent(country.href) ? 'page' : undefined}
+											target={country.external ? '_blank' : undefined}
+											rel={country.external ? 'noopener noreferrer' : undefined}
+										>
+											{@render stamp(country)}
+											<span class="footer__country-label"
+												>{country.name}&nbsp;<span class="footer__arrow" aria-hidden="true">&rarr;</span></span
+											>
+										</a>
+									{:else}
+										<span class="footer__country-name" class:is-active={countryActive(country)}>
+											{@render stamp(country)}
+											<span class="footer__country-label">{country.name}</span>
+										</span>
+									{/if}
+									{#if country.locations.length}
+										<button
+											type="button"
+											class="footer__fold"
+											class:is-open={open}
+											aria-expanded={open}
+											aria-controls={`footer-places-${i}`}
+											aria-label={`${open ? 'Hide' : 'Show'} locations in ${country.name}`}
+											onclick={() => toggle(i, country)}
+										>
+											<span class="footer__fold-count" aria-hidden="true">
+												{country.locations.length}
+											</span>
+											<svg class="footer__chevron" width="14" height="8" viewBox="0 0 10 6" aria-hidden="true">
+												<path
+													d="M1 1l4 4 4-4"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+											</svg>
+										</button>
+									{/if}
+								</div>
+								{#if country.locations.length}
+									<ul id={`footer-places-${i}`} class="footer__places" class:is-folded={!open}>
+										{#each country.locations as place}
+											<li class="footer__place">
+												<a
+													class="footer__link"
+													class:is-active={isActive(place.href)}
+													href={place.href}
+													aria-current={isCurrent(place.href) ? 'page' : undefined}
+													target={place.external ? '_blank' : undefined}
+													rel={place.external ? 'noopener noreferrer' : undefined}
+												>
+													{place.label}
+												</a>
+											</li>
+										{/each}
+									</ul>
+								{/if}
 							</li>
 						{/each}
-						{#if column.highlight}
-							<li>
-								<a
-									class="footer__link footer__link--all"
-									href={column.highlight.href}
-									target={column.highlight.external ? '_blank' : undefined}
-									rel={column.highlight.external ? 'noopener noreferrer' : undefined}
-								>
-									{column.highlight.label}
-									<span class="footer__arrow" aria-hidden="true">&rarr;</span>
-								</a>
-							</li>
-						{/if}
 					</ul>
 				</nav>
-			{/each}
-		</div>
-
-		<!-- Newsletter — its own block so the column count never affects its placement -->
-		<div class="footer__signup">
-			<h2 class="footer__heading">Stay in touch</h2>
-			{#if status === 'success'}
-				<p class="footer__signup-success" role="status">{message}</p>
-			{:else}
-				<p class="footer__signup-lead">
-					Occasional notes on new listings and the markets we cover. A few times a year, no more.
-				</p>
-				<form class="footer__signup-form" onsubmit={subscribe} novalidate>
-					<label class="footer__signup-label" for="footer-email">Email address</label>
-					<div class="footer__signup-row">
-						<input
-							id="footer-email"
-							class="footer__signup-input"
-							type="email"
-							name="email"
-							placeholder="you@example.com"
-							autocomplete="email"
-							bind:value={email}
-							disabled={status === 'submitting'}
-							aria-describedby="footer-signup-msg"
-						/>
-						<button class="footer__signup-button" type="submit" disabled={status === 'submitting'}>
-							{status === 'submitting' ? 'Sending' : 'Subscribe'}
-						</button>
-					</div>
-					<p
-						id="footer-signup-msg"
-						class="footer__signup-error"
-						class:is-visible={status === 'error'}
-						role="alert"
-					>
-						{status === 'error' ? message : ''}
-					</p>
-				</form>
 			{/if}
+
+			<div class="footer__aside">
+				{#each content.columns as column}
+					<nav class="footer__col" aria-label={column.heading}>
+						<h2 class="footer__heading">{column.heading}</h2>
+						<ul class="footer__list">
+							{#each column.links as link}
+								<li>
+									<a
+										class="footer__link"
+										href={link.href}
+										target={link.external ? '_blank' : undefined}
+										rel={link.external ? 'noopener noreferrer' : undefined}
+									>
+										{link.label}
+									</a>
+								</li>
+							{/each}
+							{#if column.highlight}
+								<li>
+									<a
+										class="footer__link footer__link--all"
+										href={column.highlight.href}
+										target={column.highlight.external ? '_blank' : undefined}
+										rel={column.highlight.external ? 'noopener noreferrer' : undefined}
+									>
+										{column.highlight.label}
+										<span class="footer__arrow" aria-hidden="true">&rarr;</span>
+									</a>
+								</li>
+							{/if}
+						</ul>
+					</nav>
+				{/each}
+
+				<!-- Newsletter — its own block, so the number of columns never moves it -->
+				<div class="footer__signup">
+					<h2 class="footer__heading">Stay in touch</h2>
+					{#if status === 'success'}
+						<p class="footer__signup-success" role="status">{message}</p>
+					{:else}
+						<p class="footer__signup-lead">
+							Occasional notes on new listings and the markets we cover. A few times a year, no more.
+						</p>
+						<form class="footer__signup-form" onsubmit={subscribe} novalidate>
+							<label class="footer__signup-label" for="footer-email">Email address</label>
+							<div class="footer__signup-row">
+								<input
+									id="footer-email"
+									class="footer__signup-input"
+									type="email"
+									name="email"
+									placeholder="you@example.com"
+									autocomplete="email"
+									bind:value={email}
+									disabled={status === 'submitting'}
+									aria-describedby="footer-signup-msg"
+								/>
+								<button class="footer__signup-button" type="submit" disabled={status === 'submitting'}>
+									{status === 'submitting' ? 'Sending' : 'Subscribe'}
+								</button>
+							</div>
+							<p
+								id="footer-signup-msg"
+								class="footer__signup-error"
+								class:is-visible={status === 'error'}
+								role="alert"
+							>
+								{status === 'error' ? message : ''}
+							</p>
+						</form>
+					{/if}
+				</div>
+			</div>
 		</div>
 
 		<!-- Tier 3: legal + social -->
@@ -331,17 +446,164 @@
 		transform: translateX(3px);
 	}
 
-	/* Tier 2 — index columns. Newsletter lives in its own block below, so the number
-	   of country columns never pushes it around. */
-	.footer__columns {
+	/* Tier 2 — the country index takes two thirds, the editorial links and the
+	   newsletter stack in the last third. The index grows by one row per market, so the
+	   two sides come level at around six or seven countries rather than the index
+	   running away with the page. */
+	.footer__index {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-		gap: var(--space-xl) var(--space-lg);
-		padding-top: var(--space-xl);
+		grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+		gap: var(--space-xl) var(--space-2xl);
+		padding-block: var(--space-xl);
 	}
 
-	.footer__signup {
-		padding-block: var(--space-xl);
+	.footer__aside {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xl);
+	}
+
+	/* One row per country: the name in the shelf's serif voice on the left, its places
+	   running inline on the right, hairlines between rows. */
+	.footer__country-list {
+		list-style: none;
+		border-top: 1px solid rgba(245, 241, 232, 0.14);
+	}
+
+	.footer__country {
+		display: grid;
+		grid-template-columns: 12.5rem minmax(0, 1fr);
+		column-gap: var(--space-lg);
+		align-items: baseline;
+		padding-block: 1.15rem;
+		border-bottom: 1px solid rgba(245, 241, 232, 0.14);
+	}
+
+	.footer__country-head {
+		display: flex;
+		align-items: center;
+		min-width: 0;
+	}
+
+	/* Flag stamp beside the name, as in the header shelf. The label is plain inline
+	   text, so on a name that wraps ("United Arab Emirates") the arrow follows the last
+	   word instead of parking at the column edge; the no-break space keeps it from
+	   wrapping alone. Items align on the label's baseline (the stamp centres itself),
+	   so the row still lines up with the first line of places beside it. */
+	.footer__country-name {
+		display: flex;
+		align-items: baseline;
+		gap: 0.85rem;
+		font-family: var(--serif);
+		font-size: 1.25rem;
+		font-weight: 400;
+		line-height: 1.2;
+		color: var(--on-green);
+		text-decoration: none;
+		transition: color var(--duration-hover) var(--ease);
+	}
+
+	.footer__country-label {
+		min-width: 0;
+		text-wrap: balance;
+	}
+
+	.footer__stamp {
+		flex: 0 0 auto;
+		align-self: center;
+		display: inline-flex;
+		width: 2.25rem;
+		height: 1.5rem;
+		overflow: hidden;
+		border: 1px solid rgba(245, 241, 232, 0.35);
+	}
+
+	.footer__stamp :global(svg),
+	.footer__stamp :global(img) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.footer__country-name .footer__arrow {
+		margin-left: 0.15em;
+		font-family: var(--sans);
+		font-size: var(--text-ui);
+		color: rgba(245, 241, 232, 0.6);
+		transition:
+			color var(--duration-hover) var(--ease),
+			transform var(--duration-hover) var(--ease);
+	}
+
+	a.footer__country-name:hover,
+	a.footer__country-name:focus-visible,
+	.footer__country-name.is-active,
+	.footer__country-name.is-active .footer__arrow,
+	a.footer__country-name:hover .footer__arrow,
+	a.footer__country-name:focus-visible .footer__arrow {
+		color: var(--gold);
+	}
+
+	a.footer__country-name:hover .footer__arrow,
+	a.footer__country-name:focus-visible .footer__arrow {
+		transform: translateX(3px);
+	}
+
+	/* The fold toggle exists for phones only, and only once the page has hydrated. */
+	.footer__fold {
+		display: none;
+	}
+
+	/* Places run inline and wrap, parted by gold dots. Each dot sits in its item's
+	   leading padding; the list is pulled left by that padding and clipped there, so
+	   a dot that would open a wrapped line is cut away rather than hanging at the
+	   margin. The clip stops 4px short of each link, leaving focus rings whole. */
+	.footer__places {
+		list-style: none;
+		display: flex;
+		flex-wrap: wrap;
+		row-gap: 0.35rem;
+		margin-left: -1.25rem;
+		clip-path: inset(-0.5rem -0.5rem -0.5rem calc(1.25rem - 4px));
+	}
+
+	.footer__place {
+		position: relative;
+		padding-left: 1.25rem;
+	}
+
+	.footer__place::before {
+		content: '';
+		position: absolute;
+		left: 0.475rem;
+		top: 50%;
+		width: 3px;
+		height: 3px;
+		margin-top: -1px;
+		background: var(--gold);
+		opacity: 0.7;
+	}
+
+	.footer__place .footer__link {
+		white-space: nowrap;
+	}
+
+	/* Gold ink alone sits too close in value to the ivory links around it, so the page
+	   you are on also takes a gold hairline underline. */
+	.footer__link.is-active {
+		color: var(--gold);
+		text-decoration: underline;
+		text-decoration-color: var(--gold);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 0.3em;
+	}
+
+	.footer__link:focus-visible,
+	.footer__country-name:focus-visible,
+	.footer__fold:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 2px;
 	}
 
 	.footer__heading {
@@ -352,6 +614,12 @@
 		text-transform: uppercase;
 		color: var(--gold);
 		margin-bottom: var(--space-md);
+	}
+
+	/* The index heading sits close on its rule, a table header, which also brings the
+	   first country level with the first Explore link beside it. */
+	.footer__countries .footer__heading {
+		margin-bottom: var(--space-xs);
 	}
 
 	.footer__list {
@@ -405,15 +673,18 @@
 		border: 0;
 	}
 
+	/* In the narrow desktop column the button drops beneath the field rather than
+	   squeezing it: an address has to fit where it is typed. */
 	.footer__signup-row {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: stretch;
 		gap: var(--space-sm);
 		max-width: 26rem;
 	}
 
 	.footer__signup-input {
-		flex: 1;
+		flex: 1 1 10rem;
 		min-width: 0;
 		background: transparent;
 		border: none;
@@ -521,6 +792,12 @@
 		font-size: var(--text-small);
 	}
 
+	/* Flex items, so each <li> is exactly its link's height rather than a line box
+	   around it; the row then centres on the same line as the social icon. */
+	.footer__legal li {
+		display: flex;
+	}
+
 	/* Reset the button back to the link vocabulary it sits in: visually it is the third
 	   legal link, it just happens to open a dialog rather than navigate. */
 	.footer__cookie {
@@ -561,6 +838,100 @@
 		.footer__invite {
 			text-align: left;
 		}
+
+		.footer__index {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		/* Six short editorial links take two columns rather than a tall single one. */
+		.footer__list {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 0 var(--space-md);
+		}
+
+		/* Every footer link is a comfortable 44px tap on a phone, the legal line included. */
+		.footer__list .footer__link,
+		.footer__legal .footer__link,
+		.footer__social {
+			min-height: 2.75rem;
+		}
+
+		.footer__social {
+			min-width: 2.75rem;
+			align-items: center;
+			justify-content: center;
+		}
+
+		/* The row becomes the drawer's: the name links to the country, a hairline-parted
+		   toggle on the right shows its places as a plain list beneath. */
+		.footer__country {
+			grid-template-columns: minmax(0, 1fr);
+			padding-block: 0;
+		}
+
+		.footer__country-name {
+			flex: 1;
+			padding-block: 0.8rem;
+		}
+
+		.footer.is-enhanced .footer__fold {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.6rem;
+			flex-shrink: 0;
+			align-self: stretch;
+			min-width: 4.25rem;
+			min-height: 2.75rem;
+			padding: 0 0 0 var(--space-sm);
+			background: none;
+			border: none;
+			border-left: 1px solid rgba(245, 241, 232, 0.14);
+			font-family: var(--sans);
+			font-size: var(--text-small);
+			font-feature-settings: 'tnum';
+			color: rgba(245, 241, 232, 0.72);
+			cursor: pointer;
+			transition: color var(--duration-hover) var(--ease);
+		}
+
+		.footer__fold:hover {
+			color: var(--gold);
+		}
+
+		.footer__chevron {
+			transition: transform var(--duration-hover) var(--ease);
+		}
+
+		.footer__fold.is-open .footer__chevron {
+			transform: rotate(180deg);
+		}
+
+		.footer__places {
+			display: block;
+			margin: 0 0 var(--space-sm);
+			padding-left: var(--space-sm);
+			border-left: 1px solid rgba(214, 195, 163, 0.35);
+			clip-path: none;
+		}
+
+		.footer.is-enhanced .footer__places.is-folded {
+			display: none;
+		}
+
+		.footer__place {
+			padding-left: 0;
+		}
+
+		.footer__place::before {
+			content: none;
+		}
+
+		.footer__place .footer__link {
+			min-height: 2.75rem;
+			white-space: normal;
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -572,7 +943,11 @@
 		.footer__signup-input,
 		.footer__signup-button,
 		.footer__signup-error,
-		.footer__cookie {
+		.footer__cookie,
+		.footer__country-name,
+		.footer__country-name .footer__arrow,
+		.footer__fold,
+		.footer__chevron {
 			transition: none;
 		}
 	}

@@ -3,6 +3,17 @@
 A short log of removed schema paths so future debugging has context for
 documents that may still carry legacy fields.
 
+## 2026-09-23 — Footer country columns retired
+
+The footer's country index is now read from the header menu's country groups
+(PR #189), so the hand-built country columns in `siteSettings.footer.columns`
+are redundant. The site skips any column headed with a country the header lists;
+`footer-geography-tidy-migrate` deletes those columns from the data (leaving
+editorial columns such as "Explore"), sorts the header's country groups by
+`displayOrder`, and adds Mijas and Malaga to Spain in the header menu (Ojen was
+left out: no listings yet). No schema path removed; `footerColumn` stays for
+editorial columns.
+
 ## 2026-07-28 — Campaign parameters off internal links
 
 Links pointing at our own site no longer carry `utm_*` or ad click identifiers.
