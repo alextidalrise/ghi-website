@@ -156,8 +156,7 @@
 											target={country.external ? '_blank' : undefined}
 											rel={country.external ? 'noopener noreferrer' : undefined}
 										>
-											{country.name}
-											<span class="footer__arrow" aria-hidden="true">&rarr;</span>
+											{country.name}&nbsp;<span class="footer__arrow" aria-hidden="true">&rarr;</span>
 										</a>
 									{:else}
 										<span class="footer__country-name" class:is-active={countryActive(country)}>
@@ -473,10 +472,11 @@
 		min-width: 0;
 	}
 
+	/* Inline, so on a name that wraps ("United Arab Emirates") the arrow follows the last
+	   word instead of parking at the column edge; the no-break space keeps it from
+	   wrapping alone. */
 	.footer__country-name {
-		display: inline-flex;
-		align-items: baseline;
-		gap: 0.5rem;
+		display: inline;
 		font-family: var(--serif);
 		font-size: 1.25rem;
 		font-weight: 400;
@@ -488,6 +488,7 @@
 	}
 
 	.footer__country-name .footer__arrow {
+		margin-left: 0.15em;
 		font-family: var(--sans);
 		font-size: var(--text-ui);
 		color: rgba(245, 241, 232, 0.6);
@@ -576,8 +577,10 @@
 		margin-bottom: var(--space-md);
 	}
 
+	/* The index heading sits close on its rule, a table header, which also brings the
+	   first country level with the first Explore link beside it. */
 	.footer__countries .footer__heading {
-		margin-bottom: var(--space-sm);
+		margin-bottom: var(--space-xs);
 	}
 
 	.footer__list {
@@ -750,6 +753,12 @@
 		font-size: var(--text-small);
 	}
 
+	/* Flex items, so each <li> is exactly its link's height rather than a line box
+	   around it; the row then centres on the same line as the social icon. */
+	.footer__legal li {
+		display: flex;
+	}
+
 	/* Reset the button back to the link vocabulary it sits in: visually it is the third
 	   legal link, it just happens to open a dialog rather than navigate. */
 	.footer__cookie {
@@ -802,8 +811,17 @@
 			gap: 0 var(--space-md);
 		}
 
-		.footer__list .footer__link {
-			padding-block: 0.6rem;
+		/* Every footer link is a comfortable 44px tap on a phone, the legal line included. */
+		.footer__list .footer__link,
+		.footer__legal .footer__link,
+		.footer__social {
+			min-height: 2.75rem;
+		}
+
+		.footer__social {
+			min-width: 2.75rem;
+			align-items: center;
+			justify-content: center;
 		}
 
 		/* The row becomes the drawer's: the name links to the country, a hairline-parted
@@ -872,7 +890,7 @@
 		}
 
 		.footer__place .footer__link {
-			padding-block: 0.6rem;
+			min-height: 2.75rem;
 			white-space: normal;
 		}
 	}
