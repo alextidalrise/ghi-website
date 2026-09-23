@@ -36,3 +36,23 @@ export const golfFields = defineType({
 		}
 	}
 });
+
+/**
+ * Curated membership of the Front Line Collection (the /front-line-collection grid and the
+ * homepage frontline rail). Deliberately separate from `golf.golfRelevance`: that records
+ * the property's real relationship to the course and stays factual, while this is an
+ * editorial choice to showcase it. Only frontline_golf listings can be members, so the
+ * switch is hidden otherwise — unless it is already on, so it can still be switched off.
+ */
+export const frontlineCollectionField = defineField({
+	name: 'includeInFrontlineCollection',
+	title: 'Include in Front Line Collection',
+	type: 'boolean',
+	group: 'golf',
+	initialValue: false,
+	hidden: ({ document }) =>
+		(document?.golf as { golfRelevance?: string } | undefined)?.golfRelevance !== 'frontline_golf' &&
+		document?.includeInFrontlineCollection !== true,
+	description:
+		'Showcase this home in the Front Line Collection and the homepage frontline rail. The collection is a curated selection of A-class, high-value frontline homes, not every frontline listing. Leaving this off does not change the golf relevance shown on the listing page or in search.'
+});

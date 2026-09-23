@@ -13,6 +13,17 @@ export const PUBLIC_LISTING_FILTER = /* groq */ `
   (coalesce(status, "") == $publishedStatus || $previewAll)
 `;
 
+/**
+ * Membership of the Front Line Collection: a genuine frontline golf listing that an editor
+ * has also opted in. The collection is a curated showcase, so `golf.golfRelevance` alone is
+ * not enough — it stays a factual attribute (property pages, country/location frontline
+ * rails, ordinary search). Mirrors the Studio pin picker's `pinScopes.frontline`.
+ */
+export const FRONTLINE_COLLECTION_FILTER = /* groq */ `(
+  coalesce(golf.golfRelevance, "") == "frontline_golf"
+  && includeInFrontlineCollection == true
+)`;
+
 /** Same gate applies to child units / unit types. */
 export const PUBLIC_CHILD_UNIT_FILTER = PUBLIC_LISTING_FILTER;
 

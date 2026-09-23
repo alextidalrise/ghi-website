@@ -7,6 +7,7 @@ import {
 	DEVELOPMENT_DISPLAY_MODES,
 	DEVELOPMENT_STATUSES
 } from '../constants/enums';
+import { frontlineCollectionField } from '../objects/golfFields';
 import { reviewItemsField, statusField } from '../objects/workflowFields';
 import {
 	ghiListingIdRule,
@@ -230,6 +231,7 @@ export const development = defineType({
 			type: 'golfFields',
 			group: 'golf'
 		}),
+		frontlineCollectionField,
 		defineField({
 			name: 'related',
 			title: 'Related listings',

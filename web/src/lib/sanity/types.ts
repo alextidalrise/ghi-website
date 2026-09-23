@@ -1219,6 +1219,7 @@ export type PropertyListing = {
   pricing?: PropertyPricingFields;
   specs?: SpecsFields;
   golf?: GolfFields;
+  includeInFrontlineCollection?: boolean;
   content?: PropertyContentFields;
   marketing?: MarketingFields;
   media?: PropertyMediaFields;
@@ -1327,6 +1328,7 @@ export type Development = {
   content?: ContentFields;
   marketing?: MarketingFields;
   golf?: GolfFields;
+  includeInFrontlineCollection?: boolean;
   related?: RelatedContentFields;
   ctas?: CtaFields;
   seo?: SeoFields;

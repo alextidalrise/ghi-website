@@ -78,7 +78,9 @@ describe('fetchFrontlineListingCards', () => {
 	it('fetches frontline_golf cards with limit and transforms results', async () => {
 		const raw = baseCard();
 
-		mockedFetchPublic.mockImplementation(async (_query, options) => {
+		mockedFetchPublic.mockImplementation(async (query, options) => {
+			// Location/country rails stay factual: every frontline listing, curated or not.
+			expect(query).not.toContain('includeInFrontlineCollection');
 			expect(options?.params).toMatchObject({
 				countrySlug: 'spain',
 				locationSlug: 'costa-del-sol',
@@ -113,10 +115,11 @@ describe('fetchFrontlineListingCards', () => {
 });
 
 describe('fetchHomepageFrontlineListingCards', () => {
-	it('fetches site-wide frontline_golf cards without country scope params', async () => {
+	it('fetches curated Front Line Collection cards without country scope params', async () => {
 		const raw = baseCard();
 
-		mockedFetchPublic.mockImplementation(async (_query, options) => {
+		mockedFetchPublic.mockImplementation(async (query, options) => {
+			expect(query).toContain('includeInFrontlineCollection == true');
 			expect(options?.params).toMatchObject({
 				golfRelevance: ['frontline_golf'],
 				propertyType: null,

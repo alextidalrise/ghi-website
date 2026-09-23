@@ -1,7 +1,11 @@
 import { LISTING_CARD_UNION } from '../allowlists';
 import type { ListingSort } from '../../listing/filterOptions';
 import { rateQueryParams, type RateTable } from '../../currency/rates';
-import { PUBLIC_CHILD_UNIT_FILTER, PUBLIC_LISTING_FILTER } from './filters';
+import {
+	FRONTLINE_COLLECTION_FILTER,
+	PUBLIC_CHILD_UNIT_FILTER,
+	PUBLIC_LISTING_FILTER
+} from './filters';
 import { PRICE_NUMERIC_EUR } from './priceNumeric';
 
 /**
@@ -44,8 +48,9 @@ export const SORT_ORDER_FRAGMENTS = {
 } as const satisfies Record<ListingSort, string>;
 
 export type ListingSearchScope =
-	/** `pins: 'frontline'` leads with siteSettings.frontlinePinnedListings (Front Line Collection). */
-	| { type: 'global'; pins?: 'frontline' }
+	| { type: 'global' }
+	/** The curated Front Line Collection, led by siteSettings.frontlinePinnedListings. */
+	| { type: 'frontlineCollection' }
 	| { type: 'community'; countrySlug: string; locationSlug: string; communitySlug: string }
 	| {
 			type: 'location';
@@ -63,6 +68,8 @@ function scopeFilter(scope: ListingSearchScope): string {
 	switch (scope.type) {
 		case 'global':
 			return 'true';
+		case 'frontlineCollection':
+			return FRONTLINE_COLLECTION_FILTER;
 		case 'community':
 			return /* groq */ `
         location.country->slug.current == $countrySlug
@@ -193,10 +200,9 @@ function pinSourceExpression(scope: ListingSearchScope): string | null {
 			return /* groq */ `*[_id == $pinSourceId][0].pinnedListings`;
 		case 'golfCourse':
 			return /* groq */ `*[_id == $golfCourseId][0].pinnedListings`;
+		case 'frontlineCollection':
+			return /* groq */ `*[_type == "siteSettings" && _id == "siteSettings"][0].frontlinePinnedListings`;
 		case 'global':
-			return scope.pins === 'frontline'
-				? /* groq */ `*[_type == "siteSettings" && _id == "siteSettings"][0].frontlinePinnedListings`
-				: null;
 		case 'community':
 			return null;
 	}

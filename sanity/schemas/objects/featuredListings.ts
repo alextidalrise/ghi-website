@@ -79,7 +79,10 @@ export const pinScopes = {
 		filter: '$scopeId in golf.linkedGolfCourses[]._ref',
 		params: { scopeId: publishedId(document._id) }
 	}),
-	frontline: (): PinScope => ({ filter: 'golf.golfRelevance == "frontline_golf"' })
+	/** Mirrors the web's FRONTLINE_COLLECTION_FILTER: frontline golf and opted in. */
+	frontline: (): PinScope => ({
+		filter: 'golf.golfRelevance == "frontline_golf" && includeInFrontlineCollection == true'
+	})
 };
 
 /**

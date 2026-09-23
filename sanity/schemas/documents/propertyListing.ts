@@ -2,6 +2,7 @@ import { defineField, defineType } from 'sanity';
 import { HideFieldTitle } from '../../components/HideFieldTitle';
 import { LocationFieldsInput } from '../../components/LocationFieldsInput';
 import { PROPERTY_LISTING_KINDS, PROPERTY_TYPES, TRANSACTION_TYPES } from '../constants/enums';
+import { frontlineCollectionField } from '../objects/golfFields';
 import { reviewItemsField, statusField } from '../objects/workflowFields';
 import { ghiListingIdRule, validatePublishGate } from '../validators/rules';
 
@@ -138,6 +139,7 @@ export const propertyListing = defineType({
 			type: 'golfFields',
 			group: 'golf'
 		}),
+		frontlineCollectionField,
 		defineField({
 			name: 'content',
 			title: 'Website content',

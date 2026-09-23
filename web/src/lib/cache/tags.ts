@@ -19,7 +19,7 @@ export const cacheTag = {
 	gridCountry: (countrySlug: string) => `grid:country:${countrySlug}`,
 	/** Location grid membership — the location page. */
 	gridLocation: (locationId: string) => `grid:loc:${locationId}`,
-	/** Global "newest frontline_golf" rail (homepage, /front-line-collection). */
+	/** The curated Front Line Collection (homepage rail, /front-line-collection). */
 	frontline: 'rail:frontline',
 	/** Country-scoped frontline rail (country page). */
 	frontlineCountry: (countrySlug: string) => `rail:frontline:country:${countrySlug}`,

@@ -44,6 +44,8 @@
 		"typegen": "pnpm schema:extract && sanity typegen generate",
 		"migrate:buyer-types": "tsx migrations/buyer-types-migrate.ts",
 		"migrate:buyer-types:dry-run": "tsx migrations/buyer-types-migrate.ts --dry-run",
+		"migrate:frontline-collection": "tsx migrations/frontline-collection-seed-migrate.ts",
+		"migrate:frontline-collection:dry-run": "tsx migrations/frontline-collection-seed-migrate.ts --dry-run",
 		"migrate:country-refs": "tsx migrations/country-refs-migrate.ts",
 		"migrate:country-refs:dry-run": "tsx migrations/country-refs-migrate.ts --dry-run",
 		"migrate:location-hierarchy": "tsx migrations/location-hierarchy-migrate.ts",
