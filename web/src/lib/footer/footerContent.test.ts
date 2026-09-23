@@ -41,6 +41,8 @@ describe('footerCountries', () => {
 		);
 		expect(countries.map((c) => c.name)).toEqual(['Spain', 'UAE']);
 		expect(countries[0].href).toBe('/spain');
+		expect(countries[0].slug).toBe('spain');
+		expect(countries[0].flag).toBeNull();
 		expect(countries[0].locations.map((l) => l.label)).toEqual(['Marbella', 'Estepona']);
 		expect(countries[1].locations).toEqual([]);
 	});

@@ -8,6 +8,10 @@ import type { SiteNav } from '$lib/nav/siteNav';
  */
 export type FooterCountry = {
 	name: string;
+	/** Country slug: names the built-in flag art when no flag is uploaded. */
+	slug: string;
+	/** The flag SVG an editor uploaded, as the header shelf shows it. */
+	flag: string | null;
 	href: string | null;
 	external: boolean;
 	locations: FooterLink[];
@@ -68,6 +72,8 @@ export function footerCountries(nav: SiteNav): FooterCountry[] {
 			seen.add(group.countrySlug);
 			countries.push({
 				name: group.label,
+				slug: group.countrySlug,
+				flag: group.flag,
 				href: group.href,
 				external: group.external,
 				locations: group.children

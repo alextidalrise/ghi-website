@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import CountryFlagArt from '$lib/components/CountryFlagArt.svelte';
 	import { buildFooter, footerCountries, type FooterCountry } from '$lib/footer/footerContent';
 	import { buildSiteNav, isNavItemActive } from '$lib/nav/siteNav';
 	import { getConsent } from '$lib/analytics';
@@ -105,6 +106,14 @@
 	</svg>
 {/snippet}
 
+<!-- The header's flag stamp: the same art (uploaded SVG, else the built-in stamp) in the
+     same 1px-framed 3:2 box. Decorative: the name beside it carries the meaning. -->
+{#snippet stamp(country: FooterCountry)}
+	<span class="footer__stamp" aria-hidden="true">
+		<CountryFlagArt slug={country.slug} flagUrl={country.flag} />
+	</span>
+{/snippet}
+
 <footer class="footer on-dark" class:is-enhanced={enhanced}>
 	<div class="footer__inner content-wrap">
 		<!-- Tier 1: brand + invitation -->
@@ -156,11 +165,15 @@
 											target={country.external ? '_blank' : undefined}
 											rel={country.external ? 'noopener noreferrer' : undefined}
 										>
-											{country.name}&nbsp;<span class="footer__arrow" aria-hidden="true">&rarr;</span>
+											{@render stamp(country)}
+											<span class="footer__country-label"
+												>{country.name}&nbsp;<span class="footer__arrow" aria-hidden="true">&rarr;</span></span
+											>
 										</a>
 									{:else}
 										<span class="footer__country-name" class:is-active={countryActive(country)}>
-											{country.name}
+											{@render stamp(country)}
+											<span class="footer__country-label">{country.name}</span>
 										</span>
 									{/if}
 									{#if country.locations.length}
@@ -459,7 +472,7 @@
 
 	.footer__country {
 		display: grid;
-		grid-template-columns: 10rem minmax(0, 1fr);
+		grid-template-columns: 12.5rem minmax(0, 1fr);
 		column-gap: var(--space-lg);
 		align-items: baseline;
 		padding-block: 1.15rem;
@@ -472,19 +485,45 @@
 		min-width: 0;
 	}
 
-	/* Inline, so on a name that wraps ("United Arab Emirates") the arrow follows the last
+	/* Flag stamp beside the name, as in the header shelf. The label is plain inline
+	   text, so on a name that wraps ("United Arab Emirates") the arrow follows the last
 	   word instead of parking at the column edge; the no-break space keeps it from
-	   wrapping alone. */
+	   wrapping alone. Items align on the label's baseline (the stamp centres itself),
+	   so the row still lines up with the first line of places beside it. */
 	.footer__country-name {
-		display: inline;
+		display: flex;
+		align-items: baseline;
+		gap: 0.85rem;
 		font-family: var(--serif);
 		font-size: 1.25rem;
 		font-weight: 400;
 		line-height: 1.2;
 		color: var(--on-green);
 		text-decoration: none;
-		text-wrap: balance;
 		transition: color var(--duration-hover) var(--ease);
+	}
+
+	.footer__country-label {
+		min-width: 0;
+		text-wrap: balance;
+	}
+
+	.footer__stamp {
+		flex: 0 0 auto;
+		align-self: center;
+		display: inline-flex;
+		width: 2.25rem;
+		height: 1.5rem;
+		overflow: hidden;
+		border: 1px solid rgba(245, 241, 232, 0.35);
+	}
+
+	.footer__stamp :global(svg),
+	.footer__stamp :global(img) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	.footer__country-name .footer__arrow {
