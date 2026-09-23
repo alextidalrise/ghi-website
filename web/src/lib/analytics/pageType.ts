@@ -24,6 +24,7 @@ export type PageType =
 	| 'contact'
 	| 'partners'
 	| 'legal'
+	| 'newsletter'
 	| 'holding'
 	| 'internal'
 	| 'not_found';
@@ -48,6 +49,7 @@ const PAGE_TYPES: Record<string, PageType> = {
 	'/guides/[slug]': 'guide',
 	'/insights': 'insight_index',
 	'/insights/[slug]': 'insight',
+	'/newsletter': 'newsletter',
 	'/soon': 'holding',
 	// Grouped: the three legal pages are one behaviour in reporting, not three.
 	'/privacy': 'legal',

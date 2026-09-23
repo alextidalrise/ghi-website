@@ -4,15 +4,17 @@
 	import CountryFlagArt from '$lib/components/CountryFlagArt.svelte';
 	import { buildFooter, footerCountries, type FooterCountry } from '$lib/footer/footerContent';
 	import { buildSiteNav, isNavItemActive } from '$lib/nav/siteNav';
-	import { getConsent } from '$lib/analytics';
+	import { getConsent, trackSignUp } from '$lib/analytics';
 	import type { FooterContent, FooterSocialPlatform, HeaderNav } from '$lib/sanity/queries';
 
 	type Props = {
 		footer: FooterContent | null;
 		nav: HeaderNav | null;
+		/** Off on /newsletter, where the page itself is the sign-up form. */
+		showSignup?: boolean;
 	};
 
-	let { footer, nav }: Props = $props();
+	let { footer, nav, showSignup = true }: Props = $props();
 
 	// The footer's words, Explore links, legal and socials are authored in Sanity (with
 	// built-in defaults). Its geography is not: the country index is read from the header
@@ -55,6 +57,8 @@
 
 	type Status = 'idle' | 'submitting' | 'success' | 'error';
 	let email = $state('');
+	// Honeypot: hidden from people, filled in by bots. See $lib/server/newsletterSignup.
+	let trap = $state('');
 	let status = $state<Status>('idle');
 	let message = $state('');
 
@@ -69,13 +73,14 @@
 			const response = await fetch('/api/newsletter', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({ email })
+				body: JSON.stringify({ email, nl_hp_leave_blank: trap, source: 'footer' })
 			});
 			const result = await response.json().catch(() => ({}));
 
 			if (response.ok) {
+				trackSignUp('footer');
 				status = 'success';
-				message = 'Thank you. We will be in touch occasionally, never often.';
+				message = "You're subscribed. Look out for our next email.";
 				email = '';
 			} else {
 				status = 'error';
@@ -261,13 +266,14 @@
 				{/each}
 
 				<!-- Newsletter — its own block, so the number of columns never moves it -->
+				{#if showSignup}
 				<div class="footer__signup">
 					<h2 class="footer__heading">Stay in touch</h2>
 					{#if status === 'success'}
 						<p class="footer__signup-success" role="status">{message}</p>
 					{:else}
 						<p class="footer__signup-lead">
-							Occasional notes on new listings and the markets we cover. A few times a year, no more.
+							New homes as they come to market, and regular notes on the places we cover.
 						</p>
 						<form class="footer__signup-form" onsubmit={subscribe} novalidate>
 							<label class="footer__signup-label" for="footer-email">Email address</label>
@@ -287,6 +293,13 @@
 									{status === 'submitting' ? 'Sending' : 'Subscribe'}
 								</button>
 							</div>
+							<div class="footer__signup-trap" aria-hidden="true">
+								<label for="footer-trap">Leave this field blank</label>
+								<input id="footer-trap" type="text" name="nl_hp_leave_blank" tabindex="-1" autocomplete="off" bind:value={trap} />
+							</div>
+							<p class="footer__signup-consent">
+								By subscribing you agree to receive our emails. Unsubscribe any time.
+							</p>
 							<p
 								id="footer-signup-msg"
 								class="footer__signup-error"
@@ -298,6 +311,7 @@
 						</form>
 					{/if}
 				</div>
+				{/if}
 			</div>
 		</div>
 
@@ -671,6 +685,23 @@
 		clip: rect(0, 0, 0, 0);
 		white-space: nowrap;
 		border: 0;
+	}
+
+	/* Off-screen rather than display:none, which some bots skip. */
+	.footer__signup-trap {
+		position: absolute;
+		left: -9999px;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+	}
+
+	.footer__signup-consent {
+		max-width: 26rem;
+		margin-top: var(--space-xs);
+		font-size: var(--text-small);
+		line-height: 1.6;
+		color: rgba(245, 241, 232, 0.7);
 	}
 
 	/* In the narrow desktop column the button drops beneath the field rather than

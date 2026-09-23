@@ -95,6 +95,11 @@
           "oklch(96% 0 0)"
         ]
       },
+      "error": {
+        "role": "neutral",
+        "displayName": "Error",
+        "canonical": "oklch(47% 0.12 30)"
+      },
       "hero-dark": {
         "role": "neutral",
         "displayName": "Hero Dark",

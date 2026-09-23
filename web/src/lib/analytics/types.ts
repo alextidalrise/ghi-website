@@ -49,6 +49,7 @@ export type GhiEventName =
 	| 'ghi_floorplan_request_started'
 	| 'ghi_contact_clicked'
 	| 'ghi_lead_submitted'
+	| 'ghi_sign_up'
 	| 'ghi_currency_select';
 
 /** Kind of listing an event refers to. Mirrors the domain's `listingKind`. */
