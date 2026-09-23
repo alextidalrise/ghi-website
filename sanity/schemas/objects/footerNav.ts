@@ -5,9 +5,9 @@ import { defineField, defineType } from 'sanity';
  * destinations reuse the shared `navLink` (reference / internal path / external URL), and
  * a labelled link is a `navMenuChild` — so an editor learns one link control for both.
  *
- * A `footerColumn` is one index column (a country with its locations, or an editorial
- * set like "Explore"). Unlike the header, footer geography is curated here rather than
- * generated from the taxonomy, so the order and the exact set are under editorial control.
+ * A `footerColumn` is one editorial link column, like "Explore". The footer's geography
+ * is not authored here: its country index is read from the header menu's country groups,
+ * and a column headed with one of those countries is skipped by the site.
  */
 export const footerColumn = defineType({
 	name: 'footerColumn',
@@ -18,7 +18,7 @@ export const footerColumn = defineType({
 			name: 'heading',
 			title: 'Heading',
 			type: 'string',
-			description: 'Column title — for example a country name ("Spain") or "Explore".',
+			description: 'Column title — for example "Explore".',
 			validation: (Rule) => Rule.required()
 		}),
 		defineField({

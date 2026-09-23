@@ -47,7 +47,7 @@ export const siteSettings = defineType({
 			title: 'Footer',
 			type: 'object',
 			description:
-				'The site footer. Leave any field empty to fall back to its built-in default. Geography columns are curated here rather than generated from the location list.',
+				'The site footer. Leave any field empty to fall back to its built-in default. The countries and their locations are not set here: the footer lists the countries under the header menu's Countries item, with the same locations, so edit them there.',
 			options: { collapsible: true, collapsed: true },
 			fields: [
 				defineField({
@@ -77,7 +77,7 @@ export const siteSettings = defineType({
 					type: 'array',
 					of: [{ type: 'footerColumn' }],
 					description:
-						'The link columns — countries with their locations, plus an editorial column like “Explore”. Drag to reorder.',
+						'Editorial link columns shown beside the country index, like “Explore”. Countries come from the header menu; a column named after a country listed there is not shown.',
 					validation: (Rule) => Rule.max(6)
 				}),
 				defineField({
