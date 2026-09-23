@@ -19,6 +19,8 @@
 		"headernav:delete": "tsx migrations/seed-header-nav.ts --delete",
 		"headernav:countries": "tsx migrations/header-nav-countries-migrate.ts",
 		"headernav:countries:dry-run": "tsx migrations/header-nav-countries-migrate.ts --dry-run",
+		"footer:geography": "tsx migrations/footer-geography-tidy-migrate.ts",
+		"footer:geography:dry-run": "tsx migrations/footer-geography-tidy-migrate.ts --dry-run",
 		"footer:seed": "tsx migrations/seed-footer.ts",
 		"footer:seed:dry-run": "tsx migrations/seed-footer.ts --dry-run",
 		"footer:delete": "tsx migrations/seed-footer.ts --delete",
