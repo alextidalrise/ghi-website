@@ -25,6 +25,7 @@ export const ALLOWED_EVENTS: ReadonlySet<GhiEventName> = new Set<GhiEventName>([
 	'ghi_floorplan_request_started',
 	'ghi_contact_clicked',
 	'ghi_lead_submitted',
+	'ghi_sign_up',
 	'ghi_currency_select'
 ]);
 
@@ -64,6 +65,8 @@ export const ALLOWED_KEYS: ReadonlySet<string> = new Set([
 	'placement',
 	'lead_type',
 	'form_location',
+	// newsletter sign-up (GA4's own `sign_up` parameter name)
+	'method',
 	// currency switcher
 	'display_currency',
 	'previous_currency'

@@ -155,6 +155,7 @@ renaming a GA4 event never requires a code change here.
 | `ghi_floorplan_request_started` | `floorplan_request_started` | Floorplan CTA opens the form | `PropertyDetail.svelte` |
 | `ghi_contact_clicked` | `contact_click` | WhatsApp, phone or email CTA chosen | `EnquiryRail`, `/contact`, `TalkToUsBand` |
 | `ghi_lead_submitted` | `generate_lead` | **HubSpot accepted a submission** | `EnquiryRail`, `/contact` |
+| `ghi_sign_up` | `sign_up` | **Mailchimp accepted a newsletter sign-up** (`method`: `footer` \| `newsletter_page`) | `Footer`, `/newsletter` |
 | `ghi_currency_select` | `currency_select` | Visitor changes their display currency (a real change, not a re-pick) | `SiteNav` (the bar's currency picker) |
 
 ### Parameters
@@ -164,7 +165,7 @@ renaming a GA4 event never requires a code change here.
 
 `page_type` is one of: `home`, `country`, `location`, `community`, `listing`, `unit`,
 `golf_course`, `collection`, `guide_index`, `guide`, `insight_index`, `insight`, `about`,
-`contact`, `partners`, `legal`, `not_found`. (`holding` and `internal` are mapped but never
+`contact`, `partners`, `legal`, `newsletter`, `not_found`. (`holding` and `internal` are mapped but never
 emitted — those routes are gated off before any event fires.)
 
 `listing` covers property, development and catch-all detail pages alike; `listing_kind`
@@ -229,11 +230,9 @@ course impressions are not a commercial metric.
 
 ### What is deliberately not measured
 
-- **Newsletter and buyer-guide signups.** `/api/newsletter` is a stub that returns `ok`
-  without contacting HubSpot. Reporting a conversion for a subscription that was never
-  delivered would be worse than reporting nothing. `buyer_guide_request` is absent from
-  `LeadType` for the same reason. See the TODO in that file for what to add when it is
-  wired up — `sign_up`, not `generate_lead`.
+- **Buyer-guide requests.** `/api/guide` captures the lead in HubSpot, but no PDF is sent
+  yet, so `buyer_guide_request` is absent from `LeadType`. Reporting a conversion for a
+  guide that was never delivered would be worse than reporting nothing.
 - **The `/soon` holding page.**
 - **Anything on `/internal`.**
 
@@ -418,7 +417,8 @@ browser can confirm — run them in GTM Preview on a preview deployment via `?gh
 - [ ] Client-side validation failure: no event
 - [ ] Break `HUBSPOT_ENQUIRY_FORM_GUID` to force a 502: **no event**
 - [ ] Floorplan request reports `lead_type: floorplan_request`
-- [ ] Newsletter and buyer-guide submissions report **nothing**
+- [ ] Newsletter sign-up (footer and `/newsletter`): exactly one `sign_up` with the right `method`, only after the server answers `ok`
+- [ ] Buyer-guide submissions report **nothing**
 
 **Privacy**
 - [ ] Visit a page with `?email=someone@example.com`: it does not appear in `page_location`

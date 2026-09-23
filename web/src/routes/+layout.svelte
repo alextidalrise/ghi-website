@@ -129,7 +129,7 @@
 		{@render children()}
 	</main>
 
-	<Footer footer={data.footer} nav={data.headerNav} />
+	<Footer footer={data.footer} nav={data.headerNav} showSignup={page.route.id !== '/newsletter'} />
 {/if}
 
 <style>

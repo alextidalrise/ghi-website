@@ -209,6 +209,21 @@ export function trackLeadSubmitted(params: {
 	});
 }
 
+/** Which form produced a newsletter sign-up. */
+export type SignUpMethod = 'footer' | 'newsletter_page';
+
+/**
+ * The server confirmed Mailchimp accepted a newsletter sign-up.
+ *
+ * `sign_up` rather than `generate_lead`: a subscriber has asked for email, not for contact
+ * from an advisor, and counting them as leads would inflate the metric the business steers by.
+ * The same rules as `trackLeadSubmitted` apply: success branch only, never on click. Market
+ * choices are not sent; they are Mailchimp segmentation, not analytics.
+ */
+export function trackSignUp(method: SignUpMethod): void {
+	push({ event: 'ghi_sign_up', method });
+}
+
 /**
  * Which surface of the switcher the visitor used. Only `nav_bar` is emitted now that the
  * picker lives in the bar at every width; `drawer` is kept so the historic series (the

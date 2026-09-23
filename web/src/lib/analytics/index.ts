@@ -18,11 +18,13 @@ export {
 	trackListingSelected,
 	trackListingViewed,
 	trackSearchSubmitted,
+	trackSignUp,
 	type CurrencyPlacement,
 	type GalleryNavigation,
 	type GallerySurface,
 	type SearchParams,
-	type SearchPlacement
+	type SearchPlacement,
+	type SignUpMethod
 } from './events';
 
 export {
