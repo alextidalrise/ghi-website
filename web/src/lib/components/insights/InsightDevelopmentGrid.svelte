@@ -225,11 +225,13 @@
 		color: var(--green);
 	}
 
+	/* Status and completion always stack: a row that wraps only when the pair is too long reads
+	   inconsistently across cards (a short "Off plan" + date sat side by side). */
 	.dev-card__timeline {
 		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.5rem 0.65rem;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.5rem;
 		margin-top: 0.55rem;
 	}
 
