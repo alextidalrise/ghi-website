@@ -14,9 +14,8 @@
 
 	let { children, data } = $props();
 
-	// Pages that are themselves an email sign-up. The footer's form would be a second,
-	// competing ask on them, so it steps aside.
-	const SIGNUP_PAGES = new Set(['/newsletter', '/uae-buying-guide']);
+	const BARE_ROUTES = new Set(['/soon', '/uae-buying-guide']);
+
 
 	// Both come from the server: the gate was resolved in analyticsHandle, and the consent
 	// cookie was read there too, so the first client render already agrees with the markup
@@ -62,9 +61,10 @@
 
 	const studioUrl = publicEnv.PUBLIC_SANITY_STUDIO_URL ?? 'http://localhost:3333/development';
 
-	// The pre-launch holding page is a full-screen takeover: it opts out of the
-	// SiteNav + Footer shell (and its padding) so nothing else shows while unlaunched.
-	const bare = $derived(page.route.id === '/soon');
+	// Pages that opt out of the SiteNav + Footer shell (and its padding). The pre-launch
+	// holding page is a full-screen takeover; the lead-magnet lander drops the chrome so
+	// the only thing to do is ask for the guide. Both render their own <main>.
+	const bare = $derived(BARE_ROUTES.has(page.route.id ?? ''));
 
 	onMount(() => {
 		// After the first client render, so the banner's absence still matches the server's
@@ -136,7 +136,7 @@
 	<Footer
 		footer={data.footer}
 		nav={data.headerNav}
-		showSignup={!SIGNUP_PAGES.has(page.route.id ?? '')}
+		showSignup={page.route.id !== '/newsletter'}
 	/>
 {/if}
 
