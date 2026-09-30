@@ -1,0 +1,79 @@
+---
+title: 'Your UAE buying guide'
+preheader: 'Your copy of How to Buy Property in the UAE as an International Buyer: the steps, the costs, mortgages, tax and residency.'
+locale: en
+subject: 'Your UAE buying guide'
+---
+
+<x-main>
+
+  <!--
+    UAE BUYING GUIDE DELIVERY. Sent by the Mailchimp Customer Journey that starts
+    when a member gains the tag "Guide: UAE buying guide", which the landing page
+    at /uae-buying-guide adds. Setup: docs/uae-guide-lead-magnet.md.
+
+    The download link points at the final, legally approved PDF. It does not
+    resolve until that file is published at /downloads/, so validate:links fails
+    until then, which is the point: do not switch the journey on before it passes.
+
+    No hero image: the email has one job, and the button is it.
+  -->
+
+  <x-section edit="lead" pt="40" pb="40">
+
+    <x-overline gap="12">Buying guide / UAE</x-overline>
+
+    <x-heading level="1" gap="20">Your UAE buying guide</x-heading>
+
+    <x-text variant="lead" gap="24">
+      Here is your copy of How to Buy Property in the UAE as an International Buyer.
+    </x-text>
+
+    <x-text gap="32">
+      It takes you through the eight steps from choosing a community to collecting the title
+      deed, then every buying cost with a worked example, what UAE banks lend to international
+      buyers, tax as an owner, wills, and how a property can qualify you for residency.
+    </x-text>
+
+    <x-button
+      href="{{ page.site.origin }}/downloads/ghi-uae-buying-guide.pdf?utm_source=mailchimp&utm_medium=email&utm_campaign=uae-buying-guide"
+      gap="0"
+    >Download the guide (PDF)</x-button>
+
+  </x-section>
+
+  <x-band edit="cta_section" pt="48" pb="48">
+
+    <x-heading level="2" tone="on-green" gap="16">When you are ready to look</x-heading>
+
+    <x-text tone="on-green" gap="28">
+      We can plan viewings across Dubai and Abu Dhabi, and introduce you to our UAE legal
+      partner, Stevenson Bernard Law Associates, before you sign anything.
+    </x-text>
+
+    <x-button
+      variant="gold"
+      href="{{ page.site.origin }}/uae?utm_source=mailchimp&utm_medium=email&utm_campaign=uae-buying-guide"
+      gap="0"
+    >See our UAE golf homes</x-button>
+
+  </x-band>
+
+  <x-section edit="body" pt="40" pb="40">
+
+    <x-text gap="0">
+      Any question about buying in the UAE, reply to this email. It reaches a person, not a
+      queue.
+    </x-text>
+
+    <x-rule gap="28"></x-rule>
+
+    <x-text variant="ui" tone="muted" gap="0">
+      You are receiving this because you asked for the guide at golfhomesinternational.com.
+      We will also send our newsletter of new golf homes and market notes; you can unsubscribe
+      from it below.
+    </x-text>
+
+  </x-section>
+
+</x-main>

@@ -13,7 +13,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MARKET_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_MARKETS = 12;
 
-const SOURCES: readonly SignupSource[] = ['footer', 'newsletter-page'];
+const SOURCES: readonly SignupSource[] = ['footer', 'newsletter-page', 'uae-guide'];
 
 /**
  * The hidden field bots fill in. The name must match no browser autofill heuristic: a trap

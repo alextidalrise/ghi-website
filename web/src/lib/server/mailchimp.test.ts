@@ -95,6 +95,33 @@ describe('subscribeToNewsletter', () => {
 		expect(JSON.parse(fetchMock.mock.calls[3][1].body).status).toBe('subscribed');
 	});
 
+	it('clears and re-adds a guide tag, so a repeat request starts the journey again', async () => {
+		fetchMock
+			.mockResolvedValueOnce(reply(400, { title: 'Member Exists' }))
+			.mockResolvedValueOnce(reply(204))
+			.mockResolvedValueOnce(reply(204))
+			.mockResolvedValueOnce(reply(200, { status: 'subscribed' }));
+
+		const result = await subscribeToNewsletter({
+			email: 'a@example.com',
+			source: 'uae-guide',
+			markets: ['uae'],
+			guide: 'UAE buying guide'
+		});
+
+		expect(result).toEqual({ ok: true });
+		const memberUrl = `${MEMBERS}/${memberHash('a@example.com')}`;
+		expect(fetchMock.mock.calls[1][0]).toBe(`${memberUrl}/tags`);
+		expect(JSON.parse(fetchMock.mock.calls[1][1].body).tags).toEqual([
+			{ name: 'Guide: UAE buying guide', status: 'inactive' }
+		]);
+		expect(JSON.parse(fetchMock.mock.calls[2][1].body).tags).toEqual([
+			{ name: 'Source: UAE guide page', status: 'active' },
+			{ name: 'Market: uae', status: 'active' },
+			{ name: 'Guide: UAE buying guide', status: 'active' }
+		]);
+	});
+
 	it('never resubscribes someone who unsubscribed', async () => {
 		fetchMock
 			.mockResolvedValueOnce(reply(400, { title: 'Member Exists' }))
@@ -166,6 +193,12 @@ describe('subscribeToNewsletter', () => {
 describe('signupTags', () => {
 	it('always carries the source, and only the extras it was given', () => {
 		expect(signupTags({ email: 'a@example.com', source: 'footer' })).toEqual(['Source: Footer']);
+	});
+
+	it('tags a guide request with the guide, which is what the journey triggers on', () => {
+		expect(
+			signupTags({ email: 'a@example.com', source: 'uae-guide', guide: 'UAE buying guide' })
+		).toEqual(['Source: UAE guide page', 'Guide: UAE buying guide']);
 	});
 });
 
