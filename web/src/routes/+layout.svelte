@@ -122,7 +122,7 @@
      focus trap holding them there. Rendered outside the `bare` branch too — a cookie
      notice is a legal control, not part of the site shell, so the holding page gets it
      as well. -->
-<ConsentUi />
+<ConsentUi placement={page.route.id === '/uae-buying-guide' ? 'top' : 'corner'} />
 
 {#if bare}
 	{@render children()}
