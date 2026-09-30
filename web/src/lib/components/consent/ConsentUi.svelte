@@ -2,6 +2,13 @@
 	import ConsentBanner from './ConsentBanner.svelte';
 	import ConsentPreferences from './ConsentPreferences.svelte';
 
+	type Props = {
+		/** Where the banner sits. See ConsentBanner. */
+		placement?: 'corner' | 'top';
+	};
+
+	let { placement = 'corner' }: Props = $props();
+
 	/**
 	 * The consent UI's single mount point, rendered once from the root layout.
 	 *
@@ -11,5 +18,5 @@
 	 */
 </script>
 
-<ConsentBanner />
+<ConsentBanner {placement} />
 <ConsentPreferences />

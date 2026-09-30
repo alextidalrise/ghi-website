@@ -15,6 +15,19 @@
 	 * same padding, differing only in their label. That equality is a compliance
 	 * requirement, not a stylistic preference — see docs/consent-ui-brief.md.
 	 */
+	type Props = {
+		/**
+		 * `corner` (the default): bottom-left on desktop, full width at the foot of a phone.
+		 * `top`: a compact panel top-right on desktop and a slim strip across the top of a
+		 * phone, for a page whose action sits low on the first screen (the guide lander,
+		 * where the corner banner covered the whole form on a phone). Same choices, same
+		 * equal buttons; only the position and the density change.
+		 */
+		placement?: 'corner' | 'top';
+	};
+
+	let { placement = 'corner' }: Props = $props();
+
 	const consent = getConsent();
 
 	// Set while a decision that will reload the page is being recorded, so the reload
@@ -32,7 +45,8 @@
 	 */
 	$effect(() => {
 		const el = bannerEl;
-		if (!el) return;
+		// At the top it overlays the page's head, not its foot: there is nothing to reserve.
+		if (!el || placement === 'top') return;
 
 		const observer = new ResizeObserver(([entry]) => {
 			document.body.style.setProperty(
@@ -57,6 +71,7 @@
 {#if consent.needsPrompt}
 	<section
 		class="consent-banner"
+		class:consent-banner--top={placement === 'top'}
 		bind:this={bannerEl}
 		aria-labelledby="consent-banner-title"
 	>
@@ -285,6 +300,114 @@
 
 		.consent-banner__body--narrow {
 			display: block;
+		}
+	}
+
+	/* ── Top placement ── */
+	.consent-banner--top {
+		top: var(--space-sm);
+		right: var(--space-sm);
+		bottom: auto;
+		left: auto;
+		width: min(22rem, calc(100vw - var(--space-sm) * 2));
+		padding: var(--space-sm) var(--space-md);
+		box-shadow: 0 12px 32px -20px oklch(0.2 0.03 165 / 0.55);
+		animation-name: consent-banner-in-top;
+	}
+
+	@keyframes consent-banner-in-top {
+		from {
+			opacity: 0;
+			transform: translateY(-0.75rem);
+		}
+	}
+
+	.consent-banner--top .consent-banner__title {
+		font-size: 1.0625rem;
+	}
+
+	/* The short sentence at every width: the panel is narrow and every line it saves is
+	   page back on screen. */
+	.consent-banner--top .consent-banner__body--wide {
+		display: none;
+	}
+
+	.consent-banner--top .consent-banner__body--narrow {
+		display: block;
+	}
+
+	.consent-banner--top .consent-banner__actions {
+		gap: var(--space-xs);
+		margin-top: 0.75rem;
+	}
+
+	.consent-banner--top .consent-banner__button {
+		min-height: 2.75rem;
+		padding: 0.625rem 0.75rem;
+	}
+
+	.consent-banner--top .consent-banner__manage {
+		margin-top: 0.25rem;
+	}
+
+	.consent-banner--top .consent-banner__status {
+		margin-top: 0.75rem;
+		min-height: 2.75rem;
+	}
+
+	/* On a phone: a strip across the top. The sentence runs full width, and Manage sits
+	   beside the two equal buttons rather than under them, so the strip stays about two
+	   lines of text plus one row of controls. */
+	@media (max-width: 760px) {
+		.consent-banner--top {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			align-items: center;
+			column-gap: var(--space-sm);
+			top: 0;
+			right: 0;
+			left: 0;
+			width: auto;
+			padding: 0.625rem var(--space-sm);
+			border-width: 0 0 1px;
+		}
+
+		/* Still names the region for assistive tech (aria-labelledby); just not drawn. */
+		.consent-banner--top .consent-banner__title {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
+		}
+
+		.consent-banner--top .consent-banner__body,
+		.consent-banner--top .consent-banner__status {
+			grid-column: 1 / -1;
+			margin-top: 0;
+			font-size: 0.75rem;
+			line-height: 1.45;
+		}
+
+		.consent-banner--top .consent-banner__actions {
+			margin-top: 0.5rem;
+		}
+
+		/* Still 40px targets, and still identical to each other. */
+		.consent-banner--top .consent-banner__button {
+			min-height: 2.5rem;
+			padding: 0.5rem 0.75rem;
+			font-size: 0.75rem;
+			white-space: nowrap;
+		}
+
+		.consent-banner--top .consent-banner__manage {
+			max-width: 6.5rem;
+			margin-top: 0.5rem;
+			align-self: center;
+			line-height: 1.3;
+			text-align: left;
 		}
 	}
 
