@@ -10,7 +10,7 @@
 	type Props = {
 		footer: FooterContent | null;
 		nav: HeaderNav | null;
-		/** Off on /newsletter, where the page itself is the sign-up form. */
+		/** Off on /newsletter and /uae-buying-guide, where the page itself is the sign-up form. */
 		showSignup?: boolean;
 	};
 

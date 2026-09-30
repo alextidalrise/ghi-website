@@ -209,8 +209,11 @@ export function trackLeadSubmitted(params: {
 	});
 }
 
-/** Which form produced a newsletter sign-up. */
-export type SignUpMethod = 'footer' | 'newsletter_page';
+/**
+ * Which form produced a newsletter sign-up. `uae_guide` is the buying-guide landing page:
+ * the visitor asked for the PDF and joined the list in the same step, so it is a sign-up.
+ */
+export type SignUpMethod = 'footer' | 'newsletter_page' | 'uae_guide';
 
 /**
  * The server confirmed Mailchimp accepted a newsletter sign-up.

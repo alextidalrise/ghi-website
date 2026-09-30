@@ -28,7 +28,7 @@ import { env } from '$env/dynamic/private';
 export type SubscribeResult = { ok: true } | { ok: false; status: number; error: string };
 
 /** Which form the address came from. Recorded as a tag, so it must stay human-readable. */
-export type SignupSource = 'footer' | 'newsletter-page';
+export type SignupSource = 'footer' | 'newsletter-page' | 'uae-guide';
 
 export type SubscribeInput = {
 	email: string;
@@ -39,21 +39,34 @@ export type SubscribeInput = {
 	markets?: string[];
 	/** Sanitised `utm_campaign`, when the visit carried one. */
 	campaign?: string | null;
+	/**
+	 * The lead magnet requested, as a fixed label (never visitor input). It becomes a
+	 * `Guide:` tag, and that tag is what a Mailchimp Customer Journey triggers on to email
+	 * the download link. See docs/uae-guide-lead-magnet.md.
+	 */
+	guide?: string;
 };
 
 const GENERIC_ERROR = 'Something went wrong on our end. Please try again shortly.';
 
 const SOURCE_LABELS: Record<SignupSource, string> = {
 	footer: 'Footer',
-	'newsletter-page': 'Newsletter page'
+	'newsletter-page': 'Newsletter page',
+	'uae-guide': 'UAE guide page'
 };
 
+/** The tag a guide request carries. Exported so the journey's trigger name has one source. */
+export function guideTag(guide: string): string {
+	return `Guide: ${guide}`;
+}
+
 /** The tags a new sign-up carries. Exported for tests. */
-export function signupTags({ source, markets = [], campaign }: SubscribeInput): string[] {
+export function signupTags({ source, markets = [], campaign, guide }: SubscribeInput): string[] {
 	return [
 		`Source: ${SOURCE_LABELS[source]}`,
 		...markets.map((slug) => `Market: ${slug}`),
-		...(campaign ? [`Campaign: ${campaign}`] : [])
+		...(campaign ? [`Campaign: ${campaign}`] : []),
+		...(guide ? [guideTag(guide)] : [])
 	];
 }
 
@@ -114,7 +127,14 @@ export async function subscribeToNewsletter(input: SubscribeInput): Promise<Subs
 		// case: the visitor did the one thing the form lets them do, and reflecting their actual
 		// subscription state back would leak it to anyone who can type an address into the box.
 		if (response.status === 400 && detail.title === 'Member Exists') {
-			await updateExistingMember(`${endpoint}/${memberHash(input.email)}`, headers, tags, consent);
+			const retrigger = input.guide ? [guideTag(input.guide)] : [];
+			await updateExistingMember(
+				`${endpoint}/${memberHash(input.email)}`,
+				headers,
+				tags,
+				consent,
+				retrigger
+			);
 			return { ok: true };
 		}
 
@@ -186,6 +206,9 @@ export function memberHash(email: string): string {
  * been told they're subscribed, so a failure here is only logged.
  *
  * - Always adds the new tags, so a returning subscriber's market choice is kept.
+ * - Takes each `retrigger` tag off before adding it back. A tag the member already has is
+ *   not "added" again, so without this a second request for a guide (the first email lost,
+ *   say) would start no journey and send nothing.
  * - Promotes `pending` members to `subscribed`: they signed up under the old double opt-in
  *   and never clicked the email, and submitting this form is fresh consent.
  * - Never touches `unsubscribed` or `cleaned` members. Unsubscribing is final unless they
@@ -195,9 +218,19 @@ async function updateExistingMember(
 	memberUrl: string,
 	headers: Record<string, string>,
 	tags: string[],
-	consent: Record<string, string>
+	consent: Record<string, string>,
+	retrigger: string[] = []
 ): Promise<void> {
 	try {
+		if (retrigger.length > 0) {
+			const cleared = await fetch(`${memberUrl}/tags`, {
+				method: 'POST',
+				headers,
+				body: JSON.stringify({ tags: retrigger.map((name) => ({ name, status: 'inactive' })) })
+			});
+			if (!cleared.ok) console.error(`Mailchimp tag reset failed (${cleared.status})`);
+		}
+
 		const tagged = await fetch(`${memberUrl}/tags`, {
 			method: 'POST',
 			headers,

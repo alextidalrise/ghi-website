@@ -14,6 +14,10 @@
 
 	let { children, data } = $props();
 
+	// Pages that are themselves an email sign-up. The footer's form would be a second,
+	// competing ask on them, so it steps aside.
+	const SIGNUP_PAGES = new Set(['/newsletter', '/uae-buying-guide']);
+
 	// Both come from the server: the gate was resolved in analyticsHandle, and the consent
 	// cookie was read there too, so the first client render already agrees with the markup
 	// and the consent UI can render without a flash. Read untracked and once — the root
@@ -129,7 +133,11 @@
 		{@render children()}
 	</main>
 
-	<Footer footer={data.footer} nav={data.headerNav} showSignup={page.route.id !== '/newsletter'} />
+	<Footer
+		footer={data.footer}
+		nav={data.headerNav}
+		showSignup={!SIGNUP_PAGES.has(page.route.id ?? '')}
+	/>
 {/if}
 
 <style>
