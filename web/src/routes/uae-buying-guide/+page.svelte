@@ -2,10 +2,14 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import { trackSignUp } from '$lib/analytics';
+	import { getConsent, trackSignUp } from '$lib/analytics';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
+
+	// The page renders bare (no site nav or footer; see the root layout), so it carries
+	// the two things the shell would: the brand, and the legal links with Cookie settings.
+	const consent = getConsent();
 
 	type Placement = 'hero' | 'closing';
 	type Result = {
@@ -181,8 +185,12 @@
 	{/if}
 {/snippet}
 
-<div class="lander">
+<main class="lander">
 	<section class="hero" aria-labelledby="guide-title">
+		<a class="hero__brand" href="/" aria-label="Golf Homes International home">
+			<img src="/design-system/assets/logo-green.svg" alt="" width="140" height="32" />
+		</a>
+
 		<div class="hero__head">
 			<p class="hero__overline">Free buying guide · Dubai &amp; Abu Dhabi</p>
 			<h1 id="guide-title" class="hero__title">How to buy a golf home in the UAE, from anywhere.</h1>
@@ -287,7 +295,18 @@
 			</div>
 		</div>
 	</section>
-</div>
+</main>
+
+<footer class="legal">
+	<p>© {new Date().getFullYear()} Golf Homes International</p>
+	<ul>
+		<li><a href="/privacy">Privacy</a></li>
+		<li><a href="/terms">Terms</a></li>
+		<li>
+			<button type="button" onclick={() => consent.openPreferences()}>Cookie settings</button>
+		</li>
+	</ul>
+</footer>
 
 <style>
 	/* ── Hero: the offer on white, the form on the page's one green band ──
@@ -296,12 +315,33 @@
 	   takes the right half and runs to the viewport edge, like /newsletter. */
 	.hero {
 		display: grid;
-		grid-template-areas: 'head' 'band' 'gets';
+		grid-template-areas: 'brand' 'head' 'band' 'gets';
+	}
+
+	/* The logo in place of the site nav: green on white, the one way back to the site. */
+	.hero__brand {
+		grid-area: brand;
+		justify-self: start;
+		padding: 1.25rem var(--content-padding) 0;
+	}
+
+	/* The artwork carries ~7% side bearing; pull it back so the wordmark's left edge
+	   lines up with the overline and headline below. */
+	.hero__brand img {
+		display: block;
+		width: 7.5rem;
+		height: auto;
+		translate: -7% 0;
+	}
+
+	.hero__brand:focus-visible {
+		outline: 2px solid var(--gold);
+		outline-offset: 4px;
 	}
 
 	.hero__head {
 		grid-area: head;
-		padding: 1.25rem var(--content-padding) var(--space-md);
+		padding: var(--space-md) var(--content-padding);
 	}
 
 	.hero__band {
@@ -333,14 +373,22 @@
 				calc((100vw - var(--content-max)) / 2 + var(--content-padding))
 			);
 			grid-template-columns: 1fr 1fr;
-			grid-template-rows: auto 1fr;
-			grid-template-areas: 'head band' 'gets band';
-			min-height: calc(100svh - var(--nav-height));
+			grid-template-rows: auto 1fr auto;
+			grid-template-areas: 'brand band' 'head band' 'gets band';
+			min-height: 100svh;
+		}
+
+		.hero__brand {
+			padding: var(--space-lg) var(--space-2xl) 0 var(--edge);
+		}
+
+		.hero__brand img {
+			width: 8.75rem;
 		}
 
 		.hero__head {
 			align-self: end;
-			padding: var(--space-xl) var(--space-2xl) 0 var(--edge);
+			padding: var(--space-lg) var(--space-2xl) 0 var(--edge);
 		}
 
 		.hero__gets {
@@ -673,10 +721,10 @@
 	}
 
 	/* ── Closing ask: the page's one tint band, so it reads as its own moment without a
-	   second green band. It runs into the footer, whose edge divides them. ── */
+	   second green band. The legal line below closes the page on white. ── */
 	.closing {
 		margin-top: var(--space-2xl);
-		padding: var(--space-2xl) var(--content-padding);
+		padding-block: var(--space-2xl);
 		background: var(--surface-tint);
 	}
 
@@ -685,6 +733,9 @@
 		gap: var(--space-lg);
 		max-width: var(--content-max);
 		margin: 0 auto;
+		/* Padded inside the max width, like the sections above, so all their left edges
+		   meet the same line. */
+		padding-inline: var(--content-padding);
 	}
 
 	@media (min-width: 48rem) {
@@ -984,6 +1035,49 @@
 
 	.request__done--light .request__again {
 		color: var(--muted);
+	}
+
+	/* ── Legal line: what the site footer would have carried, and nothing else ── */
+	.legal {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--space-xs) var(--space-md);
+		max-width: var(--content-max);
+		margin: 0 auto;
+		padding: var(--space-md) var(--content-padding);
+		font-size: var(--text-small);
+		color: var(--muted);
+	}
+
+	.legal ul {
+		display: flex;
+		gap: var(--space-md);
+		padding: 0;
+		list-style: none;
+	}
+
+	.legal a,
+	.legal button {
+		display: inline-block;
+		padding: 0.25rem 0;
+		border: none;
+		background: none;
+		font: inherit;
+		color: inherit;
+		text-decoration: underline;
+		text-decoration-color: var(--border);
+		text-underline-offset: 0.2em;
+		cursor: pointer;
+	}
+
+	.legal a:hover,
+	.legal a:focus-visible,
+	.legal button:hover,
+	.legal button:focus-visible {
+		color: var(--green);
+		text-decoration-color: var(--gold);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
