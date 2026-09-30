@@ -82,8 +82,8 @@
 			where: 'Steps 2 and 3'
 		},
 		{
-			fact: 'About AED 188,000 on top of the price.',
-			body: 'The guide’s worked example for a AED 3 million resale villa in Dubai. The transfer fee is officially shared with the seller, yet buyers usually pay all of it. Every line is set out, and why off-plan costs less.',
+			fact: 'About AED 188,000 on top of the price.',
+			body: 'The guide’s worked example for a AED 3 million resale villa in Dubai. The transfer fee is officially shared with the seller, yet buyers usually pay all of it. Every line is set out, and why off-plan costs less.',
 			where: 'Costs of buying'
 		},
 		{
@@ -92,7 +92,7 @@
 			where: 'Wills and succession'
 		},
 		{
-			fact: 'AED 2 million can qualify you for residency.',
+			fact: 'AED 2 million can qualify you for residency.',
 			body: 'Owners can apply for long-term Golden Residency, and mortgaged and off-plan homes can count. The guide sets out who qualifies and where to apply.',
 			where: 'A note on residency'
 		}
@@ -228,7 +228,7 @@
 			<h2 class="hero__gets-title">What you’ll get</h2>
 			<ul class="gets">
 				<li><strong>The eight steps</strong> from first viewing to title deed, for resale and off-plan homes.</li>
-				<li><strong>Every buying cost,</strong> with a worked example on a AED 3 million villa.</li>
+				<li><strong>Every buying cost,</strong> with a worked example on a AED&nbsp;3&nbsp;million villa.</li>
 				<li><strong>Mortgage limits</strong> for buyers who live outside the UAE.</li>
 				<li><strong>Tax, wills and residency:</strong> what owning in the UAE involves after you buy.</li>
 			</ul>
@@ -372,14 +372,22 @@
 				var(--content-padding),
 				calc((100vw - var(--content-max)) / 2 + var(--content-padding))
 			);
+			/* The text half's own, tighter gutters. Lining it up with the 1060px column (as
+			   --edge does) left the headline and list ~400px at 1280, which pushed "What
+			   you'll get" below the fold. It is a page of its own now (no nav above it), so
+			   nothing needs it on that line. */
+			--text-edge: clamp(var(--content-padding), 5vw, var(--edge));
+			--text-inner: var(--space-xl);
 			grid-template-columns: 1fr 1fr;
-			grid-template-rows: auto 1fr auto;
-			grid-template-areas: 'brand band' 'head band' 'gets band';
+			/* The logo stays at the top; any spare height splits evenly above and below
+			   the text, so on a tall screen it sits centred rather than sinking. */
+			grid-template-rows: auto 1fr auto auto 1fr;
+			grid-template-areas: 'brand band' '. band' 'head band' 'gets band' '. band';
 			min-height: 100svh;
 		}
 
 		.hero__brand {
-			padding: var(--space-lg) var(--space-2xl) 0 var(--edge);
+			padding: var(--space-lg) var(--text-inner) 0 var(--text-edge);
 		}
 
 		.hero__brand img {
@@ -387,12 +395,11 @@
 		}
 
 		.hero__head {
-			align-self: end;
-			padding: var(--space-lg) var(--space-2xl) 0 var(--edge);
+			padding: var(--space-lg) var(--text-inner) 0 var(--text-edge);
 		}
 
 		.hero__gets {
-			padding: var(--space-lg) var(--space-2xl) var(--space-2xl) var(--edge);
+			padding: var(--space-lg) var(--text-inner) var(--space-xl) var(--text-edge);
 		}
 
 		.hero__band {
@@ -456,7 +463,13 @@
 		/* A step under the display token: at full size the headline ran to four lines and
 		   pushed "What you'll get" below the fold. */
 		.hero__title {
+			max-width: 20ch;
 			font-size: clamp(2.5rem, 3vw + 1rem, 3.5rem);
+		}
+
+		/* Measure widened with the gutters, so the lines actually use the room. */
+		.hero__lead {
+			max-width: 54ch;
 		}
 
 		.hero__lead {
@@ -589,6 +602,12 @@
 		border: solid var(--green);
 		border-width: 0 1.5px 1.5px 0;
 		transform: rotate(45deg);
+	}
+
+	@media (min-width: 56rem) {
+		.gets {
+			max-width: 54ch;
+		}
 	}
 
 	.gets strong {
