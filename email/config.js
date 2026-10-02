@@ -98,7 +98,13 @@ export default {
 		height: '',
 		gap: '',
 		pt: '',
-		pb: ''
+		pb: '',
+		// partner-grid-row, partner-cell, advisory-cta
+		repeat: '',
+		side: '',
+		title: '',
+		label: '',
+		cta: ''
 	},
 
 	/*
