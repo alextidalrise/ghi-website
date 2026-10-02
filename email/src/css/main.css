@@ -195,6 +195,13 @@ p {
 		height: auto !important;
 	}
 
+	/* The gutter cell between two boxed cells becomes a 16px vertical gap once stacked. */
+	.sm-grid-gap {
+		display: block !important;
+		width: 100% !important;
+		height: 16px !important;
+	}
+
 	.sm-button-compact {
 		padding-left: 12px !important;
 		padding-right: 12px !important;
