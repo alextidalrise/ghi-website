@@ -178,6 +178,19 @@ p {
 		width: 100% !important;
 		max-width: 100% !important;
 	}
+
+	/* Boxed card content (partner-cell) keeps even padding once stacked. */
+	.sm-card-inner {
+		padding: 20px !important;
+		box-sizing: border-box !important;
+	}
+
+	/* The gutter cell between two boxed cells becomes a 16px vertical gap once stacked. */
+	.sm-grid-gap {
+		display: block !important;
+		width: 100% !important;
+		height: 16px !important;
+	}
 }
 
 /* -------------------------------------------------------------------------- */
