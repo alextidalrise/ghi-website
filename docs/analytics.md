@@ -155,7 +155,7 @@ renaming a GA4 event never requires a code change here.
 | `ghi_floorplan_request_started` | `floorplan_request_started` | Floorplan CTA opens the form | `PropertyDetail.svelte` |
 | `ghi_contact_clicked` | `contact_click` | WhatsApp, phone or email CTA chosen | `EnquiryRail`, `/contact`, `TalkToUsBand` |
 | `ghi_lead_submitted` | `generate_lead` | **HubSpot accepted a submission** | `EnquiryRail`, `/contact` |
-| `ghi_sign_up` | `sign_up` | **Mailchimp accepted a newsletter sign-up** (`method`: `footer` \| `newsletter_page`) | `Footer`, `/newsletter` |
+| `ghi_sign_up` | `sign_up` | **Mailchimp accepted a newsletter sign-up** (`method`: `footer` \| `newsletter_page` \| `uae_guide`) | `Footer`, `/newsletter`, `/uae-buying-guide` |
 | `ghi_currency_select` | `currency_select` | Visitor changes their display currency (a real change, not a re-pick) | `SiteNav` (the bar's currency picker) |
 
 ### Parameters
@@ -165,7 +165,7 @@ renaming a GA4 event never requires a code change here.
 
 `page_type` is one of: `home`, `country`, `location`, `community`, `listing`, `unit`,
 `golf_course`, `collection`, `guide_index`, `guide`, `insight_index`, `insight`, `about`,
-`contact`, `partners`, `legal`, `newsletter`, `not_found`. (`holding` and `internal` are mapped but never
+`contact`, `partners`, `legal`, `newsletter`, `lead_magnet`, `not_found`. (`holding` and `internal` are mapped but never
 emitted — those routes are gated off before any event fires.)
 
 `listing` covers property, development and catch-all detail pages alike; `listing_kind`
@@ -417,7 +417,7 @@ browser can confirm — run them in GTM Preview on a preview deployment via `?gh
 - [ ] Client-side validation failure: no event
 - [ ] Break `HUBSPOT_ENQUIRY_FORM_GUID` to force a 502: **no event**
 - [ ] Floorplan request reports `lead_type: floorplan_request`
-- [ ] Newsletter sign-up (footer and `/newsletter`): exactly one `sign_up` with the right `method`, only after the server answers `ok`
+- [ ] Newsletter sign-up (footer, `/newsletter` and `/uae-buying-guide`): exactly one `sign_up` with the right `method`, only after the server answers `ok`
 - [ ] Buyer-guide submissions report **nothing**
 
 **Privacy**

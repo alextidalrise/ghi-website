@@ -14,6 +14,9 @@
 
 	let { children, data } = $props();
 
+	const BARE_ROUTES = new Set(['/soon', '/uae-buying-guide']);
+
+
 	// Both come from the server: the gate was resolved in analyticsHandle, and the consent
 	// cookie was read there too, so the first client render already agrees with the markup
 	// and the consent UI can render without a flash. Read untracked and once — the root
@@ -58,9 +61,10 @@
 
 	const studioUrl = publicEnv.PUBLIC_SANITY_STUDIO_URL ?? 'http://localhost:3333/development';
 
-	// The pre-launch holding page is a full-screen takeover: it opts out of the
-	// SiteNav + Footer shell (and its padding) so nothing else shows while unlaunched.
-	const bare = $derived(page.route.id === '/soon');
+	// Pages that opt out of the SiteNav + Footer shell (and its padding). The pre-launch
+	// holding page is a full-screen takeover; the lead-magnet lander drops the chrome so
+	// the only thing to do is ask for the guide. Both render their own <main>.
+	const bare = $derived(BARE_ROUTES.has(page.route.id ?? ''));
 
 	onMount(() => {
 		// After the first client render, so the banner's absence still matches the server's
@@ -118,7 +122,7 @@
      focus trap holding them there. Rendered outside the `bare` branch too — a cookie
      notice is a legal control, not part of the site shell, so the holding page gets it
      as well. -->
-<ConsentUi />
+<ConsentUi placement={page.route.id === '/uae-buying-guide' ? 'top' : 'corner'} />
 
 {#if bare}
 	{@render children()}
@@ -129,7 +133,11 @@
 		{@render children()}
 	</main>
 
-	<Footer footer={data.footer} nav={data.headerNav} showSignup={page.route.id !== '/newsletter'} />
+	<Footer
+		footer={data.footer}
+		nav={data.headerNav}
+		showSignup={page.route.id !== '/newsletter'}
+	/>
 {/if}
 
 <style>

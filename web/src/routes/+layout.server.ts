@@ -57,9 +57,9 @@ export const load: LayoutServerLoad = async ({
 	   no-store. */
 	const analyticsState = { mode: analytics?.mode ?? 'off' };
 
-	// The holding route renders bare (no nav/footer), so it needs no taxonomy — and
-	// skipping the Sanity call keeps it standing even if the dataset is empty/unreachable.
-	if (route.id === '/soon') {
+	// Bare routes render no nav/footer, so they need no taxonomy — and skipping the Sanity
+	// call keeps the holding page standing even if the dataset is empty/unreachable.
+	if (route.id === '/soon' || route.id === '/uae-buying-guide') {
 		return { preview, footer: null, headerNav: null, analytics: analyticsState };
 	}
 
