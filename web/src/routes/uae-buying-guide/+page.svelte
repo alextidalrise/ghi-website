@@ -64,7 +64,7 @@
 		'Make an offer and sign Form F',
 		'Inspect and complete your checks',
 		'Buying off-plan',
-		'Complete at the trustee office'
+		'Complete at the trustee office, or from abroad'
 	];
 
 	const TOPICS = [
@@ -76,6 +76,12 @@
 	];
 
 	const PREVIEWS = [
+		{
+			// First and full width: it is the guide's answer to the headline's "from anywhere".
+			fact: 'You don’t have to fly out to complete.',
+			body: 'Many buyers sign a power of attorney and complete from home. The guide explains who to appoint (usually not your lawyer) and what a document signed abroad needs first.',
+			where: 'Buying without travelling'
+		},
 		{
 			fact: 'A passport is enough to buy.',
 			body: 'No residence visa, no Emirates ID, no local tax number. The banks will still ask for one thing, and it is worth having ready before you make an offer.',
@@ -267,7 +273,7 @@
 	<section class="preview" aria-labelledby="preview-title">
 		<div class="preview__intro">
 			<p class="overline">A preview</p>
-			<h2 id="preview-title" class="section-title">Four things the guide will tell you.</h2>
+			<h2 id="preview-title" class="section-title">Five things the guide will tell you.</h2>
 		</div>
 
 		<div class="preview__grid">
@@ -712,6 +718,18 @@
 	.preview__item {
 		padding-top: var(--space-md);
 		border-top: 1px solid var(--gold);
+	}
+
+	/* An odd count would orphan the last card, so the first spans the row instead and
+	   the rest pair up beneath it. */
+	@media (min-width: 48rem) {
+		.preview__item:first-child:nth-last-child(odd) {
+			grid-column: 1 / -1;
+		}
+
+		.preview__item:first-child:nth-last-child(odd) .preview__body {
+			max-width: 60ch;
+		}
 	}
 
 	.preview__fact {

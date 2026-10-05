@@ -34,10 +34,15 @@ below).
    for legal review, and it is deliberately not published. The page repeats some of the
    guide's claims, and those need the same review: a passport is enough to buy, about AED
    188,000 of costs on a AED 3m villa, the transfer fee usually paid in full by the buyer,
-   property frozen without a UAE will, AED 2m for Golden Residency, and the partner named as
-   Stevenson Bernard Law Associates. They live in `PREVIEWS` and the hero copy in
+   property frozen without a UAE will, AED 2m for Golden Residency, completing from home
+   by power of attorney (usually not appointing your lawyer, and a document signed abroad
+   needing more steps first), and the partner named as Stevenson Bernard Law Associates. They live in `PREVIEWS` and the hero copy in
    `web/src/routes/uae-buying-guide/+page.svelte`. If the final PDF changes page count,
    update `GUIDE_PAGES` there.
+   The guide went back with legal changes on 2026-10-05 (`docs/GHI-UAE-Buying-Guide-DRAFT-PoA-update.pdf`):
+   Step 8's one-line power-of-attorney note became the "Buying without travelling to the UAE"
+   section. Before export, remove the draft marks: "Editorial review draft. Not yet
+   published." on the cover and "EDITORIAL DRAFT • NOT PUBLISHED" in every page footer.
 2. **Publish the final PDF** at `web/static/downloads/ghi-uae-buying-guide.pdf`, which is
    served as `https://www.golfhomesinternational.com/downloads/ghi-uae-buying-guide.pdf`.
    `vercel.json` sends `X-Robots-Tag: noindex` for `/downloads/*`, so search engines never
