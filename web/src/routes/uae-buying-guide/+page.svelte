@@ -54,7 +54,7 @@
 		};
 
 	/** The guide as written. Keep in step with the PDF: the page promises what it contains. */
-	const GUIDE_PAGES = 6;
+	const GUIDE_PAGES = 7;
 
 	const STEPS = [
 		'Choose your location',
@@ -62,15 +62,16 @@
 		'Arrange your funds',
 		'Appoint an independent lawyer',
 		'Make an offer and sign Form F',
-		'Inspect and complete your checks',
+		'Inspect, including golf-specific checks',
 		'Buying off-plan',
-		'Complete at the trustee office, or from abroad'
+		'Complete at the trustee office, or through a representative'
 	];
 
 	const TOPICS = [
 		{ title: 'Costs of buying', note: 'Every fee in Dubai, and how Abu Dhabi differs' },
 		{ title: 'Mortgages', note: 'What UAE banks lend to international buyers' },
 		{ title: 'Tax as an owner', note: 'VAT, service charges and the housing fee' },
+		{ title: 'Renting out your home', note: 'Holiday-home permits and long-term tenancies' },
 		{ title: 'Wills and succession', note: 'The step international buyers most often miss' },
 		{ title: 'Residency', note: 'How a property can qualify you for a visa' }
 	];
@@ -79,7 +80,7 @@
 		{
 			// First and full width: it is the guide's answer to the headline's "from anywhere".
 			fact: 'You don’t have to fly out to complete.',
-			body: 'Many buyers sign a power of attorney and complete from home. The guide explains who to appoint (usually not your lawyer) and what a document signed abroad needs first.',
+			body: 'Someone does need to be at the trustee office, acting for you under a power of attorney. The guide explains who to appoint (usually not your lawyer), the wording the Land Department expects, and what a document signed abroad needs first.',
 			where: 'Buying without travelling'
 		},
 		{
@@ -99,7 +100,7 @@
 		},
 		{
 			fact: 'AED 2 million can qualify you for residency.',
-			body: 'Owners can apply for long-term Golden Residency, and mortgaged and off-plan homes can count. The guide sets out who qualifies and where to apply.',
+			body: 'Owners can apply for long-term Golden Residency, and mortgaged and off-plan homes can count. The guide sets out who qualifies, why the property should be in your own name, and where to apply.',
 			where: 'A note on residency'
 		}
 	];
@@ -293,7 +294,7 @@
 				<h2 id="closing-title" class="section-title">Get the UAE buying guide.</h2>
 				<p>
 					Free, {GUIDE_PAGES} pages, and in your inbox within minutes. It ends with an
-					introduction to our UAE legal partner, Stevenson Bernard Law Associates, if you want one.
+					offer to introduce you to our UAE legal partner, if you want one.
 				</p>
 			</div>
 			<div class="closing__form">

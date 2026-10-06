@@ -30,23 +30,23 @@ below).
 
 ## Before launch
 
-1. **Legal sign-off, for the guide and for the page.** The PDF in `docs/` is the draft
-   for legal review, and it is deliberately not published. The page repeats some of the
-   guide's claims, and those need the same review: a passport is enough to buy, about AED
-   188,000 of costs on a AED 3m villa, the transfer fee usually paid in full by the buyer,
-   property frozen without a UAE will, AED 2m for Golden Residency, completing from home
-   by power of attorney (usually not appointing your lawyer, and a document signed abroad
-   needing more steps first), and the partner named as Stevenson Bernard Law Associates. They live in `PREVIEWS` and the hero copy in
-   `web/src/routes/uae-buying-guide/+page.svelte`. If the final PDF changes page count,
-   update `GUIDE_PAGES` there.
-   The guide went back with legal changes on 2026-10-05 (`docs/GHI-UAE-Buying-Guide-DRAFT-PoA-update.pdf`):
-   Step 8's one-line power-of-attorney note became the "Buying without travelling to the UAE"
-   section. Before export, remove the draft marks: "Editorial review draft. Not yet
-   published." on the cover and "EDITORIAL DRAFT • NOT PUBLISHED" in every page footer.
-2. **Publish the final PDF** at `web/static/downloads/ghi-uae-buying-guide.pdf`, which is
-   served as `https://www.golfhomesinternational.com/downloads/ghi-uae-buying-guide.pdf`.
+1. **Legal sign-off, for the guide and for the page.** Done for the guide: the final,
+   approved PDF arrived on 2026-10-06 (7 pages, issued October 2026, no draft marks). The
+   page repeats some of the guide's claims, so its copy needs the same review: a passport is
+   enough to buy, about AED 188,000 of costs on a AED 3m villa, the transfer fee usually paid
+   in full by the buyer, property frozen without a UAE will, AED 2m for Golden Residency (in
+   your own name), and not having to fly out to complete (someone attends under a power of
+   attorney, usually not your lawyer, and a document signed abroad needs more steps first).
+   They live in `PREVIEWS` and the hero copy in `web/src/routes/uae-buying-guide/+page.svelte`.
+   If the PDF changes page count, update `GUIDE_PAGES` there.
+   **The legal partner is no longer named.** The final guide says "an established UAE-based
+   law firm" instead of naming Stevenson Bernard Law Associates. The page and the delivery
+   email follow it, so don't name the firm in copy without checking with legal first.
+2. **Publish the final PDF.** Done: it's at `web/static/downloads/ghi-uae-buying-guide.pdf`,
+   which is served as `https://www.golfhomesinternational.com/downloads/ghi-uae-buying-guide.pdf`.
    `vercel.json` sends `X-Robots-Tag: noindex` for `/downloads/*`, so search engines never
-   give the PDF away without the sign-up. Never publish the `DRAFT-for-legal-review` file.
+   give the PDF away without the sign-up. To publish a revised guide, replace that file;
+   the URL stays the same, so the email never needs to change. Never publish a draft.
 3. **Build the journey in Mailchimp** (Automations → Customer Journeys → Build from
    scratch):
    - First create the tag `Guide: UAE buying guide` under Audience → Tags, spelled
